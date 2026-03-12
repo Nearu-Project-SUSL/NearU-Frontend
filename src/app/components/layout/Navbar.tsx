@@ -1,6 +1,6 @@
 import { Bell, User, Menu } from 'lucide-react';
 import { Link } from 'react-router';
-import { useSidebar } from '../context/SidebarContext';
+import { useSidebar } from '../../context/SidebarContext';
 
 export default function Navbar() {
   const { toggleSidebar } = useSidebar();

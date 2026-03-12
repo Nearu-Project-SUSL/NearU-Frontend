@@ -1,5 +1,5 @@
 import { ReactNode } from 'react';
-import { useSidebar } from '../context/SidebarContext';
+import { useSidebar } from '../../context/SidebarContext';
 
 interface PageLayoutProps {
   children: ReactNode;
