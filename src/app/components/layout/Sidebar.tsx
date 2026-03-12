@@ -1,6 +1,6 @@
 import { Home, UtensilsCrossed, Bike, Bus, Briefcase, Building2, Gift, Tag, Settings, X, GraduationCap, User } from 'lucide-react';
 import { Link, useNavigate } from 'react-router';
-import { useSidebar } from '../context/SidebarContext';
+import { useSidebar } from '../../context/SidebarContext';
 
 interface SidebarProps {
   activeSection?: string;

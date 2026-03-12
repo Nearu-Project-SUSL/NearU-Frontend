@@ -1,48 +1,28 @@
 import { createBrowserRouter } from "react-router";
-import Home from "./pages/Home";
-import Register from "./pages/Register";
-import Login from "./pages/Login";
-import LandingPage from "./pages/LandingPage";
-import LoadingScreen from "./pages/LoadingScreen";
-import LocationPermission from "./pages/LocationPermission";
-import Transport from "./pages/Transport";
-import TransportSelection from "./pages/TransportSelection";
-import TukRiders from "./pages/TukRiders";
-import Rides from "./pages/Rides";
-import Food from "./pages/Food";
-import FoodVendor from "./pages/FoodVendor";
-import Gifts from "./pages/Gifts";
-import GiftShop from "./pages/GiftShop";
-import Accommodation from "./pages/Accommodation";
-import AccommodationDetail from "./pages/AccommodationDetail";
-import Jobs from "./pages/Jobs";
-import JobDetail from "./pages/JobDetail";
-import Deals from "./pages/Deals";
-import Profile from "./pages/Profile";
-import Favorites from "./pages/Favorites";
-import ResetPassword from "./pages/ResetPassword";
-import ForgotPassword from "./pages/ForgotPassword";
-import RiderHome from "./pages/RiderHome";
-import RiderProfile from "./pages/RiderProfile";
-import BusinessOwnerHome from "./pages/BusinessOwnerHome";
-import AdminHome from "./pages/AdminHome";
+
+// Public Pages
+import LoadingScreen from "./pages/public/LoadingScreen";
+import Login from "./pages/public/Login";
+import Register from "./pages/public/Register";
+import ForgotPassword from "./pages/public/ForgotPassword";
+import ResetPassword from "./pages/public/ResetPassword";
+
+// Protected Pages
+import Home from "./pages/protected/Home";
+import Profile from "./pages/protected/Profile";
+import AdminHome from "./pages/protected/AdminHome";
+import BusinessOwnerHome from "./pages/protected/BusinessOwnerHome";
+import RiderHome from "./pages/protected/RiderHome";
+import RiderProfile from "./pages/protected/RiderProfile";
+
+import ProtectedRoute from "./routing/ProtectedRoute";
+import Unauthorized from "./pages/public/Unauthorized";
 
 export const router = createBrowserRouter([
+  // Public Routes - Accessible to anyone
   {
     path: "/",
     Component: LoadingScreen,
-  },
-  {
-    path: "/location-permission",
-    Component: LocationPermission,
-  },
-  {
-    path: "/landing",
-    Component: LandingPage,
-  },
-  {
-    path: "/home",
-    Component: Home,
   },
   {
     path: "/register",
@@ -53,78 +33,6 @@ export const router = createBrowserRouter([
     Component: Login,
   },
   {
-    path: "/transport",
-    Component: TransportSelection,
-  },
-  {
-    path: "/transport/tuk",
-    Component: TukRiders,
-  },
-  {
-    path: "/transport/all",
-    Component: Transport,
-  },
-  {
-    path: "/transport/bus",
-    Component: Transport,
-  },
-  {
-    path: "/transport/train",
-    Component: Transport,
-  },
-  {
-    path: "/transport/bike",
-    Component: Rides,
-  },
-  {
-    path: "/rides",
-    Component: Rides,
-  },
-  {
-    path: "/food",
-    Component: Food,
-  },
-  {
-    path: "/food/:vendorId",
-    Component: FoodVendor,
-  },
-  {
-    path: "/gifts",
-    Component: Gifts,
-  },
-  {
-    path: "/gifts/:shopId",
-    Component: GiftShop,
-  },
-  {
-    path: "/accommodation",
-    Component: Accommodation,
-  },
-  {
-    path: "/accommodation/:id",
-    Component: AccommodationDetail,
-  },
-  {
-    path: "/jobs",
-    Component: Jobs,
-  },
-  {
-    path: "/jobs/:id",
-    Component: JobDetail,
-  },
-  {
-    path: "/deals",
-    Component: Deals,
-  },
-  {
-    path: "/profile",
-    Component: Profile,
-  },
-  {
-    path: "/favorites",
-    Component: Favorites,
-  },
-  {
     path: "/reset-password",
     Component: ResetPassword,
   },
@@ -133,19 +41,59 @@ export const router = createBrowserRouter([
     Component: ForgotPassword,
   },
   {
-    path: "/rider-home",
-    Component: RiderHome,
+    path: "/unauthorized",
+    Component: Unauthorized,
   },
+
+  // Protected Routes - Requires Authentication (Any Role)
   {
-    path: "/rider-profile",
-    Component: RiderProfile,
+    element: <ProtectedRoute />,
+    children: [
+      {
+        path: "/home",
+        Component: Home,
+      },
+      {
+        path: "/profile",
+        Component: Profile,
+      },
+    ]
   },
+
+  // Protected Routes - Requires Admin Role
   {
-    path: "/business-owner-home",
-    Component: BusinessOwnerHome,
+    element: <ProtectedRoute allowedRoles={["Admin", "SuperAdmin"]} />,
+    children: [
+      {
+        path: "/admin-home",
+        Component: AdminHome,
+      },
+    ]
   },
+
+  // Protected Routes - Requires BusinessOwner Role
   {
-    path: "/admin-home",
-    Component: AdminHome,
+    element: <ProtectedRoute allowedRoles={["BusinessOwner"]} />,
+    children: [
+      {
+        path: "/business-owner-home",
+        Component: BusinessOwnerHome,
+      },
+    ]
   },
+
+  // Protected Routes - Requires Rider Role
+  {
+    element: <ProtectedRoute allowedRoles={["Rider"]} />,
+    children: [
+      {
+        path: "/rider-home",
+        Component: RiderHome,
+      },
+      {
+        path: "/rider-profile",
+        Component: RiderProfile,
+      },
+    ]
+  }
 ]);
