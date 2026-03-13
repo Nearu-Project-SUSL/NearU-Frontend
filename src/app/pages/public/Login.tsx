@@ -1,11 +1,66 @@
-import { Link } from 'react-router';
-import { Eye, EyeOff, GraduationCap, Bike, Store, Mail, Lock } from 'lucide-react';
+import { Link, useNavigate } from 'react-router';
+import { Eye, EyeOff, GraduationCap, Bike, Store, Mail, Lock, Loader2 } from 'lucide-react';
 import { useState } from 'react';
+import { toast } from 'sonner';
+import authService from '../../../api/authService';
+import useAuth from '../../hooks/useAuth';
+import { validateEmail, validateRequired } from '../../utils/validation';
 
 export default function Login() {
+  const navigate = useNavigate();
+  const { setAuth } = useAuth();
   const [showPassword, setShowPassword] = useState(false);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
+  const [errors, setErrors] = useState({ email: '', password: '' });
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    
+    const emailError = validateEmail(email);
+    const passwordError = validateRequired(password, 'Password');
+    
+    if (emailError || passwordError) {
+      setErrors({ email: emailError, password: passwordError });
+      return;
+    }
+
+    setIsLoading(true);
+    setErrors({ email: '', password: '' });
+
+    try {
+      const response = await authService.login({ email, password });
+      setAuth({
+        user: response.user,
+        accessToken: response.accessToken,
+      });
+      
+      localStorage.setItem('accessToken', response.accessToken);
+      
+      toast.success('Login successful!');
+      
+      const userRole = response.user.roles[0];
+      if (userRole === 'Admin') {
+        navigate('/admin');
+      } else if (userRole === 'BusinessOwner') {
+        navigate('/business');
+      } else if (userRole === 'Rider') {
+        navigate('/rider');
+      } else {
+        navigate('/home');
+      }
+    } catch (error: any) {
+      const errorMessage = error.response?.data?.message || 'Login failed. Please check your credentials.';
+      toast.error(errorMessage);
+      setErrors({ 
+        email: '', 
+        password: error.response?.status === 401 ? 'Invalid email or password' : '' 
+      });
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   return (
     <div className="min-h-screen w-full relative overflow-hidden bg-gradient-to-br from-gray-900 via-black to-gray-900">
@@ -92,7 +147,7 @@ export default function Login() {
               </div>
 
               {/* Form */}
-              <form className="space-y-6">
+              <form onSubmit={handleSubmit} className="space-y-6">
                 {/* Email */}
                 <div className="animate-slideUp" style={{ animationDelay: '0.1s' }}>
                   <label className="text-gray-300 text-sm block mb-2">Enter your Email</label>
@@ -100,12 +155,21 @@ export default function Login() {
                     <Mail className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
                     <input
                       type="email"
-                      placeholder="Studentatuniversity@sab.lk"
+                      placeholder="student@sab.lk"
                       value={email}
-                      onChange={(e) => setEmail(e.target.value)}
-                      className="w-full bg-black/40 border-2 border-yellow-400/20 focus:border-yellow-400/60 rounded-xl px-12 py-3.5 text-white placeholder:text-gray-500 focus:outline-none transition-all duration-300"
+                      onChange={(e) => {
+                        setEmail(e.target.value);
+                        setErrors({ ...errors, email: '' });
+                      }}
+                      disabled={isLoading}
+                      className={`w-full bg-black/40 border-2 ${
+                        errors.email ? 'border-red-500' : 'border-yellow-400/20'
+                      } focus:border-yellow-400/60 rounded-xl px-12 py-3.5 text-white placeholder:text-gray-500 focus:outline-none transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed`}
                     />
                   </div>
+                  {errors.email && (
+                    <p className="text-red-400 text-xs mt-1">{errors.email}</p>
+                  )}
                 </div>
 
                 {/* Password */}
@@ -117,17 +181,27 @@ export default function Login() {
                       type={showPassword ? 'text' : 'password'}
                       placeholder="Enter your password"
                       value={password}
-                      onChange={(e) => setPassword(e.target.value)}
-                      className="w-full bg-black/40 border-2 border-yellow-400/20 focus:border-yellow-400/60 rounded-xl px-12 py-3.5 text-white placeholder:text-gray-500 focus:outline-none transition-all duration-300"
+                      onChange={(e) => {
+                        setPassword(e.target.value);
+                        setErrors({ ...errors, password: '' });
+                      }}
+                      disabled={isLoading}
+                      className={`w-full bg-black/40 border-2 ${
+                        errors.password ? 'border-red-500' : 'border-yellow-400/20'
+                      } focus:border-yellow-400/60 rounded-xl px-12 py-3.5 text-white placeholder:text-gray-500 focus:outline-none transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed`}
                     />
                     <button
                       type="button"
                       onClick={() => setShowPassword(!showPassword)}
-                      className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 hover:text-yellow-400 transition-colors"
+                      disabled={isLoading}
+                      className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 hover:text-yellow-400 transition-colors disabled:opacity-50"
                     >
                       {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
                     </button>
                   </div>
+                  {errors.password && (
+                    <p className="text-red-400 text-xs mt-1">{errors.password}</p>
+                  )}
                   <div className="flex justify-end mt-2">
                     <Link to="/forgot-password" className="text-gray-400 hover:text-yellow-400 text-sm transition-colors">
                       Forgot Password?
@@ -138,10 +212,18 @@ export default function Login() {
                 {/* Login Button */}
                 <button
                   type="submit"
-                  className="w-full bg-gradient-to-r from-yellow-400 to-yellow-600 hover:from-yellow-500 hover:to-yellow-700 text-black py-4 rounded-xl transition-all shadow-lg shadow-yellow-500/30 hover:shadow-yellow-500/50 border-2 border-black/20 hover:scale-105 duration-300 animate-slideUp"
+                  disabled={isLoading}
+                  className="w-full bg-gradient-to-r from-yellow-400 to-yellow-600 hover:from-yellow-500 hover:to-yellow-700 text-black font-semibold py-4 rounded-xl transition-all shadow-lg shadow-yellow-500/30 hover:shadow-yellow-500/50 border-2 border-black/20 hover:scale-105 duration-300 animate-slideUp disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100 flex items-center justify-center gap-2"
                   style={{ animationDelay: '0.3s' }}
                 >
-                  Login
+                  {isLoading ? (
+                    <>
+                      <Loader2 className="w-5 h-5 animate-spin" />
+                      Logging in...
+                    </>
+                  ) : (
+                    'Login'
+                  )}
                 </button>
 
                 {/* Divider */}
@@ -150,7 +232,7 @@ export default function Login() {
                     <div className="w-full border-t border-yellow-400/20"></div>
                   </div>
                   <div className="relative flex justify-center text-xs">
-                    <span className="bg-black/50 px-4 text-gray-400">OR COUNTINUE WITH</span>
+                    <span className="bg-black/50 px-4 text-gray-400">OR CONTINUE WITH</span>
                   </div>
                 </div>
 
@@ -158,7 +240,9 @@ export default function Login() {
                 <div className="grid grid-cols-2 gap-4 animate-slideUp" style={{ animationDelay: '0.5s' }}>
                   <button
                     type="button"
-                    className="bg-black/40 hover:bg-black/60 border-2 border-yellow-400/20 hover:border-yellow-400/40 text-white py-3 rounded-xl flex items-center justify-center gap-2 transition-all hover:scale-105 duration-300"
+                    disabled={isLoading}
+                    onClick={() => toast.info('Google login coming soon!')}
+                    className="bg-black/40 hover:bg-black/60 border-2 border-yellow-400/20 hover:border-yellow-400/40 text-white py-3 rounded-xl flex items-center justify-center gap-2 transition-all hover:scale-105 duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
                   >
                     <svg className="w-5 h-5" viewBox="0 0 24 24">
                       <path
@@ -183,7 +267,9 @@ export default function Login() {
 
                   <button
                     type="button"
-                    className="bg-black/40 hover:bg-black/60 border-2 border-yellow-400/20 hover:border-yellow-400/40 text-white py-3 rounded-xl flex items-center justify-center gap-2 transition-all hover:scale-105 duration-300"
+                    disabled={isLoading}
+                    onClick={() => toast.info('Guest login coming soon!')}
+                    className="bg-black/40 hover:bg-black/60 border-2 border-yellow-400/20 hover:border-yellow-400/40 text-white py-3 rounded-xl flex items-center justify-center gap-2 transition-all hover:scale-105 duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
                   >
                     <GraduationCap className="w-5 h-5" />
                     <span className="text-sm">Guest</span>
