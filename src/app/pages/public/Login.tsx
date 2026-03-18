@@ -1,10 +1,34 @@
 import { Link, useNavigate } from 'react-router';
-import { Eye, EyeOff, GraduationCap, Bike, Store, Mail, Lock, Loader2 } from 'lucide-react';
 import { useState } from 'react';
 import { toast } from 'sonner';
 import authService from '../../../api/authService';
 import useAuth from '../../hooks/useAuth';
 import { validateEmail, validateRequired } from '../../utils/validation';
+
+// MUI Components
+import { 
+  TextField, 
+  Button, 
+  IconButton, 
+  InputAdornment, 
+  CircularProgress,
+  Box,
+  Typography,
+  Divider
+} from '@mui/material';
+
+// MUI Icons
+import {
+  Email as MailIcon,
+  Lock as LockIcon,
+  Visibility as EyeIcon,
+  VisibilityOff as EyeOffIcon,
+  School as GraduationCapIcon,
+  DirectionsBike as BikeIcon,
+  Store as StoreIcon,
+  Google as GoogleIcon,
+  Person as GuestIcon
+} from '@mui/icons-material';
 
 export default function Login() {
   const navigate = useNavigate();
@@ -42,11 +66,11 @@ export default function Login() {
       
       const userRole = response.user.roles[0];
       if (userRole === 'Admin') {
-        navigate('/admin');
+        navigate('/admin-home');
       } else if (userRole === 'BusinessOwner') {
-        navigate('/business');
+        navigate('/business-owner-home');
       } else if (userRole === 'Rider') {
-        navigate('/rider');
+        navigate('/rider-home');
       } else {
         navigate('/home');
       }
@@ -81,12 +105,25 @@ export default function Login() {
         </Link>
         <div className="flex items-center gap-4">
           <span className="text-gray-400 text-sm">New to NearU?</span>
-          <Link 
-            to="/register" 
-            className="px-6 py-2.5 bg-yellow-400/10 hover:bg-yellow-400/20 text-yellow-400 rounded-xl border border-yellow-400/20 hover:border-yellow-400/40 transition-all backdrop-blur-sm hover:scale-105 duration-300"
+          <Button 
+            component={Link}
+            to="/register"
+            variant="outlined"
+            sx={{
+              color: '#facc15',
+              borderColor: 'rgba(250, 204, 21, 0.2)',
+              borderRadius: '0.75rem',
+              px: 3,
+              '&:hover': {
+                borderColor: '#facc15',
+                bgcolor: 'rgba(250, 204, 21, 0.1)',
+                transform: 'scale(1.05)',
+              },
+              transition: 'all 0.3s',
+            }}
           >
             Sign Up
-          </Link>
+          </Button>
         </div>
       </nav>
 
@@ -105,21 +142,21 @@ export default function Login() {
                 <div className="relative w-64 h-64 bg-gradient-to-br from-gray-800 to-black rounded-3xl border-2 border-yellow-400/30 shadow-2xl shadow-yellow-400/20 p-8">
                   {/* Center circle */}
                   <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-20 h-20 bg-gradient-to-br from-yellow-400 to-yellow-600 rounded-full flex items-center justify-center shadow-lg animate-pulse">
-                    <GraduationCap className="w-10 h-10 text-black" />
+                    <GraduationCapIcon sx={{ fontSize: 40, color: 'black' }} />
                   </div>
 
                   {/* Orbiting icons */}
                   <div className="absolute top-8 left-1/2 -translate-x-1/2 w-12 h-12 bg-yellow-400/20 rounded-full flex items-center justify-center border border-yellow-400/40 animate-float">
-                    <Store className="w-6 h-6 text-yellow-400" />
+                    <StoreIcon sx={{ fontSize: 24, color: '#facc15' }} />
                   </div>
                   <div className="absolute bottom-8 left-1/2 -translate-x-1/2 w-12 h-12 bg-yellow-400/20 rounded-full flex items-center justify-center border border-yellow-400/40 animate-float" style={{ animationDelay: '1s' }}>
-                    <Bike className="w-6 h-6 text-yellow-400" />
+                    <BikeIcon sx={{ fontSize: 24, color: '#facc15' }} />
                   </div>
                   <div className="absolute left-8 top-1/2 -translate-y-1/2 w-12 h-12 bg-yellow-400/20 rounded-full flex items-center justify-center border border-yellow-400/40 animate-float" style={{ animationDelay: '2s' }}>
-                    <Mail className="w-6 h-6 text-yellow-400" />
+                    <MailIcon sx={{ fontSize: 24, color: '#facc15' }} />
                   </div>
                   <div className="absolute right-8 top-1/2 -translate-y-1/2 w-12 h-12 bg-yellow-400/20 rounded-full flex items-center justify-center border border-yellow-400/40 animate-float" style={{ animationDelay: '3s' }}>
-                    <Lock className="w-6 h-6 text-yellow-400" />
+                    <LockIcon sx={{ fontSize: 24, color: '#facc15' }} />
                   </div>
                 </div>
               </div>
@@ -127,13 +164,13 @@ export default function Login() {
 
             {/* Text */}
             <div className="text-center space-y-4 max-w-md">
-              <h2 className="text-4xl text-white">
+              <Typography variant="h3" sx={{ color: 'white', fontWeight: 'bold' }}>
                 Connecting Your Campus<br />
                 <span className="text-yellow-400">One Click Away.</span>
-              </h2>
-              <p className="text-gray-400 text-lg leading-relaxed">
+              </Typography>
+              <Typography variant="body1" sx={{ color: 'gray', fontSize: '1.125rem' }}>
                 Discover local businesses, uni riders, and part-time jobs tailored for university students. Join the NearU community today.
-              </p>
+              </Typography>
             </div>
           </div>
 
@@ -142,144 +179,183 @@ export default function Login() {
             <div className="bg-gradient-to-br from-yellow-400/5 to-black/50 backdrop-blur-xl rounded-3xl border-2 border-yellow-400/20 p-8 lg:p-10 shadow-2xl shadow-yellow-400/10 hover:border-yellow-400/30 transition-all duration-500">
               {/* Header */}
               <div className="text-center mb-8">
-                <h2 className="text-3xl lg:text-4xl text-white mb-2">Welcome Back</h2>
-                <p className="text-gray-400">Please Enter your Details to Sign in.</p>
+                <Typography variant="h4" sx={{ color: 'white', mb: 1 }}>Welcome Back</Typography>
+                <Typography variant="body2" sx={{ color: 'gray' }}>Please Enter your Details to Sign in.</Typography>
               </div>
 
               {/* Form */}
               <form onSubmit={handleSubmit} className="space-y-6">
                 {/* Email */}
                 <div className="animate-slideUp" style={{ animationDelay: '0.1s' }}>
-                  <label className="text-gray-300 text-sm block mb-2">Enter your Email</label>
-                  <div className="relative">
-                    <Mail className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
-                    <input
-                      type="email"
-                      placeholder="student@sab.lk"
-                      value={email}
-                      onChange={(e) => {
-                        setEmail(e.target.value);
-                        setErrors({ ...errors, email: '' });
-                      }}
-                      disabled={isLoading}
-                      className={`w-full bg-black/40 border-2 ${
-                        errors.email ? 'border-red-500' : 'border-yellow-400/20'
-                      } focus:border-yellow-400/60 rounded-xl px-12 py-3.5 text-white placeholder:text-gray-500 focus:outline-none transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed`}
-                    />
-                  </div>
-                  {errors.email && (
-                    <p className="text-red-400 text-xs mt-1">{errors.email}</p>
-                  )}
+                  <Typography variant="body2" sx={{ color: '#d1d5db', mb: 1 }}>Enter your Email</Typography>
+                  <TextField
+                    fullWidth
+                    placeholder="student@sab.lk"
+                    variant="outlined"
+                    value={email}
+                    onChange={(e) => {
+                      setEmail(e.target.value);
+                      setErrors({ ...errors, email: '' });
+                    }}
+                    error={!!errors.email}
+                    helperText={errors.email}
+                    disabled={isLoading}
+                    slotProps={{
+                      input: {
+                        startAdornment: (
+                          <InputAdornment position="start">
+                            <MailIcon sx={{ color: 'gray' }} />
+                          </InputAdornment>
+                        ),
+                      }
+                    }}
+                    sx={{
+                      '& .MuiOutlinedInput-root': {
+                        bgcolor: 'rgba(0,0,0,0.4)',
+                        '& fieldset': { borderColor: 'rgba(250, 204, 21, 0.2)' },
+                        '&:hover fieldset': { borderColor: 'rgba(250, 204, 21, 0.6)' },
+                        '&.Mui-focused fieldset': { borderColor: 'rgba(250, 204, 21, 0.6)' },
+                      },
+                      input: { color: 'white' },
+                    }}
+                  />
                 </div>
 
                 {/* Password */}
                 <div className="animate-slideUp" style={{ animationDelay: '0.2s' }}>
-                  <label className="text-gray-300 text-sm block mb-2">Password</label>
-                  <div className="relative">
-                    <Lock className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
-                    <input
-                      type={showPassword ? 'text' : 'password'}
-                      placeholder="Enter your password"
-                      value={password}
-                      onChange={(e) => {
-                        setPassword(e.target.value);
-                        setErrors({ ...errors, password: '' });
-                      }}
-                      disabled={isLoading}
-                      className={`w-full bg-black/40 border-2 ${
-                        errors.password ? 'border-red-500' : 'border-yellow-400/20'
-                      } focus:border-yellow-400/60 rounded-xl px-12 py-3.5 text-white placeholder:text-gray-500 focus:outline-none transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed`}
-                    />
-                    <button
-                      type="button"
-                      onClick={() => setShowPassword(!showPassword)}
-                      disabled={isLoading}
-                      className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 hover:text-yellow-400 transition-colors disabled:opacity-50"
-                    >
-                      {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
-                    </button>
-                  </div>
-                  {errors.password && (
-                    <p className="text-red-400 text-xs mt-1">{errors.password}</p>
-                  )}
+                  <Typography variant="body2" sx={{ color: '#d1d5db', mb: 1 }}>Password</Typography>
+                  <TextField
+                    fullWidth
+                    type={showPassword ? 'text' : 'password'}
+                    placeholder="Enter your password"
+                    variant="outlined"
+                    value={password}
+                    onChange={(e) => {
+                      setPassword(e.target.value);
+                      setErrors({ ...errors, password: '' });
+                    }}
+                    error={!!errors.password}
+                    helperText={errors.password}
+                    disabled={isLoading}
+                    slotProps={{
+                      input: {
+                        startAdornment: (
+                          <InputAdornment position="start">
+                            <LockIcon sx={{ color: 'gray' }} />
+                          </InputAdornment>
+                        ),
+                        endAdornment: (
+                          <InputAdornment position="end">
+                            <IconButton
+                              onClick={() => setShowPassword(!showPassword)}
+                              edge="end"
+                              sx={{ color: 'gray', '&:hover': { color: '#facc15' } }}
+                            >
+                              {showPassword ? <EyeOffIcon /> : <EyeIcon />}
+                            </IconButton>
+                          </InputAdornment>
+                        ),
+                      }
+                    }}
+                    sx={{
+                      '& .MuiOutlinedInput-root': {
+                        bgcolor: 'rgba(0,0,0,0.4)',
+                        '& fieldset': { borderColor: 'rgba(250, 204, 21, 0.2)' },
+                        '&:hover fieldset': { borderColor: 'rgba(250, 204, 21, 0.6)' },
+                        '&.Mui-focused fieldset': { borderColor: 'rgba(250, 204, 21, 0.6)' },
+                      },
+                      input: { color: 'white' },
+                    }}
+                  />
                   <div className="flex justify-end mt-2">
-                    <Link to="/forgot-password" className="text-gray-400 hover:text-yellow-400 text-sm transition-colors">
+                    <Link to="/forgot-password" style={{ color: '#9ca3af', fontSize: '0.875rem' }} className="hover:text-yellow-400 transition-colors">
                       Forgot Password?
                     </Link>
                   </div>
                 </div>
 
                 {/* Login Button */}
-                <button
+                <Button
                   type="submit"
+                  fullWidth
+                  variant="contained"
                   disabled={isLoading}
-                  className="w-full bg-gradient-to-r from-yellow-400 to-yellow-600 hover:from-yellow-500 hover:to-yellow-700 text-black font-semibold py-4 rounded-xl transition-all shadow-lg shadow-yellow-500/30 hover:shadow-yellow-500/50 border-2 border-black/20 hover:scale-105 duration-300 animate-slideUp disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100 flex items-center justify-center gap-2"
-                  style={{ animationDelay: '0.3s' }}
+                  sx={{
+                    py: 1.5,
+                    bgcolor: '#facc15',
+                    color: 'black',
+                    '&:hover': { bgcolor: '#eab308', transform: 'scale(1.05)' },
+                    transition: 'all 0.3s',
+                    boxShadow: '0 10px 15px -3px rgba(250, 204, 21, 0.3)',
+                    fontSize: '1.125rem',
+                  }}
+                  startIcon={isLoading ? <CircularProgress size={20} color="inherit" /> : null}
                 >
-                  {isLoading ? (
-                    <>
-                      <Loader2 className="w-5 h-5 animate-spin" />
-                      Logging in...
-                    </>
-                  ) : (
-                    'Login'
-                  )}
-                </button>
+                  {isLoading ? 'Logging in...' : 'Login'}
+                </Button>
 
                 {/* Divider */}
-                <div className="relative my-6 animate-fadeIn" style={{ animationDelay: '0.4s' }}>
-                  <div className="absolute inset-0 flex items-center">
-                    <div className="w-full border-t border-yellow-400/20"></div>
-                  </div>
-                  <div className="relative flex justify-center text-xs">
-                    <span className="bg-black/50 px-4 text-gray-400">OR CONTINUE WITH</span>
-                  </div>
-                </div>
+                <Box sx={{ position: 'relative', my: 3 }}>
+                  <Divider sx={{ borderColor: 'rgba(250, 204, 21, 0.2)' }} />
+                  <Typography 
+                    variant="caption" 
+                    sx={{ 
+                      position: 'absolute', 
+                      top: '50%', 
+                      left: '50%', 
+                      transform: 'translate(-50%, -50%)',
+                      bgcolor: 'black',
+                      px: 2,
+                      color: 'gray'
+                    }}
+                  >
+                    OR CONTINUE WITH
+                  </Typography>
+                </Box>
 
                 {/* Social Login */}
                 <div className="grid grid-cols-2 gap-4 animate-slideUp" style={{ animationDelay: '0.5s' }}>
-                  <button
-                    type="button"
-                    disabled={isLoading}
+                  <Button
+                    fullWidth
+                    variant="outlined"
+                    startIcon={<GoogleIcon />}
                     onClick={() => toast.info('Google login coming soon!')}
-                    className="bg-black/40 hover:bg-black/60 border-2 border-yellow-400/20 hover:border-yellow-400/40 text-white py-3 rounded-xl flex items-center justify-center gap-2 transition-all hover:scale-105 duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
+                    sx={{
+                      color: 'white',
+                      borderColor: 'rgba(250, 204, 21, 0.2)',
+                      '&:hover': { borderColor: 'rgba(250, 204, 21, 0.4)', bgcolor: 'rgba(250, 204, 21, 0.05)' },
+                    }}
                   >
-                    <svg className="w-5 h-5" viewBox="0 0 24 24">
-                      <path
-                        fill="currentColor"
-                        d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"
-                      />
-                      <path
-                        fill="currentColor"
-                        d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"
-                      />
-                      <path
-                        fill="currentColor"
-                        d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"
-                      />
-                      <path
-                        fill="currentColor"
-                        d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"
-                      />
-                    </svg>
-                    <span className="text-sm">Google</span>
-                  </button>
+                    Google
+                  </Button>
 
-                  <button
-                    type="button"
-                    disabled={isLoading}
-                    onClick={() => toast.info('Guest login coming soon!')}
-                    className="bg-black/40 hover:bg-black/60 border-2 border-yellow-400/20 hover:border-yellow-400/40 text-white py-3 rounded-xl flex items-center justify-center gap-2 transition-all hover:scale-105 duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
+                  <Button
+                    fullWidth
+                    variant="outlined"
+                    startIcon={<GuestIcon />}
+                    onClick={() => {
+                      setAuth({
+                        user: { id: 'guest', email: 'guest@nearu.com', roles: ['Student'] },
+                        accessToken: 'guest-token',
+                      });
+                      localStorage.setItem('accessToken', 'guest-token');
+                      toast.success('Logged in as Guest');
+                      navigate('/home');
+                    }}
+                    sx={{
+                      color: 'white',
+                      borderColor: 'rgba(250, 204, 21, 0.2)',
+                      '&:hover': { borderColor: 'rgba(250, 204, 21, 0.4)', bgcolor: 'rgba(250, 204, 21, 0.05)' },
+                    }}
                   >
-                    <GraduationCap className="w-5 h-5" />
-                    <span className="text-sm">Guest</span>
-                  </button>
+                    Guest
+                  </Button>
                 </div>
 
                 {/* Terms */}
-                <p className="text-center text-xs text-gray-500 mt-4 animate-fadeIn" style={{ animationDelay: '0.6s' }}>
+                <Typography variant="caption" sx={{ display: 'block', textAlign: 'center', color: 'gray', mt: 2 }}>
                   By Continuing, you agree to NearU's Terms of Service and Privacy Policy.
-                </p>
+                </Typography>
               </form>
             </div>
           </div>

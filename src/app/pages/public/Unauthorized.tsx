@@ -1,9 +1,23 @@
 import { useNavigate, Link } from "react-router";
-import { ShieldAlert, ArrowLeft, Home } from "lucide-react";
+
+// MUI Components
+import {
+  Box,
+  Typography,
+  Button,
+  Paper,
+  Stack
+} from '@mui/material';
+
+// MUI Icons
+import {
+  ShieldOutlined as ShieldAlertIcon,
+  ArrowBack as ArrowLeftIcon,
+  Home as HomeIcon
+} from '@mui/icons-material';
 
 const Unauthorized = () => {
     const navigate = useNavigate();
-
     const goBack = () => navigate(-1);
 
     return (
@@ -13,46 +27,88 @@ const Unauthorized = () => {
             <div className="absolute top-1/4 right-1/4 w-96 h-96 bg-red-400/10 rounded-full blur-3xl animate-float"></div>
             <div className="absolute bottom-1/4 left-1/4 w-80 h-80 bg-red-600/10 rounded-full blur-3xl animate-float" style={{ animationDelay: '2s' }}></div>
 
-            <div className="relative z-10 max-w-md w-full">
-                <div className="bg-gradient-to-br from-gray-900 to-black border-2 border-red-400/30 rounded-3xl p-8 shadow-2xl shadow-red-400/10 text-center animate-slideUp">
+            <Box sx={{ position: 'relative', zIndex: 10, maxWidth: '448px', width: '100%' }}>
+                <Paper 
+                    sx={{ 
+                        bgcolor: 'rgba(17, 24, 39, 0.8)', 
+                        backdropFilter: 'blur(16px)', 
+                        border: '2px solid rgba(239, 68, 68, 0.3)', 
+                        borderRadius: '1.5rem', 
+                        p: 5, 
+                        textAlign: 'center',
+                        boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.5)',
+                        animation: 'slideUp 0.5s ease-out'
+                    }}
+                >
                     {/* Icon */}
-                    <div className="w-20 h-20 bg-gradient-to-br from-red-400 to-red-600 rounded-full flex items-center justify-center mx-auto mb-6 shadow-lg shadow-red-400/50 animate-pulse">
-                        <ShieldAlert className="w-10 h-10 text-white" />
-                    </div>
+                    <Box 
+                        sx={{ 
+                            width: 80, 
+                            height: 80, 
+                            bgcolor: 'rgba(239, 68, 68, 0.1)', 
+                            borderRadius: '50%', 
+                            display: 'flex', 
+                            alignItems: 'center', 
+                            justifyContent: 'center', 
+                            mx: 'auto', 
+                            mb: 3,
+                            border: '2px solid #ef4444',
+                            animation: 'pulse 2s infinite'
+                        }}
+                    >
+                        <ShieldAlertIcon sx={{ fontSize: 40, color: '#ef4444' }} />
+                    </Box>
 
                     {/* Title */}
-                    <h1 className="text-4xl font-bold text-red-400 mb-4">Access Denied</h1>
+                    <Typography variant="h3" sx={{ color: '#ef4444', fontWeight: 'bold', mb: 2 }}>Access Denied</Typography>
 
                     {/* Message */}
-                    <p className="text-gray-300 text-lg mb-2">Unauthorized Access</p>
-                    <p className="text-gray-400 mb-8">
+                    <Typography variant="h6" sx={{ color: '#d1d5db', mb: 1 }}>Unauthorized Access</Typography>
+                    <Typography variant="body2" sx={{ color: '#9ca3af', mb: 4 }}>
                         You do not have permission to access this page. Please contact an administrator if you believe this is an error.
-                    </p>
+                    </Typography>
 
                     {/* Buttons */}
-                    <div className="flex flex-col sm:flex-row gap-4">
-                        <button
+                    <Stack direction={{ xs: 'column', sm: 'row' }} spacing={2}>
+                        <Button
+                            fullWidth
+                            variant="outlined"
                             onClick={goBack}
-                            className="flex-1 bg-black/40 hover:bg-black/60 border-2 border-red-400/20 hover:border-red-400/40 text-white py-3 rounded-xl transition-all hover:scale-105 duration-300 flex items-center justify-center gap-2"
+                            startIcon={<ArrowLeftIcon />}
+                            sx={{ 
+                                color: 'white', 
+                                borderColor: 'rgba(239, 68, 68, 0.2)',
+                                py: 1.5,
+                                borderRadius: '0.75rem',
+                                '&:hover': { borderColor: '#ef4444', bgcolor: 'rgba(239, 68, 68, 0.05)' }
+                            }}
                         >
-                            <ArrowLeft className="w-5 h-5" />
                             Go Back
-                        </button>
-                        <Link
+                        </Button>
+                        <Button
+                            fullWidth
+                            variant="contained"
+                            component={Link}
                             to="/"
-                            className="flex-1 bg-gradient-to-r from-red-400 to-red-600 hover:from-red-500 hover:to-red-700 text-white py-3 rounded-xl transition-all hover:scale-105 duration-300 flex items-center justify-center gap-2 shadow-lg shadow-red-400/30"
+                            startIcon={<HomeIcon />}
+                            sx={{ 
+                                bgcolor: '#ef4444', 
+                                color: 'white',
+                                py: 1.5,
+                                borderRadius: '0.75rem',
+                                '&:hover': { bgcolor: '#dc2626' }
+                            }}
                         >
-                            <Home className="w-5 h-5" />
                             Go Home
-                        </Link>
-                    </div>
-                </div>
+                        </Button>
+                    </Stack>
+                </Paper>
 
                 {/* Help Text */}
-                <p className="text-center text-gray-500 text-sm mt-6">
-                    Need help? <Link to="/login" className="text-red-400 hover:text-red-300 transition-colors">Contact Support</Link>
-                </p>
-            </div>
+                <Typography variant="body2" sx={{ textAlign: 'center', color: 'gray', mt: 3 }}>
+                    Need help? <Link to="/login" style={{ color: '#ef4444', textDecoration: 'none' }}>Contact Support</Link>
+                </Typography>
+            </Box>
         </div>
     )
 }

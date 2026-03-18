@@ -1,6 +1,38 @@
-import { Home, UtensilsCrossed, Bike, Bus, Briefcase, Building2, Gift, Tag, Settings, X, GraduationCap, User } from 'lucide-react';
 import { Link, useNavigate } from 'react-router';
 import { useSidebar } from '../../context/SidebarContext';
+
+// MUI Components
+import {
+  Drawer,
+  List,
+  ListItem,
+  ListItemButton,
+  ListItemIcon,
+  ListItemText,
+  Box,
+  Typography,
+  IconButton,
+  Avatar,
+  Divider,
+  Tooltip
+} from '@mui/material';
+
+// MUI Icons
+import {
+  Home as HomeIcon,
+  Restaurant as FoodIcon,
+  DirectionsBus as BusIcon,
+  DirectionsBike as BikeIcon,
+  Work as BriefcaseIcon,
+  Business as BuildingIcon,
+  CardGiftcard as GiftIcon,
+  LocalOffer as TagIcon,
+  Settings as SettingsIcon,
+  Close as CloseIcon,
+  Menu as MenuIcon,
+  Person as UserIcon,
+  ChevronLeft as ChevronLeftIcon
+} from '@mui/icons-material';
 
 interface SidebarProps {
   activeSection?: string;
@@ -11,110 +43,164 @@ export function Sidebar({ activeSection }: SidebarProps) {
   const navigate = useNavigate();
 
   const navItems = [
-    { icon: Home, label: 'Home', id: 'home', path: '/home' },
-    { icon: UtensilsCrossed, label: 'Food', id: 'food', path: '/food' },
-    { icon: Bus, label: 'Transport', id: 'transport', path: '/transport' },
-    { icon: Bike, label: 'Rides', id: 'rides', path: '/rides' },
-    { icon: Briefcase, label: 'Jobs', id: 'jobs', path: '/jobs' },
-    { icon: Building2, label: 'Accommodation', id: 'accommodation', path: '/accommodation' },
-    { icon: Gift, label: 'Custom Gifts', id: 'gifts', path: '/gifts' },
-    { icon: Tag, label: 'Deals and Offers', id: 'offers', path: '/deals' },
+    { icon: HomeIcon, label: 'Home', id: 'home', path: '/home' },
+    { icon: FoodIcon, label: 'Food', id: 'food', path: '/food' },
+    { icon: BusIcon, label: 'Transport', id: 'transport', path: '/transport' },
+    { icon: BikeIcon, label: 'Rides', id: 'rides', path: '/rides' },
+    { icon: BriefcaseIcon, label: 'Jobs', id: 'jobs', path: '/jobs' },
+    { icon: BuildingIcon, label: 'Accommodation', id: 'accommodation', path: '/accommodation' },
+    { icon: GiftIcon, label: 'Custom Gifts', id: 'gifts', path: '/gifts' },
+    { icon: TagIcon, label: 'Deals and Offers', id: 'offers', path: '/deals' },
   ];
 
+  const drawerWidth = 240;
+  const collapsedWidth = 80;
+
   return (
-    <>
-      {/* Sidebar */}
-      <div className={`fixed left-0 top-0 h-full bg-gradient-to-b from-gray-900 to-black border-r-2 border-yellow-400/20 z-40 transition-all duration-500 ease-in-out ${
-        isExpanded ? 'w-56' : 'w-20'
-      }`}>
-        {/* Header */}
-        <div className="flex items-center justify-between h-20 px-5 border-b border-yellow-400/20">
-          <div className={`transition-all duration-300 ${isExpanded ? 'opacity-100' : 'opacity-0 w-0'}`}>
-            <h2 className="text-yellow-400 text-xl whitespace-nowrap">NearU</h2>
-            <p className="text-yellow-400/70 text-xs whitespace-nowrap">Uni Life Assistant</p>
-          </div>
-          
-          <button
-            onClick={toggleSidebar}
-            className="w-8 h-8 bg-yellow-400/10 hover:bg-yellow-400/20 rounded-lg flex items-center justify-center transition-all group hover:scale-110"
-          >
-            <X className={`w-5 h-5 text-yellow-400 transition-transform duration-300 ${isExpanded ? 'rotate-0' : 'rotate-45'}`} />
-          </button>
-        </div>
+    <Drawer
+      variant="permanent"
+      sx={{
+        width: isExpanded ? drawerWidth : collapsedWidth,
+        flexShrink: 0,
+        '& .MuiDrawer-paper': {
+          width: isExpanded ? drawerWidth : collapsedWidth,
+          boxSizing: 'border-box',
+          bgcolor: '#111827',
+          backgroundImage: 'linear-gradient(to bottom, #111827, #000000)',
+          borderRight: '2px solid rgba(250, 204, 21, 0.2)',
+          transition: 'all 0.5s ease-in-out',
+          overflowX: 'hidden',
+        },
+      }}
+    >
+      {/* Header */}
+      <Box sx={{ 
+        display: 'flex', 
+        alignItems: 'center', 
+        justifyContent: isExpanded ? 'space-between' : 'center', 
+        px: 2, 
+        height: 80, 
+        borderBottom: '1px solid rgba(250, 204, 21, 0.2)' 
+      }}>
+        {isExpanded && (
+          <Box sx={{ animation: 'fadeIn 0.3s' }}>
+            <Typography variant="h6" sx={{ color: '#facc15', fontWeight: 'bold', lineHeight: 1 }}>NearU</Typography>
+            <Typography variant="caption" sx={{ color: 'rgba(250, 204, 21, 0.7)' }}>Uni Life Assistant</Typography>
+          </Box>
+        )}
+        <IconButton 
+          onClick={toggleSidebar}
+          sx={{ 
+            bgcolor: 'rgba(250, 204, 21, 0.1)', 
+            color: '#facc15',
+            '&:hover': { bgcolor: 'rgba(250, 204, 21, 0.2)' }
+          }}
+        >
+          {isExpanded ? <ChevronLeftIcon /> : <MenuIcon />}
+        </IconButton>
+      </Box>
 
-        {/* Navigation Items */}
-        <nav className="flex flex-col gap-1 p-3">
-          {navItems.map((item) => {
-            const Icon = item.icon;
-            const isActive = activeSection === item.id;
-            
-            return (
-              <button
-                key={item.id}
-                onClick={() => {
-                  if (item.path) {
-                    navigate(item.path);
-                    if (item.id !== 'home' && item.id !== 'transport') {
-                      setTimeout(() => {
-                        document.getElementById(item.id)?.scrollIntoView({ behavior: 'smooth' });
-                      }, 100);
+      {/* Navigation Items */}
+      <List sx={{ px: 1.5, py: 2 }}>
+        {navItems.map((item) => {
+          const isActive = activeSection === item.id;
+          return (
+            <ListItem key={item.id} disablePadding sx={{ display: 'block', mb: 0.5 }}>
+              <Tooltip title={!isExpanded ? item.label : ""} placement="right">
+                <ListItemButton
+                  onClick={() => {
+                    if (item.path) {
+                      navigate(item.path);
                     }
-                  } else {
-                    document.getElementById(item.id)?.scrollIntoView({ behavior: 'smooth' });
-                  }
-                }}
-                className={`group relative flex items-center gap-4 px-4 py-3 rounded-xl transition-all duration-300 ${
-                  isActive
-                    ? 'bg-yellow-400/20 text-yellow-400 shadow-lg shadow-yellow-400/20'
-                    : 'text-yellow-400/70 hover:bg-yellow-400/10 hover:text-yellow-400'
-                }`}
-              >
-                <Icon className={`w-6 h-6 flex-shrink-0 transition-transform duration-300 ${
-                  isActive ? 'scale-110' : 'group-hover:scale-110'
-                }`} />
-                
-                <span className={`text-sm whitespace-nowrap transition-all duration-300 ${
-                  isExpanded ? 'opacity-100 translate-x-0' : 'opacity-0 -translate-x-4 absolute'
-                }`}>
-                  {item.label}
-                </span>
+                  }}
+                  sx={{
+                    minHeight: 48,
+                    justifyContent: isExpanded ? 'flex-start' : 'center',
+                    px: 2.5,
+                    borderRadius: '0.75rem',
+                    bgcolor: isActive ? 'rgba(250, 204, 21, 0.15)' : 'transparent',
+                    color: isActive ? '#facc15' : 'rgba(250, 204, 21, 0.7)',
+                    '&:hover': {
+                      bgcolor: 'rgba(250, 204, 21, 0.1)',
+                      color: '#facc15',
+                    },
+                    transition: 'all 0.3s',
+                  }}
+                >
+                  <ListItemIcon
+                    sx={{
+                      minWidth: 0,
+                      mr: isExpanded ? 2 : 'auto',
+                      justifyContent: 'center',
+                      color: 'inherit',
+                    }}
+                  >
+                    <item.icon />
+                  </ListItemIcon>
+                  {isExpanded && (
+                    <ListItemText 
+                      primary={item.label} 
+                      sx={{ 
+                        opacity: isExpanded ? 1 : 0,
+                        '& .MuiTypography-root': { fontSize: '0.875rem', fontWeight: isActive ? 600 : 400 }
+                      }} 
+                    />
+                  )}
+                  {isActive && (
+                    <Box sx={{ 
+                      position: 'absolute', 
+                      left: 0, 
+                      top: '20%', 
+                      height: '60%', 
+                      width: 4, 
+                      bgcolor: '#facc15', 
+                      borderRadius: '0 4px 4px 0' 
+                    }} />
+                  )}
+                </ListItemButton>
+              </Tooltip>
+            </ListItem>
+          );
+        })}
+      </List>
 
-                {/* Active indicator */}
-                {isActive && (
-                  <div className="absolute left-0 top-1/2 -translate-y-1/2 w-1 h-8 bg-yellow-400 rounded-r-full animate-slideIn"></div>
-                )}
-              </button>
-            );
-          })}
-        </nav>
-
-        {/* User Account at bottom */}
-        <div className="absolute bottom-6 left-0 right-0 px-3">
-          <Link 
-            to="/profile"
-            className={`group flex items-center gap-3 px-3 py-2.5 rounded-xl transition-all w-full border border-yellow-400/20 hover:border-yellow-400/40 ${
-              activeSection === 'profile' ? 'bg-yellow-400/20 text-yellow-400 border-yellow-400/40' : 'bg-yellow-400/5 text-yellow-400/70 hover:bg-yellow-400/10 hover:text-yellow-400'
-            }`}
+      {/* User Account at bottom */}
+      <Box sx={{ mt: 'auto', p: 2, pb: 4 }}>
+        <ListItemButton
+          component={Link}
+          to="/profile"
+          sx={{
+            p: 1,
+            borderRadius: '0.75rem',
+            border: '1px solid rgba(250, 204, 21, 0.2)',
+            bgcolor: activeSection === 'profile' ? 'rgba(250, 204, 21, 0.15)' : 'rgba(250, 204, 21, 0.05)',
+            justifyContent: isExpanded ? 'flex-start' : 'center',
+            '&:hover': { bgcolor: 'rgba(250, 204, 21, 0.1)', borderColor: 'rgba(250, 204, 21, 0.4)' },
+          }}
+        >
+          <Avatar 
+            sx={{ 
+              width: 36, 
+              height: 36, 
+              bgcolor: '#facc15', 
+              color: 'black',
+              mr: isExpanded ? 1.5 : 0
+            }}
           >
-            {/* User Avatar */}
-            <div className="w-9 h-9 rounded-full bg-gradient-to-br from-yellow-400 to-yellow-600 flex items-center justify-center flex-shrink-0 group-hover:scale-110 transition-transform duration-300 shadow-lg">
-              <User className="w-4.5 h-4.5 text-black" />
-            </div>
-            
-            {/* User Info */}
-            <div className={`flex flex-col justify-center transition-all duration-300 ${
-              isExpanded ? 'opacity-100 translate-x-0' : 'opacity-0 -translate-x-4 absolute'
-            }`}>
-              <span className="text-sm font-semibold whitespace-nowrap leading-tight">
+            <UserIcon fontSize="small" />
+          </Avatar>
+          {isExpanded && (
+            <Box sx={{ overflow: 'hidden' }}>
+              <Typography variant="body2" sx={{ fontWeight: 'bold', color: 'white', noWrap: true }}>
                 Student Name
-              </span>
-              <span className="text-xs text-yellow-400/50 whitespace-nowrap leading-tight">
+              </Typography>
+              <Typography variant="caption" sx={{ color: 'rgba(250, 204, 21, 0.6)', display: 'block' }}>
                 View Profile
-              </span>
-            </div>
-          </Link>
-        </div>
-      </div>
-    </>
+              </Typography>
+            </Box>
+          )}
+        </ListItemButton>
+      </Box>
+    </Drawer>
   );
 }
