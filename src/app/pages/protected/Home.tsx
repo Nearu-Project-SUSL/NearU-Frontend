@@ -38,7 +38,7 @@ export default function Home() {
                   { title: 'Transport', count: '5 Routes', color: '#60a5fa' },
                   { title: 'Jobs', count: '8 Openings', color: '#34d399' }
                 ].map((stat, i) => (
-                  <Grid item xs={12} sm={4} key={i}>
+                  <Grid xs={12} sm={4} key={i}>
                     <Paper 
                       sx={{ 
                         p: 3, 
