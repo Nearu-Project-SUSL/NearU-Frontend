@@ -1,6 +1,27 @@
 import { useState } from 'react';
 import { useNavigate, Link } from 'react-router';
-import { Lock, Eye, EyeOff, KeyRound, CheckCircle2, ArrowLeft } from 'lucide-react';
+
+// MUI Components
+import {
+  Box,
+  Typography,
+  Button,
+  TextField,
+  IconButton,
+  InputAdornment,
+  Paper,
+  Divider
+} from '@mui/material';
+
+// MUI Icons
+import {
+  Lock as LockIcon,
+  Visibility as EyeIcon,
+  VisibilityOff as EyeOffIcon,
+  Key as KeyRoundIcon,
+  CheckCircle as CheckCircle2Icon,
+  ArrowBack as ArrowLeftIcon
+} from '@mui/icons-material';
 
 export default function ResetPassword() {
   const navigate = useNavigate();
@@ -72,176 +93,202 @@ export default function ResetPassword() {
   if (isSuccess) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-black via-gray-900 to-black flex items-center justify-center p-4">
-        <div className="bg-gradient-to-br from-gray-900 to-black border-2 border-yellow-400 rounded-3xl p-8 max-w-md w-full text-center animate-slideIn">
-          <div className="w-20 h-20 bg-yellow-400 rounded-full flex items-center justify-center mx-auto mb-6 animate-bounce">
-            <CheckCircle2 className="w-12 h-12 text-black" />
-          </div>
-          <h2 className="text-3xl font-bold text-yellow-400 mb-3">Success!</h2>
-          <p className="text-gray-300 text-lg">
+        <Paper 
+          sx={{ 
+            bgcolor: 'rgba(17, 24, 39, 0.8)', 
+            backdropFilter: 'blur(16px)', 
+            border: '2px solid #facc15', 
+            borderRadius: '1.5rem', 
+            p: 5, 
+            maxWidth: '400px', 
+            width: '100%', 
+            textAlign: 'center',
+            boxShadow: '0 20px 25px -5px rgba(250, 204, 21, 0.2)',
+            animation: 'slideIn 0.5s ease-out'
+          }}
+        >
+          <Box 
+            sx={{ 
+              width: 80, 
+              height: 80, 
+              bgcolor: 'rgba(250, 204, 21, 0.1)', 
+              borderRadius: '50%', 
+              display: 'flex', 
+              alignItems: 'center', 
+              justifyContent: 'center', 
+              mx: 'auto', 
+              mb: 3,
+              border: '2px solid #facc15',
+              animation: 'bounce 2s infinite'
+            }}
+          >
+            <CheckCircle2Icon sx={{ fontSize: 48, color: '#facc15' }} />
+          </Box>
+          <Typography variant="h4" sx={{ color: '#facc15', fontWeight: 'bold', mb: 1 }}>Success!</Typography>
+          <Typography sx={{ color: '#d1d5db', fontSize: '1.125rem' }}>
             Your password has been reset successfully
-          </p>
-          <div className="mt-6 flex gap-2 justify-center">
-            <div className="w-2 h-2 bg-yellow-400 rounded-full animate-pulse"></div>
-            <div className="w-2 h-2 bg-yellow-400 rounded-full animate-pulse delay-100"></div>
-            <div className="w-2 h-2 bg-yellow-400 rounded-full animate-pulse delay-200"></div>
-          </div>
-        </div>
+          </Typography>
+          <Box sx={{ mt: 3, display: 'flex', gap: 1, justifyContent: 'center' }}>
+            <Box sx={{ width: 8, height: 8, bgcolor: '#facc15', borderRadius: '50%', animation: 'pulse 1.5s infinite' }}></Box>
+            <Box sx={{ width: 8, height: 8, bgcolor: '#facc15', borderRadius: '50%', animation: 'pulse 1.5s infinite', animationDelay: '0.1s' }}></Box>
+            <Box sx={{ width: 8, height: 8, bgcolor: '#facc15', borderRadius: '50%', animation: 'pulse 1.5s infinite', animationDelay: '0.2s' }}></Box>
+          </Box>
+        </Paper>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-black via-gray-900 to-black flex items-center justify-center p-4">
-      <div className="w-full max-w-md">
+    <div className="min-h-screen bg-gradient-to-br from-black via-gray-900 to-black flex items-center justify-center p-4 relative overflow-hidden">
+      <div className="w-full max-w-md relative z-10">
         {/* Back Button */}
-        <Link 
+        <Button
+          component={Link}
           to="/profile"
-          className="inline-flex items-center gap-2 text-yellow-400 hover:text-yellow-300 mb-6 transition-all group"
+          startIcon={<ArrowLeftIcon />}
+          sx={{ color: '#facc15', mb: 3, '&:hover': { bgcolor: 'transparent', transform: 'translateX(-4px)' }, transition: 'all 0.3s' }}
         >
-          <ArrowLeft className="w-5 h-5 group-hover:-translate-x-1 transition-transform" />
-          <span>Back to Profile</span>
-        </Link>
+          Back to Profile
+        </Button>
 
-        {/* Reset Password Form */}
-        <div className="bg-gradient-to-br from-gray-900 to-black border-2 border-yellow-400/30 rounded-3xl p-8 shadow-2xl shadow-yellow-400/10 animate-slideIn">
+        {/* Main Card */}
+        <Paper 
+          sx={{ 
+            bgcolor: 'rgba(17, 24, 39, 0.8)', 
+            backdropFilter: 'blur(16px)', 
+            border: '2px solid rgba(250, 204, 21, 0.2)', 
+            borderRadius: '1.5rem', 
+            p: 4, 
+            boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.5)',
+            animation: 'slideIn 0.5s ease-out'
+          }}
+        >
           {/* Header */}
-          <div className="text-center mb-8">
-            <div className="w-16 h-16 bg-yellow-400 rounded-full flex items-center justify-center mx-auto mb-4 shadow-lg shadow-yellow-400/50">
-              <KeyRound className="w-8 h-8 text-black" />
-            </div>
-            <h1 className="text-3xl font-bold text-yellow-400 mb-2">Reset Password</h1>
-            <p className="text-gray-400">Create a new secure password</p>
-          </div>
+          <Box sx={{ textAlign: 'center', mb: 4 }}>
+            <Box sx={{ width: 64, height: 64, bgcolor: 'rgba(250, 204, 21, 0.1)', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', mx: 'auto', mb: 2, border: '1px solid rgba(250, 204, 21, 0.3)' }}>
+              <KeyRoundIcon sx={{ fontSize: 32, color: '#facc15' }} />
+            </Box>
+            <Typography variant="h5" sx={{ color: '#facc15', fontWeight: 'bold', mb: 1 }}>Reset Password</Typography>
+            <Typography variant="body2" sx={{ color: '#9ca3af' }}>Create a new secure password</Typography>
+          </Box>
 
           {/* Form */}
-          <form onSubmit={handleSubmit} className="space-y-5">
-            {/* Current Password */}
-            <div className="space-y-2">
-              <label htmlFor="currentPassword" className="block text-sm font-medium text-yellow-400">
-                Current Password
-              </label>
-              <div className="relative">
-                <div className="absolute left-4 top-1/2 -translate-y-1/2">
-                  <Lock className="w-5 h-5 text-yellow-400/70" />
-                </div>
-                <input
-                  type={showCurrentPassword ? 'text' : 'password'}
-                  id="currentPassword"
-                  name="currentPassword"
-                  value={formData.currentPassword}
-                  onChange={handleChange}
-                  className={`w-full bg-black/50 border-2 ${
-                    errors.currentPassword ? 'border-red-500' : 'border-yellow-400/30'
-                  } rounded-xl px-12 py-3 text-white placeholder-gray-500 focus:outline-none focus:border-yellow-400 transition-all`}
-                  placeholder="Enter current password"
-                />
-                <button
-                  type="button"
-                  onClick={() => setShowCurrentPassword(!showCurrentPassword)}
-                  className="absolute right-4 top-1/2 -translate-y-1/2 text-yellow-400/70 hover:text-yellow-400 transition-colors"
-                >
-                  {showCurrentPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
-                </button>
-              </div>
-              {errors.currentPassword && (
-                <p className="text-red-500 text-sm">{errors.currentPassword}</p>
-              )}
-            </div>
+          <form onSubmit={handleSubmit}>
+            <Box sx={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
+              {/* Current Password */}
+              <TextField
+                fullWidth
+                label="Current Password"
+                type={showCurrentPassword ? 'text' : 'password'}
+                name="currentPassword"
+                value={formData.currentPassword}
+                onChange={handleChange}
+                error={!!errors.currentPassword}
+                helperText={errors.currentPassword}
+                slotProps={{
+                  input: {
+                    startAdornment: (
+                      <InputAdornment position="start">
+                        <LockIcon sx={{ color: '#facc15', opacity: 0.7 }} />
+                      </InputAdornment>
+                    ),
+                    endAdornment: (
+                      <InputAdornment position="end">
+                        <IconButton onClick={() => setShowCurrentPassword(!showCurrentPassword)} edge="end" sx={{ color: 'gray' }}>
+                          {showCurrentPassword ? <EyeOffIcon /> : <EyeIcon />}
+                        </IconButton>
+                      </InputAdornment>
+                    ),
+                  }
+                }}
+              />
 
-            {/* New Password */}
-            <div className="space-y-2">
-              <label htmlFor="newPassword" className="block text-sm font-medium text-yellow-400">
-                New Password
-              </label>
-              <div className="relative">
-                <div className="absolute left-4 top-1/2 -translate-y-1/2">
-                  <Lock className="w-5 h-5 text-yellow-400/70" />
-                </div>
-                <input
-                  type={showNewPassword ? 'text' : 'password'}
-                  id="newPassword"
-                  name="newPassword"
-                  value={formData.newPassword}
-                  onChange={handleChange}
-                  className={`w-full bg-black/50 border-2 ${
-                    errors.newPassword ? 'border-red-500' : 'border-yellow-400/30'
-                  } rounded-xl px-12 py-3 text-white placeholder-gray-500 focus:outline-none focus:border-yellow-400 transition-all`}
-                  placeholder="Enter new password"
-                />
-                <button
-                  type="button"
-                  onClick={() => setShowNewPassword(!showNewPassword)}
-                  className="absolute right-4 top-1/2 -translate-y-1/2 text-yellow-400/70 hover:text-yellow-400 transition-colors"
-                >
-                  {showNewPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
-                </button>
-              </div>
-              {errors.newPassword && (
-                <p className="text-red-500 text-sm">{errors.newPassword}</p>
-              )}
-            </div>
+              {/* New Password */}
+              <TextField
+                fullWidth
+                label="New Password"
+                type={showNewPassword ? 'text' : 'password'}
+                name="newPassword"
+                value={formData.newPassword}
+                onChange={handleChange}
+                error={!!errors.newPassword}
+                helperText={errors.newPassword}
+                slotProps={{
+                  input: {
+                    startAdornment: (
+                      <InputAdornment position="start">
+                        <LockIcon sx={{ color: '#facc15', opacity: 0.7 }} />
+                      </InputAdornment>
+                    ),
+                    endAdornment: (
+                      <InputAdornment position="end">
+                        <IconButton onClick={() => setShowNewPassword(!showNewPassword)} edge="end" sx={{ color: 'gray' }}>
+                          {showNewPassword ? <EyeOffIcon /> : <EyeIcon />}
+                        </IconButton>
+                      </InputAdornment>
+                    ),
+                  }
+                }}
+              />
 
-            {/* Confirm Password */}
-            <div className="space-y-2">
-              <label htmlFor="confirmPassword" className="block text-sm font-medium text-yellow-400">
-                Confirm New Password
-              </label>
-              <div className="relative">
-                <div className="absolute left-4 top-1/2 -translate-y-1/2">
-                  <Lock className="w-5 h-5 text-yellow-400/70" />
-                </div>
-                <input
-                  type={showConfirmPassword ? 'text' : 'password'}
-                  id="confirmPassword"
-                  name="confirmPassword"
-                  value={formData.confirmPassword}
-                  onChange={handleChange}
-                  className={`w-full bg-black/50 border-2 ${
-                    errors.confirmPassword ? 'border-red-500' : 'border-yellow-400/30'
-                  } rounded-xl px-12 py-3 text-white placeholder-gray-500 focus:outline-none focus:border-yellow-400 transition-all`}
-                  placeholder="Confirm new password"
-                />
-                <button
-                  type="button"
-                  onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                  className="absolute right-4 top-1/2 -translate-y-1/2 text-yellow-400/70 hover:text-yellow-400 transition-colors"
-                >
-                  {showConfirmPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
-                </button>
-              </div>
-              {errors.confirmPassword && (
-                <p className="text-red-500 text-sm">{errors.confirmPassword}</p>
-              )}
-            </div>
+              {/* Confirm Password */}
+              <TextField
+                fullWidth
+                label="Confirm New Password"
+                type={showConfirmPassword ? 'text' : 'password'}
+                name="confirmPassword"
+                value={formData.confirmPassword}
+                onChange={handleChange}
+                error={!!errors.confirmPassword}
+                helperText={errors.confirmPassword}
+                slotProps={{
+                  input: {
+                    startAdornment: (
+                      <InputAdornment position="start">
+                        <LockIcon sx={{ color: '#facc15', opacity: 0.7 }} />
+                      </InputAdornment>
+                    ),
+                    endAdornment: (
+                      <InputAdornment position="end">
+                        <IconButton onClick={() => setShowConfirmPassword(!showConfirmPassword)} edge="end" sx={{ color: 'gray' }}>
+                          {showConfirmPassword ? <EyeOffIcon /> : <EyeIcon />}
+                        </IconButton>
+                      </InputAdornment>
+                    ),
+                  }
+                }}
+              />
 
-            {/* Password Requirements */}
-            <div className="bg-yellow-400/10 border border-yellow-400/30 rounded-xl p-4">
-              <p className="text-yellow-400 text-sm font-semibold mb-2">Password Requirements:</p>
-              <ul className="text-gray-400 text-xs space-y-1">
-                <li className="flex items-center gap-2">
-                  <div className="w-1 h-1 bg-yellow-400 rounded-full"></div>
-                  At least 8 characters long
-                </li>
-                <li className="flex items-center gap-2">
-                  <div className="w-1 h-1 bg-yellow-400 rounded-full"></div>
-                  Contains uppercase and lowercase letters
-                </li>
-                <li className="flex items-center gap-2">
-                  <div className="w-1 h-1 bg-yellow-400 rounded-full"></div>
-                  Contains at least one number
-                </li>
-              </ul>
-            </div>
+              {/* Password Requirements */}
+              <Paper sx={{ p: 2, bgcolor: 'rgba(250, 204, 21, 0.05)', border: '1px solid rgba(250, 204, 21, 0.2)' }}>
+                <Typography variant="subtitle2" sx={{ color: '#facc15', mb: 1 }}>Requirements:</Typography>
+                <Box sx={{ display: 'flex', flexDirection: 'column', gap: 0.5 }}>
+                  <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                    <Box sx={{ width: 4, height: 4, bgcolor: '#facc15', borderRadius: '50%' }} />
+                    <Typography variant="caption" sx={{ color: 'gray' }}>At least 8 characters long</Typography>
+                  </Box>
+                  <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                    <Box sx={{ width: 4, height: 4, bgcolor: '#facc15', borderRadius: '50%' }} />
+                    <Typography variant="caption" sx={{ color: 'gray' }}>Contains uppercase and lowercase letters</Typography>
+                  </Box>
+                  <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                    <Box sx={{ width: 4, height: 4, bgcolor: '#facc15', borderRadius: '50%' }} />
+                    <Typography variant="caption" sx={{ color: 'gray' }}>Contains at least one number</Typography>
+                  </Box>
+                </Box>
+              </Paper>
 
-            {/* Submit Button */}
-            <button
-              type="submit"
-              className="w-full bg-gradient-to-r from-yellow-400 to-yellow-500 text-black font-bold py-3 rounded-xl hover:from-yellow-500 hover:to-yellow-600 transition-all transform hover:scale-105 shadow-lg shadow-yellow-400/30 hover:shadow-yellow-400/50"
-            >
-              Reset Password
-            </button>
+              <Button
+                fullWidth
+                variant="contained"
+                type="submit"
+                sx={{ py: 1.5, bgcolor: '#facc15', color: 'black', '&:hover': { bgcolor: '#eab308', transform: 'scale(1.02)' }, transition: 'all 0.3s' }}
+              >
+                Reset Password
+              </Button>
+            </Box>
           </form>
-        </div>
+        </Paper>
       </div>
     </div>
   );

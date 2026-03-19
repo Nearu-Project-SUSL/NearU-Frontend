@@ -1,6 +1,31 @@
 import { useState } from 'react';
 import { useNavigate, Link } from 'react-router';
-import { Mail, Lock, Eye, EyeOff, KeyRound, CheckCircle2, ArrowLeft, Send, ShieldCheck } from 'lucide-react';
+
+// MUI Components
+import {
+  Box,
+  Typography,
+  Button,
+  TextField,
+  IconButton,
+  InputAdornment,
+  Paper,
+  Divider,
+  Grid
+} from '@mui/material';
+
+// MUI Icons
+import {
+  Email as MailIcon,
+  Lock as LockIcon,
+  Visibility as EyeIcon,
+  VisibilityOff as EyeOffIcon,
+  Key as KeyRoundIcon,
+  CheckCircle as CheckCircle2Icon,
+  ArrowBack as ArrowLeftIcon,
+  Send as SendIcon,
+  Shield as ShieldCheckIcon
+} from '@mui/icons-material';
 
 type Step = 'email' | 'verify' | 'reset' | 'success';
 
@@ -118,23 +143,52 @@ export default function ForgotPassword() {
         <div className="absolute top-1/4 right-1/4 w-96 h-96 bg-yellow-400/10 rounded-full blur-3xl animate-float"></div>
         <div className="absolute bottom-1/4 left-1/4 w-80 h-80 bg-yellow-600/10 rounded-full blur-3xl animate-float" style={{ animationDelay: '2s' }}></div>
 
-        <div className="relative z-10 bg-gradient-to-br from-gray-900 to-black border-2 border-yellow-400 rounded-3xl p-8 max-w-md w-full text-center shadow-2xl shadow-yellow-400/20 animate-slideUp">
-          <div className="w-24 h-24 bg-gradient-to-br from-yellow-400 to-yellow-600 rounded-full flex items-center justify-center mx-auto mb-6 shadow-lg shadow-yellow-400/50 animate-bounce">
-            <CheckCircle2 className="w-14 h-14 text-black" />
-          </div>
-          <h2 className="text-3xl font-bold text-yellow-400 mb-3">Password Reset!</h2>
-          <p className="text-gray-300 text-lg mb-2">
+        <Paper 
+          sx={{ 
+            position: 'relative', 
+            zIndex: 10, 
+            bgcolor: 'rgba(17, 24, 39, 0.8)', 
+            backdropFilter: 'blur(16px)', 
+            border: '2px solid #facc15', 
+            borderRadius: '1.5rem', 
+            p: 5, 
+            maxWidth: '400px', 
+            width: '100%', 
+            textAlign: 'center',
+            boxShadow: '0 20px 25px -5px rgba(250, 204, 21, 0.2)',
+            animation: 'slideUp 0.5s ease-out'
+          }}
+        >
+          <Box 
+            sx={{ 
+              width: 80, 
+              height: 80, 
+              bgcolor: 'rgba(250, 204, 21, 0.1)', 
+              borderRadius: '50%', 
+              display: 'flex', 
+              alignItems: 'center', 
+              justifyContent: 'center', 
+              mx: 'auto', 
+              mb: 3,
+              border: '2px solid #facc15',
+              animation: 'bounce 2s infinite'
+            }}
+          >
+            <CheckCircle2Icon sx={{ fontSize: 48, color: '#facc15' }} />
+          </Box>
+          <Typography variant="h4" sx={{ color: '#facc15', fontWeight: 'bold', mb: 1 }}>Password Reset!</Typography>
+          <Typography sx={{ color: '#d1d5db', fontSize: '1.125rem', mb: 1 }}>
             Your password has been reset successfully
-          </p>
-          <p className="text-gray-400 text-sm">
+          </Typography>
+          <Typography sx={{ color: '#9ca3af', fontSize: '0.875rem' }}>
             Redirecting you to login...
-          </p>
-          <div className="mt-6 flex gap-2 justify-center">
-            <div className="w-2 h-2 bg-yellow-400 rounded-full animate-pulse"></div>
-            <div className="w-2 h-2 bg-yellow-400 rounded-full animate-pulse" style={{ animationDelay: '0.2s' }}></div>
-            <div className="w-2 h-2 bg-yellow-400 rounded-full animate-pulse" style={{ animationDelay: '0.4s' }}></div>
-          </div>
-        </div>
+          </Typography>
+          <Box sx={{ mt: 3, display: 'flex', gap: 1, justifyContent: 'center' }}>
+            <Box sx={{ width: 8, height: 8, bgcolor: '#facc15', borderRadius: '50%', animation: 'pulse 1.5s infinite' }}></Box>
+            <Box sx={{ width: 8, height: 8, bgcolor: '#facc15', borderRadius: '50%', animation: 'pulse 1.5s infinite', animationDelay: '0.2s' }}></Box>
+            <Box sx={{ width: 8, height: 8, bgcolor: '#facc15', borderRadius: '50%', animation: 'pulse 1.5s infinite', animationDelay: '0.4s' }}></Box>
+          </Box>
+        </Paper>
       </div>
     );
   }
@@ -146,254 +200,240 @@ export default function ForgotPassword() {
       <div className="absolute top-1/4 right-1/4 w-96 h-96 bg-yellow-400/10 rounded-full blur-3xl animate-float"></div>
       <div className="absolute bottom-1/4 left-1/4 w-80 h-80 bg-yellow-600/10 rounded-full blur-3xl animate-float" style={{ animationDelay: '2s' }}></div>
 
-      <div className="relative z-10 w-full max-w-md">
+      <Box sx={{ position: 'relative', zIndex: 10, width: '100%', maxWidth: '448px' }}>
         {/* Back Button */}
-        <Link 
+        <Button
+          component={Link}
           to="/login"
-          className="inline-flex items-center gap-2 text-yellow-400 hover:text-yellow-300 mb-6 transition-all group animate-fadeIn"
+          startIcon={<ArrowLeftIcon />}
+          sx={{ color: '#facc15', mb: 3, '&:hover': { bgcolor: 'transparent', transform: 'translateX(-4px)' }, transition: 'all 0.3s' }}
         >
-          <ArrowLeft className="w-5 h-5 group-hover:-translate-x-1 transition-transform" />
-          <span>Back to Login</span>
-        </Link>
+          Back to Login
+        </Button>
 
         {/* Main Card */}
-        <div className="bg-gradient-to-br from-gray-900 to-black border-2 border-yellow-400/30 rounded-3xl p-8 shadow-2xl shadow-yellow-400/10 animate-slideUp">
-          
+        <Paper 
+          sx={{ 
+            bgcolor: 'rgba(17, 24, 39, 0.8)', 
+            backdropFilter: 'blur(16px)', 
+            border: '2px solid rgba(250, 204, 21, 0.2)', 
+            borderRadius: '1.5rem', 
+            p: 4, 
+            boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.5)',
+            animation: 'slideUp 0.5s ease-out'
+          }}
+        >
           {/* Progress Indicator */}
-          <div className="flex items-center justify-center gap-2 mb-8">
-            <div className={`w-3 h-3 rounded-full transition-all ${step === 'email' ? 'bg-yellow-400 w-8' : 'bg-yellow-400/30'}`}></div>
-            <div className={`w-3 h-3 rounded-full transition-all ${step === 'verify' ? 'bg-yellow-400 w-8' : 'bg-yellow-400/30'}`}></div>
-            <div className={`w-3 h-3 rounded-full transition-all ${step === 'reset' ? 'bg-yellow-400 w-8' : 'bg-yellow-400/30'}`}></div>
-          </div>
+          <Box sx={{ display: 'flex', justifyContent: 'center', gap: 1, mb: 4 }}>
+            <Box sx={{ height: 4, width: step === 'email' ? 32 : 12, borderRadius: 2, bgcolor: step === 'email' ? '#facc15' : 'rgba(250, 204, 21, 0.2)', transition: 'all 0.3s' }} />
+            <Box sx={{ height: 4, width: step === 'verify' ? 32 : 12, borderRadius: 2, bgcolor: step === 'verify' ? '#facc15' : 'rgba(250, 204, 21, 0.2)', transition: 'all 0.3s' }} />
+            <Box sx={{ height: 4, width: step === 'reset' ? 32 : 12, borderRadius: 2, bgcolor: step === 'reset' ? '#facc15' : 'rgba(250, 204, 21, 0.2)', transition: 'all 0.3s' }} />
+          </Box>
 
           {/* Step 1: Email Input */}
           {step === 'email' && (
-            <div className="animate-fadeIn">
-              <div className="text-center mb-8">
-                <div className="w-16 h-16 bg-gradient-to-br from-yellow-400 to-yellow-600 rounded-full flex items-center justify-center mx-auto mb-4 shadow-lg shadow-yellow-400/50 animate-pulse">
-                  <Mail className="w-8 h-8 text-black" />
-                </div>
-                <h1 className="text-3xl font-bold text-yellow-400 mb-2">Forgot Password?</h1>
-                <p className="text-gray-400">Don't worry! Enter your email and we'll send you a reset code</p>
-              </div>
+            <Box className="animate-fadeIn">
+              <Box sx={{ textAlign: 'center', mb: 4 }}>
+                <Box sx={{ width: 64, height: 64, bgcolor: 'rgba(250, 204, 21, 0.1)', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', mx: 'auto', mb: 2, border: '1px solid rgba(250, 204, 21, 0.3)' }}>
+                  <MailIcon sx={{ fontSize: 32, color: '#facc15' }} />
+                </Box>
+                <Typography variant="h5" sx={{ color: '#facc15', fontWeight: 'bold', mb: 1 }}>Forgot Password?</Typography>
+                <Typography variant="body2" sx={{ color: '#9ca3af' }}>Enter your email and we'll send you a reset code</Typography>
+              </Box>
 
-              <form onSubmit={handleEmailSubmit} className="space-y-6">
-                <div className="space-y-2">
-                  <label htmlFor="email" className="block text-sm font-medium text-yellow-400">
-                    Email Address
-                  </label>
-                  <div className="relative">
-                    <div className="absolute left-4 top-1/2 -translate-y-1/2">
-                      <Mail className="w-5 h-5 text-yellow-400/70" />
-                    </div>
-                    <input
-                      type="email"
-                      id="email"
-                      value={email}
-                      onChange={(e) => {
-                        setEmail(e.target.value);
-                        setErrors({ ...errors, email: '' });
-                      }}
-                      className={`w-full bg-black/50 border-2 ${
-                        errors.email ? 'border-red-500' : 'border-yellow-400/30'
-                      } rounded-xl px-12 py-3.5 text-white placeholder-gray-500 focus:outline-none focus:border-yellow-400 transition-all`}
-                      placeholder="student@sab.lk"
-                    />
-                  </div>
-                  {errors.email && (
-                    <p className="text-red-500 text-sm">{errors.email}</p>
-                  )}
-                </div>
-
-                <button
-                  type="submit"
-                  className="w-full bg-gradient-to-r from-yellow-400 to-yellow-600 text-black font-bold py-3.5 rounded-xl hover:from-yellow-500 hover:to-yellow-700 transition-all transform hover:scale-105 shadow-lg shadow-yellow-400/30 hover:shadow-yellow-400/50 flex items-center justify-center gap-2"
-                >
-                  <Send className="w-5 h-5" />
-                  Send Reset Code
-                </button>
+              <form onSubmit={handleEmailSubmit}>
+                <Box sx={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
+                  <TextField
+                    fullWidth
+                    label="Email Address"
+                    placeholder="student@sab.lk"
+                    value={email}
+                    onChange={(e) => { setEmail(e.target.value); setErrors({ ...errors, email: '' }); }}
+                    error={!!errors.email}
+                    helperText={errors.email}
+                    slotProps={{
+                      input: {
+                        startAdornment: (
+                          <InputAdornment position="start">
+                            <MailIcon sx={{ color: '#facc15', opacity: 0.7 }} />
+                          </InputAdornment>
+                        ),
+                      }
+                    }}
+                  />
+                  <Button
+                    fullWidth
+                    variant="contained"
+                    type="submit"
+                    startIcon={<SendIcon />}
+                    sx={{ py: 1.5, bgcolor: '#facc15', color: 'black', '&:hover': { bgcolor: '#eab308' } }}
+                  >
+                    Send Reset Code
+                  </Button>
+                </Box>
               </form>
-            </div>
+            </Box>
           )}
 
           {/* Step 2: Verification Code */}
           {step === 'verify' && (
-            <div className="animate-fadeIn">
-              <div className="text-center mb-8">
-                <div className="w-16 h-16 bg-gradient-to-br from-yellow-400 to-yellow-600 rounded-full flex items-center justify-center mx-auto mb-4 shadow-lg shadow-yellow-400/50 animate-pulse">
-                  <ShieldCheck className="w-8 h-8 text-black" />
-                </div>
-                <h1 className="text-3xl font-bold text-yellow-400 mb-2">Check Your Email</h1>
-                <p className="text-gray-400">We've sent a 6-digit code to</p>
-                <p className="text-yellow-400 font-semibold mt-1">{email}</p>
-              </div>
+            <Box className="animate-fadeIn">
+              <Box sx={{ textAlign: 'center', mb: 4 }}>
+                <Box sx={{ width: 64, height: 64, bgcolor: 'rgba(250, 204, 21, 0.1)', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', mx: 'auto', mb: 2, border: '1px solid rgba(250, 204, 21, 0.3)' }}>
+                  <ShieldCheckIcon sx={{ fontSize: 32, color: '#facc15' }} />
+                </Box>
+                <Typography variant="h5" sx={{ color: '#facc15', fontWeight: 'bold', mb: 1 }}>Check Your Email</Typography>
+                <Typography variant="body2" sx={{ color: '#9ca3af' }}>We've sent a 6-digit code to</Typography>
+                <Typography variant="body2" sx={{ color: '#facc15', fontWeight: 'bold' }}>{email}</Typography>
+              </Box>
 
-              <form onSubmit={handleVerificationSubmit} className="space-y-6">
-                <div className="space-y-2">
-                  <label className="block text-sm font-medium text-yellow-400 text-center">
-                    Enter Verification Code
-                  </label>
-                  <div className="flex gap-2 justify-center">
+              <form onSubmit={handleVerificationSubmit}>
+                <Box sx={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
+                  <Box sx={{ display: 'flex', gap: 1, justifyContent: 'center' }}>
                     {verificationCode.map((digit, index) => (
-                      <input
+                      <TextField
                         key={index}
                         id={`code-${index}`}
-                        type="text"
-                        maxLength={1}
                         value={digit}
                         onChange={(e) => handleVerificationChange(index, e.target.value)}
-                        onKeyDown={(e) => {
+                        onKeyDown={(e: any) => {
                           if (e.key === 'Backspace' && !digit && index > 0) {
-                            const prevInput = document.getElementById(`code-${index - 1}`);
-                            prevInput?.focus();
+                            document.getElementById(`code-${index - 1}`)?.focus();
                           }
                         }}
-                        className="w-12 h-14 bg-black/50 border-2 border-yellow-400/30 rounded-xl text-white text-center text-xl font-bold focus:outline-none focus:border-yellow-400 transition-all"
+                        slotProps={{
+                          input: {
+                            sx: { 
+                              width: '48px', 
+                              height: '56px', 
+                              '& input': { textAlign: 'center', px: 0, fontSize: '1.25rem', fontWeight: 'bold' }
+                            }
+                          }
+                        }}
                       />
                     ))}
-                  </div>
+                  </Box>
                   {errors.verificationCode && (
-                    <p className="text-red-500 text-sm text-center">{errors.verificationCode}</p>
+                    <Typography color="error" variant="caption" sx={{ textAlign: 'center' }}>{errors.verificationCode}</Typography>
                   )}
-                </div>
-
-                <button
-                  type="submit"
-                  className="w-full bg-gradient-to-r from-yellow-400 to-yellow-600 text-black font-bold py-3.5 rounded-xl hover:from-yellow-500 hover:to-yellow-700 transition-all transform hover:scale-105 shadow-lg shadow-yellow-400/30 hover:shadow-yellow-400/50"
-                >
-                  Verify Code
-                </button>
-
-                <div className="text-center">
-                  <button
-                    type="button"
-                    onClick={() => setStep('email')}
-                    className="text-gray-400 hover:text-yellow-400 text-sm transition-colors"
+                  <Button
+                    fullWidth
+                    variant="contained"
+                    type="submit"
+                    sx={{ py: 1.5, bgcolor: '#facc15', color: 'black', '&:hover': { bgcolor: '#eab308' } }}
                   >
-                    Didn't receive the code? <span className="text-yellow-400 font-semibold">Resend</span>
-                  </button>
-                </div>
+                    Verify Code
+                  </Button>
+                  <Button
+                    onClick={() => setStep('email')}
+                    sx={{ color: '#9ca3af', textTransform: 'none', '&:hover': { color: '#facc15' } }}
+                  >
+                    Didn't receive the code? <Typography component="span" sx={{ color: '#facc15', fontWeight: 'bold', ml: 1 }}>Resend</Typography>
+                  </Button>
+                </Box>
               </form>
-            </div>
+            </Box>
           )}
 
           {/* Step 3: Reset Password */}
           {step === 'reset' && (
-            <div className="animate-fadeIn">
-              <div className="text-center mb-8">
-                <div className="w-16 h-16 bg-gradient-to-br from-yellow-400 to-yellow-600 rounded-full flex items-center justify-center mx-auto mb-4 shadow-lg shadow-yellow-400/50 animate-pulse">
-                  <KeyRound className="w-8 h-8 text-black" />
-                </div>
-                <h1 className="text-3xl font-bold text-yellow-400 mb-2">Create New Password</h1>
-                <p className="text-gray-400">Your new password must be different from previous passwords</p>
-              </div>
+            <Box className="animate-fadeIn">
+              <Box sx={{ textAlign: 'center', mb: 4 }}>
+                <Box sx={{ width: 64, height: 64, bgcolor: 'rgba(250, 204, 21, 0.1)', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', mx: 'auto', mb: 2, border: '1px solid rgba(250, 204, 21, 0.3)' }}>
+                  <KeyRoundIcon sx={{ fontSize: 32, color: '#facc15' }} />
+                </Box>
+                <Typography variant="h5" sx={{ color: '#facc15', fontWeight: 'bold', mb: 1 }}>Create New Password</Typography>
+                <Typography variant="body2" sx={{ color: '#9ca3af' }}>Your new password must be different</Typography>
+              </Box>
 
-              <form onSubmit={handleResetSubmit} className="space-y-5">
-                {/* New Password */}
-                <div className="space-y-2">
-                  <label htmlFor="newPassword" className="block text-sm font-medium text-yellow-400">
-                    New Password
-                  </label>
-                  <div className="relative">
-                    <div className="absolute left-4 top-1/2 -translate-y-1/2">
-                      <Lock className="w-5 h-5 text-yellow-400/70" />
-                    </div>
-                    <input
-                      type={showNewPassword ? 'text' : 'password'}
-                      id="newPassword"
-                      value={formData.newPassword}
-                      onChange={(e) => {
-                        setFormData({ ...formData, newPassword: e.target.value });
-                        setErrors({ ...errors, newPassword: '' });
-                      }}
-                      className={`w-full bg-black/50 border-2 ${
-                        errors.newPassword ? 'border-red-500' : 'border-yellow-400/30'
-                      } rounded-xl px-12 py-3 text-white placeholder-gray-500 focus:outline-none focus:border-yellow-400 transition-all`}
-                      placeholder="Enter new password"
-                    />
-                    <button
-                      type="button"
-                      onClick={() => setShowNewPassword(!showNewPassword)}
-                      className="absolute right-4 top-1/2 -translate-y-1/2 text-yellow-400/70 hover:text-yellow-400 transition-colors"
-                    >
-                      {showNewPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
-                    </button>
-                  </div>
-                  {errors.newPassword && (
-                    <p className="text-red-500 text-sm">{errors.newPassword}</p>
-                  )}
-                </div>
+              <form onSubmit={handleResetSubmit}>
+                <Box sx={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
+                  <TextField
+                    fullWidth
+                    label="New Password"
+                    type={showNewPassword ? 'text' : 'password'}
+                    value={formData.newPassword}
+                    onChange={(e) => setFormData({ ...formData, newPassword: e.target.value })}
+                    error={!!errors.newPassword}
+                    helperText={errors.newPassword}
+                    slotProps={{
+                      input: {
+                        startAdornment: (
+                          <InputAdornment position="start">
+                            <LockIcon sx={{ color: '#facc15', opacity: 0.7 }} />
+                          </InputAdornment>
+                        ),
+                        endAdornment: (
+                          <InputAdornment position="end">
+                            <IconButton onClick={() => setShowNewPassword(!showNewPassword)} edge="end" sx={{ color: 'gray' }}>
+                              {showNewPassword ? <EyeOffIcon /> : <EyeIcon />}
+                            </IconButton>
+                          </InputAdornment>
+                        ),
+                      }
+                    }}
+                  />
+                  <TextField
+                    fullWidth
+                    label="Confirm Password"
+                    type={showConfirmPassword ? 'text' : 'password'}
+                    value={formData.confirmPassword}
+                    onChange={(e) => setFormData({ ...formData, confirmPassword: e.target.value })}
+                    error={!!errors.confirmPassword}
+                    helperText={errors.confirmPassword}
+                    slotProps={{
+                      input: {
+                        startAdornment: (
+                          <InputAdornment position="start">
+                            <LockIcon sx={{ color: '#facc15', opacity: 0.7 }} />
+                          </InputAdornment>
+                        ),
+                        endAdornment: (
+                          <InputAdornment position="end">
+                            <IconButton onClick={() => setShowConfirmPassword(!showConfirmPassword)} edge="end" sx={{ color: 'gray' }}>
+                              {showConfirmPassword ? <EyeOffIcon /> : <EyeIcon />}
+                            </IconButton>
+                          </InputAdornment>
+                        ),
+                      }
+                    }}
+                  />
+                  
+                  <Paper sx={{ p: 2, bgcolor: 'rgba(250, 204, 21, 0.05)', border: '1px solid rgba(250, 204, 21, 0.2)' }}>
+                    <Typography variant="subtitle2" sx={{ color: '#facc15', mb: 1 }}>Requirements:</Typography>
+                    <Box sx={{ display: 'flex', flexDirection: 'column', gap: 0.5 }}>
+                      {[
+                        { label: '8+ characters', met: formData.newPassword.length >= 8 },
+                        { label: 'Upper & Lower case', met: /(?=.*[a-z])(?=.*[A-Z])/.test(formData.newPassword) },
+                        { label: 'One number', met: /(?=.*\d)/.test(formData.newPassword) }
+                      ].map((req, i) => (
+                        <Box key={i} sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                          <Box sx={{ width: 6, height: 6, borderRadius: '50%', bgcolor: req.met ? '#10b981' : 'gray' }} />
+                          <Typography variant="caption" sx={{ color: req.met ? 'white' : 'gray' }}>{req.label}</Typography>
+                        </Box>
+                      ))}
+                    </Box>
+                  </Paper>
 
-                {/* Confirm Password */}
-                <div className="space-y-2">
-                  <label htmlFor="confirmPassword" className="block text-sm font-medium text-yellow-400">
-                    Confirm Password
-                  </label>
-                  <div className="relative">
-                    <div className="absolute left-4 top-1/2 -translate-y-1/2">
-                      <Lock className="w-5 h-5 text-yellow-400/70" />
-                    </div>
-                    <input
-                      type={showConfirmPassword ? 'text' : 'password'}
-                      id="confirmPassword"
-                      value={formData.confirmPassword}
-                      onChange={(e) => {
-                        setFormData({ ...formData, confirmPassword: e.target.value });
-                        setErrors({ ...errors, confirmPassword: '' });
-                      }}
-                      className={`w-full bg-black/50 border-2 ${
-                        errors.confirmPassword ? 'border-red-500' : 'border-yellow-400/30'
-                      } rounded-xl px-12 py-3 text-white placeholder-gray-500 focus:outline-none focus:border-yellow-400 transition-all`}
-                      placeholder="Confirm new password"
-                    />
-                    <button
-                      type="button"
-                      onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                      className="absolute right-4 top-1/2 -translate-y-1/2 text-yellow-400/70 hover:text-yellow-400 transition-colors"
-                    >
-                      {showConfirmPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
-                    </button>
-                  </div>
-                  {errors.confirmPassword && (
-                    <p className="text-red-500 text-sm">{errors.confirmPassword}</p>
-                  )}
-                </div>
-
-                {/* Password Requirements */}
-                <div className="bg-yellow-400/10 border border-yellow-400/30 rounded-xl p-4">
-                  <p className="text-yellow-400 text-sm font-semibold mb-2">Password Requirements:</p>
-                  <ul className="text-gray-400 text-xs space-y-1">
-                    <li className="flex items-center gap-2">
-                      <div className={`w-1.5 h-1.5 rounded-full ${formData.newPassword.length >= 8 ? 'bg-green-400' : 'bg-gray-600'}`}></div>
-                      At least 8 characters long
-                    </li>
-                    <li className="flex items-center gap-2">
-                      <div className={`w-1.5 h-1.5 rounded-full ${/(?=.*[a-z])(?=.*[A-Z])/.test(formData.newPassword) ? 'bg-green-400' : 'bg-gray-600'}`}></div>
-                      Contains uppercase and lowercase letters
-                    </li>
-                    <li className="flex items-center gap-2">
-                      <div className={`w-1.5 h-1.5 rounded-full ${/(?=.*\d)/.test(formData.newPassword) ? 'bg-green-400' : 'bg-gray-600'}`}></div>
-                      Contains at least one number
-                    </li>
-                  </ul>
-                </div>
-
-                <button
-                  type="submit"
-                  className="w-full bg-gradient-to-r from-yellow-400 to-yellow-600 text-black font-bold py-3.5 rounded-xl hover:from-yellow-500 hover:to-yellow-700 transition-all transform hover:scale-105 shadow-lg shadow-yellow-400/30 hover:shadow-yellow-400/50"
-                >
-                  Reset Password
-                </button>
+                  <Button
+                    fullWidth
+                    variant="contained"
+                    type="submit"
+                    sx={{ py: 1.5, bgcolor: '#facc15', color: 'black', '&:hover': { bgcolor: '#eab308' } }}
+                  >
+                    Reset Password
+                  </Button>
+                </Box>
               </form>
-            </div>
+            </Box>
           )}
-        </div>
+        </Paper>
+      </Box>
 
-        {/* Help Text */}
-        <p className="text-center text-gray-500 text-sm mt-6 animate-fadeIn">
-          Need help? <Link to="/login" className="text-yellow-400 hover:text-yellow-300 transition-colors">Contact Support</Link>
-        </p>
-      </div>
+      {/* Help Text */}
+      <Typography variant="body2" sx={{ position: 'relative', zIndex: 10, textAlign: 'center', color: 'gray', mt: 3 }}>
+        Need help? <Link to="/login" style={{ color: '#facc15', textDecoration: 'none' }}>Contact Support</Link>
+      </Typography>
     </div>
   );
 }

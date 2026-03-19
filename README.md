@@ -12,6 +12,7 @@
   - User account flows: register, login, forgot password, reset password
   - Role-specific dashboards: rider, business owner, and admin
   - Shared UI component library based on Radix UI primitives
+  - **Integrated with ASP.NET Core backend API**
 
   ## Tech Stack
 
@@ -22,13 +23,18 @@
   - Tailwind CSS 4
   - Radix UI components
   - Material UI packages (`@mui/material`, `@mui/icons-material`)
+  - Axios for API communication
+  - JWT authentication with auto-refresh
 
   ## Prerequisites
 
   - Node.js 18+ (LTS recommended)
   - npm 9+
+  - .NET 8 SDK (for backend)
 
   ## Getting Started
+
+  ### Frontend Only
 
   1. Clone the repository:
 
@@ -43,19 +49,51 @@
   npm install
   ```
 
-  3. Start the development server:
+  3. Create a `.env` file (copy from `.env.example`):
+
+  ```bash
+  cp .env.example .env
+  ```
+
+  4. Start the development server:
 
   ```bash
   npm run dev
   ```
 
-  4. Open the local URL shown in the terminal (usually `http://localhost:5173`).
+  5. Open the local URL shown in the terminal (usually `http://localhost:5173`).
+
+  ### Full Stack (Frontend + Backend)
+
+  To run both frontend and backend together:
+
+  ```bash
+  npm run start:all
+  ```
+
+  This will start:
+  - Backend API on `http://localhost:5059`
+  - Frontend on `http://localhost:5173`
+
+  ## Backend Integration
+
+  The frontend is integrated with the NearU Backend located at:
+  `C:\Users\THIMIRA\source\repos\NearU_Backend_Revised`
+
+  - **Backend Technology**: ASP.NET Core Web API
+  - **Database**: PostgreSQL (Railway hosted)
+  - **Authentication**: JWT with refresh token rotation
+  - **API Base URL**: Configured via `.env` file (`VITE_API_BASE_URL`)
+
+  For detailed integration information, see [BACKEND_INTEGRATION.md](./BACKEND_INTEGRATION.md).
 
   ## Available Commands
 
   ```bash
-  npm run dev      # Start development server
-  npm run build    # Create production build in dist/
+  npm run dev           # Start frontend development server only
+  npm run build         # Create production build in dist/
+  npm run start:backend # Start backend only
+  npm run start:all     # Start both frontend and backend
   ```
 
   Optional local preview of the production build:
@@ -63,6 +101,17 @@
   ```bash
   npx vite preview
   ```
+
+  ## Environment Variables
+
+  Create a `.env` file in the root directory:
+
+  ```env
+  VITE_API_BASE_URL=http://localhost:5059/api
+  VITE_APP_ENV=development
+  ```
+
+  See `.env.example` for the template.
 
   ## Project Structure
 

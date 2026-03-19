@@ -5,7 +5,10 @@
   "type": "module",
   "scripts": {
     "build": "vite build",
-    "dev": "vite"
+    "dev": "vite",
+    "start:backend": "cd C:\\Users\\THIMIRA\\source\\repos\\NearU_Backend_Revised && dotnet run",
+    "start:all": "powershell -ExecutionPolicy Bypass -File ./start-dev.ps1",
+    "validate": "powershell -ExecutionPolicy Bypass -File ./validate-integration.ps1"
   },
   "dependencies": {
     "@emotion/react": "11.14.0",
