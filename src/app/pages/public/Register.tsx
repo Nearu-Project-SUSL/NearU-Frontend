@@ -1,5 +1,8 @@
 import { useState } from 'react';
-import { Link } from 'react-router';
+import { Link, useNavigate } from 'react-router';
+import { toast } from 'sonner';
+import authService from '../../../api/authService';
+import useAuth from '../../hooks/useAuth';
 
 // MUI Components
 import {
@@ -18,7 +21,8 @@ import {
   InputLabel,
   Grid,
   Divider,
-  Paper
+  Paper,
+  CircularProgress
 } from '@mui/material';
 
 // MUI Icons
@@ -47,6 +51,10 @@ type UserType = 'student' | 'business' | 'rider';
 type StudentStep = 0 | 1 | 2; // MUI Stepper uses 0-based index
 
 export default function Register() {
+  const navigate = useNavigate();
+  const { setAuth } = useAuth();
+  const [isLoading, setIsLoading] = useState(false);
+
   const [userType, setUserType] = useState<UserType>('student');
   const [activeStep, setActiveStep] = useState<StudentStep>(0);
 
@@ -116,34 +124,91 @@ export default function Register() {
     setActiveStep((prevActiveStep) => (prevActiveStep - 1) as StudentStep);
   };
 
-  const handleStudentSubmit = (e: React.FormEvent) => {
+  const handleStudentSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (studentForm.password !== studentForm.confirmPassword) {
-      alert('Passwords do not match!');
+      toast.error('Passwords do not match!');
       return;
     }
-    console.log('Student registration:', studentForm);
-    alert('Student registration submitted successfully!');
+    
+    setIsLoading(true);
+    try {
+      await authService.registerStudent(studentForm);
+      const loginResponse = await authService.login({ email: studentForm.email, password: studentForm.password });
+      
+      setAuth({
+        user: loginResponse.user,
+        accessToken: loginResponse.accessToken,
+        refreshToken: loginResponse.refreshToken,
+      });
+      localStorage.setItem('accessToken', loginResponse.accessToken);
+      
+      toast.success('Registration and login successful!');
+      navigate('/home');
+    } catch (error: any) {
+      const errorMessage = error.response?.data?.message || 'Registration failed.';
+      toast.error(errorMessage);
+    } finally {
+      setIsLoading(false);
+    }
   };
 
-  const handleBusinessSubmit = (e: React.FormEvent) => {
+  const handleBusinessSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (businessForm.password !== businessForm.confirmPassword) {
-      alert('Passwords do not match!');
+      toast.error('Passwords do not match!');
       return;
     }
-    console.log('Business registration:', businessForm);
-    alert('Business registration submitted! Your application will be reviewed by admins.');
+    
+    setIsLoading(true);
+    try {
+      await authService.registerBusiness(businessForm);
+      const loginResponse = await authService.login({ email: businessForm.email, password: businessForm.password });
+      
+      setAuth({
+        user: loginResponse.user,
+        accessToken: loginResponse.accessToken,
+        refreshToken: loginResponse.refreshToken,
+      });
+      localStorage.setItem('accessToken', loginResponse.accessToken);
+      
+      toast.success('Registration and login successful!');
+      navigate('/business-owner-home');
+    } catch (error: any) {
+      const errorMessage = error.response?.data?.message || 'Registration failed.';
+      toast.error(errorMessage);
+    } finally {
+      setIsLoading(false);
+    }
   };
 
-  const handleRiderSubmit = (e: React.FormEvent) => {
+  const handleRiderSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (riderForm.password !== riderForm.confirmPassword) {
-      alert('Passwords do not match!');
+      toast.error('Passwords do not match!');
       return;
     }
-    console.log('Rider registration:', riderForm);
-    alert('Rider registration submitted! Your application will be reviewed by admins.');
+    
+    setIsLoading(true);
+    try {
+      await authService.registerRider(riderForm);
+      const loginResponse = await authService.login({ email: riderForm.email, password: riderForm.password });
+      
+      setAuth({
+        user: loginResponse.user,
+        accessToken: loginResponse.accessToken,
+        refreshToken: loginResponse.refreshToken,
+      });
+      localStorage.setItem('accessToken', loginResponse.accessToken);
+      
+      toast.success('Registration and login successful!');
+      navigate('/rider-home');
+    } catch (error: any) {
+      const errorMessage = error.response?.data?.message || 'Registration failed.';
+      toast.error(errorMessage);
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
@@ -545,10 +610,11 @@ export default function Register() {
                             fullWidth
                             variant="contained"
                             type="submit"
-                            startIcon={<CheckCircleIcon />}
+                            disabled={isLoading}
+                            startIcon={isLoading ? <CircularProgress size={20} color="inherit" /> : <CheckCircleIcon />}
                             sx={{ bgcolor: '#10b981', color: 'white', '&:hover': { bgcolor: '#059669' } }}
                           >
-                            Complete
+                            {isLoading ? 'Processing...' : 'Complete'}
                           </Button>
                         </Box>
                       </Box>
@@ -608,8 +674,8 @@ export default function Register() {
                         Note: Your application will be reviewed by our admin team.
                       </Typography>
                     </Paper>
-                    <Button fullWidth variant="contained" type="submit" endIcon={<ArrowRightIcon />} sx={{ mt: 2, bgcolor: '#facc15', color: 'black', '&:hover': { bgcolor: '#eab308' } }}>
-                      Submit for Review
+                    <Button fullWidth variant="contained" type="submit" disabled={isLoading} endIcon={isLoading ? undefined : <ArrowRightIcon />} startIcon={isLoading ? <CircularProgress size={20} color="inherit" /> : null} sx={{ mt: 2, bgcolor: '#facc15', color: 'black', '&:hover': { bgcolor: '#eab308' } }}>
+                      {isLoading ? 'Processing...' : 'Submit for Review'}
                     </Button>
                   </form>
                 </Box>
@@ -665,8 +731,8 @@ export default function Register() {
                         Note: Your application will be reviewed by our admin team.
                       </Typography>
                     </Paper>
-                    <Button fullWidth variant="contained" type="submit" endIcon={<ArrowRightIcon />} sx={{ mt: 2, bgcolor: '#facc15', color: 'black', '&:hover': { bgcolor: '#eab308' } }}>
-                      Submit for Review
+                    <Button fullWidth variant="contained" type="submit" disabled={isLoading} endIcon={isLoading ? undefined : <ArrowRightIcon />} startIcon={isLoading ? <CircularProgress size={20} color="inherit" /> : null} sx={{ mt: 2, bgcolor: '#facc15', color: 'black', '&:hover': { bgcolor: '#eab308' } }}>
+                      {isLoading ? 'Processing...' : 'Submit for Review'}
                     </Button>
                   </form>
                 </Box>
