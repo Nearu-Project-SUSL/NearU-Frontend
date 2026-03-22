@@ -1,13 +1,62 @@
 import { useState } from 'react';
-import { Link } from 'react-router';
-import { User, Mail, Lock, Phone, MapPin, Building2, FileText, Briefcase, Bike, CreditCard, ChevronRight, ChevronLeft, CheckCircle, ArrowRight, Eye, EyeOff, GraduationCap, Store } from 'lucide-react';
+import { Link, useNavigate } from 'react-router';
+import { toast } from 'sonner';
+import authService from '../../../api/authService';
+import useAuth from '../../hooks/useAuth';
+
+// MUI Components
+import {
+  Box,
+  Typography,
+  Button,
+  TextField,
+  IconButton,
+  InputAdornment,
+  Stepper,
+  Step,
+  StepLabel,
+  Select,
+  MenuItem,
+  FormControl,
+  InputLabel,
+  Grid,
+  Divider,
+  Paper,
+  CircularProgress
+} from '@mui/material';
+
+// MUI Icons
+import {
+  Person as UserIcon,
+  Email as MailIcon,
+  Lock as LockIcon,
+  Phone as PhoneIcon,
+  Map as MapIcon,
+  Business as BuildingIcon,
+  Description as FileTextIcon,
+  Work as BriefcaseIcon,
+  DirectionsBike as BikeIcon,
+  CreditCard as CreditCardIcon,
+  ChevronRight as ChevronRightIcon,
+  ChevronLeft as ChevronLeftIcon,
+  CheckCircle as CheckCircleIcon,
+  ArrowForward as ArrowRightIcon,
+  Visibility as EyeIcon,
+  VisibilityOff as EyeOffIcon,
+  School as GraduationCapIcon,
+  Store as StoreIcon
+} from '@mui/icons-material';
 
 type UserType = 'student' | 'business' | 'rider';
-type StudentStep = 1 | 2 | 3;
+type StudentStep = 0 | 1 | 2; // MUI Stepper uses 0-based index
 
 export default function Register() {
+  const navigate = useNavigate();
+  const { setAuth } = useAuth();
+  const [isLoading, setIsLoading] = useState(false);
+
   const [userType, setUserType] = useState<UserType>('student');
-  const [studentStep, setStudentStep] = useState<StudentStep>(1);
+  const [activeStep, setActiveStep] = useState<StudentStep>(0);
 
   // Student form state
   const [studentForm, setStudentForm] = useState({
@@ -65,42 +114,101 @@ export default function Register() {
   const businessTypes = ['Food Vendor', 'Accommodation', 'Transport', 'Retail Shop', 'Services'];
   const vehicleTypes = ['Tuk Tuk', 'Motorcycle', 'Bicycle', 'Car'];
 
-  const handleStudentStepNext = () => {
-    if (studentStep < 3) setStudentStep((studentStep + 1) as StudentStep);
+  const steps = ['Basic Info', 'Personal Details', 'Additional Info'];
+
+  const handleNext = () => {
+    setActiveStep((prevActiveStep) => (prevActiveStep + 1) as StudentStep);
   };
 
-  const handleStudentStepBack = () => {
-    if (studentStep > 1) setStudentStep((studentStep - 1) as StudentStep);
+  const handleBack = () => {
+    setActiveStep((prevActiveStep) => (prevActiveStep - 1) as StudentStep);
   };
 
-  const handleStudentSubmit = (e: React.FormEvent) => {
+  const handleStudentSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (studentForm.password !== studentForm.confirmPassword) {
-      alert('Passwords do not match!');
+      toast.error('Passwords do not match!');
       return;
     }
-    console.log('Student registration:', studentForm);
-    alert('Student registration submitted successfully!');
+    
+    setIsLoading(true);
+    try {
+      await authService.registerStudent(studentForm);
+      const loginResponse = await authService.login({ email: studentForm.email, password: studentForm.password });
+      
+      setAuth({
+        user: loginResponse.user,
+        accessToken: loginResponse.accessToken,
+        refreshToken: loginResponse.refreshToken,
+      });
+      localStorage.setItem('accessToken', loginResponse.accessToken);
+      
+      toast.success('Registration and login successful!');
+      navigate('/home');
+    } catch (error: any) {
+      const errorMessage = error.response?.data?.message || 'Registration failed.';
+      toast.error(errorMessage);
+    } finally {
+      setIsLoading(false);
+    }
   };
 
-  const handleBusinessSubmit = (e: React.FormEvent) => {
+  const handleBusinessSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (businessForm.password !== businessForm.confirmPassword) {
-      alert('Passwords do not match!');
+      toast.error('Passwords do not match!');
       return;
     }
-    console.log('Business registration:', businessForm);
-    alert('Business registration submitted! Your application will be reviewed by admins.');
+    
+    setIsLoading(true);
+    try {
+      await authService.registerBusiness(businessForm);
+      const loginResponse = await authService.login({ email: businessForm.email, password: businessForm.password });
+      
+      setAuth({
+        user: loginResponse.user,
+        accessToken: loginResponse.accessToken,
+        refreshToken: loginResponse.refreshToken,
+      });
+      localStorage.setItem('accessToken', loginResponse.accessToken);
+      
+      toast.success('Registration and login successful!');
+      navigate('/business-owner-home');
+    } catch (error: any) {
+      const errorMessage = error.response?.data?.message || 'Registration failed.';
+      toast.error(errorMessage);
+    } finally {
+      setIsLoading(false);
+    }
   };
 
-  const handleRiderSubmit = (e: React.FormEvent) => {
+  const handleRiderSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (riderForm.password !== riderForm.confirmPassword) {
-      alert('Passwords do not match!');
+      toast.error('Passwords do not match!');
       return;
     }
-    console.log('Rider registration:', riderForm);
-    alert('Rider registration submitted! Your application will be reviewed by admins.');
+    
+    setIsLoading(true);
+    try {
+      await authService.registerRider(riderForm);
+      const loginResponse = await authService.login({ email: riderForm.email, password: riderForm.password });
+      
+      setAuth({
+        user: loginResponse.user,
+        accessToken: loginResponse.accessToken,
+        refreshToken: loginResponse.refreshToken,
+      });
+      localStorage.setItem('accessToken', loginResponse.accessToken);
+      
+      toast.success('Registration and login successful!');
+      navigate('/rider-home');
+    } catch (error: any) {
+      const errorMessage = error.response?.data?.message || 'Registration failed.';
+      toast.error(errorMessage);
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
@@ -122,12 +230,25 @@ export default function Register() {
         </Link>
         <div className="flex items-center gap-4">
           <span className="text-gray-400 text-sm">Already have an account?</span>
-          <Link 
-            to="/login" 
-            className="px-6 py-2.5 bg-yellow-400/10 hover:bg-yellow-400/20 text-yellow-400 rounded-xl border border-yellow-400/20 hover:border-yellow-400/40 transition-all backdrop-blur-sm hover:scale-105 duration-300"
+          <Button 
+            component={Link}
+            to="/login"
+            variant="outlined"
+            sx={{
+              color: '#facc15',
+              borderColor: 'rgba(250, 204, 21, 0.2)',
+              borderRadius: '0.75rem',
+              px: 3,
+              '&:hover': {
+                borderColor: '#facc15',
+                bgcolor: 'rgba(250, 204, 21, 0.1)',
+                transform: 'scale(1.05)',
+              },
+              transition: 'all 0.3s',
+            }}
           >
             Sign In
-          </Link>
+          </Button>
         </div>
       </nav>
 
@@ -146,21 +267,21 @@ export default function Register() {
                 <div className="relative w-64 h-64 bg-gradient-to-br from-gray-800 to-black rounded-3xl border-2 border-yellow-400/30 shadow-2xl shadow-yellow-400/20 p-8">
                   {/* Center circle */}
                   <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-20 h-20 bg-gradient-to-br from-yellow-400 to-yellow-600 rounded-full flex items-center justify-center shadow-lg animate-pulse">
-                    <GraduationCap className="w-10 h-10 text-black" />
+                    <GraduationCapIcon sx={{ fontSize: 40, color: 'black' }} />
                   </div>
 
                   {/* Orbiting icons */}
                   <div className="absolute top-8 left-1/2 -translate-x-1/2 w-12 h-12 bg-yellow-400/20 rounded-full flex items-center justify-center border border-yellow-400/40 animate-float">
-                    <User className="w-6 h-6 text-yellow-400" />
+                    <UserIcon sx={{ fontSize: 24, color: '#facc15' }} />
                   </div>
                   <div className="absolute bottom-8 left-1/2 -translate-x-1/2 w-12 h-12 bg-yellow-400/20 rounded-full flex items-center justify-center border border-yellow-400/40 animate-float" style={{ animationDelay: '1s' }}>
-                    <Bike className="w-6 h-6 text-yellow-400" />
+                    <BikeIcon sx={{ fontSize: 24, color: '#facc15' }} />
                   </div>
                   <div className="absolute left-8 top-1/2 -translate-y-1/2 w-12 h-12 bg-yellow-400/20 rounded-full flex items-center justify-center border border-yellow-400/40 animate-float" style={{ animationDelay: '2s' }}>
-                    <Store className="w-6 h-6 text-yellow-400" />
+                    <StoreIcon sx={{ fontSize: 24, color: '#facc15' }} />
                   </div>
                   <div className="absolute right-8 top-1/2 -translate-y-1/2 w-12 h-12 bg-yellow-400/20 rounded-full flex items-center justify-center border border-yellow-400/40 animate-float" style={{ animationDelay: '3s' }}>
-                    <Building2 className="w-6 h-6 text-yellow-400" />
+                    <BuildingIcon sx={{ fontSize: 24, color: '#facc15' }} />
                   </div>
                 </div>
               </div>
@@ -168,13 +289,13 @@ export default function Register() {
 
             {/* Text */}
             <div className="text-center space-y-4 max-w-md">
-              <h2 className="text-4xl text-white">
+              <Typography variant="h3" sx={{ color: 'white', fontWeight: 'bold' }}>
                 Join the NearU<br />
                 <span className="text-yellow-400">Community Today.</span>
-              </h2>
-              <p className="text-gray-400 text-lg leading-relaxed">
+              </Typography>
+              <Typography variant="body1" sx={{ color: 'gray', fontSize: '1.125rem' }}>
                 Connect with campus services, discover local businesses, and find part-time opportunities at Sabaragamuwa University.
-              </p>
+              </Typography>
             </div>
           </div>
 
@@ -183,724 +304,444 @@ export default function Register() {
             <div className="bg-gradient-to-br from-yellow-400/5 to-black/50 backdrop-blur-xl rounded-3xl border-2 border-yellow-400/20 p-8 lg:p-10 shadow-2xl shadow-yellow-400/10 hover:border-yellow-400/30 transition-all duration-500">
               {/* Header */}
               <div className="text-center mb-6">
-                <h2 className="text-3xl lg:text-4xl text-white mb-2">Create Account</h2>
-                <p className="text-gray-400">Join the Sabaragamuwa University community</p>
+                <Typography variant="h4" sx={{ color: 'white', mb: 1 }}>Create Account</Typography>
+                <Typography variant="body2" sx={{ color: 'gray' }}>Join the Sabaragamuwa University community</Typography>
               </div>
 
               {/* User Type Selector */}
-              <div className="grid grid-cols-3 gap-3 mb-8 animate-slideUp" style={{ animationDelay: '0.1s' }}>
-                <button
-                  onClick={() => setUserType('student')}
-                  className={`relative p-4 rounded-xl border-2 transition-all duration-300 group ${
-                    userType === 'student'
-                      ? 'bg-gradient-to-br from-yellow-400/20 to-yellow-600/20 border-yellow-400 shadow-lg shadow-yellow-400/20'
-                      : 'bg-black/40 border-yellow-400/20 hover:border-yellow-400/40'
-                  }`}
-                >
-                  <div className={`w-10 h-10 rounded-lg flex items-center justify-center mb-2 mx-auto transition-all ${
-                    userType === 'student' ? 'bg-gradient-to-br from-yellow-400 to-yellow-600 scale-110' : 'bg-gray-800 group-hover:scale-105'
-                  }`}>
-                    <User className="w-5 h-5 text-white" />
-                  </div>
-                  <p className="text-sm text-white">Student</p>
-                </button>
+              <Grid container spacing={2} sx={{ mb: 4 }}>
+                {[
+                  { type: 'student', icon: UserIcon, label: 'Student' },
+                  { type: 'business', icon: BuildingIcon, label: 'Business' },
+                  { type: 'rider', icon: BikeIcon, label: 'Rider' }
+                ].map((item) => (
+                  <Grid item xs={4} key={item.type}>
+                    <Button
+                      fullWidth
+                      onClick={() => setUserType(item.type as UserType)}
+                      sx={{
+                        flexDirection: 'column',
+                        py: 2,
+                        borderRadius: '0.75rem',
+                        border: '2px solid',
+                        borderColor: userType === item.type ? '#facc15' : 'rgba(250, 204, 21, 0.2)',
+                        bgcolor: userType === item.type ? 'rgba(250, 204, 21, 0.1)' : 'rgba(0,0,0,0.4)',
+                        color: 'white',
+                        '&:hover': {
+                          borderColor: userType === item.type ? '#facc15' : 'rgba(250, 204, 21, 0.4)',
+                          bgcolor: userType === item.type ? 'rgba(250, 204, 21, 0.15)' : 'rgba(0,0,0,0.6)',
+                        },
+                      }}
+                    >
+                      <Box sx={{ 
+                        bgcolor: userType === item.type ? '#facc15' : 'rgba(156, 163, 175, 0.2)',
+                        p: 1, 
+                        borderRadius: '0.5rem',
+                        mb: 1,
+                        display: 'flex',
+                        transition: 'all 0.3s'
+                      }}>
+                        <item.icon sx={{ color: userType === item.type ? 'black' : 'white' }} />
+                      </Box>
+                      <Typography variant="caption" sx={{ fontWeight: 600 }}>{item.label}</Typography>
+                    </Button>
+                  </Grid>
+                ))}
+              </Grid>
 
-                <button
-                  onClick={() => setUserType('business')}
-                  className={`relative p-4 rounded-xl border-2 transition-all duration-300 group ${
-                    userType === 'business'
-                      ? 'bg-gradient-to-br from-yellow-400/20 to-yellow-600/20 border-yellow-400 shadow-lg shadow-yellow-400/20'
-                      : 'bg-black/40 border-yellow-400/20 hover:border-yellow-400/40'
-                  }`}
-                >
-                  <div className={`w-10 h-10 rounded-lg flex items-center justify-center mb-2 mx-auto transition-all ${
-                    userType === 'business' ? 'bg-gradient-to-br from-yellow-400 to-yellow-600 scale-110' : 'bg-gray-800 group-hover:scale-105'
-                  }`}>
-                    <Building2 className="w-5 h-5 text-white" />
-                  </div>
-                  <p className="text-sm text-white">Business</p>
-                </button>
-
-                <button
-                  onClick={() => setUserType('rider')}
-                  className={`relative p-4 rounded-xl border-2 transition-all duration-300 group ${
-                    userType === 'rider'
-                      ? 'bg-gradient-to-br from-yellow-400/20 to-yellow-600/20 border-yellow-400 shadow-lg shadow-yellow-400/20'
-                      : 'bg-black/40 border-yellow-400/20 hover:border-yellow-400/40'
-                  }`}
-                >
-                  <div className={`w-10 h-10 rounded-lg flex items-center justify-center mb-2 mx-auto transition-all ${
-                    userType === 'rider' ? 'bg-gradient-to-br from-yellow-400 to-yellow-600 scale-110' : 'bg-gray-800 group-hover:scale-105'
-                  }`}>
-                    <Bike className="w-5 h-5 text-white" />
-                  </div>
-                  <p className="text-sm text-white">Rider</p>
-                </button>
-              </div>
-
-              {/* Student Registration */}
+              {/* Form Content */}
               {userType === 'student' && (
-                <div className="animate-fadeIn">
-                  {/* Progress Steps */}
-                  <div className="flex items-center justify-between mb-6">
-                    <div className="flex items-center gap-2 flex-1">
-                      <div className={`w-8 h-8 rounded-full flex items-center justify-center text-xs transition-all ${
-                        studentStep >= 1 ? 'bg-yellow-400 text-black' : 'bg-gray-800 text-gray-500'
-                      }`}>
-                        {studentStep > 1 ? <CheckCircle className="w-4 h-4" /> : '1'}
-                      </div>
-                      <div className={`flex-1 h-0.5 rounded ${studentStep > 1 ? 'bg-yellow-400' : 'bg-gray-800'}`}></div>
-                    </div>
-                    <div className="flex items-center gap-2 flex-1">
-                      <div className={`w-8 h-8 rounded-full flex items-center justify-center text-xs transition-all ${
-                        studentStep >= 2 ? 'bg-yellow-400 text-black' : 'bg-gray-800 text-gray-500'
-                      }`}>
-                        {studentStep > 2 ? <CheckCircle className="w-4 h-4" /> : '2'}
-                      </div>
-                      <div className={`flex-1 h-0.5 rounded ${studentStep > 2 ? 'bg-yellow-400' : 'bg-gray-800'}`}></div>
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <div className={`w-8 h-8 rounded-full flex items-center justify-center text-xs transition-all ${
-                        studentStep >= 3 ? 'bg-yellow-400 text-black' : 'bg-gray-800 text-gray-500'
-                      }`}>
-                        3
-                      </div>
-                    </div>
-                  </div>
+                <Box className="animate-fadeIn">
+                  <Stepper activeStep={activeStep} alternativeLabel sx={{ mb: 4, '& .MuiStepIcon-root.Mui-active': { color: '#facc15' }, '& .MuiStepIcon-root.Mui-completed': { color: '#facc15' } }}>
+                    {steps.map((label) => (
+                      <Step key={label}>
+                        <StepLabel sx={{ '& .MuiStepLabel-label': { color: 'gray' }, '& .MuiStepLabel-label.Mui-active': { color: 'white' } }}>{label}</StepLabel>
+                      </Step>
+                    ))}
+                  </Stepper>
 
                   <form onSubmit={handleStudentSubmit}>
-                    {/* Step 1: Basic Information */}
-                    {studentStep === 1 && (
-                      <div className="space-y-4 animate-fadeIn">
-                        <div className="text-center mb-4">
-                          <h3 className="text-xl text-white mb-1">Basic Information</h3>
-                          <p className="text-gray-400 text-sm">Let's start with your basic details</p>
-                        </div>
-
-                        <div>
-                          <label className="block text-sm text-gray-300 mb-2">Full Name</label>
-                          <div className="relative">
-                            <User className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
-                            <input
-                              type="text"
-                              required
-                              value={studentForm.fullName}
-                              onChange={(e) => setStudentForm({...studentForm, fullName: e.target.value})}
-                              className="w-full bg-black/40 border-2 border-yellow-400/20 focus:border-yellow-400/60 rounded-xl px-12 py-3 text-white placeholder:text-gray-500 focus:outline-none transition-all duration-300"
-                              placeholder="Enter your full name"
-                            />
-                          </div>
-                        </div>
-
-                        <div>
-                          <label className="block text-sm text-gray-300 mb-2">Email Address</label>
-                          <div className="relative">
-                            <Mail className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
-                            <input
-                              type="email"
-                              required
-                              value={studentForm.email}
-                              onChange={(e) => setStudentForm({...studentForm, email: e.target.value})}
-                              className="w-full bg-black/40 border-2 border-yellow-400/20 focus:border-yellow-400/60 rounded-xl px-12 py-3 text-white placeholder:text-gray-500 focus:outline-none transition-all duration-300"
-                              placeholder="your.email@student.sab.ac.lk"
-                            />
-                          </div>
-                        </div>
-
-                        <div>
-                          <label className="block text-sm text-gray-300 mb-2">Password</label>
-                          <div className="relative">
-                            <Lock className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
-                            <input
-                              type={showPassword ? "text" : "password"}
-                              required
-                              value={studentForm.password}
-                              onChange={(e) => setStudentForm({...studentForm, password: e.target.value})}
-                              className="w-full bg-black/40 border-2 border-yellow-400/20 focus:border-yellow-400/60 rounded-xl px-12 py-3 text-white placeholder:text-gray-500 focus:outline-none transition-all duration-300"
-                              placeholder="Create a strong password"
-                            />
-                            <button
-                              type="button"
-                              onClick={() => setShowPassword(!showPassword)}
-                              className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 hover:text-yellow-400 transition-colors"
-                            >
-                              {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
-                            </button>
-                          </div>
-                        </div>
-
-                        <div>
-                          <label className="block text-sm text-gray-300 mb-2">Confirm Password</label>
-                          <div className="relative">
-                            <Lock className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
-                            <input
-                              type={showConfirmPassword ? "text" : "password"}
-                              required
-                              value={studentForm.confirmPassword}
-                              onChange={(e) => setStudentForm({...studentForm, confirmPassword: e.target.value})}
-                              className="w-full bg-black/40 border-2 border-yellow-400/20 focus:border-yellow-400/60 rounded-xl px-12 py-3 text-white placeholder:text-gray-500 focus:outline-none transition-all duration-300"
-                              placeholder="Confirm your password"
-                            />
-                            <button
-                              type="button"
-                              onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                              className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 hover:text-yellow-400 transition-colors"
-                            >
-                              {showConfirmPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
-                            </button>
-                          </div>
-                        </div>
-
-                        <button
-                          type="button"
-                          onClick={handleStudentStepNext}
-                          className="w-full bg-gradient-to-r from-yellow-400 to-yellow-600 hover:from-yellow-500 hover:to-yellow-700 text-black py-3.5 rounded-xl transition-all shadow-lg shadow-yellow-500/30 hover:shadow-yellow-500/50 border-2 border-black/20 hover:scale-105 duration-300 flex items-center justify-center gap-2 mt-6"
+                    {activeStep === 0 && (
+                      <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+                        <TextField
+                          fullWidth
+                          label="Full Name"
+                          variant="outlined"
+                          required
+                          value={studentForm.fullName}
+                          onChange={(e) => setStudentForm({...studentForm, fullName: e.target.value})}
+                          slotProps={{
+                            input: {
+                              startAdornment: (
+                                <InputAdornment position="start">
+                                  <UserIcon sx={{ color: 'gray' }} />
+                                </InputAdornment>
+                              ),
+                            }
+                          }}
+                        />
+                        <TextField
+                          fullWidth
+                          label="Email Address"
+                          type="email"
+                          variant="outlined"
+                          required
+                          value={studentForm.email}
+                          onChange={(e) => setStudentForm({...studentForm, email: e.target.value})}
+                          slotProps={{
+                            input: {
+                              startAdornment: (
+                                <InputAdornment position="start">
+                                  <MailIcon sx={{ color: 'gray' }} />
+                                </InputAdornment>
+                              ),
+                            }
+                          }}
+                        />
+                        <TextField
+                          fullWidth
+                          label="Password"
+                          type={showPassword ? "text" : "password"}
+                          variant="outlined"
+                          required
+                          value={studentForm.password}
+                          onChange={(e) => setStudentForm({...studentForm, password: e.target.value})}
+                          slotProps={{
+                            input: {
+                              startAdornment: (
+                                <InputAdornment position="start">
+                                  <LockIcon sx={{ color: 'gray' }} />
+                                </InputAdornment>
+                              ),
+                              endAdornment: (
+                                <InputAdornment position="end">
+                                  <IconButton onClick={() => setShowPassword(!showPassword)} edge="end" sx={{ color: 'gray' }}>
+                                    {showPassword ? <EyeOffIcon /> : <EyeIcon />}
+                                  </IconButton>
+                                </InputAdornment>
+                              ),
+                            }
+                          }}
+                        />
+                        <TextField
+                          fullWidth
+                          label="Confirm Password"
+                          type={showConfirmPassword ? "text" : "password"}
+                          variant="outlined"
+                          required
+                          value={studentForm.confirmPassword}
+                          onChange={(e) => setStudentForm({...studentForm, confirmPassword: e.target.value})}
+                          slotProps={{
+                            input: {
+                              startAdornment: (
+                                <InputAdornment position="start">
+                                  <LockIcon sx={{ color: 'gray' }} />
+                                </InputAdornment>
+                              ),
+                              endAdornment: (
+                                <InputAdornment position="end">
+                                  <IconButton onClick={() => setShowConfirmPassword(!showConfirmPassword)} edge="end" sx={{ color: 'gray' }}>
+                                    {showConfirmPassword ? <EyeOffIcon /> : <EyeIcon />}
+                                  </IconButton>
+                                </InputAdornment>
+                              ),
+                            }
+                          }}
+                        />
+                        <Button
+                          fullWidth
+                          variant="contained"
+                          onClick={handleNext}
+                          sx={{ mt: 2, bgcolor: '#facc15', color: 'black', '&:hover': { bgcolor: '#eab308' } }}
+                          endIcon={<ChevronRightIcon />}
                         >
                           Next Step
-                          <ChevronRight className="w-5 h-5" />
-                        </button>
-                      </div>
+                        </Button>
+                      </Box>
                     )}
 
-                    {/* Step 2: Personal Details */}
-                    {studentStep === 2 && (
-                      <div className="space-y-4 animate-fadeIn">
-                        <div className="text-center mb-4">
-                          <h3 className="text-xl text-white mb-1">Personal Details</h3>
-                          <p className="text-gray-400 text-sm">Tell us more about yourself</p>
-                        </div>
-
-                        <div className="grid grid-cols-2 gap-3">
-                          <div>
-                            <label className="block text-sm text-gray-300 mb-2">Student ID</label>
-                            <input
-                              type="text"
+                    {activeStep === 1 && (
+                      <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+                        <Grid container spacing={2}>
+                          <Grid item xs={6}>
+                            <TextField
+                              fullWidth
+                              label="Student ID"
                               required
                               value={studentForm.studentId}
                               onChange={(e) => setStudentForm({...studentForm, studentId: e.target.value})}
-                              className="w-full bg-black/40 border-2 border-yellow-400/20 focus:border-yellow-400/60 rounded-xl px-4 py-3 text-white placeholder:text-gray-500 focus:outline-none transition-all duration-300"
-                              placeholder="SAB/2024/001"
                             />
-                          </div>
-
-                          <div>
-                            <label className="block text-sm text-gray-300 mb-2">Phone Number</label>
-                            <input
+                          </Grid>
+                          <Grid item xs={6}>
+                            <TextField
+                              fullWidth
+                              label="Phone Number"
                               type="tel"
                               required
                               value={studentForm.phone}
                               onChange={(e) => setStudentForm({...studentForm, phone: e.target.value})}
-                              className="w-full bg-black/40 border-2 border-yellow-400/20 focus:border-yellow-400/60 rounded-xl px-4 py-3 text-white placeholder:text-gray-500 focus:outline-none transition-all duration-300"
-                              placeholder="+94 77 123 4567"
                             />
-                          </div>
-                        </div>
-
-                        <div className="grid grid-cols-2 gap-3">
-                          <div>
-                            <label className="block text-sm text-gray-300 mb-2">Faculty</label>
-                            <select
-                              required
-                              value={studentForm.faculty}
-                              onChange={(e) => setStudentForm({...studentForm, faculty: e.target.value})}
-                              className="w-full bg-black/40 border-2 border-yellow-400/20 focus:border-yellow-400/60 rounded-xl px-4 py-3 text-white focus:outline-none transition-all duration-300"
-                            >
-                              <option value="">Select faculty</option>
-                              {faculties.map(faculty => (
-                                <option key={faculty} value={faculty}>{faculty}</option>
-                              ))}
-                            </select>
-                          </div>
-
-                          <div>
-                            <label className="block text-sm text-gray-300 mb-2">Year</label>
-                            <select
-                              required
-                              value={studentForm.year}
-                              onChange={(e) => setStudentForm({...studentForm, year: e.target.value})}
-                              className="w-full bg-black/40 border-2 border-yellow-400/20 focus:border-yellow-400/60 rounded-xl px-4 py-3 text-white focus:outline-none transition-all duration-300"
-                            >
-                              <option value="">Select year</option>
-                              {years.map(year => (
-                                <option key={year} value={year}>{year}</option>
-                              ))}
-                            </select>
-                          </div>
-                        </div>
-
-                        <div className="flex gap-3 mt-6">
-                          <button
-                            type="button"
-                            onClick={handleStudentStepBack}
-                            className="flex-1 bg-black/40 hover:bg-black/60 border-2 border-yellow-400/20 hover:border-yellow-400/40 text-white py-3 rounded-xl transition-all hover:scale-105 duration-300 flex items-center justify-center gap-2"
+                          </Grid>
+                        </Grid>
+                        <Grid container spacing={2}>
+                          <Grid item xs={6}>
+                            <FormControl fullWidth>
+                              <InputLabel>Faculty</InputLabel>
+                              <Select
+                                value={studentForm.faculty}
+                                label="Faculty"
+                                onChange={(e) => setStudentForm({...studentForm, faculty: e.target.value})}
+                                required
+                              >
+                                {faculties.map(faculty => (
+                                  <MenuItem key={faculty} value={faculty}>{faculty}</MenuItem>
+                                ))}
+                              </Select>
+                            </FormControl>
+                          </Grid>
+                          <Grid item xs={6}>
+                            <FormControl fullWidth>
+                              <InputLabel>Year</InputLabel>
+                              <Select
+                                value={studentForm.year}
+                                label="Year"
+                                onChange={(e) => setStudentForm({...studentForm, year: e.target.value})}
+                                required
+                              >
+                                {years.map(year => (
+                                  <MenuItem key={year} value={year}>{year}</MenuItem>
+                                ))}
+                              </Select>
+                            </FormControl>
+                          </Grid>
+                        </Grid>
+                        <Box sx={{ display: 'flex', gap: 2, mt: 2 }}>
+                          <Button
+                            fullWidth
+                            variant="outlined"
+                            onClick={handleBack}
+                            startIcon={<ChevronLeftIcon />}
+                            sx={{ color: 'white', borderColor: 'rgba(250, 204, 21, 0.2)' }}
                           >
-                            <ChevronLeft className="w-5 h-5" />
                             Back
-                          </button>
-                          <button
-                            type="button"
-                            onClick={handleStudentStepNext}
-                            className="flex-1 bg-gradient-to-r from-yellow-400 to-yellow-600 hover:from-yellow-500 hover:to-yellow-700 text-black py-3 rounded-xl transition-all shadow-lg shadow-yellow-500/30 hover:shadow-yellow-500/50 border-2 border-black/20 hover:scale-105 duration-300 flex items-center justify-center gap-2"
+                          </Button>
+                          <Button
+                            fullWidth
+                            variant="contained"
+                            onClick={handleNext}
+                            endIcon={<ChevronRightIcon />}
+                            sx={{ bgcolor: '#facc15', color: 'black', '&:hover': { bgcolor: '#eab308' } }}
                           >
                             Next Step
-                            <ChevronRight className="w-5 h-5" />
-                          </button>
-                        </div>
-                      </div>
+                          </Button>
+                        </Box>
+                      </Box>
                     )}
 
-                    {/* Step 3: Additional Information */}
-                    {studentStep === 3 && (
-                      <div className="space-y-4 animate-fadeIn">
-                        <div className="text-center mb-4">
-                          <h3 className="text-xl text-white mb-1">Additional Information</h3>
-                          <p className="text-gray-400 text-sm">Just a few more details</p>
-                        </div>
-
-                        <div>
-                          <label className="block text-sm text-gray-300 mb-2">Address</label>
-                          <div className="relative">
-                            <MapPin className="absolute left-4 top-3 w-5 h-5 text-gray-400" />
-                            <textarea
-                              required
-                              value={studentForm.address}
-                              onChange={(e) => setStudentForm({...studentForm, address: e.target.value})}
-                              rows={2}
-                              className="w-full bg-black/40 border-2 border-yellow-400/20 focus:border-yellow-400/60 rounded-xl px-12 py-3 text-white placeholder:text-gray-500 focus:outline-none transition-all duration-300 resize-none"
-                              placeholder="Enter your full address"
-                            />
-                          </div>
-                        </div>
-
-                        <div className="grid grid-cols-2 gap-3">
-                          <div>
-                            <label className="block text-sm text-gray-300 mb-2">City</label>
-                            <input
-                              type="text"
+                    {activeStep === 2 && (
+                      <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+                        <TextField
+                          fullWidth
+                          label="Address"
+                          multiline
+                          rows={2}
+                          required
+                          value={studentForm.address}
+                          onChange={(e) => setStudentForm({...studentForm, address: e.target.value})}
+                          slotProps={{
+                            input: {
+                              startAdornment: (
+                                <InputAdornment position="start">
+                                  <MapIcon sx={{ color: 'gray', mt: -1 }} />
+                                </InputAdornment>
+                              ),
+                            }
+                          }}
+                        />
+                        <Grid container spacing={2}>
+                          <Grid item xs={6}>
+                            <TextField
+                              fullWidth
+                              label="City"
                               required
                               value={studentForm.city}
                               onChange={(e) => setStudentForm({...studentForm, city: e.target.value})}
-                              className="w-full bg-black/40 border-2 border-yellow-400/20 focus:border-yellow-400/60 rounded-xl px-4 py-3 text-white placeholder:text-gray-500 focus:outline-none transition-all duration-300"
-                              placeholder="Colombo"
                             />
-                          </div>
-
-                          <div>
-                            <label className="block text-sm text-gray-300 mb-2">Date of Birth</label>
-                            <input
+                          </Grid>
+                          <Grid item xs={6}>
+                            <TextField
+                              fullWidth
+                              label="Date of Birth"
                               type="date"
                               required
+                              slotProps={{ inputLabel: { shrink: true } }}
                               value={studentForm.dateOfBirth}
                               onChange={(e) => setStudentForm({...studentForm, dateOfBirth: e.target.value})}
-                              className="w-full bg-black/40 border-2 border-yellow-400/20 focus:border-yellow-400/60 rounded-xl px-4 py-3 text-white focus:outline-none transition-all duration-300"
                             />
-                          </div>
-                        </div>
-
-                        <div>
-                          <label className="block text-sm text-gray-300 mb-2">Emergency Contact</label>
-                          <div className="relative">
-                            <Phone className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
-                            <input
-                              type="tel"
-                              required
-                              value={studentForm.emergencyContact}
-                              onChange={(e) => setStudentForm({...studentForm, emergencyContact: e.target.value})}
-                              className="w-full bg-black/40 border-2 border-yellow-400/20 focus:border-yellow-400/60 rounded-xl px-12 py-3 text-white placeholder:text-gray-500 focus:outline-none transition-all duration-300"
-                              placeholder="+94 77 123 4567"
-                            />
-                          </div>
-                        </div>
-
-                        <div className="flex gap-3 mt-6">
-                          <button
-                            type="button"
-                            onClick={handleStudentStepBack}
-                            className="flex-1 bg-black/40 hover:bg-black/60 border-2 border-yellow-400/20 hover:border-yellow-400/40 text-white py-3 rounded-xl transition-all hover:scale-105 duration-300 flex items-center justify-center gap-2"
+                          </Grid>
+                        </Grid>
+                        <TextField
+                          fullWidth
+                          label="Emergency Contact"
+                          required
+                          value={studentForm.emergencyContact}
+                          onChange={(e) => setStudentForm({...studentForm, emergencyContact: e.target.value})}
+                          slotProps={{
+                            input: {
+                              startAdornment: (
+                                <InputAdornment position="start">
+                                  <PhoneIcon sx={{ color: 'gray' }} />
+                                </InputAdornment>
+                              ),
+                            }
+                          }}
+                        />
+                        <Box sx={{ display: 'flex', gap: 2, mt: 2 }}>
+                          <Button
+                            fullWidth
+                            variant="outlined"
+                            onClick={handleBack}
+                            startIcon={<ChevronLeftIcon />}
+                            sx={{ color: 'white', borderColor: 'rgba(250, 204, 21, 0.2)' }}
                           >
-                            <ChevronLeft className="w-5 h-5" />
                             Back
-                          </button>
-                          <button
+                          </Button>
+                          <Button
+                            fullWidth
+                            variant="contained"
                             type="submit"
-                            className="flex-1 bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white py-3 rounded-xl transition-all shadow-lg shadow-green-500/30 hover:shadow-green-500/50 border-2 border-black/20 hover:scale-105 duration-300 flex items-center justify-center gap-2"
+                            disabled={isLoading}
+                            startIcon={isLoading ? <CircularProgress size={20} color="inherit" /> : <CheckCircleIcon />}
+                            sx={{ bgcolor: '#10b981', color: 'white', '&:hover': { bgcolor: '#059669' } }}
                           >
-                            <CheckCircle className="w-5 h-5" />
-                            Complete Registration
-                          </button>
-                        </div>
-                      </div>
+                            {isLoading ? 'Processing...' : 'Complete'}
+                          </Button>
+                        </Box>
+                      </Box>
                     )}
                   </form>
-                </div>
+                </Box>
               )}
 
               {/* Business Registration */}
               {userType === 'business' && (
-                <div className="animate-fadeIn">
-                  <div className="text-center mb-4">
-                    <h3 className="text-xl text-white mb-1">Business Registration</h3>
-                    <p className="text-gray-400 text-sm">Your application will be reviewed by admins</p>
-                  </div>
-
-                  <form onSubmit={handleBusinessSubmit} className="space-y-4 max-h-96 overflow-y-auto pr-2 custom-scrollbar">
-                    <div className="grid grid-cols-2 gap-3">
-                      <div>
-                        <label className="block text-sm text-gray-300 mb-2">Business Name</label>
-                        <input
-                          type="text"
-                          required
-                          value={businessForm.businessName}
-                          onChange={(e) => setBusinessForm({...businessForm, businessName: e.target.value})}
-                          className="w-full bg-black/40 border-2 border-yellow-400/20 focus:border-yellow-400/60 rounded-xl px-4 py-2.5 text-white placeholder:text-gray-500 focus:outline-none transition-all duration-300"
-                          placeholder="Business name"
-                        />
-                      </div>
-
-                      <div>
-                        <label className="block text-sm text-gray-300 mb-2">Owner Name</label>
-                        <input
-                          type="text"
-                          required
-                          value={businessForm.ownerName}
-                          onChange={(e) => setBusinessForm({...businessForm, ownerName: e.target.value})}
-                          className="w-full bg-black/40 border-2 border-yellow-400/20 focus:border-yellow-400/60 rounded-xl px-4 py-2.5 text-white placeholder:text-gray-500 focus:outline-none transition-all duration-300"
-                          placeholder="Owner name"
-                        />
-                      </div>
-                    </div>
-
-                    <div className="grid grid-cols-2 gap-3">
-                      <div>
-                        <label className="block text-sm text-gray-300 mb-2">Email Address</label>
-                        <input
-                          type="email"
-                          required
-                          value={businessForm.email}
-                          onChange={(e) => setBusinessForm({...businessForm, email: e.target.value})}
-                          className="w-full bg-black/40 border-2 border-yellow-400/20 focus:border-yellow-400/60 rounded-xl px-4 py-2.5 text-white placeholder:text-gray-500 focus:outline-none transition-all duration-300"
-                          placeholder="business@example.com"
-                        />
-                      </div>
-
-                      <div>
-                        <label className="block text-sm text-gray-300 mb-2">Phone Number</label>
-                        <input
-                          type="tel"
-                          required
-                          value={businessForm.phone}
-                          onChange={(e) => setBusinessForm({...businessForm, phone: e.target.value})}
-                          className="w-full bg-black/40 border-2 border-yellow-400/20 focus:border-yellow-400/60 rounded-xl px-4 py-2.5 text-white placeholder:text-gray-500 focus:outline-none transition-all duration-300"
-                          placeholder="+94 77 123 4567"
-                        />
-                      </div>
-                    </div>
-
-                    <div className="grid grid-cols-2 gap-3">
-                      <div>
-                        <label className="block text-sm text-gray-300 mb-2">Password</label>
-                        <div className="relative">
-                          <input
-                            type={showPassword ? "text" : "password"}
-                            required
-                            value={businessForm.password}
-                            onChange={(e) => setBusinessForm({...businessForm, password: e.target.value})}
-                            className="w-full bg-black/40 border-2 border-yellow-400/20 focus:border-yellow-400/60 rounded-xl px-4 pr-10 py-2.5 text-white placeholder:text-gray-500 focus:outline-none transition-all duration-300"
-                            placeholder="Password"
-                          />
-                          <button
-                            type="button"
-                            onClick={() => setShowPassword(!showPassword)}
-                            className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-yellow-400 transition-colors"
-                          >
-                            {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
-                          </button>
-                        </div>
-                      </div>
-
-                      <div>
-                        <label className="block text-sm text-gray-300 mb-2">Confirm Password</label>
-                        <div className="relative">
-                          <input
-                            type={showConfirmPassword ? "text" : "password"}
-                            required
-                            value={businessForm.confirmPassword}
-                            onChange={(e) => setBusinessForm({...businessForm, confirmPassword: e.target.value})}
-                            className="w-full bg-black/40 border-2 border-yellow-400/20 focus:border-yellow-400/60 rounded-xl px-4 pr-10 py-2.5 text-white placeholder:text-gray-500 focus:outline-none transition-all duration-300"
-                            placeholder="Confirm password"
-                          />
-                          <button
-                            type="button"
-                            onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                            className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-yellow-400 transition-colors"
-                          >
-                            {showConfirmPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
-                          </button>
-                        </div>
-                      </div>
-                    </div>
-
-                    <div>
-                      <label className="block text-sm text-gray-300 mb-2">Business Type</label>
-                      <div className="relative">
-                        <Briefcase className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
-                        <select
-                          required
-                          value={businessForm.businessType}
-                          onChange={(e) => setBusinessForm({...businessForm, businessType: e.target.value})}
-                          className="w-full bg-black/40 border-2 border-yellow-400/20 focus:border-yellow-400/60 rounded-xl pl-12 pr-4 py-2.5 text-white focus:outline-none transition-all duration-300"
-                        >
-                          {businessTypes.map(type => (
-                            <option key={type} value={type}>{type}</option>
-                          ))}
-                        </select>
-                      </div>
-                    </div>
-
-                    <div>
-                      <label className="block text-sm text-gray-300 mb-2">Business Address</label>
-                      <textarea
-                        required
-                        value={businessForm.address}
-                        onChange={(e) => setBusinessForm({...businessForm, address: e.target.value})}
-                        rows={2}
-                        className="w-full bg-black/40 border-2 border-yellow-400/20 focus:border-yellow-400/60 rounded-xl px-4 py-2.5 text-white placeholder:text-gray-500 focus:outline-none transition-all duration-300 resize-none"
-                        placeholder="Business address"
-                      />
-                    </div>
-
-                    <div>
-                      <label className="block text-sm text-gray-300 mb-2">Business Description</label>
-                      <textarea
-                        required
-                        value={businessForm.description}
-                        onChange={(e) => setBusinessForm({...businessForm, description: e.target.value})}
-                        rows={2}
-                        className="w-full bg-black/40 border-2 border-yellow-400/20 focus:border-yellow-400/60 rounded-xl px-4 py-2.5 text-white placeholder:text-gray-500 focus:outline-none transition-all duration-300 resize-none"
-                        placeholder="Describe your business"
-                      />
-                    </div>
-
-                    <div className="grid grid-cols-2 gap-3">
-                      <div>
-                        <label className="block text-sm text-gray-300 mb-2">Registration No.</label>
-                        <input
-                          type="text"
-                          required
-                          value={businessForm.registrationNumber}
-                          onChange={(e) => setBusinessForm({...businessForm, registrationNumber: e.target.value})}
-                          className="w-full bg-black/40 border-2 border-yellow-400/20 focus:border-yellow-400/60 rounded-xl px-4 py-2.5 text-white placeholder:text-gray-500 focus:outline-none transition-all duration-300"
-                          placeholder="Registration no."
-                        />
-                      </div>
-
-                      <div>
-                        <label className="block text-sm text-gray-300 mb-2">Tax ID (Optional)</label>
-                        <input
-                          type="text"
-                          value={businessForm.taxId}
-                          onChange={(e) => setBusinessForm({...businessForm, taxId: e.target.value})}
-                          className="w-full bg-black/40 border-2 border-yellow-400/20 focus:border-yellow-400/60 rounded-xl px-4 py-2.5 text-white placeholder:text-gray-500 focus:outline-none transition-all duration-300"
-                          placeholder="Tax ID"
-                        />
-                      </div>
-                    </div>
-
-                    <div className="bg-yellow-400/10 border border-yellow-400/30 rounded-xl p-3 mt-4">
-                      <p className="text-yellow-400 text-xs">
-                        <strong>Note:</strong> Your application will be reviewed by our admin team. You'll receive an email notification once approved.
-                      </p>
-                    </div>
-
-                    <button
-                      type="submit"
-                      className="w-full bg-gradient-to-r from-yellow-400 to-yellow-600 hover:from-yellow-500 hover:to-yellow-700 text-black py-3 rounded-xl transition-all shadow-lg shadow-yellow-500/30 hover:shadow-yellow-500/50 border-2 border-black/20 hover:scale-105 duration-300 flex items-center justify-center gap-2 mt-4"
-                    >
-                      Submit for Review
-                      <ArrowRight className="w-5 h-5" />
-                    </button>
+                <Box className="animate-fadeIn">
+                  <form onSubmit={handleBusinessSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '1rem', maxHeight: '400px', overflowY: 'auto', paddingRight: '8px' }} className="custom-scrollbar">
+                    <Grid container spacing={2}>
+                      <Grid item xs={6}>
+                        <TextField fullWidth label="Business Name" required value={businessForm.businessName} onChange={(e) => setBusinessForm({...businessForm, businessName: e.target.value})} />
+                      </Grid>
+                      <Grid item xs={6}>
+                        <TextField fullWidth label="Owner Name" required value={businessForm.ownerName} onChange={(e) => setBusinessForm({...businessForm, ownerName: e.target.value})} />
+                      </Grid>
+                    </Grid>
+                    <Grid container spacing={2}>
+                      <Grid item xs={6}>
+                        <TextField fullWidth label="Email" type="email" required value={businessForm.email} onChange={(e) => setBusinessForm({...businessForm, email: e.target.value})} />
+                      </Grid>
+                      <Grid item xs={6}>
+                        <TextField fullWidth label="Phone" type="tel" required value={businessForm.phone} onChange={(e) => setBusinessForm({...businessForm, phone: e.target.value})} />
+                      </Grid>
+                    </Grid>
+                    <Grid container spacing={2}>
+                      <Grid item xs={6}>
+                        <TextField fullWidth label="Password" type={showPassword ? "text" : "password"} required value={businessForm.password} onChange={(e) => setBusinessForm({...businessForm, password: e.target.value})} />
+                      </Grid>
+                      <Grid item xs={6}>
+                        <TextField fullWidth label="Confirm" type={showConfirmPassword ? "text" : "password"} required value={businessForm.confirmPassword} onChange={(e) => setBusinessForm({...businessForm, confirmPassword: e.target.value})} />
+                      </Grid>
+                    </Grid>
+                    <FormControl fullWidth>
+                      <InputLabel>Business Type</InputLabel>
+                      <Select value={businessForm.businessType} label="Business Type" onChange={(e) => setBusinessForm({...businessForm, businessType: e.target.value})} required>
+                        {businessTypes.map(type => (
+                          <MenuItem key={type} value={type}>{type}</MenuItem>
+                        ))}
+                      </Select>
+                    </FormControl>
+                    <TextField fullWidth label="Address" multiline rows={2} required value={businessForm.address} onChange={(e) => setBusinessForm({...businessForm, address: e.target.value})} />
+                    <TextField fullWidth label="Description" multiline rows={2} required value={businessForm.description} onChange={(e) => setBusinessForm({...businessForm, description: e.target.value})} />
+                    <Grid container spacing={2}>
+                      <Grid item xs={6}>
+                        <TextField fullWidth label="Registration No." required value={businessForm.registrationNumber} onChange={(e) => setBusinessForm({...businessForm, registrationNumber: e.target.value})} />
+                      </Grid>
+                      <Grid item xs={6}>
+                        <TextField fullWidth label="Tax ID" value={businessForm.taxId} onChange={(e) => setBusinessForm({...businessForm, taxId: e.target.value})} />
+                      </Grid>
+                    </Grid>
+                    <Paper sx={{ p: 2, bgcolor: 'rgba(250, 204, 21, 0.05)', border: '1px solid rgba(250, 204, 21, 0.2)' }}>
+                      <Typography variant="caption" sx={{ color: '#facc15' }}>
+                        Note: Your application will be reviewed by our admin team.
+                      </Typography>
+                    </Paper>
+                    <Button fullWidth variant="contained" type="submit" disabled={isLoading} endIcon={isLoading ? undefined : <ArrowRightIcon />} startIcon={isLoading ? <CircularProgress size={20} color="inherit" /> : null} sx={{ mt: 2, bgcolor: '#facc15', color: 'black', '&:hover': { bgcolor: '#eab308' } }}>
+                      {isLoading ? 'Processing...' : 'Submit for Review'}
+                    </Button>
                   </form>
-                </div>
+                </Box>
               )}
 
               {/* Rider Registration */}
               {userType === 'rider' && (
-                <div className="animate-fadeIn">
-                  <div className="text-center mb-4">
-                    <h3 className="text-xl text-white mb-1">Rider Registration</h3>
-                    <p className="text-gray-400 text-sm">Your application will be reviewed by admins</p>
-                  </div>
-
-                  <form onSubmit={handleRiderSubmit} className="space-y-4 max-h-96 overflow-y-auto pr-2 custom-scrollbar">
-                    <div className="grid grid-cols-2 gap-3">
-                      <div>
-                        <label className="block text-sm text-gray-300 mb-2">Full Name</label>
-                        <input
-                          type="text"
-                          required
-                          value={riderForm.fullName}
-                          onChange={(e) => setRiderForm({...riderForm, fullName: e.target.value})}
-                          className="w-full bg-black/40 border-2 border-yellow-400/20 focus:border-yellow-400/60 rounded-xl px-4 py-2.5 text-white placeholder:text-gray-500 focus:outline-none transition-all duration-300"
-                          placeholder="Full name"
-                        />
-                      </div>
-
-                      <div>
-                        <label className="block text-sm text-gray-300 mb-2">Phone Number</label>
-                        <input
-                          type="tel"
-                          required
-                          value={riderForm.phone}
-                          onChange={(e) => setRiderForm({...riderForm, phone: e.target.value})}
-                          className="w-full bg-black/40 border-2 border-yellow-400/20 focus:border-yellow-400/60 rounded-xl px-4 py-2.5 text-white placeholder:text-gray-500 focus:outline-none transition-all duration-300"
-                          placeholder="+94 77 123 4567"
-                        />
-                      </div>
-                    </div>
-
-                    <div className="grid grid-cols-2 gap-3">
-                      <div>
-                        <label className="block text-sm text-gray-300 mb-2">Email Address</label>
-                        <input
-                          type="email"
-                          required
-                          value={riderForm.email}
-                          onChange={(e) => setRiderForm({...riderForm, email: e.target.value})}
-                          className="w-full bg-black/40 border-2 border-yellow-400/20 focus:border-yellow-400/60 rounded-xl px-4 py-2.5 text-white placeholder:text-gray-500 focus:outline-none transition-all duration-300"
-                          placeholder="your.email@example.com"
-                        />
-                      </div>
-
-                      <div>
-                        <label className="block text-sm text-gray-300 mb-2">Emergency Contact</label>
-                        <input
-                          type="tel"
-                          required
-                          value={riderForm.emergencyContact}
-                          onChange={(e) => setRiderForm({...riderForm, emergencyContact: e.target.value})}
-                          className="w-full bg-black/40 border-2 border-yellow-400/20 focus:border-yellow-400/60 rounded-xl px-4 py-2.5 text-white placeholder:text-gray-500 focus:outline-none transition-all duration-300"
-                          placeholder="+94 77 123 4567"
-                        />
-                      </div>
-                    </div>
-
-                    <div className="grid grid-cols-2 gap-3">
-                      <div>
-                        <label className="block text-sm text-gray-300 mb-2">Password</label>
-                        <div className="relative">
-                          <input
-                            type={showPassword ? "text" : "password"}
-                            required
-                            value={riderForm.password}
-                            onChange={(e) => setRiderForm({...riderForm, password: e.target.value})}
-                            className="w-full bg-black/40 border-2 border-yellow-400/20 focus:border-yellow-400/60 rounded-xl px-4 pr-10 py-2.5 text-white placeholder:text-gray-500 focus:outline-none transition-all duration-300"
-                            placeholder="Password"
-                          />
-                          <button
-                            type="button"
-                            onClick={() => setShowPassword(!showPassword)}
-                            className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-yellow-400 transition-colors"
-                          >
-                            {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
-                          </button>
-                        </div>
-                      </div>
-
-                      <div>
-                        <label className="block text-sm text-gray-300 mb-2">Confirm Password</label>
-                        <div className="relative">
-                          <input
-                            type={showConfirmPassword ? "text" : "password"}
-                            required
-                            value={riderForm.confirmPassword}
-                            onChange={(e) => setRiderForm({...riderForm, confirmPassword: e.target.value})}
-                            className="w-full bg-black/40 border-2 border-yellow-400/20 focus:border-yellow-400/60 rounded-xl px-4 pr-10 py-2.5 text-white placeholder:text-gray-500 focus:outline-none transition-all duration-300"
-                            placeholder="Confirm password"
-                          />
-                          <button
-                            type="button"
-                            onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                            className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-yellow-400 transition-colors"
-                          >
-                            {showConfirmPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
-                          </button>
-                        </div>
-                      </div>
-                    </div>
-
-                    <div className="grid grid-cols-2 gap-3">
-                      <div>
-                        <label className="block text-sm text-gray-300 mb-2">Vehicle Type</label>
-                        <select
-                          required
-                          value={riderForm.vehicleType}
-                          onChange={(e) => setRiderForm({...riderForm, vehicleType: e.target.value})}
-                          className="w-full bg-black/40 border-2 border-yellow-400/20 focus:border-yellow-400/60 rounded-xl px-4 py-2.5 text-white focus:outline-none transition-all duration-300"
-                        >
-                          {vehicleTypes.map(type => (
-                            <option key={type} value={type}>{type}</option>
-                          ))}
-                        </select>
-                      </div>
-
-                      <div>
-                        <label className="block text-sm text-gray-300 mb-2">Vehicle Number</label>
-                        <input
-                          type="text"
-                          required
-                          value={riderForm.vehicleNumber}
-                          onChange={(e) => setRiderForm({...riderForm, vehicleNumber: e.target.value})}
-                          className="w-full bg-black/40 border-2 border-yellow-400/20 focus:border-yellow-400/60 rounded-xl px-4 py-2.5 text-white placeholder:text-gray-500 focus:outline-none transition-all duration-300"
-                          placeholder="CAB-1234"
-                        />
-                      </div>
-                    </div>
-
-                    <div>
-                      <label className="block text-sm text-gray-300 mb-2">Driving License Number</label>
-                      <input
-                        type="text"
-                        required
-                        value={riderForm.licenseNumber}
-                        onChange={(e) => setRiderForm({...riderForm, licenseNumber: e.target.value})}
-                        className="w-full bg-black/40 border-2 border-yellow-400/20 focus:border-yellow-400/60 rounded-xl px-4 py-2.5 text-white placeholder:text-gray-500 focus:outline-none transition-all duration-300"
-                        placeholder="DL-123456"
-                      />
-                    </div>
-
-                    <div>
-                      <label className="block text-sm text-gray-300 mb-2">Address</label>
-                      <textarea
-                        required
-                        value={riderForm.address}
-                        onChange={(e) => setRiderForm({...riderForm, address: e.target.value})}
-                        rows={2}
-                        className="w-full bg-black/40 border-2 border-yellow-400/20 focus:border-yellow-400/60 rounded-xl px-4 py-2.5 text-white placeholder:text-gray-500 focus:outline-none transition-all duration-300 resize-none"
-                        placeholder="Enter your full address"
-                      />
-                    </div>
-
-                    <div className="bg-yellow-400/10 border border-yellow-400/30 rounded-xl p-3 mt-4">
-                      <p className="text-yellow-400 text-xs">
-                        <strong>Note:</strong> Your application will be reviewed by our admin team. You'll need to provide additional documents for verification.
-                      </p>
-                    </div>
-
-                    <button
-                      type="submit"
-                      className="w-full bg-gradient-to-r from-yellow-400 to-yellow-600 hover:from-yellow-500 hover:to-yellow-700 text-black py-3 rounded-xl transition-all shadow-lg shadow-yellow-500/30 hover:shadow-yellow-500/50 border-2 border-black/20 hover:scale-105 duration-300 flex items-center justify-center gap-2 mt-4"
-                    >
-                      Submit for Review
-                      <ArrowRight className="w-5 h-5" />
-                    </button>
+                <Box className="animate-fadeIn">
+                  <form onSubmit={handleRiderSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '1rem', maxHeight: '400px', overflowY: 'auto', paddingRight: '8px' }} className="custom-scrollbar">
+                    <Grid container spacing={2}>
+                      <Grid item xs={6}>
+                        <TextField fullWidth label="Full Name" required value={riderForm.fullName} onChange={(e) => setRiderForm({...riderForm, fullName: e.target.value})} />
+                      </Grid>
+                      <Grid item xs={6}>
+                        <TextField fullWidth label="Phone" type="tel" required value={riderForm.phone} onChange={(e) => setRiderForm({...riderForm, phone: e.target.value})} />
+                      </Grid>
+                    </Grid>
+                    <Grid container spacing={2}>
+                      <Grid item xs={6}>
+                        <TextField fullWidth label="Email" type="email" required value={riderForm.email} onChange={(e) => setRiderForm({...riderForm, email: e.target.value})} />
+                      </Grid>
+                      <Grid item xs={6}>
+                        <TextField fullWidth label="Emergency Contact" type="tel" required value={riderForm.emergencyContact} onChange={(e) => setRiderForm({...riderForm, emergencyContact: e.target.value})} />
+                      </Grid>
+                    </Grid>
+                    <Grid container spacing={2}>
+                      <Grid item xs={6}>
+                        <TextField fullWidth label="Password" type={showPassword ? "text" : "password"} required value={riderForm.password} onChange={(e) => setRiderForm({...riderForm, password: e.target.value})} />
+                      </Grid>
+                      <Grid item xs={6}>
+                        <TextField fullWidth label="Confirm" type={showConfirmPassword ? "text" : "password"} required value={riderForm.confirmPassword} onChange={(e) => setRiderForm({...riderForm, confirmPassword: e.target.value})} />
+                      </Grid>
+                    </Grid>
+                    <Grid container spacing={2}>
+                      <Grid item xs={6}>
+                        <FormControl fullWidth>
+                          <InputLabel>Vehicle Type</InputLabel>
+                          <Select value={riderForm.vehicleType} label="Vehicle Type" onChange={(e) => setRiderForm({...riderForm, vehicleType: e.target.value})} required>
+                            {vehicleTypes.map(type => (
+                              <MenuItem key={type} value={type}>{type}</MenuItem>
+                            ))}
+                          </Select>
+                        </FormControl>
+                      </Grid>
+                      <Grid item xs={6}>
+                        <TextField fullWidth label="Vehicle No." required value={riderForm.vehicleNumber} onChange={(e) => setRiderForm({...riderForm, vehicleNumber: e.target.value})} />
+                      </Grid>
+                    </Grid>
+                    <TextField fullWidth label="License No." required value={riderForm.licenseNumber} onChange={(e) => setRiderForm({...riderForm, licenseNumber: e.target.value})} />
+                    <TextField fullWidth label="Address" multiline rows={2} required value={riderForm.address} onChange={(e) => setRiderForm({...riderForm, address: e.target.value})} />
+                    <Paper sx={{ p: 2, bgcolor: 'rgba(250, 204, 21, 0.05)', border: '1px solid rgba(250, 204, 21, 0.2)' }}>
+                      <Typography variant="caption" sx={{ color: '#facc15' }}>
+                        Note: Your application will be reviewed by our admin team.
+                      </Typography>
+                    </Paper>
+                    <Button fullWidth variant="contained" type="submit" disabled={isLoading} endIcon={isLoading ? undefined : <ArrowRightIcon />} startIcon={isLoading ? <CircularProgress size={20} color="inherit" /> : null} sx={{ mt: 2, bgcolor: '#facc15', color: 'black', '&:hover': { bgcolor: '#eab308' } }}>
+                      {isLoading ? 'Processing...' : 'Submit for Review'}
+                    </Button>
                   </form>
-                </div>
+                </Box>
               )}
 
               {/* Terms */}
-              <p className="text-center text-xs text-gray-500 mt-6 animate-fadeIn">
+              <Typography variant="caption" sx={{ display: 'block', textAlign: 'center', color: 'gray', mt: 4 }}>
                 By Continuing, you agree to NearU's Terms of Service and Privacy Policy.
-              </p>
+              </Typography>
             </div>
           </div>
         </div>

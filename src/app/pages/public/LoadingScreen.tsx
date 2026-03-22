@@ -11,7 +11,7 @@ export default function LoadingScreen() {
       setProgress((prev) => {
         if (prev >= 100) {
           clearInterval(interval);
-          setTimeout(() => navigate('/location-permission'), 500);
+          setTimeout(() => navigate('/login'), 500);
           return 100;
         }
         return prev + 2;
