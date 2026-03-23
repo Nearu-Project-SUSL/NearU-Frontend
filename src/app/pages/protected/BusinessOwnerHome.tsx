@@ -38,7 +38,7 @@ export default function BusinessOwnerHome() {
                   { title: 'Active Orders', count: '14', color: '#facc15' },
                   { title: 'Rating', count: '4.8/5.0', color: '#34d399' }
                 ].map((stat, i) => (
-                  <Grid item xs={12} sm={4} key={i}>
+                  <Grid xs={12} sm={4} key={i}>
                     <Paper 
                       sx={{ 
                         p: 3, 
