@@ -9,6 +9,7 @@ import ResetPassword from "./pages/public/ResetPassword";
 
 // Protected Pages
 import Home from "./pages/protected/Home";
+import Jobs from "./pages/protected/Jobs";
 import Profile from "./pages/protected/Profile";
 import AdminHome from "./pages/protected/AdminHome";
 import BusinessOwnerHome from "./pages/protected/BusinessOwnerHome";
@@ -52,6 +53,10 @@ export const router = createBrowserRouter([
       {
         path: "/home",
         Component: Home,
+      },
+      {
+        path: "/jobs",
+        Component: Jobs,
       },
       {
         path: "/profile",
