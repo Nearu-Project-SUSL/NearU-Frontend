@@ -7,6 +7,7 @@
     "build": "vite build",
     "typecheck": "tsc -b",
     "dev": "vite",
+    "start": "serve -s dist",
     "start:backend": "cd C:\\Users\\THIMIRA\\source\\repos\\NearU_Backend_Revised && dotnet run",
     "start:all": "powershell -ExecutionPolicy Bypass -File ./start-dev.ps1",
     "validate": "powershell -ExecutionPolicy Bypass -File ./validate-integration.ps1"
@@ -63,6 +64,7 @@
     "react-router": "7.13.0",
     "react-slick": "0.31.0",
     "recharts": "2.15.2",
+    "serve": "^14.2.6",
     "sonner": "2.0.3",
     "tailwind-merge": "3.2.0",
     "tw-animate-css": "1.3.8",
