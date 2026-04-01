@@ -6,6 +6,8 @@ import Login from "./pages/public/Login";
 import Register from "./pages/public/Register";
 import ForgotPassword from "./pages/public/ForgotPassword";
 import ResetPassword from "./pages/public/ResetPassword";
+import Accommodation from "./pages/public/Accormodation";
+import AccommodationDetail from "./pages/public/AccommodationDetail";
 
 // Protected Pages
 import Home from "./pages/protected/Home";
@@ -61,6 +63,14 @@ export const router = createBrowserRouter([
       {
         path: "/profile",
         Component: Profile,
+      },
+      {
+        path: "/accommodation",
+        Component: Accommodation,
+      },
+      {
+        path: "/accommodation/:id",
+        Component: AccommodationDetail,
       },
     ]
   },
