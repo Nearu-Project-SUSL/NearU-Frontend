@@ -365,8 +365,8 @@ export default function Home() {
 
         <PageLayout>
           {/* Main Scroller wrapper */}
-          <Box sx={{ height: 'calc(100vh - 68px)', overflowY: 'auto', overflowX: 'hidden' }}>
-            <Box sx={{ px: { xs: 2.5, md: 5 }, py: { xs: 4, md: 5 }, maxWidth: 1400, mx: 'auto', width: '100%' }}>
+          <Box sx={{ height: '100vh', overflowY: 'auto', overflowX: 'hidden', mt: '-64px', pt: '64px' }}>
+            <Box sx={{ px: { xs: 2.5, md: 5 }, py: { xs: 4, md: 5 }, pb: 8, maxWidth: 1400, mx: 'auto', width: '100%' }}>
               
               {/* ── Hero ─────────────────────────────────────────── */}
               <Fade in={visible} timeout={600}>

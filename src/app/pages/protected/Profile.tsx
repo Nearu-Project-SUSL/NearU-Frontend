@@ -21,7 +21,8 @@ import {
   Edit as EditIcon,
   Security as SecurityIcon,
   Notifications as BellIcon,
-  ChevronRight as ChevronRightIcon
+  ChevronRight as ChevronRightIcon,
+  WorkOutline as WorkIcon
 } from '@mui/icons-material';
 import useAuth from '../../hooks/useAuth';
 import Navbar from '../../components/layout/Navbar';
@@ -50,7 +51,7 @@ export default function Profile() {
             
             <Grid container spacing={4}>
               {/* Profile Card */}
-              <Grid xs={12} md={4}>
+              <Grid size={{ xs: 12, md: 4 }}>
                 <Paper sx={{ p: 4, textAlign: 'center', bgcolor: 'rgba(255, 255, 255, 0.03)', borderRadius: '1.5rem', border: '1px solid rgba(255, 255, 255, 0.1)' }}>
                   <Avatar 
                     sx={{ 
@@ -84,7 +85,7 @@ export default function Profile() {
               </Grid>
 
               {/* Settings List */}
-              <Grid xs={12} md={8}>
+              <Grid size={{ xs: 12, md: 8 }}>
                 <Paper sx={{ bgcolor: 'rgba(255, 255, 255, 0.03)', borderRadius: '1.5rem', border: '1px solid rgba(255, 255, 255, 0.1)', overflow: 'hidden' }}>
                   <List disablePadding>
                     <ListItem sx={{ py: 2, px: 3 }}>
@@ -101,6 +102,19 @@ export default function Profile() {
                       <ListItemText 
                         primary={<Typography sx={{ color: 'white' }}>Security</Typography>} 
                         secondary={<Typography variant="body2" sx={{ color: 'gray' }}>Password, 2FA, Login activity</Typography>} 
+                      />
+                      <ChevronRightIcon sx={{ color: 'gray' }} />
+                    </ListItem>
+                    <Divider sx={{ borderColor: 'rgba(255, 255, 255, 0.05)' }} />
+
+                    <ListItem 
+                      onClick={() => navigate('/my-jobs')}
+                      sx={{ py: 2, px: 3, cursor: 'pointer', '&:hover': { bgcolor: 'rgba(255, 255, 255, 0.02)' } }}
+                    >
+                      <ListItemIcon><WorkIcon sx={{ color: '#facc15' }} /></ListItemIcon>
+                      <ListItemText 
+                        primary={<Typography sx={{ color: 'white' }}>My Posted Jobs</Typography>} 
+                        secondary={<Typography variant="body2" sx={{ color: 'gray' }}>Manage jobs you have created</Typography>} 
                       />
                       <ChevronRightIcon sx={{ color: 'gray' }} />
                     </ListItem>
