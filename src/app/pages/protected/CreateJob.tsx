@@ -5,6 +5,7 @@ import { Sidebar } from '../../components/layout/Sidebar';
 import Navbar from '../../components/layout/Navbar';
 import { toast } from 'sonner';
 import jobService from '../../../api/jobService';
+import { useCreateJob } from '../../hooks/useJobs';
 
 import {
   Box,
@@ -15,6 +16,7 @@ import {
   MenuItem,
   Fade,
   InputAdornment,
+  Stack,
 } from '@mui/material';
 
 import {
@@ -75,18 +77,46 @@ export default function CreateJob() {
 
   const [logoFile, setLogoFile] = useState<File | null>(null);
   const [logoPreview, setLogoPreview] = useState<string | null>(null);
+  const [logoUrl, setLogoUrl] = useState<string>('');
+  const [logoInputMode, setLogoInputMode] = useState<'file' | 'url'>('file');
+  const [isUploadingLogo, setIsUploadingLogo] = useState(false);
 
-  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files[0]) {
       const file = e.target.files[0];
       setLogoFile(file);
-      setLogoPreview(URL.createObjectURL(file));
+      
+      // Create preview
+      const previewUrl = URL.createObjectURL(file);
+      setLogoPreview(previewUrl);
+      
+      // Upload to ImageKit immediately
+      try {
+        setIsUploadingLogo(true);
+        const uploadedUrl = await jobService.uploadLogo(file);
+        setLogoUrl(uploadedUrl);
+        toast.success('Logo uploaded successfully!');
+      } catch (error: any) {
+        toast.error(error.response?.data?.message || 'Failed to upload logo');
+        setLogoFile(null);
+        setLogoPreview(null);
+      } finally {
+        setIsUploadingLogo(false);
+      }
     }
+  };
+
+  const handleLogoUrlChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const url = e.target.value;
+    setLogoUrl(url);
+    setLogoPreview(url);
   };
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
+
+  const createJobMutation = useCreateJob();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -96,11 +126,11 @@ export default function CreateJob() {
       
       const jobData = {
         ...formData,
-        logo: logoPreview || undefined,
+        logo: logoUrl || undefined,
         isNew: true
       };
       
-      await jobService.createJob(jobData);
+      await createJobMutation.mutateAsync(jobData);
       toast.success('Job posted successfully!');
       navigate('/jobs');
     } catch (error: any) {
@@ -197,27 +227,91 @@ export default function CreateJob() {
                             border: '1px dashed rgba(255,255,255,0.2)', 
                             borderRadius: '12px', 
                             p: 3, 
-                            textAlign: 'center',
                             bgcolor: 'rgba(255,255,255,0.02)',
-                            transition: 'all 0.3s',
-                            '&:hover': { borderColor: '#facc15', bgcolor: 'rgba(250, 204, 21, 0.05)' }
                           }}>
-                            {logoPreview ? (
-                              <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 2 }}>
-                                <Box component="img" src={logoPreview} alt="Logo preview" sx={{ height: 64, width: 64, borderRadius: '12px', objectFit: 'cover', border: '1px solid rgba(255,255,255,0.1)' }} />
-                                <Button variant="outlined" component="label" size="small" sx={{ color: '#fff', borderColor: 'rgba(255,255,255,0.3)', textTransform: 'none', '&:hover': { borderColor: '#facc15', color: '#facc15' } }}>
-                                  Change Image
-                                  <input type="file" hidden accept="image/*" onChange={handleFileChange} />
-                                </Button>
+                            <Typography variant="body2" sx={{ color: 'rgba(255,255,255,0.6)', mb: 2, textAlign: 'center' }}>
+                              Company Logo (Optional)
+                            </Typography>
+                            
+                            {/* Toggle between file upload and URL */}
+                            <Stack direction="row" spacing={1} justifyContent="center" sx={{ mb: 2 }}>
+                              <Button 
+                                size="small" 
+                                variant={logoInputMode === 'file' ? 'contained' : 'outlined'}
+                                onClick={() => setLogoInputMode('file')}
+                                sx={{ 
+                                  bgcolor: logoInputMode === 'file' ? 'rgba(250, 204, 21, 0.2)' : 'transparent',
+                                  color: '#fff', 
+                                  borderColor: 'rgba(255,255,255,0.2)',
+                                  textTransform: 'none',
+                                  fontSize: '0.75rem'
+                                }}
+                              >
+                                Upload File (ImageKit)
+                              </Button>
+                              <Button 
+                                size="small" 
+                                variant={logoInputMode === 'url' ? 'contained' : 'outlined'}
+                                onClick={() => setLogoInputMode('url')}
+                                sx={{ 
+                                  bgcolor: logoInputMode === 'url' ? 'rgba(250, 204, 21, 0.2)' : 'transparent',
+                                  color: '#fff', 
+                                  borderColor: 'rgba(255,255,255,0.2)',
+                                  textTransform: 'none',
+                                  fontSize: '0.75rem'
+                                }}
+                              >
+                                Image URL
+                              </Button>
+                            </Stack>
+
+                            {logoInputMode === 'file' ? (
+                              <Box sx={{ 
+                                border: '1px dashed rgba(255,255,255,0.2)', 
+                                borderRadius: '12px', 
+                                p: 2, 
+                                textAlign: 'center',
+                                transition: 'all 0.3s',
+                                '&:hover': { borderColor: '#facc15', bgcolor: 'rgba(250, 204, 21, 0.05)' }
+                              }}>
+                                {logoPreview && logoInputMode === 'file' ? (
+                                  <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 2 }}>
+                                    <Box component="img" src={logoPreview} alt="Logo preview" sx={{ height: 64, width: 64, borderRadius: '12px', objectFit: 'cover', border: '1px solid rgba(255,255,255,0.1)' }} />
+                                    {isUploadingLogo && <Typography variant="caption" sx={{ color: '#facc15' }}>Uploading to ImageKit...</Typography>}
+                                    {!isUploadingLogo && logoUrl && <Typography variant="caption" sx={{ color: '#22c55e' }}>✓ Uploaded to ImageKit</Typography>}
+                                    <Button variant="outlined" component="label" size="small" disabled={isUploadingLogo} sx={{ color: '#fff', borderColor: 'rgba(255,255,255,0.3)', textTransform: 'none', fontSize: '0.75rem', '&:hover': { borderColor: '#facc15', color: '#facc15' } }}>
+                                      Change Image
+                                      <input type="file" hidden accept="image/*" onChange={handleFileChange} />
+                                    </Button>
+                                  </Box>
+                                ) : (
+                                  <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 1 }}>
+                                    <ImageIcon sx={{ color: 'rgba(255,255,255,0.3)', fontSize: 32 }} />
+                                    <Typography variant="caption" sx={{ color: 'rgba(255,255,255,0.5)' }}>Max 5MB • PNG, JPG, WebP</Typography>
+                                    <Typography variant="caption" sx={{ color: '#facc15' }}>Powered by ImageKit Cloud</Typography>
+                                    <Button variant="contained" component="label" size="small" disabled={isUploadingLogo} sx={{ mt: 1, bgcolor: 'rgba(255,255,255,0.1)', color: '#fff', textTransform: 'none', boxShadow: 'none', fontSize: '0.75rem', '&:hover': { bgcolor: 'rgba(255,255,255,0.2)', boxShadow: 'none' } }}>
+                                      {isUploadingLogo ? 'Uploading...' : 'Select Image'}
+                                      <input type="file" hidden accept="image/*" onChange={handleFileChange} />
+                                    </Button>
+                                  </Box>
+                                )}
                               </Box>
                             ) : (
-                              <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 1 }}>
-                                <ImageIcon sx={{ color: 'rgba(255,255,255,0.3)', fontSize: 32 }} />
-                                <Typography variant="body2" sx={{ color: 'rgba(255,255,255,0.6)' }}>Upload Company Logo (Optional)</Typography>
-                                <Button variant="contained" component="label" size="small" sx={{ mt: 1, bgcolor: 'rgba(255,255,255,0.1)', color: '#fff', textTransform: 'none', boxShadow: 'none', '&:hover': { bgcolor: 'rgba(255,255,255,0.2)', boxShadow: 'none' } }}>
-                                  Select Image
-                                  <input type="file" hidden accept="image/*" onChange={handleFileChange} />
-                                </Button>
+                              <TextField
+                                fullWidth
+                                size="small"
+                                label="Logo URL"
+                                placeholder="https://example.com/logo.png"
+                                value={logoUrl}
+                                onChange={handleLogoUrlChange}
+                                sx={textFieldStyles}
+                              />
+                            )}
+
+                            {/* Preview for URL mode */}
+                            {logoInputMode === 'url' && logoPreview && (
+                              <Box sx={{ mt: 2, display: 'flex', justifyContent: 'center' }}>
+                                <Box component="img" src={logoPreview} alt="Logo preview" sx={{ height: 64, width: 64, borderRadius: '12px', objectFit: 'cover', border: '1px solid rgba(255,255,255,0.1)' }} onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }} />
                               </Box>
                             )}
                           </Box>

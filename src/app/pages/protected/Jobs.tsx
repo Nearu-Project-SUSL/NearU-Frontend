@@ -3,7 +3,8 @@ import { useNavigate } from 'react-router';
 import { PageLayout } from '../../components/layout/PageLayout';
 import { Sidebar } from '../../components/layout/Sidebar';
 import Navbar from '../../components/layout/Navbar';
-import jobService, { JobResponse } from '../../../api/jobService';
+import { JobResponse } from '../../../api/jobService';
+import { useAllJobs } from '../../hooks/useJobs';
 import { toast } from 'sonner';
 
 import {
@@ -190,8 +191,9 @@ export default function Jobs() {
   const [selectedJob, setSelectedJob] = useState<JobResponse | null>(null);
   const [isDetailsOpen, setIsDetailsOpen] = useState(false);
   const [visible, setVisible] = useState(false);
-  const [jobs, setJobs] = useState<JobResponse[]>([]);
-  const [loading, setLoading] = useState(true);
+  
+  // React Query Fetch
+  const { data: jobs = [], isLoading: loading, isError, error } = useAllJobs();
   
   // Filters
   const [activeCategory, setActiveCategory] = useState<string>('All');
@@ -206,20 +208,10 @@ export default function Jobs() {
   }, []);
 
   useEffect(() => {
-    fetchJobs();
-  }, []);
-
-  const fetchJobs = async () => {
-    try {
-      setLoading(true);
-      const data = await jobService.getAllJobs();
-      setJobs(data);
-    } catch (error: any) {
-      toast.error(error.response?.data?.message || 'Failed to fetch jobs');
-    } finally {
-      setLoading(false);
+    if (isError) {
+      toast.error((error as any)?.response?.data?.message || 'Failed to fetch jobs');
     }
-  };
+  }, [isError, error]);
 
   const handleJobClick = (job: JobResponse) => {
     setSelectedJob(job);
@@ -545,7 +537,7 @@ export default function Jobs() {
                 {/* Company & Title */}
                 <Box sx={{ display: 'flex', flexDirection: { xs: 'column', md: 'row' }, alignItems: { xs: 'flex-start', md: 'flex-end' }, gap: 3, mb: 4 }}>
                     <Avatar 
-                        src={selectedJob.logo} 
+                        src={selectedJob.logo || undefined} 
                         variant="rounded"
                         sx={{ 
                             width: 100, 
@@ -610,7 +602,7 @@ export default function Jobs() {
                                     <PayIcon sx={{ color: '#22c55e' }} />
                                     <Box>
                                         <Typography variant="caption" sx={{ color: 'rgba(255,255,255,0.4)', display: 'block' }}>Salary / Pay</Typography>
-                                        <Typography variant="body2" sx={{ color: '#fff', fontWeight: 600 }}>{selectedJob.pay}</Typography>
+                                        <Typography variant="body2" sx={{ color: '#fff', fontWeight: 600 }}>{selectedJob.payRange}</Typography>
                                     </Box>
                                 </Box>
                                 
