@@ -4,6 +4,7 @@ import { PageLayout } from '../../components/layout/PageLayout';
 import { Sidebar } from '../../components/layout/Sidebar';
 import Navbar from '../../components/layout/Navbar';
 import { toast } from 'sonner';
+import jobService from '../../../api/jobService';
 
 import {
   Box,
@@ -60,12 +61,13 @@ const textFieldStyles = {
 
 export default function CreateJob() {
   const navigate = useNavigate();
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const [formData, setFormData] = useState({
     title: '',
     company: '',
     location: '',
-    pay: '',
-    type: '',
+    payRange: '',
+    jobType: '',
     category: '',
     description: '',
     longDescription: '',
@@ -86,11 +88,26 @@ export default function CreateJob() {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    // In actual implementation, send formData and auth token to backend here.
-    toast.success('Job posted successfully! (Mock)');
-    navigate('/jobs');
+    
+    try {
+      setIsSubmitting(true);
+      
+      const jobData = {
+        ...formData,
+        logo: logoPreview || undefined,
+        isNew: true
+      };
+      
+      await jobService.createJob(jobData);
+      toast.success('Job posted successfully!');
+      navigate('/jobs');
+    } catch (error: any) {
+      toast.error(error.response?.data?.message || 'Failed to create job');
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
@@ -165,9 +182,9 @@ export default function CreateJob() {
                             fullWidth
                             required
                             label="Pay / Salary"
-                            name="pay"
+                            name="payRange"
                             placeholder="e.g. Rs. 400 / hr"
-                            value={formData.pay}
+                            value={formData.payRange}
                             onChange={handleChange}
                             InputProps={{
                               startAdornment: <InputAdornment position="start"><PayIcon sx={{ color: 'rgba(255,255,255,0.5)' }} /></InputAdornment>,
@@ -211,8 +228,8 @@ export default function CreateJob() {
                             fullWidth
                             required
                             label="Job Type"
-                            name="type"
-                            value={formData.type}
+                            name="jobType"
+                            value={formData.jobType}
                             onChange={handleChange}
                             InputProps={{
                               startAdornment: <InputAdornment position="start"><LabelIcon sx={{ color: 'rgba(255,255,255,0.5)' }} /></InputAdornment>,
@@ -287,6 +304,7 @@ export default function CreateJob() {
                       type="submit"
                       variant="contained"
                       size="large"
+                      disabled={isSubmitting}
                       sx={{
                         bgcolor: '#facc15',
                         color: '#000',
@@ -297,10 +315,14 @@ export default function CreateJob() {
                         textTransform: 'none',
                         '&:hover': {
                           bgcolor: '#eab308',
+                        },
+                        '&:disabled': {
+                          bgcolor: 'rgba(250, 204, 21, 0.3)',
+                          color: 'rgba(0,0,0,0.4)'
                         }
                       }}
                     >
-                      Post Your Job
+                      {isSubmitting ? 'Posting...' : 'Post Your Job'}
                     </Button>
                     <Button
                       variant="text"

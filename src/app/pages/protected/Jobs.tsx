@@ -3,6 +3,8 @@ import { useNavigate } from 'react-router';
 import { PageLayout } from '../../components/layout/PageLayout';
 import { Sidebar } from '../../components/layout/Sidebar';
 import Navbar from '../../components/layout/Navbar';
+import jobService, { JobResponse } from '../../../api/jobService';
+import { toast } from 'sonner';
 
 import {
   Box,
@@ -46,212 +48,6 @@ import {
   AddCircleOutline as AddIcon
 } from '@mui/icons-material';
 
-// ─── Mock Data ───────────────────────────────────────────────────────────────
-
-type JobType = 'Part-Time' | 'Internship' | 'Freelance' | 'Campus' | 'Full-Time';
-
-interface Job {
-  id: string;
-  title: string;
-  company: string;
-  location: string;
-  pay: string;
-  type: JobType | string;
-  category: string;
-  createdAt: string; 
-  postedByUserId: string;
-  postedBy: {
-    name: string;
-    role: string;
-    avatar: string;
-    email: string;
-    phone: string;
-  };
-  logo: string;
-  description: string;
-  longDescription: string;
-  requirements: string[];
-  tags: string[];
-  isNew?: boolean;
-}
-
-const currentUserMockId = 'user123';
-
-const jobsData: Job[] = [
-  {
-    id: 'j1',
-    title: 'Library Assistant',
-    company: 'Sabaragamuwa University',
-    location: 'Main Campus Library',
-    pay: 'Rs. 400 / hr',
-    type: 'Campus',
-    category: 'Campus',
-    createdAt: '2026-04-02T10:00:00Z',
-    isNew: true,
-    postedByUserId: 'user999',
-    postedBy: {
-      name: 'Dr. Priyantha Silva',
-      role: 'Chief Librarian',
-      avatar: 'https://i.pravatar.cc/150?img=11',
-      email: 'library@sab.ac.lk',
-      phone: '+94 45 2280011',
-    },
-    logo: 'https://ui-avatars.com/api/?name=SU&background=facc15&color=000&bold=true',
-    description: 'Assist with organizing books, managing student checkouts, and maintaining a quiet study environment.',
-    longDescription: 'We are looking for a dedicated student to assist our library staff during peak hours. The role involves checking books in and out, shelving returned items, and helping students locate resources. This is an excellent opportunity for those who enjoy a quiet work environment and want to stay close to their studies.',
-    requirements: [
-      'Currently enrolled student at Sabaragamuwa University',
-      'Basic computer literacy',
-      'Good organizational skills',
-      'Ability to work at least 10 hours per week'
-    ],
-    tags: ['Student Friendly', 'Flexible', 'On Campus'],
-  },
-  {
-    id: 'j6',
-    title: 'Delivery Partner',
-    company: 'NearU Food',
-    location: 'Belihuloya & Pambahinna',
-    pay: 'Rs. 200 / delivery',
-    type: 'Freelance',
-    category: 'Delivery',
-    createdAt: '2026-04-02T08:00:00Z',
-    isNew: true,
-    postedByUserId: 'user999',
-    postedBy: {
-      name: 'Admin Team',
-      role: 'Operations Manager',
-      avatar: 'https://i.pravatar.cc/150?img=12',
-      email: 'careers@nearu.lk',
-      phone: '+94 77 1234567',
-    },
-    logo: 'https://ui-avatars.com/api/?name=NU&background=ef4444&color=fff&bold=true',
-    description: 'Own a bike? Earn extra cash delivering food to fellow students during your free time.',
-    longDescription: 'Join the NearU delivery fleet and become a vital part of our campus ecosystem. You can set your own hours and earn per delivery. Perfect for students with their own transport who want to make quick cash between lectures or in the evenings.',
-    requirements: [
-      'Valid driving license and a registered motorbike',
-      'Smart phone with active data connection',
-      'Punctuality and good communication skills',
-      'Familiarity with the campus layout'
-    ],
-    tags: ['Be Your Own Boss', 'Immediate Start', 'High Tips'],
-  },
-  {
-    id: 'j4',
-    title: 'Social Media Content Creator',
-    company: 'Wix Media',
-    location: 'Hybrid / Remote',
-    pay: 'Rs. 25,000 / month',
-    type: 'Internship',
-    category: 'Marketing',
-    createdAt: '2026-04-02T05:00:00Z',
-    isNew: true,
-    postedByUserId: 'user123', // MOCK CURRENT USER POST
-    postedBy: {
-      name: 'Sarah Jenkins (You)',
-      role: 'Creative Director',
-      avatar: 'https://i.pravatar.cc/150?img=5',
-      email: 'sarah@wixmedia.lk',
-      phone: '+94 71 9876543',
-    },
-    logo: 'https://ui-avatars.com/api/?name=WM&background=ec4899&color=fff&bold=true',
-    description: 'Help manage our Instagram and TikTok accounts. Create engaging content for youth brands.',
-    longDescription: 'Wix Media is looking for a creative student intern to help us dominate social media. You will be responsible for filming short-form video content, designing graphics, and engaging with our community. If you are always on TikTok and know the latest trends, this is for you!',
-    requirements: [
-      'Experience with CapCut, Canva, or Adobe Suite',
-      'Strong understanding of social media algorithms',
-      'Creative mindset and storytelling ability',
-      'Must provide a portfolio or link to social profiles'
-    ],
-    tags: ['Creative', 'Hybrid', 'Portfolio'],
-  },
-  {
-    id: 'j3',
-    title: 'Math Tutor (A/L Combined)',
-    company: 'EduCare Academy',
-    location: 'Belihuloya Town',
-    pay: 'Rs. 1,200 / hr',
-    type: 'Freelance',
-    category: 'Tutoring',
-    createdAt: '2026-03-30T10:00:00Z',
-    postedByUserId: 'user999',
-    postedBy: {
-      name: 'Mr. Bandara',
-      role: 'Academy Principal',
-      avatar: 'https://i.pravatar.cc/150?img=8',
-      email: 'educare.town@gmail.com',
-      phone: '+94 45 5566778',
-    },
-    logo: 'https://ui-avatars.com/api/?name=EC&background=10b981&color=fff&bold=true',
-    description: 'Looking for an undergrad excellent in Combined Maths to tutor local A/L students.',
-    longDescription: 'Help the local community by sharing your knowledge. We need a bright undergraduate to conduct evening classes for Advanced Level students. You will be provided with all necessary teaching materials and a comfortable classroom environment.',
-    requirements: [
-      'A/A+ in Combined Maths at G.C.E A/L',
-      'Clear communication and patience',
-      'Available on Saturday mornings or weekday evenings',
-      'Previous teaching experience is a plus'
-    ],
-    tags: ['High Pay', 'Weekend', 'Education'],
-  },
-  {
-    id: 'j2',
-    title: 'Customer Support Lead',
-    company: 'TechFlow Solutions',
-    location: 'Fully Remote',
-    pay: 'Rs. 40,000 / month',
-    type: 'Part-Time',
-    category: 'Tech',
-    createdAt: '2026-03-29T10:00:00Z',
-    postedByUserId: 'user123', // MOCK CURRENT USER POST
-    postedBy: {
-      name: 'Michael Chen (You)',
-      role: 'HR Manager',
-      avatar: 'https://i.pravatar.cc/150?img=3',
-      email: 'hr@techflow.io',
-      phone: '+1 555 0199',
-    },
-    logo: 'https://ui-avatars.com/api/?name=TF&background=3b82f6&color=fff&bold=true',
-    description: 'Provide email and chat support for our software products. Evening and weekend shifts available.',
-    longDescription: 'Join our international tech team from the comfort of your hostel. You will be handling customer inquiries via Intercom and email, helping users troubleshoot our SaaS platform. We provide full training and a supportive remote environment.',
-    requirements: [
-      'Excellent written English',
-      'Stable internet connection',
-      'Problem-solving mindset',
-      'Ability to work independently'
-    ],
-    tags: ['Remote', 'USD Equiv', 'Tech Skill'],
-  },
-  {
-    id: 'j5',
-    title: 'Evening Barista',
-    company: 'Bean & Brew Cafe',
-    location: 'Near University Main Gate',
-    pay: 'Rs. 350 / hr + Meals',
-    type: 'Part-Time',
-    category: 'Food & Bev',
-    createdAt: '2026-03-28T10:00:00Z',
-    postedByUserId: 'user999',
-    postedBy: {
-      name: 'Amila Perera',
-      role: 'Cafe Owner',
-      avatar: 'https://i.pravatar.cc/150?img=15',
-      email: 'beanbrew.belihuloya@gmail.com',
-      phone: '+94 76 5544332',
-    },
-    logo: 'https://ui-avatars.com/api/?name=BB&background=8b5cf6&color=fff&bold=true',
-    description: 'Looking for energetic staff for the evening shift (4 PM - 9 PM). Coffee training will be provided.',
-    longDescription: 'Bean & Brew is the favorite hangout spot for Sabra students. We need a friendly face to join our evening team. You\'ll learn to make great coffee, handle the POS system, and ensure our customers have a great experience. We offer free meals during shifts!',
-    requirements: [
-      'Friendly and outgoing personality',
-      'Ability to work in a fast-paced environment',
-      'Punctuality is critical',
-      'No prior experience required (we train!)'
-    ],
-    tags: ['Evening Shift', 'Free Meals', 'Social'],
-  },
-];
-
-// Helper to format date purely for visual rendering
 function formatDate(dateString: string) {
     const d = new Date(dateString);
     return d.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
@@ -273,7 +69,7 @@ function useHorizontalScroll() {
 }
 
 // ─── Job Card Component ───────────────────────────────────────────────────────
-function JobCard({ job, index, onClick }: { job: Job, index: number, onClick: (job: Job) => void }) {
+function JobCard({ job, index, onClick }: { job: JobResponse, index: number, onClick: (job: JobResponse) => void }) {
   const [hovered, setHovered] = useState(false);
 
   return (
@@ -306,7 +102,7 @@ function JobCard({ job, index, onClick }: { job: Job, index: number, onClick: (j
           {/* Top: Logo & Badges */}
           <Box sx={{ display: 'flex', justifyContent: 'space-between', width: '100%', mb: 2.5 }}>
             <Avatar 
-                src={job.logo} 
+                src={job.logo || `https://ui-avatars.com/api/?name=${job.company}&background=facc15&color=000&bold=true`} 
                 variant="rounded"
                 sx={{ 
                     width: 54, 
@@ -352,7 +148,7 @@ function JobCard({ job, index, onClick }: { job: Job, index: number, onClick: (j
              </Box>
              <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5, color: 'rgba(255,255,255,0.6)' }}>
                 <PayIcon sx={{ fontSize: 16, color: '#22c55e' }} />
-                <Typography variant="caption" sx={{ fontWeight: 600, color: '#fff' }}>{job.pay}</Typography>
+                <Typography variant="caption" sx={{ fontWeight: 600, color: '#fff' }}>{job.payRange}</Typography>
              </Box>
           </Stack>
 
@@ -362,7 +158,7 @@ function JobCard({ job, index, onClick }: { job: Job, index: number, onClick: (j
 
           <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1, mt: 'auto', width: '100%', pt: 2, borderTop: '1px solid rgba(255,255,255,0.05)' }}>
             <Box sx={{ px: 1, py: 0.4, borderRadius: '6px', bgcolor: 'rgba(59,130,246,0.1)', color: '#3b82f6', fontSize: '0.7rem', fontWeight: 700, border: '1px solid rgba(59,130,246,0.2)' }}>
-              {job.type}
+              {job.jobType}
             </Box>
             <Box sx={{ px: 1, py: 0.4, borderRadius: '6px', bgcolor: 'rgba(236,72,153,0.1)', color: '#ec4899', fontSize: '0.7rem', fontWeight: 700, border: '1px solid rgba(236,72,153,0.2)' }}>
               {job.category}
@@ -391,9 +187,11 @@ const textFieldStyles = {
 
 export default function Jobs() {
   const navigate = useNavigate();
-  const [selectedJob, setSelectedJob] = useState<Job | null>(null);
+  const [selectedJob, setSelectedJob] = useState<JobResponse | null>(null);
   const [isDetailsOpen, setIsDetailsOpen] = useState(false);
   const [visible, setVisible] = useState(false);
+  const [jobs, setJobs] = useState<JobResponse[]>([]);
+  const [loading, setLoading] = useState(true);
   
   // Filters
   const [activeCategory, setActiveCategory] = useState<string>('All');
@@ -407,7 +205,23 @@ export default function Jobs() {
     return () => clearTimeout(t);
   }, []);
 
-  const handleJobClick = (job: Job) => {
+  useEffect(() => {
+    fetchJobs();
+  }, []);
+
+  const fetchJobs = async () => {
+    try {
+      setLoading(true);
+      const data = await jobService.getAllJobs();
+      setJobs(data);
+    } catch (error: any) {
+      toast.error(error.response?.data?.message || 'Failed to fetch jobs');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleJobClick = (job: JobResponse) => {
     setSelectedJob(job);
     setIsDetailsOpen(true);
   };
@@ -417,7 +231,7 @@ export default function Jobs() {
   };
 
   // 1. Sort by CreatedAt (Newest to Oldest)
-  const sortedJobs = [...jobsData].sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+  const sortedJobs = [...jobs].sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
 
   // 2. Extract uniquely generated properties for badges/sections
   const newJobs = sortedJobs.filter(j => j.isNew);
@@ -428,7 +242,7 @@ export default function Jobs() {
   // 3. Filter Application
   const filteredJobs = sortedJobs.filter(j => {
     if (activeCategory !== 'All' && j.category !== activeCategory) return false;
-    if (activeType !== 'All' && j.type !== activeType) return false;
+    if (activeType !== 'All' && j.jobType !== activeType) return false;
     if (searchQuery.trim() !== '') {
        const q = searchQuery.toLowerCase();
        if (!j.title.toLowerCase().includes(q) && !j.company.toLowerCase().includes(q)) return false;
@@ -545,48 +359,50 @@ export default function Jobs() {
               </Fade>
 
               {/* ── New Job Postings (Carousel) ──────────────────────────── */}
-              <Box sx={{ mb: 8 }}>
-                <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 4 }}>
-                      <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
-                        <WorkIcon sx={{ color: '#facc15', fontSize: 28 }} />
-                        <Box>
-                          <Typography variant="h5" sx={{ fontWeight: 800, color: '#fff', letterSpacing: '-0.01em' }}>
-                            New Job Postings
-                          </Typography>
-                          <Typography variant="caption" sx={{ color: 'rgba(255,255,255,0.4)' }}>Recently added opportunities for you</Typography>
+              {!loading && newJobs.length > 0 && (
+                <Box sx={{ mb: 8 }}>
+                  <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 4 }}>
+                        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
+                          <WorkIcon sx={{ color: '#facc15', fontSize: 28 }} />
+                          <Box>
+                            <Typography variant="h5" sx={{ fontWeight: 800, color: '#fff', letterSpacing: '-0.01em' }}>
+                              New Job Postings
+                            </Typography>
+                            <Typography variant="caption" sx={{ color: 'rgba(255,255,255,0.4)' }}>Recently added opportunities for you</Typography>
+                          </Box>
+                        </Box>
+                        <Box sx={{ display: 'flex', gap: 1.5 }}>
+                          <IconButton onClick={() => scrollNewJobs('left')} sx={{ bgcolor: 'rgba(255,255,255,0.03)', color: '#fff', border: '1px solid rgba(255,255,255,0.08)', '&:hover': { bgcolor: 'rgba(250,204,21,0.15)', borderColor: '#facc15' } }}>
+                            <ChevronLeftIcon />
+                          </IconButton>
+                          <IconButton onClick={() => scrollNewJobs('right')} sx={{ bgcolor: 'rgba(255,255,255,0.03)', color: '#fff', border: '1px solid rgba(255,255,255,0.08)', '&:hover': { bgcolor: 'rgba(250,204,21,0.15)', borderColor: '#facc15' } }}>
+                            <ChevronRightIcon />
+                          </IconButton>
                         </Box>
                       </Box>
-                      <Box sx={{ display: 'flex', gap: 1.5 }}>
-                        <IconButton onClick={() => scrollNewJobs('left')} sx={{ bgcolor: 'rgba(255,255,255,0.03)', color: '#fff', border: '1px solid rgba(255,255,255,0.08)', '&:hover': { bgcolor: 'rgba(250,204,21,0.15)', borderColor: '#facc15' } }}>
-                          <ChevronLeftIcon />
-                        </IconButton>
-                        <IconButton onClick={() => scrollNewJobs('right')} sx={{ bgcolor: 'rgba(255,255,255,0.03)', color: '#fff', border: '1px solid rgba(255,255,255,0.08)', '&:hover': { bgcolor: 'rgba(250,204,21,0.15)', borderColor: '#facc15' } }}>
-                          <ChevronRightIcon />
-                        </IconButton>
+                      
+                      <Box 
+                        ref={newJobsRef}
+                        sx={{ 
+                          display: 'flex', 
+                          gap: 3, 
+                          overflowX: 'auto', 
+                          pb: 4, 
+                          px: 1, 
+                          mx: -1,
+                          scrollbarWidth: 'none', 
+                          '&::-webkit-scrollbar': { display: 'none' },
+                          scrollBehavior: 'smooth',
+                          scrollSnapType: 'x mandatory',
+                          '& > *': { scrollSnapAlign: 'start' }
+                        }}
+                      >
+                        {newJobs.map((job, i) => (
+                          <JobCard key={job.id} job={job} index={i} onClick={handleJobClick} />
+                        ))}
                       </Box>
                     </Box>
-                    
-                    <Box 
-                      ref={newJobsRef}
-                      sx={{ 
-                        display: 'flex', 
-                        gap: 3, 
-                        overflowX: 'auto', 
-                        pb: 4, 
-                        px: 1, 
-                        mx: -1,
-                        scrollbarWidth: 'none', 
-                        '&::-webkit-scrollbar': { display: 'none' },
-                        scrollBehavior: 'smooth',
-                        scrollSnapType: 'x mandatory',
-                        '& > *': { scrollSnapAlign: 'start' }
-                      }}
-                    >
-                      {newJobs.map((job, i) => (
-                        <JobCard key={job.id} job={job} index={i} onClick={handleJobClick} />
-                      ))}
-                    </Box>
-                  </Box>
+              )}
 
               {/* ── Filter Bar ────────────────────────────────────── */}
               <Box sx={{ mb: 6 }}>
@@ -653,7 +469,11 @@ export default function Jobs() {
                   </Box>
                 </Box>
 
-                {filteredJobs.length > 0 ? (
+                {loading ? (
+                  <Box sx={{ textAlign: 'center', py: 8 }}>
+                    <Typography variant="h6" sx={{ color: 'rgba(255,255,255,0.6)' }}>Loading jobs...</Typography>
+                  </Box>
+                ) : filteredJobs.length > 0 ? (
                   <Grid container spacing={3}>
                     {filteredJobs.map((job, index) => (
                       <Grid size={{ xs: 12, sm: 6, lg: 4 }} key={job.id}>
@@ -806,7 +626,7 @@ export default function Jobs() {
                                     <LabelIcon sx={{ color: '#facc15' }} />
                                     <Box>
                                         <Typography variant="caption" sx={{ color: 'rgba(255,255,255,0.4)', display: 'block' }}>Job Type</Typography>
-                                        <Typography variant="body2" sx={{ color: '#fff', fontWeight: 600 }}>{selectedJob.type}</Typography>
+                                        <Typography variant="body2" sx={{ color: '#fff', fontWeight: 600 }}>{selectedJob.jobType}</Typography>
                                     </Box>
                                 </Box>
 
@@ -824,10 +644,10 @@ export default function Jobs() {
                             {/* Poster Info */}
                             <Typography variant="subtitle2" sx={{ color: 'rgba(255,255,255,0.4)', mb: 2, fontSize: '0.75rem', fontWeight: 700, letterSpacing: '0.05em' }}>POSTED BY</Typography>
                             <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, mb: 3 }}>
-                                <Avatar src={selectedJob.postedBy.avatar} sx={{ width: 44, height: 44, border: '1px solid #facc15' }} />
+                                <Avatar src={selectedJob.postedBy.avatar || undefined} sx={{ width: 44, height: 44, border: '1px solid #facc15' }} />
                                 <Box>
                                     <Typography variant="body2" sx={{ color: '#fff', fontWeight: 700 }}>{selectedJob.postedBy.name}</Typography>
-                                    <Typography variant="caption" sx={{ color: 'rgba(255,255,255,0.4)' }}>{selectedJob.postedBy.role}</Typography>
+                                    <Typography variant="caption" sx={{ color: 'rgba(255,255,255,0.4)' }}>{selectedJob.postedBy.email}</Typography>
                                 </Box>
                             </Box>
 
@@ -847,24 +667,7 @@ export default function Jobs() {
                                     }}
                                     href={`mailto:${selectedJob.postedBy.email}`}
                                 >
-                                    Email Recruiter
-                                </Button>
-                                <Button 
-                                    fullWidth 
-                                    variant="outlined" 
-                                    startIcon={<PhoneIcon />}
-                                    sx={{ 
-                                        color: '#fff', 
-                                        borderColor: 'rgba(255,255,255,0.1)', 
-                                        fontWeight: 600, 
-                                        borderRadius: '12px', 
-                                        py: 1.2,
-                                        textTransform: 'none',
-                                        '&:hover': { borderColor: '#facc15', bgcolor: 'rgba(250, 204, 21, 0.05)' }
-                                    }}
-                                    href={`tel:${selectedJob.postedBy.phone}`}
-                                >
-                                    Call Now
+                                    Contact Poster
                                 </Button>
                             </Stack>
                         </Box>
