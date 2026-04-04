@@ -24,6 +24,7 @@ import {
   Description as DescriptionIcon,
   Category as CategoryIcon,
   Label as LabelIcon,
+  Image as ImageIcon,
 } from '@mui/icons-material';
 
 const jobTypes = ['Part-Time', 'Internship', 'Freelance', 'Campus', 'Full-Time'];
@@ -46,7 +47,7 @@ const textFieldStyles = {
       borderWidth: '2px',
     },
     '& .MuiSelect-icon': {
-        color: 'rgba(255,255,255,0.5)',
+      color: 'rgba(255,255,255,0.5)',
     }
   },
   '& .MuiInputLabel-root': {
@@ -70,6 +71,17 @@ export default function CreateJob() {
     longDescription: '',
   });
 
+  const [logoFile, setLogoFile] = useState<File | null>(null);
+  const [logoPreview, setLogoPreview] = useState<string | null>(null);
+
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files && e.target.files[0]) {
+      const file = e.target.files[0];
+      setLogoFile(file);
+      setLogoPreview(URL.createObjectURL(file));
+    }
+  };
+
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
@@ -91,7 +103,7 @@ export default function CreateJob() {
         <PageLayout>
           <Box sx={{ height: 'calc(100vh - 68px)', overflowY: 'auto', overflowX: 'hidden' }}>
             <Box sx={{ px: { xs: 2.5, md: 5 }, py: { xs: 4, md: 5 }, maxWidth: 900, mx: 'auto', width: '100%' }}>
-              
+
               <Fade in={true} timeout={600}>
                 <Box>
                   <Typography variant="h3" sx={{ fontWeight: 800, color: '#fff', letterSpacing: '-0.02em', mb: 2 }}>
@@ -102,7 +114,7 @@ export default function CreateJob() {
                   </Typography>
 
                   <Box component="form" onSubmit={handleSubmit} sx={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
-                    
+
                     <Box sx={{ p: 4, bgcolor: 'rgba(255,255,255,0.02)', borderRadius: '24px', border: '1px solid rgba(255,255,255,0.05)' }}>
                       <Typography variant="h6" sx={{ color: '#fff', mb: 3, fontWeight: 700 }}>Basic Information</Typography>
                       <Grid container spacing={3}>
@@ -162,6 +174,36 @@ export default function CreateJob() {
                             }}
                             sx={textFieldStyles}
                           />
+                        </Grid>
+                        <Grid item xs={12} sm={12}>
+                          <Box sx={{ 
+                            border: '1px dashed rgba(255,255,255,0.2)', 
+                            borderRadius: '12px', 
+                            p: 3, 
+                            textAlign: 'center',
+                            bgcolor: 'rgba(255,255,255,0.02)',
+                            transition: 'all 0.3s',
+                            '&:hover': { borderColor: '#facc15', bgcolor: 'rgba(250, 204, 21, 0.05)' }
+                          }}>
+                            {logoPreview ? (
+                              <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 2 }}>
+                                <Box component="img" src={logoPreview} alt="Logo preview" sx={{ height: 64, width: 64, borderRadius: '12px', objectFit: 'cover', border: '1px solid rgba(255,255,255,0.1)' }} />
+                                <Button variant="outlined" component="label" size="small" sx={{ color: '#fff', borderColor: 'rgba(255,255,255,0.3)', textTransform: 'none', '&:hover': { borderColor: '#facc15', color: '#facc15' } }}>
+                                  Change Image
+                                  <input type="file" hidden accept="image/*" onChange={handleFileChange} />
+                                </Button>
+                              </Box>
+                            ) : (
+                              <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 1 }}>
+                                <ImageIcon sx={{ color: 'rgba(255,255,255,0.3)', fontSize: 32 }} />
+                                <Typography variant="body2" sx={{ color: 'rgba(255,255,255,0.6)' }}>Upload Company Logo (Optional)</Typography>
+                                <Button variant="contained" component="label" size="small" sx={{ mt: 1, bgcolor: 'rgba(255,255,255,0.1)', color: '#fff', textTransform: 'none', boxShadow: 'none', '&:hover': { bgcolor: 'rgba(255,255,255,0.2)', boxShadow: 'none' } }}>
+                                  Select Image
+                                  <input type="file" hidden accept="image/*" onChange={handleFileChange} />
+                                </Button>
+                              </Box>
+                            )}
+                          </Box>
                         </Grid>
                         <Grid item xs={12} sm={6}>
                           <TextField
@@ -268,7 +310,7 @@ export default function CreateJob() {
                       Cancel & Return to Jobs
                     </Button>
                   </Box>
-                  
+
                 </Box>
               </Fade>
 
