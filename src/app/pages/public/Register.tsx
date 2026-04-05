@@ -73,8 +73,7 @@ export default function Register() {
     // Step 3: Additional Info
     address: '',
     city: '',
-    dateOfBirth: '',
-    emergencyContact: ''
+    dateOfBirth: ''
   });
 
   // Business form state
@@ -102,8 +101,7 @@ export default function Register() {
     vehicleType: 'Tuk Tuk',
     vehicleNumber: '',
     licenseNumber: '',
-    address: '',
-    emergencyContact: ''
+    address: ''
   });
 
   const [showPassword, setShowPassword] = useState(false);
@@ -580,22 +578,6 @@ export default function Register() {
                             />
                           </Grid>
                         </Grid>
-                        <TextField
-                          fullWidth
-                          label="Emergency Contact"
-                          required
-                          value={studentForm.emergencyContact}
-                          onChange={(e) => setStudentForm({...studentForm, emergencyContact: e.target.value})}
-                          slotProps={{
-                            input: {
-                              startAdornment: (
-                                <InputAdornment position="start">
-                                  <PhoneIcon sx={{ color: 'gray' }} />
-                                </InputAdornment>
-                              ),
-                            }
-                          }}
-                        />
                         <Box sx={{ display: 'flex', gap: 2, mt: 2 }}>
                           <Button
                             fullWidth
@@ -693,14 +675,7 @@ export default function Register() {
                         <TextField fullWidth label="Phone" type="tel" required value={riderForm.phone} onChange={(e) => setRiderForm({...riderForm, phone: e.target.value})} />
                       </Grid>
                     </Grid>
-                    <Grid container spacing={2}>
-                      <Grid xs={6}>
-                        <TextField fullWidth label="Email" type="email" required value={riderForm.email} onChange={(e) => setRiderForm({...riderForm, email: e.target.value})} />
-                      </Grid>
-                      <Grid xs={6}>
-                        <TextField fullWidth label="Emergency Contact" type="tel" required value={riderForm.emergencyContact} onChange={(e) => setRiderForm({...riderForm, emergencyContact: e.target.value})} />
-                      </Grid>
-                    </Grid>
+                    <TextField fullWidth label="Email" type="email" required value={riderForm.email} onChange={(e) => setRiderForm({...riderForm, email: e.target.value})} />
                     <Grid container spacing={2}>
                       <Grid xs={6}>
                         <TextField fullWidth label="Password" type={showPassword ? "text" : "password"} required value={riderForm.password} onChange={(e) => setRiderForm({...riderForm, password: e.target.value})} />

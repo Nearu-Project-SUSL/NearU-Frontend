@@ -42,6 +42,10 @@ The frontend will start on `http://localhost:5173`
 ### Configuration
 - `.env` - Backend API URL configuration
 
+### Documentation
+- `LOGO_UPLOAD_DOCUMENTATION.md` - Original logo upload docs (Base64)
+- `IMAGEKIT_INTEGRATION.md` - **NEW: ImageKit cloud storage integration**
+
 ## 🔌 API Endpoints Connected
 
 | Method | Endpoint | Purpose | Auth Required |
@@ -64,6 +68,7 @@ The frontend will start on `http://localhost:5173`
 - ✅ Search by title or company name
 - ✅ View detailed job information
 - ✅ Create new job postings
+- ✅ **Upload company logos via ImageKit Cloud CDN** (Same system as food section!)
 - ✅ Delete your job postings
 - ✅ Contact job posters via email
 - ✅ Loading states and error handling

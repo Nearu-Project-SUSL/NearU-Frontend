@@ -2,7 +2,8 @@ import { useState, useEffect } from 'react';
 import { PageLayout } from '../../components/layout/PageLayout';
 import { Sidebar } from '../../components/layout/Sidebar';
 import Navbar from '../../components/layout/Navbar';
-import jobService, { JobResponse } from '../../../api/jobService';
+import { JobResponse } from '../../../api/jobService';
+import { useAllJobs, useDeleteJob } from '../../hooks/useJobs';
 import { toast } from 'sonner';
 
 import {
@@ -46,26 +47,18 @@ function formatDate(dateString: string) {
 export default function MyJobs() {
   const [selectedJob, setSelectedJob] = useState<JobResponse | null>(null);
   const [isDetailsOpen, setIsDetailsOpen] = useState(false);
-  const [myJobs, setMyJobs] = useState<JobResponse[]>([]);
-  const [loading, setLoading] = useState(true);
+  
+  const { data: allJobs = [], isLoading: loading, isError, error } = useAllJobs();
+  const deleteJobMutation = useDeleteJob();
+  
+  const userId = localStorage.getItem('userId');
+  const myJobs = allJobs.filter(job => job.postedBy.userId === userId);
 
   useEffect(() => {
-    fetchMyJobs();
-  }, []);
-
-  const fetchMyJobs = async () => {
-    try {
-      setLoading(true);
-      const allJobs = await jobService.getAllJobs();
-      const userId = localStorage.getItem('userId');
-      const userJobs = allJobs.filter(job => job.postedBy.userId === userId);
-      setMyJobs(userJobs);
-    } catch (error: any) {
-      toast.error(error.response?.data?.message || 'Failed to fetch your jobs');
-    } finally {
-      setLoading(false);
+    if (isError) {
+      toast.error((error as any)?.response?.data?.message || 'Failed to fetch your jobs');
     }
-  };
+  }, [isError, error]);
 
   const handleJobClick = (job: JobResponse) => {
     setSelectedJob(job);
@@ -82,9 +75,8 @@ export default function MyJobs() {
     }
 
     try {
-      await jobService.deleteJob(jobId);
+      await deleteJobMutation.mutateAsync(jobId);
       toast.success('Job listing deleted successfully');
-      fetchMyJobs();
     } catch (error: any) {
       toast.error(error.response?.data?.message || 'Failed to delete job');
     }

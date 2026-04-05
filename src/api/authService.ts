@@ -23,7 +23,6 @@ export interface RegisterStudentData {
   address: string;
   city: string;
   dateOfBirth: string;
-  emergencyContact: string;
 }
 
 export interface RegisterBusinessData {
@@ -48,7 +47,6 @@ export interface RegisterRiderData {
   vehicleNumber: string;
   licenseNumber: string;
   address: string;
-  emergencyContact: string;
 }
 
 export interface AuthResponse {
