@@ -4,7 +4,7 @@ import { PageLayout } from '../../components/layout/PageLayout';
 import { Sidebar } from '../../components/layout/Sidebar';
 import Navbar from '../../components/layout/Navbar';
 import { JobResponse } from '../../../api/jobService';
-import { useAllJobs } from '../../hooks/useJobs';
+import { useAllJobs, useDeleteJob } from '../../hooks/useJobs';
 import { toast } from 'sonner';
 
 import {
@@ -194,6 +194,8 @@ export default function Jobs() {
   
   // React Query Fetch
   const { data: jobs = [], isLoading: loading, isError, error } = useAllJobs();
+  const deleteJobMutation = useDeleteJob();
+  const userId = localStorage.getItem('userId');
   
   // Filters
   const [activeCategory, setActiveCategory] = useState<string>('All');
@@ -220,6 +222,20 @@ export default function Jobs() {
 
   const handleCloseDetails = () => {
     setIsDetailsOpen(false);
+  };
+
+  const handleDeleteJob = async (jobId: string) => {
+    if (!window.confirm('Are you sure you want to delete this job listing?')) {
+      return;
+    }
+
+    try {
+      await deleteJobMutation.mutateAsync(jobId);
+      toast.success('Job listing deleted successfully');
+      setIsDetailsOpen(false);
+    } catch (error: any) {
+      toast.error(error.response?.data?.message || 'Failed to delete job');
+    }
   };
 
   // 1. Sort by CreatedAt (Newest to Oldest)
@@ -655,44 +671,79 @@ export default function Jobs() {
                                 </Box>
                             </Box>
 
-                            <Stack spacing={1.5}>
-                                <Button 
-                                    fullWidth 
-                                    variant="contained" 
-                                    startIcon={<EmailIcon />}
-                                    sx={{ 
-                                        bgcolor: '#facc15', 
-                                        color: '#000', 
-                                        fontWeight: 700, 
-                                        borderRadius: '12px', 
-                                        py: 1.2,
-                                        textTransform: 'none',
-                                        '&:hover': { bgcolor: '#eab308' }
-                                    }}
-                                    href={`mailto:${selectedJob.postedBy.email}`}
-                                >
-                                    Contact Poster
-                                </Button>
-                                {selectedJob.postedBy.mobileNumber && (
-                                   <Button 
-                                       fullWidth 
-                                       variant="outlined" 
-                                       startIcon={<PhoneIcon />}
-                                       sx={{ 
-                                           color: '#facc15', 
-                                           borderColor: 'rgba(250, 204, 21, 0.4)',
-                                           fontWeight: 700, 
-                                           borderRadius: '12px', 
-                                           py: 1.2,
-                                           textTransform: 'none',
-                                           '&:hover': { bgcolor: 'rgba(250, 204, 21, 0.1)', borderColor: '#facc15' }
-                                       }}
-                                       href={`tel:${selectedJob.postedBy.mobileNumber}`}
-                                   >
-                                       Call Poster
-                                   </Button>
-                                )}
-                            </Stack>
+                            {userId === selectedJob.postedBy.userId ? (
+                                <Stack spacing={1.5}>
+                                    <Button 
+                                        fullWidth 
+                                        variant="contained" 
+                                        onClick={() => navigate(`/jobs/update/${selectedJob.id}`)}
+                                        sx={{ 
+                                            bgcolor: '#3b82f6', 
+                                            color: '#fff', 
+                                            fontWeight: 700, 
+                                            borderRadius: '12px', 
+                                            py: 1.2,
+                                            textTransform: 'none',
+                                            '&:hover': { bgcolor: '#2563eb' }
+                                        }}
+                                    >
+                                        Update Listing
+                                    </Button>
+                                    <Button 
+                                        fullWidth 
+                                        variant="contained" 
+                                        color="error"
+                                        onClick={() => handleDeleteJob(selectedJob.id)}
+                                        sx={{ 
+                                            fontWeight: 700, 
+                                            borderRadius: '12px', 
+                                            py: 1.2,
+                                            textTransform: 'none',
+                                        }}
+                                    >
+                                        Delete Listing
+                                    </Button>
+                                </Stack>
+                            ) : (
+                                <Stack spacing={1.5}>
+                                    <Button 
+                                        fullWidth 
+                                        variant="contained" 
+                                        startIcon={<EmailIcon />}
+                                        sx={{ 
+                                            bgcolor: '#facc15', 
+                                            color: '#000', 
+                                            fontWeight: 700, 
+                                            borderRadius: '12px', 
+                                            py: 1.2,
+                                            textTransform: 'none',
+                                            '&:hover': { bgcolor: '#eab308' }
+                                        }}
+                                        href={`mailto:${selectedJob.postedBy.email}`}
+                                    >
+                                        Contact Poster
+                                    </Button>
+                                    {selectedJob.postedBy.mobileNumber && (
+                                       <Button 
+                                           fullWidth 
+                                           variant="outlined" 
+                                           startIcon={<PhoneIcon />}
+                                           sx={{ 
+                                               color: '#facc15', 
+                                               borderColor: 'rgba(250, 204, 21, 0.4)',
+                                               fontWeight: 700, 
+                                               borderRadius: '12px', 
+                                               py: 1.2,
+                                               textTransform: 'none',
+                                               '&:hover': { bgcolor: 'rgba(250, 204, 21, 0.1)', borderColor: '#facc15' }
+                                           }}
+                                           href={`tel:${selectedJob.postedBy.mobileNumber}`}
+                                       >
+                                           Call Poster
+                                       </Button>
+                                    )}
+                                </Stack>
+                            )}
                         </Box>
                     </Grid>
                 </Grid>
