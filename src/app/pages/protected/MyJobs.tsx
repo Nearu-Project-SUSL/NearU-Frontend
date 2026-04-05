@@ -135,9 +135,12 @@ export default function MyJobs() {
                                           </Box>
                                       </Box>
                                   </Box>
-                                  <Box sx={{ p: 4, borderLeft: { xs: 'none', md: '1px solid rgba(255,255,255,0.05)' }, borderTop: { xs: '1px solid rgba(255,255,255,0.05)', md: 'none' }, display: 'flex', flexDirection: 'column', justifyContent: 'center', bgcolor: 'rgba(255,255,255,0.01)', minWidth: 200 }}>
-                                      <Button onClick={() => handleJobClick(job)} variant="outlined" sx={{ color: '#facc15', borderColor: 'rgba(250, 204, 21, 0.4)', mb: 2, borderRadius: '12px' }}>
+                                  <Box sx={{ p: 4, borderLeft: { xs: 'none', md: '1px solid rgba(255,255,255,0.05)' }, borderTop: { xs: '1px solid rgba(255,255,255,0.05)', md: 'none' }, display: 'flex', flexDirection: 'column', justifyContent: 'center', gap: 1.5, bgcolor: 'rgba(255,255,255,0.01)', minWidth: 200 }}>
+                                      <Button onClick={() => handleJobClick(job)} variant="outlined" sx={{ color: '#facc15', borderColor: 'rgba(250, 204, 21, 0.4)', borderRadius: '12px' }}>
                                           View Details
+                                      </Button>
+                                      <Button onClick={() => window.location.href=`/jobs/update/${job.id}`} variant="contained" sx={{ bgcolor: '#3b82f6', '&:hover': { bgcolor: '#2563eb' }, borderRadius: '12px', fontWeight: 700 }}>
+                                          Update Listing
                                       </Button>
                                       <Button onClick={() => handleDeleteJob(job.id)} variant="contained" color="error" sx={{ borderRadius: '12px', fontWeight: 700 }}>
                                           Delete Listing

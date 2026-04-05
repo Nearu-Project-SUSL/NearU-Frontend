@@ -11,6 +11,7 @@ import ResetPassword from "./pages/public/ResetPassword";
 import Home from "./pages/protected/Home";
 import Jobs from "./pages/protected/Jobs";
 import CreateJob from "./pages/protected/CreateJob";
+import UpdateJob from "./pages/protected/UpdateJob";
 import MyJobs from "./pages/protected/MyJobs";
 import Profile from "./pages/protected/Profile";
 import AdminHome from "./pages/protected/AdminHome";
@@ -63,6 +64,10 @@ export const router = createBrowserRouter([
       {
         path: "/jobs/create",
         Component: CreateJob,
+      },
+      {
+        path: "/jobs/update/:id",
+        Component: UpdateJob,
       },
       {
         path: "/my-jobs",

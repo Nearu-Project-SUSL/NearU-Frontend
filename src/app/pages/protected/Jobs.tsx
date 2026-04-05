@@ -590,6 +590,18 @@ export default function Jobs() {
                               </Stack>
                           </Box>
                         )}
+
+                        {/* Tags */}
+                        {selectedJob.tags && selectedJob.tags.length > 0 && (
+                          <Box sx={{ mb: 4 }}>
+                              <Typography variant="h6" sx={{ color: '#fff', fontWeight: 700, mb: 2 }}>Tags</Typography>
+                              <Box sx={{ display: 'flex', gap: 1, flexWrap: 'wrap' }}>
+                                  {selectedJob.tags.map((tag, i) => (
+                                      <Chip key={i} label={tag} variant="outlined" sx={{ color: '#facc15', borderColor: 'rgba(250, 204, 21, 0.3)', bgcolor: 'rgba(250, 204, 21, 0.05)' }} />
+                                  ))}
+                              </Box>
+                          </Box>
+                        )}
                     </Grid>
 
                     <Grid size={{ xs: 12, md: 4 }}>
@@ -661,6 +673,25 @@ export default function Jobs() {
                                 >
                                     Contact Poster
                                 </Button>
+                                {selectedJob.postedBy.mobileNumber && (
+                                   <Button 
+                                       fullWidth 
+                                       variant="outlined" 
+                                       startIcon={<PhoneIcon />}
+                                       sx={{ 
+                                           color: '#facc15', 
+                                           borderColor: 'rgba(250, 204, 21, 0.4)',
+                                           fontWeight: 700, 
+                                           borderRadius: '12px', 
+                                           py: 1.2,
+                                           textTransform: 'none',
+                                           '&:hover': { bgcolor: 'rgba(250, 204, 21, 0.1)', borderColor: '#facc15' }
+                                       }}
+                                       href={`tel:${selectedJob.postedBy.mobileNumber}`}
+                                   >
+                                       Call Poster
+                                   </Button>
+                                )}
                             </Stack>
                         </Box>
                     </Grid>
