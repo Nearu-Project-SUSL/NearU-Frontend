@@ -140,6 +140,7 @@ export default function Register() {
         refreshToken: loginResponse.refreshToken,
       });
       localStorage.setItem('accessToken', loginResponse.accessToken);
+      localStorage.setItem('userId', loginResponse.user.id);
       
       toast.success('Registration and login successful!');
       navigate('/home');
@@ -169,6 +170,7 @@ export default function Register() {
         refreshToken: loginResponse.refreshToken,
       });
       localStorage.setItem('accessToken', loginResponse.accessToken);
+      localStorage.setItem('userId', loginResponse.user.id);
       
       toast.success('Registration and login successful!');
       navigate('/business-owner-home');
@@ -198,6 +200,7 @@ export default function Register() {
         refreshToken: loginResponse.refreshToken,
       });
       localStorage.setItem('accessToken', loginResponse.accessToken);
+      localStorage.setItem('userId', loginResponse.user.id);
       
       toast.success('Registration and login successful!');
       navigate('/rider-home');
