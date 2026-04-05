@@ -15,6 +15,7 @@ import AdminHome from "./pages/protected/AdminHome";
 import BusinessOwnerHome from "./pages/protected/BusinessOwnerHome";
 import RiderHome from "./pages/protected/RiderHome";
 import RiderProfile from "./pages/protected/RiderProfile";
+import FoodPage from "./pages/protected/Food";
 
 import ProtectedRoute from "./routing/ProtectedRoute";
 import Unauthorized from "./pages/public/Unauthorized";
@@ -62,6 +63,10 @@ export const router = createBrowserRouter([
         path: "/profile",
         Component: Profile,
       },
+      {
+        path: "/food",
+        Component: FoodPage,
+      }
     ]
   },
 
