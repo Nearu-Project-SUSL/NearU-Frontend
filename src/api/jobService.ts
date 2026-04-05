@@ -6,6 +6,7 @@ export interface PostedByInfo {
   name: string;
   email: string;
   avatar: string | null;
+  mobileNumber?: string;
 }
 
 export interface JobResponse {

@@ -107,7 +107,14 @@ const authService = {
     const response = await axios.post<ApiResponse<any>>('/auth/register', {
         username: data.fullName,
         email: data.email,
-        password: data.password
+        password: data.password,
+        mobileNumber: data.phone,
+        studentId: data.studentId,
+        faculty: data.faculty,
+        year: data.year,
+        address: data.address,
+        city: data.city,
+        dateOfBirth: data.dateOfBirth
     });
     
     // Extract from ApiResponse wrapper
@@ -122,7 +129,9 @@ const authService = {
     const response = await axios.post<ApiResponse<any>>('/auth/register', {
         username: data.ownerName,
         email: data.email,
-        password: data.password
+        password: data.password,
+        mobileNumber: data.phone,
+        address: data.address
     });
     
     // Extract from ApiResponse wrapper
@@ -137,7 +146,9 @@ const authService = {
     const response = await axios.post<ApiResponse<any>>('/auth/register', {
         username: data.fullName,
         email: data.email,
-        password: data.password
+        password: data.password,
+        mobileNumber: data.phone,
+        address: data.address
     });
     
     // Extract from ApiResponse wrapper
