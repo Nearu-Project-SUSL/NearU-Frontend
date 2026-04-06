@@ -73,6 +73,8 @@ export default function CreateJob() {
     category: '',
     description: '',
     longDescription: '',
+    tags: '',
+    requirements: '',
   });
 
   const [logoFile, setLogoFile] = useState<File | null>(null);
@@ -126,6 +128,8 @@ export default function CreateJob() {
       
       const jobData = {
         ...formData,
+        tags: formData.tags ? formData.tags.split(',').map(t => t.trim()).filter(Boolean) : undefined,
+        requirements: formData.requirements ? formData.requirements.split('\n').map(r => r.trim()).filter(Boolean) : undefined,
         logo: logoUrl || undefined,
         isNew: true
       };
@@ -384,6 +388,36 @@ export default function CreateJob() {
                             name="longDescription"
                             placeholder="Provide full details about the role, requirements, and responsibilities..."
                             value={formData.longDescription}
+                            onChange={handleChange}
+                            InputProps={{
+                              startAdornment: <InputAdornment position="start" sx={{ alignSelf: 'flex-start', mt: 1.5 }}><DescriptionIcon sx={{ color: 'rgba(255,255,255,0.5)' }} /></InputAdornment>,
+                            }}
+                            sx={textFieldStyles}
+                          />
+                        </Grid>
+                        <Grid item xs={12}>
+                          <TextField
+                            fullWidth
+                            label="Tags (comma separated)"
+                            name="tags"
+                            placeholder="e.g. Remote, Urgent, Design"
+                            value={formData.tags}
+                            onChange={handleChange}
+                            InputProps={{
+                              startAdornment: <InputAdornment position="start" sx={{ alignSelf: 'flex-start', mt: 1.5 }}><LabelIcon sx={{ color: 'rgba(255,255,255,0.5)' }} /></InputAdornment>,
+                            }}
+                            sx={textFieldStyles}
+                          />
+                        </Grid>
+                        <Grid item xs={12}>
+                          <TextField
+                            fullWidth
+                            multiline
+                            rows={4}
+                            label="Requirements (one per line)"
+                            name="requirements"
+                            placeholder="e.g.&#10;Must be currently enrolled in 3rd year&#10;Excellent communication skills&#10;Access to reliable internet"
+                            value={formData.requirements}
                             onChange={handleChange}
                             InputProps={{
                               startAdornment: <InputAdornment position="start" sx={{ alignSelf: 'flex-start', mt: 1.5 }}><DescriptionIcon sx={{ color: 'rgba(255,255,255,0.5)' }} /></InputAdornment>,

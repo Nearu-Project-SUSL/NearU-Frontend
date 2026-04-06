@@ -76,6 +76,7 @@ export default function UpdateJob() {
     description: '',
     longDescription: '',
     tags: '',
+    requirements: '',
   });
 
   useEffect(() => {
@@ -91,6 +92,7 @@ export default function UpdateJob() {
              description: job.description,
              longDescription: job.longDescription || '',
              tags: job.tags ? job.tags.join(', ') : '',
+             requirements: job.requirements ? job.requirements.join('\n') : '',
           });
           if (job.logo) {
             setLogoUrl(job.logo);
@@ -157,7 +159,8 @@ export default function UpdateJob() {
       
       const jobData = {
         ...formData,
-        tags: formData.tags ? formData.tags.split(',').map(t => t.trim()).filter(Boolean) : undefined,
+        tags: formData.tags ? formData.tags.split(',').map(t => t.trim()).filter(Boolean) : [],
+        requirements: formData.requirements ? formData.requirements.split('\n').map(r => r.trim()).filter(Boolean) : [],
         logo: logoUrl || undefined,
       };
       
@@ -436,6 +439,22 @@ export default function UpdateJob() {
                             onChange={handleChange}
                             InputProps={{
                               startAdornment: <InputAdornment position="start" sx={{ alignSelf: 'flex-start', mt: 1.5 }}><LabelIcon sx={{ color: 'rgba(255,255,255,0.5)' }} /></InputAdornment>,
+                            }}
+                            sx={textFieldStyles}
+                          />
+                        </Grid>
+                        <Grid item xs={12}>
+                          <TextField
+                            fullWidth
+                            multiline
+                            rows={4}
+                            label="Requirements (one per line)"
+                            name="requirements"
+                            placeholder="e.g.&#10;Must be currently enrolled in 3rd year&#10;Excellent communication skills&#10;Access to reliable internet"
+                            value={formData.requirements}
+                            onChange={handleChange}
+                            InputProps={{
+                              startAdornment: <InputAdornment position="start" sx={{ alignSelf: 'flex-start', mt: 1.5 }}><DescriptionIcon sx={{ color: 'rgba(255,255,255,0.5)' }} /></InputAdornment>,
                             }}
                             sx={textFieldStyles}
                           />
