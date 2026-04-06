@@ -87,11 +87,11 @@ export default function CreateJob() {
     if (e.target.files && e.target.files[0]) {
       const file = e.target.files[0];
       setLogoFile(file);
-      
+
       // Create preview
       const previewUrl = URL.createObjectURL(file);
       setLogoPreview(previewUrl);
-      
+
       // Upload to ImageKit immediately
       try {
         setIsUploadingLogo(true);
@@ -122,10 +122,10 @@ export default function CreateJob() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     try {
       setIsSubmitting(true);
-      
+
       const jobData = {
         ...formData,
         tags: formData.tags ? formData.tags.split(',').map(t => t.trim()).filter(Boolean) : undefined,
@@ -133,7 +133,7 @@ export default function CreateJob() {
         logo: logoUrl || undefined,
         isNew: true
       };
-      
+
       await createJobMutation.mutateAsync(jobData);
       toast.success('Job posted successfully!');
       navigate('/jobs');
@@ -227,25 +227,25 @@ export default function CreateJob() {
                           />
                         </Grid>
                         <Grid item xs={12} sm={12}>
-                          <Box sx={{ 
-                            border: '1px dashed rgba(255,255,255,0.2)', 
-                            borderRadius: '12px', 
-                            p: 3, 
+                          <Box sx={{
+                            border: '1px dashed rgba(255,255,255,0.2)',
+                            borderRadius: '12px',
+                            p: 3,
                             bgcolor: 'rgba(255,255,255,0.02)',
                           }}>
                             <Typography variant="body2" sx={{ color: 'rgba(255,255,255,0.6)', mb: 2, textAlign: 'center' }}>
                               Company Logo (Optional)
                             </Typography>
-                            
+
                             {/* Toggle between file upload and URL */}
                             <Stack direction="row" spacing={1} justifyContent="center" sx={{ mb: 2 }}>
-                              <Button 
-                                size="small" 
+                              <Button
+                                size="small"
                                 variant={logoInputMode === 'file' ? 'contained' : 'outlined'}
                                 onClick={() => setLogoInputMode('file')}
-                                sx={{ 
+                                sx={{
                                   bgcolor: logoInputMode === 'file' ? 'rgba(250, 204, 21, 0.2)' : 'transparent',
-                                  color: '#fff', 
+                                  color: '#fff',
                                   borderColor: 'rgba(255,255,255,0.2)',
                                   textTransform: 'none',
                                   fontSize: '0.75rem'
@@ -253,13 +253,13 @@ export default function CreateJob() {
                               >
                                 Upload File (ImageKit)
                               </Button>
-                              <Button 
-                                size="small" 
+                              <Button
+                                size="small"
                                 variant={logoInputMode === 'url' ? 'contained' : 'outlined'}
                                 onClick={() => setLogoInputMode('url')}
-                                sx={{ 
+                                sx={{
                                   bgcolor: logoInputMode === 'url' ? 'rgba(250, 204, 21, 0.2)' : 'transparent',
-                                  color: '#fff', 
+                                  color: '#fff',
                                   borderColor: 'rgba(255,255,255,0.2)',
                                   textTransform: 'none',
                                   fontSize: '0.75rem'
@@ -270,10 +270,10 @@ export default function CreateJob() {
                             </Stack>
 
                             {logoInputMode === 'file' ? (
-                              <Box sx={{ 
-                                border: '1px dashed rgba(255,255,255,0.2)', 
-                                borderRadius: '12px', 
-                                p: 2, 
+                              <Box sx={{
+                                border: '1px dashed rgba(255,255,255,0.2)',
+                                borderRadius: '12px',
+                                p: 2,
                                 textAlign: 'center',
                                 transition: 'all 0.3s',
                                 '&:hover': { borderColor: '#facc15', bgcolor: 'rgba(250, 204, 21, 0.05)' }
@@ -416,7 +416,7 @@ export default function CreateJob() {
                             rows={4}
                             label="Requirements (one per line)"
                             name="requirements"
-                            placeholder="e.g.&#10;Must be currently enrolled in 3rd year&#10;Excellent communication skills&#10;Access to reliable internet"
+                            placeholder="e.g.&#10;Excellent communication skills&#10;Access to reliable internet&#10;Must have a bike"
                             value={formData.requirements}
                             onChange={handleChange}
                             InputProps={{
