@@ -1,23 +1,32 @@
+import { lazy, Suspense } from "react";
 import { createBrowserRouter } from "react-router";
 
 // Public Pages
 import LoadingScreen from "./pages/public/LoadingScreen";
-import Login from "./pages/public/Login";
-import Register from "./pages/public/Register";
-import ForgotPassword from "./pages/public/ForgotPassword";
-import ResetPassword from "./pages/public/ResetPassword";
+
+// Helper for wrapping lazy pages in Suspense
+const Loadable = (Component: any) => (props: any) => (
+  <Suspense fallback={<LoadingScreen />}>
+    <Component {...props} />
+  </Suspense>
+);
+
+const Login = Loadable(lazy(() => import("./pages/public/Login")));
+const Register = Loadable(lazy(() => import("./pages/public/Register")));
+const ForgotPassword = Loadable(lazy(() => import("./pages/public/ForgotPassword")));
+const ResetPassword = Loadable(lazy(() => import("./pages/public/ResetPassword")));
 
 // Protected Pages
-import Home from "./pages/protected/Home";
-import Jobs from "./pages/protected/Jobs";
-import CreateJob from "./pages/protected/CreateJob";
-import UpdateJob from "./pages/protected/UpdateJob";
-import MyJobs from "./pages/protected/MyJobs";
-import Profile from "./pages/protected/Profile";
-import AdminHome from "./pages/protected/AdminHome";
-import BusinessOwnerHome from "./pages/protected/BusinessOwnerHome";
-import RiderHome from "./pages/protected/RiderHome";
-import RiderProfile from "./pages/protected/RiderProfile";
+const Home = Loadable(lazy(() => import("./pages/protected/Home")));
+const Jobs = Loadable(lazy(() => import("./pages/protected/Jobs")));
+const CreateJob = Loadable(lazy(() => import("./pages/protected/CreateJob")));
+const UpdateJob = Loadable(lazy(() => import("./pages/protected/UpdateJob")));
+const MyJobs = Loadable(lazy(() => import("./pages/protected/MyJobs")));
+const Profile = Loadable(lazy(() => import("./pages/protected/Profile")));
+const AdminHome = Loadable(lazy(() => import("./pages/protected/AdminHome")));
+const BusinessOwnerHome = Loadable(lazy(() => import("./pages/protected/BusinessOwnerHome")));
+const RiderHome = Loadable(lazy(() => import("./pages/protected/RiderHome")));
+const RiderProfile = Loadable(lazy(() => import("./pages/protected/RiderProfile")));
 
 import ProtectedRoute from "./routing/ProtectedRoute";
 import Unauthorized from "./pages/public/Unauthorized";
