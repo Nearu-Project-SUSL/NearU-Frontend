@@ -16,20 +16,135 @@ import {
   AccessTime as TimeIcon,
   FiberManualRecord as DotIcon,
 } from '@mui/icons-material';
+
 import type { FoodShop } from '../../../data/foodMockData';
 
-// interface ShopCardProps{
-//   shop: FoodShop;
-//   index: number;
-// }
+interface ShopCardProps{
+  shop: FoodShop;
+}
 
-export default function ShopCard() {
+export default function ShopCard({shop}: ShopCardProps) {
   const [hovered, setHovered] = useState(false); //track hover state for animation
 
   const navigate = useNavigate(); //go to shop detail page
 
   return(
-    <Card>
+    <Card
+    onMouseEnter={() => setHovered(true)}
+    onMouseLeave={() => setHovered(false)}
+    sx={{
+      minWidth: { xs: '100%', sm: 320 },
+      maxWidth: { sm: 360 },
+      bgcolor: 'rgba(255,255,255,0.02)',
+      borderRadius: '24px',
+      border: '1px solid rgba(255,255,255,0.05)',
+      overflow: 'hidden',
+
+      
+    }}>
+
+      <CardActionArea
+        onClick={() => navigate('')}
+        sx={{display:'flex', flexDirection:'column', alignItems:'stretch'}}>
+
+          <Box sx={{position:'relative', height:180, overflow:'hidden'}}>
+             <Box 
+              component= "img"
+              src={shop.photoUrl}
+              alt={shop.name}
+              sx={{
+                width:'100%',
+                height:'100%',
+                objectFit:'cover',
+              }}
+              />
+                <Box 
+                  sx={{
+                    position:'absolute',
+                    bottom:0,
+                    left:0,
+                    right:0,
+                    height:'60%',
+                    background: 'linear-gradient(to top, rgba(0,0,0,0.7), transparent)'
+                  }}/>
+
+                  <Box
+                    sx={{
+                      position:'absolute',
+                      bottom:12,
+                      left:12,
+                      px:1.5,
+                      py:0.4,
+                      borderRadius:'8px',
+                      bgcolor: 'rgba(250, 204, 21, 0.15)',
+                      border: '1px solid rgba(250, 204, 21, 0.3)',
+                    }}>
+                      
+                      <Typography
+                        variant='caption'
+                        sx={{color:'#facc15', fontWeight:700, fontSize:'0.7rem'}}>
+                          
+                          {shop.category}
+                        
+                        </Typography>
+                  </Box>
+              </Box>
+
+              <Box sx={{p:2.5}}>
+
+                <Typography
+                  variant='h6'
+                  sx={{
+                    color:'#fff',
+                    fontWeight:700,
+                    mb:0.5,
+                    fontSize:'1.1rem'
+                  }}>
+                    {shop.name}
+
+                  </Typography>
+
+                  <Typography
+                  variant="body2"
+                  sx={{
+                    color:'rgba(255,255,255,0.5)',
+                    fontSize:'0.85rem',
+                    lineHeight:1.6,
+                    mb:2
+                  }}>
+                    {shop.description}
+                  </Typography>
+
+                    <Box sx={{ display:'flex', alignItems:'center', gap:1}}>
+                      <LocationIcon sx={{fontSize:14, color: 'rgba(255,255,255,0.3)'}} />
+                      <Typography
+                        variant='caption'
+                        sx={{color:'rgba(255,255,255,0.5)', fontSize:'0.78rem'}}>
+                          {shop.address}
+
+                        </Typography>
+                    </Box>
+
+                    <Box
+                      sx={{
+                        mt:2,
+                        pt:2,
+                        borderTop:'1px solid rgba(255,255,255,0.05)',
+                        display:'flex',
+                        justifyContent:'space-between',
+                        alignItems:'center'
+                      }}>
+
+                        <Typography
+                          variant='caption'
+                          sx={{color:'#facc15', fontWeight:700, fontSize:'0.78rem'}}>
+                          View Menu
+
+                        </Typography>
+                    </Box>
+                </Box>
+
+      </CardActionArea>
       
     </Card>
   );
