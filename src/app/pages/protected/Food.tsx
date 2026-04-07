@@ -89,22 +89,28 @@ export default function FoodPage(){
                       }}>
                         Discover the best food shops near Sabagagamuwa University. From rica & currey to cafes and bakeries  all in one place.
                     </Typography>
-              </Box>              
+              </Box>
+              
+                            
             </Box>
 
-            
+
             <Box
               sx={{
-                display:'flex',
-                flexWrap:'wrap',
-                gap:8,
-                justifyContent:'flex-start',
-                mr:8,
-                ml:8
+                display:'grid',
+                gridTemplateColumns:{ 
+                  xs: '1fr', 
+                  sm: 'repeat(2, 1fr)', 
+                  md: 'repeat(3, 1fr)' },
+                gap:{xs:2, md:2.5},
+                alignItems:"center",
+                ml:5,
               }}>
+
               {foodShopsData.map((shop) => (
               <ShopCard key={shop.id} shop={shop} />
             ))}
+
             </Box>
             
 
