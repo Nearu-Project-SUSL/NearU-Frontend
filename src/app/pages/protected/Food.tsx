@@ -11,7 +11,6 @@ import {
   TextField,
   InputAdornment,
   } from '@mui/material';
-import { Carousel } from "../../components/ui/carousel";
 import { useState } from "react";
 import { XIcon, SearchIcon, SparkleIcon } from "lucide-react";
 
@@ -91,6 +90,7 @@ export default function FoodPage(){
                     </Typography>
               </Box>
               
+              {/*search section */}
                             
             </Box>
 

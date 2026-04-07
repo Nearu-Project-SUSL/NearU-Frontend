@@ -36,11 +36,23 @@ export default function ShopCard({shop}: ShopCardProps) {
       minWidth: { xs: '100%', sm: 320 },
       maxWidth: { sm: 360 },
       bgcolor: 'rgba(255,255,255,0.02)',
-      borderRadius: '24px',
-      border: '1px solid rgba(255,255,255,0.05)',
       overflow: 'hidden',
+      borderRadius:"24px",
 
+      border:hovered
+        ? "1px solid rgba(250, 204, 21, 0.9)"
+        : "1px solid rgba(255,255,255,0.08)",
+
+      borderShadow:hovered
+      ? "0 0 0 1px rgba(250,204,21,0.15), 0 12px 30px rgba(0,0,0,0.35)"
+      : "none",
+
+      transition:'all 0.25s ease',
       
+      "&:hover": {
+      transform: "translateY(-4px)",
+      },
+
     }}>
 
       <CardActionArea
