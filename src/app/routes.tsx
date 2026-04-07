@@ -3,6 +3,12 @@ import { createBrowserRouter } from "react-router";
 
 // Public Pages
 import LoadingScreen from "./pages/public/LoadingScreen";
+import Login from "./pages/public/Login";
+import Register from "./pages/public/Register";
+import ForgotPassword from "./pages/public/ForgotPassword";
+import ResetPassword from "./pages/public/ResetPassword";
+import Accommodation from "./pages/public/Accormodation";
+import AccommodationDetail from "./pages/public/AccommodationDetail";
 
 // Helper for wrapping lazy pages in Suspense
 const Loadable = (Component: any) => (props: any) => (
@@ -85,6 +91,14 @@ export const router = createBrowserRouter([
       {
         path: "/profile",
         Component: Profile,
+      },
+      {
+        path: "/accommodation",
+        Component: Accommodation,
+      },
+      {
+        path: "/accommodation/:id",
+        Component: AccommodationDetail,
       },
     ]
   },
