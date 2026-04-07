@@ -62,6 +62,7 @@ export default function Login() {
       });
       
       localStorage.setItem('accessToken', response.accessToken);
+      localStorage.setItem('userId', response.user.id);
       
       toast.success('Login successful!');
       
@@ -341,6 +342,7 @@ export default function Login() {
                         refreshToken: 'guest-token',
                       });
                       localStorage.setItem('accessToken', 'guest-token');
+                      localStorage.setItem('userId', 'guest');
                       toast.success('Logged in as Guest');
                       navigate('/home');
                     }}
