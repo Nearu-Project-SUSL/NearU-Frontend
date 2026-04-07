@@ -55,14 +55,12 @@ export default function Login() {
 
     try {
       const response = await authService.login({ email, password });
+      // AuthContext will automatically persist to localStorage via its useEffect
       setAuth({
         user: response.user,
         accessToken: response.accessToken,
         refreshToken: response.refreshToken,
       });
-      
-      localStorage.setItem('accessToken', response.accessToken);
-      localStorage.setItem('userId', response.user.id);
       
       toast.success('Login successful!');
       
@@ -336,13 +334,12 @@ export default function Login() {
                     variant="outlined"
                     startIcon={<GuestIcon />}
                     onClick={() => {
+                      // AuthContext will automatically persist to localStorage via its useEffect
                       setAuth({
                         user: { id: 'guest', username: 'Guest', email: 'guest@nearu.com', roles: ['Student'] },
                         accessToken: 'guest-token',
                         refreshToken: 'guest-token',
                       });
-                      localStorage.setItem('accessToken', 'guest-token');
-                      localStorage.setItem('userId', 'guest');
                       toast.success('Logged in as Guest');
                       navigate('/home');
                     }}
