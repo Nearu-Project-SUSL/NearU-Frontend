@@ -1,6 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router';
-import { PageLayout } from '../../components/layout/PageLayout';
 import { Sidebar } from '../../components/layout/Sidebar';
 import Navbar from '../../components/layout/Navbar';
 import { JobResponse } from '../../../api/jobService';
@@ -312,14 +311,13 @@ export default function Jobs() {
   });
 
   return (
-    <Box sx={{ display: 'flex', minHeight: '100vh', bgcolor: '#050505', backgroundImage: 'radial-gradient(circle at top left, rgba(250,204,21,0.03) 0%, transparent 50%)' }}>
+    <Box sx={{ display: 'flex', height: '100vh', overflow: 'hidden', bgcolor: '#050505', backgroundImage: 'radial-gradient(circle at top left, rgba(250,204,21,0.03) 0%, transparent 50%)' }}>
       <Sidebar activeSection="jobs" />
 
-      <Box sx={{ flexGrow: 1, display: 'flex', flexDirection: 'column', minWidth: 0 }}>
+      <Box sx={{ flex: 1, display: 'flex', flexDirection: 'column', minWidth: 0, overflow: 'hidden' }}>
         <Navbar />
 
-        <PageLayout>
-          <Box sx={{ height: '100vh', overflowY: 'auto', overflowX: 'hidden', mt: '-64px', pt: '64px' }}>
+        <Box sx={{ flex: 1, overflowY: 'auto', overflowX: 'hidden' }}>
             <Box sx={{ px: { xs: 2.5, md: 5 }, py: { xs: 4, md: 5 }, pb: 8, maxWidth: 1400, mx: 'auto', width: '100%' }}>
               
               {/* ── Header Section ─────────────────────────────────────────── */}
@@ -565,7 +563,6 @@ export default function Jobs() {
 
             </Box>
           </Box>
-        </PageLayout>
       </Box>
 
       {/* ── Job Details Dialog ────────────────────────────────────────────── */}

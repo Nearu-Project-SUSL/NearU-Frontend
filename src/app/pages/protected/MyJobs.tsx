@@ -1,5 +1,4 @@
 import { useState, useEffect } from 'react';
-import { PageLayout } from '../../components/layout/PageLayout';
 import { Sidebar } from '../../components/layout/Sidebar';
 import Navbar from '../../components/layout/Navbar';
 import { JobResponse } from '../../../api/jobService';
@@ -125,12 +124,11 @@ export default function MyJobs() {
   };
 
   return (
-    <Box sx={{ display: 'flex', minHeight: '100vh', bgcolor: '#050505', backgroundImage: 'radial-gradient(circle at top right, rgba(236, 72, 153, 0.03) 0%, transparent 50%)' }}>
+    <Box sx={{ display: 'flex', height: '100vh', overflow: 'hidden', bgcolor: '#050505', backgroundImage: 'radial-gradient(circle at top right, rgba(236, 72, 153, 0.03) 0%, transparent 50%)' }}>
       <Sidebar activeSection="profile" />
-      <Box sx={{ flexGrow: 1, display: 'flex', flexDirection: 'column', minWidth: 0 }}>
+      <Box sx={{ flex: 1, display: 'flex', flexDirection: 'column', minWidth: 0, overflow: 'hidden' }}>
         <Navbar />
-        <PageLayout>
-          <Box sx={{ height: 'calc(100vh - 68px)', overflowY: 'auto', overflowX: 'hidden' }}>
+        <Box sx={{ flex: 1, overflowY: 'auto', overflowX: 'hidden' }}>
             <Box sx={{ px: { xs: 2.5, md: 5 }, py: { xs: 4, md: 5 }, maxWidth: 1000, mx: 'auto', width: '100%' }}>
               
               <Fade in={true} timeout={600}>
@@ -212,7 +210,6 @@ export default function MyJobs() {
 
             </Box>
           </Box>
-        </PageLayout>
       </Box>
 
       {/* Reusing dialog for view details... */}
