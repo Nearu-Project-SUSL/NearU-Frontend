@@ -12,7 +12,9 @@ import {
   InputAdornment,
   } from '@mui/material';
 import { useState } from "react";
-import { XIcon, SearchIcon, SparkleIcon } from "lucide-react";
+
+import SearchIcon from "@mui/icons-material/Search";
+import CloseIcon from "@mui/icons-material/Close";
 
 export default function FoodPage(){
   const [activeCategory, setActiveCategory] = useState('All');  
@@ -91,6 +93,72 @@ export default function FoodPage(){
               </Box>
               
               {/*search section */}
+              <Box
+                sx={{
+                  display:'flex',
+                  alignItems: { xs: "stretch", md: "center" },
+                  justifyContent: "space-between",
+                  flexDirection: { xs: "column", md: "row" },
+                  gap: 2,
+                  mb: 4,
+                }}>
+
+                  <Box>
+                    <Typography
+                      variant="h5"
+                      sx={{color:'#fff', fontWeight:'800'}}>
+                        Food Shops
+                      </Typography>
+
+                      <Typography
+                        variant="body2"
+                        sx={{ color:'rgba(255,255,255,0.5)'}}>
+                          {filterShops.length} shop{filterShops.length !== 1 ? 's' : ''} found
+                        </Typography>
+                  </Box>
+
+                  <TextField
+                   size="small"
+                   placeholder="search shops ..."
+                   value={searchQuery}
+                   onChange={(e) => setSearchQuery(e.target.value)}
+                   sx={{
+                    minWidth: { xs: "100%", md: 280 },
+                    "& .MuiOutlinedInput-root": {
+                      borderRadius: "14px",
+                      bgcolor: "rgba(255,255,255,0.03)",
+                      color: "#fff",
+                      "& fieldset": {
+                        borderColor: "rgba(255,255,255,0.08)",
+                      },
+                      "&:hover fieldset": {
+                        borderColor: "#facc15",
+                      },
+                      "&.Mui-focused fieldset": {
+                        borderColor: "#facc15",
+                      },
+                    },
+                    "& input::placeholder": {
+                      color: "rgba(255,255,255,0.4)",
+                      opacity: 1,}
+                   }}
+                   InputProps={{
+                    startAdornment: (
+                      <InputAdornment position="start">
+                        <SearchIcon sx={{color:'rgba(255,255,255,0.5)', fontSize:20}}/>
+                      </InputAdornment>
+                    ),
+                    endAdornment: searchQuery ? (
+                      <InputAdornment position="end">
+                        <IconButton size="small" onClick={() => setSearchQuery("")}>
+                          <CloseIcon sx={{ color: "rgba(255,255,255,0.5)", fontSize: 18 }} />
+                        </IconButton>
+                      </InputAdornment>
+                    ) : null,
+                  }} />
+
+                </Box>
+
                             
             </Box>
 
