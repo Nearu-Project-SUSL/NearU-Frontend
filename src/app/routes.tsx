@@ -26,7 +26,7 @@ const CreateJob = Loadable(lazy(() => import("./pages/protected/CreateJob")));
 const UpdateJob = Loadable(lazy(() => import("./pages/protected/UpdateJob")));
 const MyJobs = Loadable(lazy(() => import("./pages/protected/MyJobs")));
 const Profile = Loadable(lazy(() => import("./pages/protected/Profile")));
-const Accommodation = Loadable(lazy(() => import("./pages/public/Accormodation")));
+const Accommodation = Loadable(lazy(() => import("./pages/public/Accommodation")));
 const AccommodationDetail = Loadable(lazy(() => import("./pages/public/AccommodationDetail")));
 
 // ── Role-specific Pages (lazy) ────────────────────────────────────────────────
