@@ -113,7 +113,7 @@ export default function Gifts() {
                     mb: 2,
                   }}
                 >
-                  Custom <Box component="span" sx={{ color: "#facc15" }}>Gifts</Box>
+                   <Box component="span" sx={{ color: "#facc15" }}>Gifts</Box>
                 </Typography>
 
                 <Typography
