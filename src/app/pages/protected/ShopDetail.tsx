@@ -1,8 +1,3 @@
-// src/pages/food/ShopDetailPage.tsx
-// Full page for a single shop
-// Shows cover photo, shop info, and menu items grid
-// Menu item click opens MenuItemDialog
-
 import { useState } from 'react';
 import { useParams, useNavigate } from 'react-router';
 import {
@@ -301,7 +296,13 @@ export default function ShopDetailPage() {
                 </Box>
           </PageLayout>
         </Box>
+        
 
+        {/* Menu Item Dialog */}
+        <MenuItemDialog 
+          item={selectedItem}
+          onClose={() => setSelectedItem(null)}
+        />
       </Box>
   );
 }

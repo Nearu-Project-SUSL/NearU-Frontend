@@ -6,7 +6,6 @@ export interface MenuItem {
   description: string;
   price: number;           // in LKR
   photoUrl: string;
-  isAvailable: boolean;
 }
 
 export interface FoodShop {
@@ -44,7 +43,6 @@ export const foodShopsData: FoodShop[] = [
         description: 'Steamed rice with 4 curries, papadam, and sambol. A complete Sri Lankan meal.',
         price: 280,
         photoUrl: 'https://images.unsplash.com/photo-1567337710282-00832b415979?w=400&auto=format&fit=crop',
-        isAvailable: true,
       },
       {
         id: 'item-1-2',
@@ -52,7 +50,6 @@ export const foodShopsData: FoodShop[] = [
         description: 'Crispy bowl-shaped hoppers with a perfectly cooked egg in the center. Served with coconut sambol.',
         price: 80,
         photoUrl: 'https://images.unsplash.com/photo-1574653853027-5382a3d23a15?w=400&auto=format&fit=crop',
-        isAvailable: true,
       },
       {
         id: 'item-1-3',
@@ -60,7 +57,6 @@ export const foodShopsData: FoodShop[] = [
         description: 'Freshly grated coconut mixed with red chili, lime, and onion. A classic Sri Lankan condiment.',
         price: 60,
         photoUrl: 'https://images.unsplash.com/photo-1565299585323-38d6b0865b47?w=400&auto=format&fit=crop',
-        isAvailable: true,
       },
       {
         id: 'item-1-4',
@@ -68,7 +64,6 @@ export const foodShopsData: FoodShop[] = [
         description: 'Steamed rice noodle nests served with coconut milk curry and lentil dhal.',
         price: 120,
         photoUrl: 'https://images.unsplash.com/photo-1512058564366-18510be2db19?w=400&auto=format&fit=crop',
-        isAvailable: false,
       },
     ],
   },
@@ -91,7 +86,6 @@ export const foodShopsData: FoodShop[] = [
         description: 'Smooth espresso with caramel syrup, milk, and ice. Your perfect study companion.',
         price: 450,
         photoUrl: 'https://images.unsplash.com/photo-1517701604599-bb29b565090c?w=400&auto=format&fit=crop',
-        isAvailable: true,
       },
       {
         id: 'item-2-2',
@@ -99,7 +93,6 @@ export const foodShopsData: FoodShop[] = [
         description: 'Triple-layered toasted sandwich with chicken, lettuce, tomato, and cheese.',
         price: 380,
         photoUrl: 'https://images.unsplash.com/photo-1528735602780-2552fd46c7af?w=400&auto=format&fit=crop',
-        isAvailable: true,
       },
       {
         id: 'item-2-3',
@@ -107,7 +100,6 @@ export const foodShopsData: FoodShop[] = [
         description: 'Rich, fudgy brownie baked fresh every morning. Served warm with vanilla ice cream.',
         price: 220,
         photoUrl: 'https://images.unsplash.com/photo-1606313564200-e75d5e30476c?w=400&auto=format&fit=crop',
-        isAvailable: true,
       },
     ],
   },
@@ -130,7 +122,6 @@ export const foodShopsData: FoodShop[] = [
         description: 'Shredded roti stir-fried with chicken, vegetables, egg, and kottu spice mix.',
         price: 320,
         photoUrl: 'https://images.unsplash.com/photo-1512058533999-a09bf877b6db?w=400&auto=format&fit=crop',
-        isAvailable: true,
       },
       {
         id: 'item-3-2',
@@ -138,7 +129,6 @@ export const foodShopsData: FoodShop[] = [
         description: 'Classic egg kottu with shredded roti, fresh vegetables, and three eggs.',
         price: 250,
         photoUrl: 'https://images.unsplash.com/photo-1565958011703-44f9829ba187?w=400&auto=format&fit=crop',
-        isAvailable: true,
       },
       {
         id: 'item-3-3',
@@ -146,7 +136,6 @@ export const foodShopsData: FoodShop[] = [
         description: 'Melted cheese mixed into classic kottu for a rich, creamy twist.',
         price: 380,
         photoUrl: 'https://images.unsplash.com/photo-1569050467447-ce54b3bbc37d?w=400&auto=format&fit=crop',
-        isAvailable: false,
       },
     ],
   },
@@ -169,7 +158,6 @@ export const foodShopsData: FoodShop[] = [
         description: 'Wok-fried rice with chicken, egg, vegetables, and soy sauce.',
         price: 300,
         photoUrl: 'https://images.unsplash.com/photo-1603133872878-684f208fb84b?w=400&auto=format&fit=crop',
-        isAvailable: true,
       },
       {
         id: 'item-4-2',
@@ -177,7 +165,6 @@ export const foodShopsData: FoodShop[] = [
         description: 'Soft noodles in a rich chicken broth with vegetables and soft-boiled egg.',
         price: 280,
         photoUrl: 'https://images.unsplash.com/photo-1569718212165-3a8278d5f624?w=400&auto=format&fit=crop',
-        isAvailable: true,
       },
     ],
   },
@@ -200,7 +187,6 @@ export const foodShopsData: FoodShop[] = [
         description: 'Flaky, buttery croissant baked fresh each morning. Perfect with your morning tea.',
         price: 120,
         photoUrl: 'https://images.unsplash.com/photo-1555507036-ab1f4038808a?w=400&auto=format&fit=crop',
-        isAvailable: true,
       },
       {
         id: 'item-5-2',
@@ -208,7 +194,6 @@ export const foodShopsData: FoodShop[] = [
         description: '6 pieces assorted vegetable short eats — patties, rolls, and cutlets.',
         price: 180,
         photoUrl: 'https://images.unsplash.com/photo-1564834744159-ff0ea41ba4b9?w=400&auto=format&fit=crop',
-        isAvailable: true,
       },
     ],
   },

@@ -56,7 +56,7 @@ export default function ShopCard({shop}: ShopCardProps) {
     }}>
 
       <CardActionArea
-        onClick={() => navigate('')}
+        onClick={() => navigate(`/food/${shop.id}`)}
         sx={{display:'flex', flexDirection:'column', alignItems:'stretch'}}>
 
           <Box sx={{position:'relative', height:180, overflow:'hidden'}}>
