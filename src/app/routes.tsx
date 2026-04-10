@@ -90,9 +90,11 @@ export const router = createBrowserRouter([
         path: "/jobs",
         Component: Jobs,
       },
-      {
-        path:"/food/:id",
+     {
+        path: "/food/:id",
         Component: ShopDetailPage,
+      },
+      {
         path: "/jobs/create",
         Component: CreateJob,
       },
@@ -111,7 +113,8 @@ export const router = createBrowserRouter([
       {
         path: "/food",
         Component: FoodPage,
-      }
+      },
+      {
         path: "/accommodation",
         Component: Accommodation,
       },
