@@ -3,6 +3,22 @@ import { createBrowserRouter } from "react-router";
 
 // Public Pages (non-lazy — needed immediately)
 import LoadingScreen from "./pages/public/LoadingScreen";
+import Login from "./pages/public/Login";
+import Register from "./pages/public/Register";
+import ForgotPassword from "./pages/public/ForgotPassword";
+import ResetPassword from "./pages/public/ResetPassword";
+
+// Protected Pages
+import Home from "./pages/protected/Home";
+import Jobs from "./pages/protected/Jobs";
+import Profile from "./pages/protected/Profile";
+import AdminHome from "./pages/protected/AdminHome";
+import BusinessOwnerHome from "./pages/protected/BusinessOwnerHome";
+import RiderHome from "./pages/protected/RiderHome";
+import RiderProfile from "./pages/protected/RiderProfile";
+import FoodPage from "./pages/protected/Food";
+import ShopDetailPage from "./pages/protected/ShopDetail";
+
 import ProtectedRoute from "./routing/ProtectedRoute";
 import Unauthorized from "./pages/public/Unauthorized";
 
@@ -75,6 +91,8 @@ export const router = createBrowserRouter([
         Component: Jobs,
       },
       {
+        path:"/food/:id",
+        Component: ShopDetailPage,
         path: "/jobs/create",
         Component: CreateJob,
       },
@@ -91,6 +109,9 @@ export const router = createBrowserRouter([
         Component: Profile,
       },
       {
+        path: "/food",
+        Component: FoodPage,
+      }
         path: "/accommodation",
         Component: Accommodation,
       },
