@@ -1,6 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router';
-import { PageLayout } from '../../components/layout/PageLayout';
 import { Sidebar } from '../../components/layout/Sidebar';
 import Navbar from '../../components/layout/Navbar';
 import useAuth from '../../hooks/useAuth';
@@ -357,16 +356,15 @@ export default function Home() {
   const userName = auth?.user?.username || auth?.user?.email?.split('@')[0] || 'Student';
 
   return (
-    <Box sx={{ display: 'flex', minHeight: '100vh', bgcolor: '#050505', backgroundImage: 'radial-gradient(circle at top right, rgba(250,204,21,0.03) 0%, transparent 40%)' }}>
+    <Box sx={{ display: 'flex', height: '100vh', overflow: 'hidden', bgcolor: '#050505', backgroundImage: 'radial-gradient(circle at top right, rgba(250,204,21,0.03) 0%, transparent 40%)' }}>
       <Sidebar activeSection="home" />
 
-      <Box sx={{ flexGrow: 1, display: 'flex', flexDirection: 'column', minWidth: 0 }}>
+      <Box sx={{ flex: 1, display: 'flex', flexDirection: 'column', minWidth: 0, overflow: 'hidden' }}>
         <Navbar />
 
-        <PageLayout>
-          {/* Main Scroller wrapper */}
-          <Box sx={{ height: 'calc(100vh - 68px)', overflowY: 'auto', overflowX: 'hidden' }}>
-            <Box sx={{ px: { xs: 2.5, md: 5 }, py: { xs: 4, md: 5 }, maxWidth: 1400, mx: 'auto', width: '100%' }}>
+        {/* Main Scroller wrapper */}
+        <Box sx={{ flex: 1, overflowY: 'auto', overflowX: 'hidden' }}>
+          <Box sx={{ px: { xs: 2.5, md: 5 }, py: { xs: 4, md: 5 }, pb: 8, maxWidth: 1400, mx: 'auto', width: '100%' }}>
               
               {/* ── Hero ─────────────────────────────────────────── */}
               <Fade in={visible} timeout={600}>
@@ -532,9 +530,8 @@ export default function Home() {
 
               </Box>
 
-            </Box>
           </Box>
-        </PageLayout>
+        </Box>
       </Box>
     </Box>
   );
