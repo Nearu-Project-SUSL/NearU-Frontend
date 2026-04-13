@@ -1,5 +1,5 @@
 import ShopCard from "../../components/food/ShopCard";
-import { foodShopsData } from "../../../data/foodMockData";
+import { useFoodShops } from "../../hooks/useFoodShop";
 import Navbar from "../../components/layout/Navbar";
 import { Sidebar } from "../../components/layout/Sidebar";
 import { PageLayout } from "../../components/layout/PageLayout";
@@ -19,13 +19,34 @@ import CloseIcon from "@mui/icons-material/Close";
 export default function FoodPage(){
   const [activeCategory, setActiveCategory] = useState('All');  
   const [searchQuery, setSearchQuery] = useState('');
-  
-  const categories = ['All', ...new Set(foodShopsData.map((s) => s.category))]; //.. means convert set back to array
 
-  const filterShops = foodShopsData.filter((shop) => {
+  const {data: shops, isLoading, error} = useFoodShops();
+  
+  const categories = ['All'];
+
+    // show loading
+  if (isLoading) {
+    return (
+      <Box sx={{ display: 'flex', justifyContent: 'center', mt: 10 }}>
+        <Typography sx={{ color: '#fff' }}>Loading...</Typography>
+      </Box>
+    );
+  }
+
+  // show error
+  if (error) {
+    return (
+      <Box sx={{ textAlign: 'center', mt: 10 }}>
+        <Typography sx={{ color: '#ef4444' }}>
+          Failed to load shops
+        </Typography>
+      </Box>
+    );
+  }
+
+
+  const filterShops = (shops ?? []).filter((shop) => {
     
-    //category filter
-    if (activeCategory != 'All' && shop.category != activeCategory) return false;
 
     //search filter - check name 
     if(searchQuery.trim()){
@@ -175,7 +196,7 @@ export default function FoodPage(){
                 ml:5,
               }}>
 
-              {foodShopsData.map((shop) => (
+              {filterShops.map((shop) => (
               <ShopCard key={shop.id} shop={shop} />
             ))}
 
