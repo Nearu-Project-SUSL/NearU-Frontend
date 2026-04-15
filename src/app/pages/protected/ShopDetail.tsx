@@ -22,8 +22,12 @@ import Navbar from '../../components/layout/Navbar';
 import { PageLayout } from '../../components/layout/PageLayout';
 import MenuItemCard from '../../components/food/MenuItemCard';
 import MenuItemDialog from '../../components/food/MenuItemDialog';
+import AddMenuItem,{AddMenuItemFormData} from '../../../app/components/food/addMenuItem';
+
 import { foodShopsData } from '../../../data/foodMockData';
 import type { MenuItem } from '../../../data/foodMockData';
+
+
 
 export default function ShopDetailPage() {
 
@@ -34,6 +38,10 @@ export default function ShopDetailPage() {
   const [selectedItem, setSelectedItem] = useState<MenuItem | null>(null);
 
   const shop = foodShopsData.find((s) => s.id === id);
+
+  const [openAddItem, setOpenAddItem] = useState(false);
+  const [menuItems, setMenuItems] = useState<MenuItem[]>(shop?.menuItems ?? []);  //get shop if have otherwise undefine
+
 
   if(!shop){
     return(
@@ -50,6 +58,19 @@ export default function ShopDetailPage() {
       </Box>
     );
   }
+
+  const handleAddMenuItem = (data: AddMenuItemFormData) => {
+    const newItem: MenuItem = {
+      id: crypto.randomUUID(),
+      name:data.name,
+      description:data.description,
+      price:data.price,
+      photoUrl: data.photoUrl
+    };
+
+    setMenuItems((prev) => [newItem, ...prev])
+  }
+
 
 
   return(
@@ -156,6 +177,9 @@ export default function ShopDetailPage() {
 
                       </Typography>
 
+
+                      
+
                       <Typography
                         variant='body1'
                         sx={{ color:'rgba(255,255,255,0.6)', lineHeight:1.8}}>
@@ -170,16 +194,43 @@ export default function ShopDetailPage() {
                     <Grid size={{xs:12, md:8}}>
                       {/*menu section*/}
                       <Box>
-                        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5, mb: 4 }}>
-                          <MenuIcon sx={{ color: '#facc15', fontSize: 24 }} />
-                          <Typography variant="h6" sx={{ color: '#fff', fontWeight: 700 }}>
-                            Menu
-                          </Typography>
+                        <Box
+                          sx={{
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'space-between',
+                            gap: 2,
+                            mb: 4,
+                            flexWrap: 'wrap',
+                          }}
+                        >
+                          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
+                            <MenuIcon sx={{ color: '#facc15', fontSize: 24 }} />
+                            <Typography variant="h6" sx={{ color: '#fff', fontWeight: 700 }}>
+                              Menu
+                            </Typography>
+                          </Box>
+
+                          <Box
+                            component="button"
+                            onClick={() => setOpenAddItem(true)}
+                            style={{
+                              background: '#facc15',
+                              color: '#111',
+                              border: 'none',
+                              borderRadius: '999px',
+                              padding: '10px 18px',
+                              fontWeight: 700,
+                              cursor: 'pointer',
+                            }}
+                          >
+                            Add Menu Item
+                          </Box>
                         </Box>
 
-                        {shop.menuItems.length > 0 && (
+                        {menuItems.length > 0 && (
                           <Grid container spacing={2.5} sx={{ mb: 4 }}>
-                            {shop.menuItems.map((item) => (
+                            {menuItems.map((item) => (
                               <Grid size={{ xs: 12, sm: 6 }}>
                                 <MenuItemCard
                                   item={item}
@@ -302,6 +353,12 @@ export default function ShopDetailPage() {
         <MenuItemDialog 
           item={selectedItem}
           onClose={() => setSelectedItem(null)}
+        />
+
+        <AddMenuItem 
+          open={openAddItem}
+          onClose={() => setOpenAddItem(false)}
+          onSubmit={handleAddMenuItem}
         />
       </Box>
   );

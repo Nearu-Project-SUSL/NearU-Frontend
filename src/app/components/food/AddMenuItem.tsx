@@ -70,7 +70,7 @@ export default function AddMenuItem({
     onClose();
   }
   
-  return <Button variant="contained">Test Button
+  return 
   
   <Dialog
     open = {open}
@@ -137,5 +137,4 @@ export default function AddMenuItem({
       </DialogActions>
     </Dialog>
 
-  </Button>;
 }
