@@ -6,7 +6,7 @@ import Login from "./pages/public/Login";
 import Register from "./pages/public/Register";
 import ForgotPassword from "./pages/public/ForgotPassword";
 import ResetPassword from "./pages/public/ResetPassword";
-
+import Gifts from "./pages/protected/Gifts";
 // Protected Pages
 import Home from "./pages/protected/Home";
 import Jobs from "./pages/protected/Jobs";
@@ -62,6 +62,10 @@ export const router = createBrowserRouter([
         path: "/profile",
         Component: Profile,
       },
+      {
+  path: "/gifts",
+  Component: Gifts,
+}
     ]
   },
 

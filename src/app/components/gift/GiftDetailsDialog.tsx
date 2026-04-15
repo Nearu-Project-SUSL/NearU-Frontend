@@ -162,8 +162,7 @@ export default function GiftDetailsDialog({
                   />
                 </Stack>
               </Box>
-                                             {false && (
-
+{false && (
               <Stack direction="row" spacing={1.5} flexWrap="wrap">
                 <Button
                   startIcon={<EditIcon />}
@@ -183,7 +182,7 @@ export default function GiftDetailsDialog({
                   Delete Shop
                 </Button>
               </Stack>)}
-            </Box> 
+            </Box>
 
             <Grid container spacing={4}>
               <Grid item xs={12} md={4}>
@@ -238,10 +237,7 @@ export default function GiftDetailsDialog({
                 >
                   <Typography sx={{ color: "#fff", fontWeight: 800, fontSize: "1.2rem" }}>
                     Products
-                  </Typography>
-
-                {false && (
-
+                  </Typography>{false && (
                   <Button
                     startIcon={<AddIcon />}
                     variant="contained"
@@ -249,8 +245,7 @@ export default function GiftDetailsDialog({
                     onClick={() => setProductFormOpen(true)}
                   >
                     Add Product
-                  </Button>
-                )}
+                  </Button>)}
                 </Box>
 
                 <Grid container spacing={2}>
@@ -282,9 +277,6 @@ export default function GiftDetailsDialog({
                             </Typography>
 
                             <Stack direction="row" spacing={1}>
-                                             {false && (
-
-                             
                               <Button
                                 size="small"
                                 startIcon={<EditIcon />}
@@ -296,9 +288,7 @@ export default function GiftDetailsDialog({
                                 }}
                               >
                                 Edit
-                              </Button>)}
-                                                                           {false && (
-
+                              </Button>
                               <Button
                                 size="small"
                                 startIcon={<DeleteOutlineIcon />}
@@ -308,7 +298,6 @@ export default function GiftDetailsDialog({
                               >
                                 Delete
                               </Button>
-                              )}
                             </Stack>
                           </Box>
                         </Box>

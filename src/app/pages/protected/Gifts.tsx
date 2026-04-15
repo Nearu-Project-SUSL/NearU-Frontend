@@ -160,13 +160,16 @@ export default function Gifts() {
                 <Button variant="contained" onClick={fetchGiftShops} sx={primaryBtnSx}>
                   Search
                 </Button>
-
-                {false && (
-  <Button variant="outlined" onClick={() => setCreateOpen(true)} sx={secondaryBtnSx} startIcon={<AddIcon />}>
-                  Add Shop
-                </Button>
-                )}
-              
+              {/* {false && ( */}
+  <Button
+    variant="outlined"
+    onClick={() => setCreateOpen(true)}
+    sx={secondaryBtnSx}
+    startIcon={<AddIcon />}
+  >
+    Add Shop
+  </Button>
+{/* )} */}
               </Stack>
             </Box>
 
