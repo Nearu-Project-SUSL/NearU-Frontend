@@ -24,8 +24,10 @@ import MenuItemCard from '../../components/food/MenuItemCard';
 import MenuItemDialog from '../../components/food/MenuItemDialog';
 import AddMenuItem,{AddMenuItemFormData} from '../../../app/components/food/AddMenuItem';
 
-import { foodShopsData } from '../../../data/foodMockData';
-import type { MenuItem } from '../../../data/foodMockData';
+import { type MenuItemResponse } from '../../../api/foodapi';
+import { addMenuItem } from '../../../api/foodapi';
+import { useFoodShop, useMenuItems } from '../../hooks/useFoodShop';
+import { useQueryClient } from '@tanstack/react-query';
 
 
 
@@ -35,23 +37,33 @@ export default function ShopDetailPage() {
 
   const navigate = useNavigate(); //to move between pages
 
-  const [selectedItem, setSelectedItem] = useState<MenuItem | null>(null);
+  const queryClient = useQueryClient();
 
-  const shop = foodShopsData.find((s) => s.id === id);
+  const { data: shop, isLoading: shopLoading, error: shopError } = useFoodShop(id ?? '');
+  const { data: menuItems = [], isLoading: menuLoading } = useMenuItems(id ?? '');
 
+  const [selectedItem, setSelectedItem] = useState<MenuItemResponse | null>(null);
   const [openAddItem, setOpenAddItem] = useState(false);
-  const [menuItems, setMenuItems] = useState<MenuItem[]>(shop?.menuItems ?? []);  //get shop if have otherwise undefine
 
+  if (shopLoading || menuLoading) {
+    return (
+      <Box sx={{ display: 'flex', justifyContent: 'center', mt: 10 }}>
+        <Typography sx={{ color: '#fff' }}>Loading...</Typography>
+      </Box>
+    );
+  }
 
-  if(!shop){
-    return(
+  if (shopError || !shop) {
+    return (
       <Box sx={{ display: 'flex', minHeight: '100vh', bgcolor: '#050505' }}>
         <Sidebar activeSection="food" />
         <Box sx={{ flexGrow: 1, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
           <Box sx={{ textAlign: 'center' }}>
-            <Typography variant="h5" sx={{ color: '#fff', mb: 2 }}>Shop not found</Typography>
+            <Typography variant="h5" sx={{ color: '#fff', mb: 2 }}>
+              Shop not found
+            </Typography>
             <IconButton onClick={() => navigate('/food')} sx={{ color: '#facc15' }}>
-              <BackIcon /> Back to Food
+              <BackIcon />
             </IconButton>
           </Box>
         </Box>
@@ -59,17 +71,22 @@ export default function ShopDetailPage() {
     );
   }
 
-  const handleAddMenuItem = (data: AddMenuItemFormData) => {
-    const newItem: MenuItem = {
-      id: crypto.randomUUID(),
-      name:data.name,
-      description:data.description,
-      price:data.price,
-      photoUrl: data.photoUrl
-    };
+  const handleAddMenuItem = async (data: AddMenuItemFormData) => {
+    if (!id) return;
 
-    setMenuItems((prev) => [newItem, ...prev])
-  }
+    await addMenuItem(id, {
+      name: data.name,
+      description: data.description,
+      price: data.price,
+      photo: data.photo ?? null,
+    });
+
+    await queryClient.invalidateQueries({ 
+      queryKey: ['menuitems', id] 
+    });
+
+    setOpenAddItem(false);
+  };
 
 
 
@@ -100,7 +117,7 @@ export default function ShopDetailPage() {
 
                     <Box
                       component="img"
-                      src={shop.photoUrl}
+                      src={shop.photoUrl || '/default-shop-photo.jpg'}
                       alt={shop.name}
                       sx={{
                         width:'100%',
@@ -152,10 +169,6 @@ export default function ShopDetailPage() {
 
                                 </Typography>
 
-                                <Typography variant="body2" sx={{ color: 'rgba(255,255,255,0.5)' }}>
-                                  {shop.category}
-                                </Typography>
-
                           </Box>
                   </Box>
                 </Box>
@@ -183,7 +196,7 @@ export default function ShopDetailPage() {
                       <Typography
                         variant='body1'
                         sx={{ color:'rgba(255,255,255,0.6)', lineHeight:1.8}}>
-                          {shop.description}
+                          {shop.description || 'No description available.'}
 
                         </Typography>
                   </Box>
@@ -233,8 +246,12 @@ export default function ShopDetailPage() {
                             {menuItems.map((item) => (
                               <Grid size={{ xs: 12, sm: 6 }}>
                                 <MenuItemCard
-                                  item={item}
-                                  onClick={(item) => setSelectedItem(item)}
+                                  item={{
+                                    ...item,
+                                    description: item.description ?? '',
+                                    photoUrl: item.photoUrl ?? '',
+                                  }}
+                                  onClick={(menuItem) => setSelectedItem(item)}
                                 />
                               </Grid>
                             ))}
@@ -281,33 +298,11 @@ export default function ShopDetailPage() {
                                 variant="body2"
                                 sx={{ color: '#fff', fontWeight: 600, lineHeight: 1.5 }}
                               >
-                                {shop.address}
+                                {shop.address || 'No address available'}
                               </Typography>
                             </Box>
                           </Box>
 
-
-                          <Box sx={{ display: 'flex', gap: 2, alignItems: 'flex-start' }}>
-                            <TimeIcon sx={{ color: '#facc15', mt: 0.3, flexShrink: 0 }} />
-                            <Box>
-                              <Typography
-                                variant="caption"
-                                sx={{
-                                  color: 'rgba(255,255,255,0.4)',
-                                  display: 'block',
-                                  mb: 0.3,
-                                }}
-                              >
-                                Opening Hours
-                              </Typography>
-                              <Typography
-                                variant="body2"
-                                sx={{ color: '#fff', fontWeight: 600 }}
-                              >
-                                {shop.openingHours}
-                              </Typography>
-                            </Box>
-                          </Box>
 
                           <Divider sx={{ borderColor: 'rgba(255,255,255,0.05)' }} />
 
@@ -331,7 +326,7 @@ export default function ShopDetailPage() {
                                   fontWeight: 600,
                                 }}
                               >
-                                {shop.phoneNumber}
+                                {shop.phoneNumber || 'No phone number available'}
                               </Typography>
                             </Box>
                           </Box>
@@ -351,7 +346,7 @@ export default function ShopDetailPage() {
 
         {/* Menu Item Dialog */}
         <MenuItemDialog 
-          item={selectedItem}
+          item={selectedItem ? { ...selectedItem, description: selectedItem.description ?? '', photoUrl: selectedItem.photoUrl ?? '' } : null}
           onClose={() => setSelectedItem(null)}
         />
 

@@ -14,7 +14,7 @@ export interface AddMenuItemFormData {
   name: string;
   description: string;
   price: number;
-  photoUrl: string;
+  photo: File | null;
 }
 
 interface AddMenuItem {
@@ -27,7 +27,7 @@ const initialState: AddMenuItemFormData = {
   name: "",
   description: "",
   price: 0,
-  photoUrl: "",
+  photo: null,
 };
 
 export default function AddMenuItem({ 
@@ -55,8 +55,18 @@ export default function AddMenuItem({
       [name]: name === "price"? Number(value) : value,
     }));
   }
+  const handleFileChange = (
+    e: React.ChangeEvent<HTMLInputElement>
+  ) => {
+    const file = e.target.files?.[0] || null;
 
-  const handleSubmit = () => {
+    setFormData((prev) => ({
+      ...prev,
+      photo: file ?? null,
+    }));
+  };
+
+  const handleSubmit = async () => {
     if (!formData.name.trim()){
       setError("Name is Required");
       return;
@@ -66,7 +76,7 @@ export default function AddMenuItem({
       return;
     }
 
-    onSubmit(formData);
+    await onSubmit(formData);
     onClose();
   }
   
@@ -114,12 +124,23 @@ export default function AddMenuItem({
             value={formData.price}
             onChange={handleChange}
           />
-          <TextField
-            label="Photo URL"
-            name="photoUrl"
-            value={formData.photoUrl}
-            onChange={handleChange}
-          />
+          
+          <Button
+            variant="outlined"
+            component="label"
+          >
+            Upload Photo
+            <input
+              type="file"
+              hidden
+              accept="image/*"
+              onChange={handleFileChange}
+            />
+          </Button>
+
+          {formData.photo && (
+            <span>{formData.photo.name}</span>
+          )}
         
         </Stack>
       </DialogContent>
