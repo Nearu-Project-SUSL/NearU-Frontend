@@ -70,7 +70,7 @@ export default function AddMenuItem({
     onClose();
   }
   
-  return 
+  return (
   
   <Dialog
     open = {open}
@@ -137,4 +137,5 @@ export default function AddMenuItem({
       </DialogActions>
     </Dialog>
 
+  );
 }

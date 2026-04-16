@@ -22,7 +22,7 @@ import Navbar from '../../components/layout/Navbar';
 import { PageLayout } from '../../components/layout/PageLayout';
 import MenuItemCard from '../../components/food/MenuItemCard';
 import MenuItemDialog from '../../components/food/MenuItemDialog';
-import AddMenuItem,{AddMenuItemFormData} from '../../../app/components/food/addMenuItem';
+import AddMenuItem,{AddMenuItemFormData} from '../../../app/components/food/AddMenuItem';
 
 import { foodShopsData } from '../../../data/foodMockData';
 import type { MenuItem } from '../../../data/foodMockData';
