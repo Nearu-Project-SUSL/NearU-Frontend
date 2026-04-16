@@ -38,7 +38,7 @@ export default function RiderHome() {
                   { title: 'Today Earnings', count: 'Rs. 3,200', color: '#facc15' },
                   { title: 'Rating', count: '4.9/5.0', color: '#34d399' }
                 ].map((stat, i) => (
-                  <Grid item xs={12} sm={4} key={i}>
+                  <Grid xs={12} sm={4} key={i}>
                     <Paper 
                       sx={{ 
                         p: 3, 

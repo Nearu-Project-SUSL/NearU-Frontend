@@ -38,7 +38,7 @@ export default function AdminHome() {
                   { title: 'Business Apps', count: '12 Pending', color: '#facc15' },
                   { title: 'System Health', count: '99.9%', color: '#34d399' }
                 ].map((stat, i) => (
-                  <Grid item xs={12} sm={4} key={i}>
+                  <Grid xs={12} sm={4} key={i}>
                     <Paper 
                       sx={{ 
                         p: 3, 

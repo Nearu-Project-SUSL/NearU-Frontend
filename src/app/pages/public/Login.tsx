@@ -58,6 +58,7 @@ export default function Login() {
       setAuth({
         user: response.user,
         accessToken: response.accessToken,
+        refreshToken: response.refreshToken,
       });
       
       localStorage.setItem('accessToken', response.accessToken);
@@ -335,8 +336,9 @@ export default function Login() {
                     startIcon={<GuestIcon />}
                     onClick={() => {
                       setAuth({
-                        user: { id: 'guest', email: 'guest@nearu.com', roles: ['Student'] },
+                        user: { id: 'guest', username: 'Guest', email: 'guest@nearu.com', roles: ['Student'] },
                         accessToken: 'guest-token',
+                        refreshToken: 'guest-token',
                       });
                       localStorage.setItem('accessToken', 'guest-token');
                       toast.success('Logged in as Guest');

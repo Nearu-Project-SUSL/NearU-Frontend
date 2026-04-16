@@ -1,4 +1,5 @@
 import { Link } from 'react-router';
+import useAuth from '../../hooks/useAuth';
 import { useSidebar } from '../../context/SidebarContext';
 
 // MUI Components
@@ -10,108 +11,137 @@ import {
   Badge,
   Box,
   Avatar,
-  Tooltip
+  Tooltip,
 } from '@mui/material';
 
 // MUI Icons
 import {
-  Menu as MenuIcon,
   Notifications as BellIcon,
+  School as GraduationCapIcon,
+  LocationOn as LocationIcon,
+  AutoAwesome as SparkleIcon,
   Person as UserIcon,
-  School as GraduationCapIcon
 } from '@mui/icons-material';
 
+function getTimeGreeting(): string {
+  const hour = new Date().getHours();
+  if (hour < 12) return 'Good Morning';
+  if (hour < 17) return 'Good Afternoon';
+  return 'Good Evening';
+}
+
 export default function Navbar() {
-  const { toggleSidebar } = useSidebar();
+  const { auth } = useAuth();
+  const { isExpanded } = useSidebar();
+
+  const userName = auth?.user?.username || auth?.user?.email?.split('@')[0] || 'Student';
+  const greeting = getTimeGreeting();
 
   return (
-    <AppBar 
-      position="sticky" 
-      sx={{ 
+    <AppBar
+      position="sticky"
+      sx={{
         width: '100%',
-        bgcolor: 'rgba(17, 24, 39, 0.8)', 
-        backdropFilter: 'blur(16px)',
-        borderBottom: '1px solid rgba(250, 204, 21, 0.2)',
+        bgcolor: 'rgba(14, 14, 14, 0.85)',
+        backdropFilter: 'blur(20px)',
+        borderBottom: '1px solid rgba(250, 204, 21, 0.12)',
         boxShadow: 'none',
-        zIndex: 10
+        zIndex: 10,
       }}
     >
-      <Toolbar sx={{ justifyContent: 'space-between', px: { xs: 2, sm: 4 } }}>
-        {/* Left: Menu and Logo */}
-        <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
-          <IconButton
-            onClick={toggleSidebar}
-            sx={{ 
-              bgcolor: 'rgba(250, 204, 21, 0.1)', 
-              color: '#facc15',
-              '&:hover': { bgcolor: 'rgba(250, 204, 21, 0.2)' },
-              borderRadius: '0.75rem'
+      <Toolbar sx={{ px: { xs: 2, sm: 3 }, minHeight: '68px !important', gap: 2 }}>
+        {/* Left: Avatar + Greeting */}
+        <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, flex: 1 }}>
+          {/* Logo icon */}
+          <Box
+            sx={{
+              width: 48,
+              height: 48,
+              bgcolor: '#facc15',
+              backgroundImage: 'linear-gradient(135deg, #fde68a 0%, #facc15 50%, #ca8a04 100%)',
+              borderRadius: '14px',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              boxShadow: '0 0 20px rgba(250, 204, 21, 0.35)',
+              flexShrink: 0,
             }}
           >
-            <MenuIcon />
-          </IconButton>
-          
-          <Box 
-            component={Link} 
-            to="/home" 
-            sx={{ 
-              display: 'flex', 
-              alignItems: 'center', 
-              gap: 1.5, 
-              textDecoration: 'none',
-              '&:hover .logo-icon': { transform: 'scale(1.05)' }
-            }}
-          >
-            <Box 
-              className="logo-icon"
-              sx={{ 
-                width: 40, 
-                height: 40, 
-                bgcolor: '#facc15',
-                backgroundImage: 'linear-gradient(to bottom right, #facc15, #eab308)',
-                borderRadius: '0.75rem', 
-                display: 'flex', 
-                alignItems: 'center', 
-                justifyContent: 'center',
-                boxShadow: '0 4px 6px -1px rgba(250, 204, 21, 0.3)',
-                transition: 'transform 0.3s'
-              }}
-            >
-              <GraduationCapIcon sx={{ color: 'black' }} />
-            </Box>
-            <Box sx={{ display: { xs: 'none', md: 'block' } }}>
-              <Typography variant="h6" sx={{ color: 'white', fontWeight: 'bold', lineHeight: 1 }}>
-                Near<Box component="span" sx={{ color: '#facc15' }}>U</Box>
+            <GraduationCapIcon sx={{ color: '#1a0a00', fontSize: 26 }} />
+          </Box>
+
+          {/* Greeting text */}
+          <Box>
+            <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.75 }}>
+              <Typography
+                variant="h6"
+                sx={{ color: '#fff', fontWeight: 600, fontSize: '1.05rem', lineHeight: 1.2 }}
+              >
+                {greeting},{' '}
+                <Box component="span" sx={{ color: '#facc15', fontWeight: 700 }}>
+                  {userName}
+                </Box>
               </Typography>
-              <Typography variant="caption" sx={{ color: '#9ca3af' }}>Your Campus. Your Community.</Typography>
+              <SparkleIcon sx={{ color: '#facc15', fontSize: 18 }} />
+            </Box>
+            <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.4 }}>
+              <LocationIcon sx={{ color: 'rgba(255,255,255,0.35)', fontSize: 13 }} />
+              <Typography variant="caption" sx={{ color: 'rgba(255,255,255,0.4)', fontSize: '0.75rem' }}>
+                Sabaragamuwa University
+              </Typography>
             </Box>
           </Box>
         </Box>
 
         {/* Right: Actions */}
-        <Box sx={{ display: 'flex', alignItems: 'center', gap: { xs: 1, sm: 2 } }}>
+        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
           <Tooltip title="Notifications">
-            <IconButton sx={{ bgcolor: 'rgba(55, 65, 81, 0.5)', color: '#d1d5db', borderRadius: '0.75rem' }}>
-              <Badge badgeContent={3} color="error">
-                <BellIcon />
+            <IconButton
+              sx={{
+                color: 'rgba(255,255,255,0.55)',
+                borderRadius: '10px',
+                '&:hover': { color: '#facc15', bgcolor: 'rgba(250, 204, 21, 0.08)' },
+              }}
+            >
+              <Badge
+                badgeContent={3}
+                sx={{
+                  '& .MuiBadge-badge': {
+                    bgcolor: '#facc15',
+                    color: '#000',
+                    fontSize: '0.6rem',
+                    fontWeight: 800,
+                    minWidth: 17,
+                    height: 17,
+                  },
+                }}
+              >
+                <BellIcon sx={{ fontSize: 22 }} />
               </Badge>
             </IconButton>
           </Tooltip>
 
           <Tooltip title="Profile">
-            <IconButton 
+            <IconButton
               component={Link}
               to="/profile"
-              sx={{ 
-                bgcolor: '#facc15', 
-                color: 'black',
-                '&:hover': { bgcolor: '#eab308', transform: 'scale(1.05)' },
-                borderRadius: '0.75rem',
-                boxShadow: '0 4px 6px -1px rgba(250, 204, 21, 0.3)',
-                transition: 'all 0.3s'
+              sx={{
+                p: 0.5,
+                '&:hover': { opacity: 0.85 },
               }}
             >
-              <UserIcon />
+              <Avatar
+                sx={{
+                  width: 36,
+                  height: 36,
+                  bgcolor: '#facc15',
+                  color: '#000',
+                  fontWeight: 700,
+                  fontSize: '0.9rem',
+                }}
+              >
+                <UserIcon fontSize="small" />
+              </Avatar>
             </IconButton>
           </Tooltip>
         </Box>
