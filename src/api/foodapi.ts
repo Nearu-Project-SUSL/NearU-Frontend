@@ -27,7 +27,7 @@ export interface MenuItemResponse {
 }
 
 export async function getAllShops(): Promise<ShopResponse[]>{
-  const response = await fetch(`${BASE_URL}/api/foodshops`);
+  const response = await fetch(`${BASE_URL}/foodshops`);
 
   if(!response.ok){
     throw new Error(`Failed to fetch shops: ${response.statusText}`)
@@ -38,7 +38,7 @@ export async function getAllShops(): Promise<ShopResponse[]>{
 
 
 export async function getShopById(id:string): Promise<ShopResponse>{
-  const response = await fetch(`${BASE_URL}/api/foodshops/${id}`);
+  const response = await fetch(`${BASE_URL}/foodshops/${id}`);
 
   if(!response.ok){
     throw new Error(`Failed to fetch shop: ${response.statusText}`)
@@ -48,7 +48,7 @@ export async function getShopById(id:string): Promise<ShopResponse>{
 }
 
 export async function getMenuItems(shopId: string): Promise<MenuItemResponse[]> {
-  const response = await fetch(`${BASE_URL}/api/foodshops/${shopId}/menuitems`);
+  const response = await fetch(`${BASE_URL}/foodshops/${shopId}/menuitems`);
 
   if (!response.ok) {
     throw new Error(`Failed to fetch menu items: ${response.statusText}`);
@@ -77,7 +77,7 @@ export async function addMenuItem(
   }
 
   const response = await fetch(
-    `${BASE_URL}/api/foodshops/${shopId}/menuItems`,
+    `${BASE_URL}/foodshops/${shopId}/menuItems`,
     {
       method:"POST",
       body: formData
