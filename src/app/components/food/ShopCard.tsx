@@ -17,10 +17,10 @@ import {
   FiberManualRecord as DotIcon,
 } from '@mui/icons-material';
 
-import type { FoodShop } from '../../../data/foodMockData';
+import type { ShopResponse } from '../../../api/foodapi';
 
 interface ShopCardProps{
-  shop: FoodShop;
+  shop: ShopResponse;
 }
 
 export default function ShopCard({shop}: ShopCardProps) {
@@ -62,7 +62,7 @@ export default function ShopCard({shop}: ShopCardProps) {
           <Box sx={{position:'relative', height:180, overflow:'hidden'}}>
              <Box 
               component= "img"
-              src={shop.photoUrl}
+              src={shop.photoUrl || "https://via.placeholder.com/400x300?text=No+Image"}
               alt={shop.name}
               sx={{
                 width:'100%',
@@ -92,13 +92,7 @@ export default function ShopCard({shop}: ShopCardProps) {
                       border: '1px solid rgba(250, 204, 21, 0.3)',
                     }}>
                       
-                      <Typography
-                        variant='caption'
-                        sx={{color:'#facc15', fontWeight:700, fontSize:'0.7rem'}}>
-                          
-                          {shop.category}
-                        
-                        </Typography>
+                      
                   </Box>
               </Box>
 
