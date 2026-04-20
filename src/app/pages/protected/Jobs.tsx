@@ -1,11 +1,11 @@
 import { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router';
-import { PageLayout } from '../../components/layout/PageLayout';
 import { Sidebar } from '../../components/layout/Sidebar';
 import Navbar from '../../components/layout/Navbar';
 import { JobResponse } from '../../../api/jobService';
 import { useAllJobs, useDeleteJob } from '../../hooks/useJobs';
 import { toast } from 'sonner';
+import { formatDistanceToNow } from 'date-fns';
 
 import {
   Box,
@@ -25,7 +25,8 @@ import {
   Divider,
   MenuItem,
   TextField,
-  InputAdornment
+  InputAdornment,
+  Skeleton
 } from '@mui/material';
 
 import {
@@ -50,8 +51,13 @@ import {
 } from '@mui/icons-material';
 
 function formatDate(dateString: string) {
-    const d = new Date(dateString);
-    return d.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+    if (!dateString) return '';
+    try {
+        const d = new Date(dateString);
+        return formatDistanceToNow(d, { addSuffix: true });
+    } catch (e) {
+        return '';
+    }
 }
 
 // ─── Custom Carousel Hook ─────────────────────────────────────────────────────
@@ -70,6 +76,52 @@ function useHorizontalScroll() {
 }
 
 // ─── Job Card Component ───────────────────────────────────────────────────────
+function JobSkeleton({ index }: { index: number }) {
+  return (
+    <Grow in timeout={400 + index * 100}>
+      <Card
+        elevation={0}
+        sx={{
+          minWidth: { xs: '100%', sm: 340 },
+          maxWidth: { sm: 380 },
+          bgcolor: 'rgba(255,255,255,0.02)',
+          borderRadius: '24px',
+          border: '1px solid rgba(255, 255, 255, 0.05)',
+          height: '100%',
+          display: 'flex',
+          flexDirection: 'column',
+          p: 3,
+        }}
+      >
+        <Box sx={{ display: 'flex', justifyContent: 'space-between', width: '100%', mb: 2.5 }}>
+          <Skeleton variant="rounded" width={54} height={54} sx={{ borderRadius: '16px', bgcolor: 'rgba(255,255,255,0.05)' }} />
+          <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: 1 }}>
+              <Skeleton variant="text" width={40} height={20} sx={{ bgcolor: 'rgba(255,255,255,0.05)' }} />
+              <Skeleton variant="text" width={60} height={16} sx={{ bgcolor: 'rgba(255,255,255,0.05)' }} />
+          </Box>
+        </Box>
+        <Skeleton variant="text" width="80%" height={32} sx={{ mb: 0.5, bgcolor: 'rgba(255,255,255,0.05)' }} />
+        <Skeleton variant="text" width="60%" height={24} sx={{ mb: 2, bgcolor: 'rgba(255,255,255,0.05)' }} />
+        
+        <Stack direction="row" spacing={2} sx={{ mb: 2.5 }}>
+          <Skeleton variant="text" width={80} height={20} sx={{ bgcolor: 'rgba(255,255,255,0.05)' }} />
+          <Skeleton variant="text" width={80} height={20} sx={{ bgcolor: 'rgba(255,255,255,0.05)' }} />
+        </Stack>
+
+        <Box sx={{ mb: 3, width: '100%' }}>
+          <Skeleton variant="text" width="100%" height={16} sx={{ bgcolor: 'rgba(255,255,255,0.05)' }} />
+          <Skeleton variant="text" width="90%" height={16} sx={{ bgcolor: 'rgba(255,255,255,0.05)' }} />
+        </Box>
+
+        <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1, mt: 'auto', width: '100%', pt: 2, borderTop: '1px solid rgba(255,255,255,0.05)' }}>
+          <Skeleton variant="rounded" width={60} height={24} sx={{ borderRadius: '6px', bgcolor: 'rgba(255,255,255,0.05)' }} />
+          <Skeleton variant="rounded" width={80} height={24} sx={{ borderRadius: '6px', bgcolor: 'rgba(255,255,255,0.05)' }} />
+        </Box>
+      </Card>
+    </Grow>
+  );
+}
+
 function JobCard({ job, index, onClick }: { job: JobResponse, index: number, onClick: (job: JobResponse) => void }) {
   const [hovered, setHovered] = useState(false);
 
@@ -259,14 +311,13 @@ export default function Jobs() {
   });
 
   return (
-    <Box sx={{ display: 'flex', minHeight: '100vh', bgcolor: '#050505', backgroundImage: 'radial-gradient(circle at top left, rgba(250,204,21,0.03) 0%, transparent 50%)' }}>
+    <Box sx={{ display: 'flex', height: '100vh', overflow: 'hidden', bgcolor: '#050505', backgroundImage: 'radial-gradient(circle at top left, rgba(250,204,21,0.03) 0%, transparent 50%)' }}>
       <Sidebar activeSection="jobs" />
 
-      <Box sx={{ flexGrow: 1, display: 'flex', flexDirection: 'column', minWidth: 0 }}>
+      <Box sx={{ flex: 1, display: 'flex', flexDirection: 'column', minWidth: 0, overflow: 'hidden' }}>
         <Navbar />
 
-        <PageLayout>
-          <Box sx={{ height: '100vh', overflowY: 'auto', overflowX: 'hidden', mt: '-64px', pt: '64px' }}>
+        <Box sx={{ flex: 1, overflowY: 'auto', overflowX: 'hidden' }}>
             <Box sx={{ px: { xs: 2.5, md: 5 }, py: { xs: 4, md: 5 }, pb: 8, maxWidth: 1400, mx: 'auto', width: '100%' }}>
               
               {/* ── Header Section ─────────────────────────────────────────── */}
@@ -367,7 +418,7 @@ export default function Jobs() {
               </Fade>
 
               {/* ── New Job Postings (Carousel) ──────────────────────────── */}
-              {!loading && newJobs.length > 0 && (
+              {(loading || newJobs.length > 0) && (
                 <Box sx={{ mb: 8 }}>
                   <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 4 }}>
                         <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
@@ -405,9 +456,10 @@ export default function Jobs() {
                           '& > *': { scrollSnapAlign: 'start' }
                         }}
                       >
-                        {newJobs.map((job, i) => (
-                          <JobCard key={job.id} job={job} index={i} onClick={handleJobClick} />
-                        ))}
+                        {loading 
+                          ? [1, 2, 3, 4].map((i) => <Box key={i} sx={{ minWidth: { xs: '100%', sm: 340 }, maxWidth: { sm: 380 } }}><JobSkeleton index={i} /></Box>)
+                          : newJobs.map((job, i) => <JobCard key={job.id} job={job} index={i} onClick={handleJobClick} />)
+                        }
                       </Box>
                     </Box>
               )}
@@ -478,9 +530,13 @@ export default function Jobs() {
                 </Box>
 
                 {loading ? (
-                  <Box sx={{ textAlign: 'center', py: 8 }}>
-                    <Typography variant="h6" sx={{ color: 'rgba(255,255,255,0.6)' }}>Loading jobs...</Typography>
-                  </Box>
+                  <Grid container spacing={3}>
+                    {[1, 2, 3, 4, 5, 6].map((i) => (
+                      <Grid size={{ xs: 12, sm: 6, lg: 4 }} key={i}>
+                         <JobSkeleton index={i} />
+                      </Grid>
+                    ))}
+                  </Grid>
                 ) : filteredJobs.length > 0 ? (
                   <Grid container spacing={3}>
                     {filteredJobs.map((job, index) => (
@@ -507,7 +563,6 @@ export default function Jobs() {
 
             </Box>
           </Box>
-        </PageLayout>
       </Box>
 
       {/* ── Job Details Dialog ────────────────────────────────────────────── */}
