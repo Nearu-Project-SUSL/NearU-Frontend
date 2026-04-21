@@ -1,13 +1,9 @@
 import { lazy, Suspense } from "react";
 import { createBrowserRouter } from "react-router";
 
-// Public Pages (non-lazy — needed immediately)
+// LoadingScreen is eagerly imported so it can be used as the Suspense fallback
 import LoadingScreen from "./pages/public/LoadingScreen";
-import FoodPage from "./pages/protected/Food";
-import ShopDetailPage from "./pages/protected/ShopDetail";
-
 import ProtectedRoute from "./routing/ProtectedRoute";
-import Unauthorized from "./pages/public/Unauthorized";
 
 // Helper for wrapping lazy pages in Suspense
 const Loadable = (Component: any) => (props: any) => (
@@ -21,6 +17,7 @@ const Login = Loadable(lazy(() => import("./pages/public/Login")));
 const Register = Loadable(lazy(() => import("./pages/public/Register")));
 const ForgotPassword = Loadable(lazy(() => import("./pages/public/ForgotPassword")));
 const ResetPassword = Loadable(lazy(() => import("./pages/public/ResetPassword")));
+const Unauthorized = Loadable(lazy(() => import("./pages/public/Unauthorized")));
 
 // ── Protected Pages (lazy) ────────────────────────────────────────────────────
 const Home = Loadable(lazy(() => import("./pages/protected/Home")));
@@ -29,6 +26,8 @@ const CreateJob = Loadable(lazy(() => import("./pages/protected/CreateJob")));
 const UpdateJob = Loadable(lazy(() => import("./pages/protected/UpdateJob")));
 const MyJobs = Loadable(lazy(() => import("./pages/protected/MyJobs")));
 const Profile = Loadable(lazy(() => import("./pages/protected/Profile")));
+const FoodPage = Loadable(lazy(() => import("./pages/protected/Food")));
+const ShopDetailPage = Loadable(lazy(() => import("./pages/protected/ShopDetail")));
 const Accommodation = Loadable(lazy(() => import("./pages/public/Accommodation")));
 const AccommodationDetail = Loadable(lazy(() => import("./pages/public/AccommodationDetail")));
 
