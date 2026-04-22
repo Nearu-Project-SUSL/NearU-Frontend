@@ -6,6 +6,7 @@ import { JobResponse } from '../../../api/jobService';
 import { useAllJobs, useDeleteJob } from '../../hooks/useJobs';
 import { toast } from 'sonner';
 import { formatDistanceToNow } from 'date-fns';
+import CircularProgress from '@mui/material/CircularProgress';
 
 import {
   Box,
@@ -246,19 +247,24 @@ export default function Jobs() {
   const [selectedJob, setSelectedJob] = useState<JobResponse | null>(null);
   const [isDetailsOpen, setIsDetailsOpen] = useState(false);
   const [visible, setVisible] = useState(false);
-  
-  // React Query Fetch
-  const { data: jobs = [], isLoading: loading, isError, error } = useAllJobs();
+
+  // Pagination — drives the server-side fetch
+  const [currentPage, setCurrentPage] = useState(1);
+
+  // React Query — fetches only the current page from the backend
+  const { data: pagedData, isLoading: loading, isFetching, isError, error } = useAllJobs(currentPage, JOBS_PER_PAGE);
   const deleteJobMutation = useDeleteJob();
   const userId = localStorage.getItem('userId');
-  
-  // Filters
+
+  // Unpack server response
+  const jobs: JobResponse[] = pagedData?.items ?? [];
+  const totalPages = pagedData?.totalPages ?? 1;
+  const totalCount = pagedData?.totalCount ?? 0;
+
+  // Filters (client-side on the current page)
   const [activeCategory, setActiveCategory] = useState<string>('All');
   const [activeType, setActiveType] = useState<string>('All');
   const [searchQuery, setSearchQuery] = useState('');
-
-  // Pagination
-  const [currentPage, setCurrentPage] = useState(1);
 
   const { scrollRef: newJobsRef, scroll: scrollNewJobs } = useHorizontalScroll();
 
@@ -273,6 +279,11 @@ export default function Jobs() {
     }
   }, [isError, error]);
 
+  // Reset to page 1 when any filter changes
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [searchQuery, activeCategory, activeType]);
+
   const handleJobClick = (job: JobResponse) => {
     setSelectedJob(job);
     setIsDetailsOpen(true);
@@ -286,7 +297,6 @@ export default function Jobs() {
     if (!window.confirm('Are you sure you want to delete this job listing?')) {
       return;
     }
-
     try {
       await deleteJobMutation.mutateAsync(jobId);
       toast.success('Job listing deleted successfully');
@@ -296,40 +306,25 @@ export default function Jobs() {
     }
   };
 
-  // 1. Sort by CreatedAt (Newest to Oldest)
-  const sortedJobs = [...jobs].sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+  // New jobs carousel — filtered from current page items
+  const newJobs = jobs.filter(j => j.isNew);
 
-  // 2. Extract uniquely generated properties for badges/sections
-  const newJobs = sortedJobs.filter(j => j.isNew);
-  
   const jobCategories = ['All', 'Campus', 'Delivery', 'Marketing', 'Tutoring', 'Tech', 'Food & Bev', 'Other'];
   const jobTypes = ['All', 'Part-Time', 'Internship', 'Freelance', 'Campus', 'Full-Time'];
 
-  // 3. Filter Application
-  const filteredJobs = sortedJobs.filter(j => {
+  // Client-side filter applied on top of the current server page
+  const filteredJobs = jobs.filter(j => {
     if (activeCategory !== 'All' && j.category !== activeCategory) return false;
     if (activeType !== 'All' && j.jobType !== activeType) return false;
     if (searchQuery.trim() !== '') {
-       const q = searchQuery.toLowerCase();
-       if (!j.title.toLowerCase().includes(q) && !j.company.toLowerCase().includes(q)) return false;
+      const q = searchQuery.toLowerCase();
+      if (!j.title.toLowerCase().includes(q) && !j.company.toLowerCase().includes(q)) return false;
     }
     return true;
   });
 
-  // 4. Pagination — reset to page 1 whenever filters change
-  useEffect(() => {
-    setCurrentPage(1);
-  }, [searchQuery, activeCategory, activeType]);
-
-  const totalPages = Math.ceil(filteredJobs.length / JOBS_PER_PAGE);
-  const paginatedJobs = filteredJobs.slice(
-    (currentPage - 1) * JOBS_PER_PAGE,
-    currentPage * JOBS_PER_PAGE
-  );
-
   const handlePageChange = (_: React.ChangeEvent<unknown>, page: number) => {
     setCurrentPage(page);
-    // Scroll the opportunities section back to top
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
@@ -495,11 +490,16 @@ export default function Jobs() {
                          <SparkleIcon sx={{ color: 'rgba(255,255,255,0.4)', fontSize: 20 }} />
                       </Box>
                       <Box>
-                        <Typography variant="h5" sx={{ fontWeight: 800, color: '#fff', letterSpacing: '-0.01em' }}>
-                           Opportunities
-                        </Typography>
+                        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
+                          <Typography variant="h5" sx={{ fontWeight: 800, color: '#fff', letterSpacing: '-0.01em' }}>
+                             Opportunities
+                          </Typography>
+                          {isFetching && !loading && (
+                            <CircularProgress size={16} sx={{ color: 'rgba(250,204,21,0.6)' }} />
+                          )}
+                        </Box>
                         <Typography variant="caption" sx={{ color: 'rgba(255,255,255,0.4)' }}>
-                           Sorted by Newest
+                           Sorted by Newest &middot; {totalCount} total
                         </Typography>
                       </Box>
                   </Box>
@@ -563,7 +563,7 @@ export default function Jobs() {
                 ) : filteredJobs.length > 0 ? (
                   <>
                     <Grid container spacing={3}>
-                      {paginatedJobs.map((job, index) => (
+                      {filteredJobs.map((job, index) => (
                         <Grid size={{ xs: 12, sm: 6, lg: 4 }} key={job.id}>
                            <JobCard job={job} index={index} onClick={handleJobClick} />
                         </Grid>
@@ -587,8 +587,8 @@ export default function Jobs() {
                           sx={{ color: 'rgba(255,255,255,0.35)', letterSpacing: '0.05em' }}
                         >
                           Showing {(currentPage - 1) * JOBS_PER_PAGE + 1}–
-                          {Math.min(currentPage * JOBS_PER_PAGE, filteredJobs.length)} of{' '}
-                          {filteredJobs.length} opportunities
+                          {Math.min(currentPage * JOBS_PER_PAGE, totalCount)} of{' '}
+                          {totalCount} opportunities
                         </Typography>
                         <Pagination
                           count={totalPages}
