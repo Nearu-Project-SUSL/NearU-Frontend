@@ -28,6 +28,14 @@ export interface JobResponse {
   postedAt: string;
 }
 
+export interface PagedJobResponse {
+  items: JobResponse[];
+  totalCount: number;
+  totalPages: number;
+  currentPage: number;
+  pageSize: number;
+}
+
 export interface CreateJobData {
   title: string;
   company: string;
@@ -59,8 +67,10 @@ export interface UpdateJobData {
 }
 
 const jobService = {
-  getAllJobs: async (): Promise<JobResponse[]> => {
-    const response = await axios.get<ApiResponse<JobResponse[]>>('/job');
+  getAllJobs: async (page: number = 1, pageSize: number = 10): Promise<PagedJobResponse> => {
+    const response = await axios.get<ApiResponse<PagedJobResponse>>('/job', {
+      params: { page, pageSize },
+    });
     return response.data.data;
   },
 
