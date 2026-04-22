@@ -26,7 +26,8 @@ import {
   MenuItem,
   TextField,
   InputAdornment,
-  Skeleton
+  Skeleton,
+  Pagination
 } from '@mui/material';
 
 import {
@@ -238,6 +239,8 @@ const textFieldStyles = {
 
 // ─── Jobs Page Component ─────────────────────────────────────────────────────
 
+const JOBS_PER_PAGE = 10;
+
 export default function Jobs() {
   const navigate = useNavigate();
   const [selectedJob, setSelectedJob] = useState<JobResponse | null>(null);
@@ -253,6 +256,9 @@ export default function Jobs() {
   const [activeCategory, setActiveCategory] = useState<string>('All');
   const [activeType, setActiveType] = useState<string>('All');
   const [searchQuery, setSearchQuery] = useState('');
+
+  // Pagination
+  const [currentPage, setCurrentPage] = useState(1);
 
   const { scrollRef: newJobsRef, scroll: scrollNewJobs } = useHorizontalScroll();
 
@@ -309,6 +315,23 @@ export default function Jobs() {
     }
     return true;
   });
+
+  // 4. Pagination — reset to page 1 whenever filters change
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [searchQuery, activeCategory, activeType]);
+
+  const totalPages = Math.ceil(filteredJobs.length / JOBS_PER_PAGE);
+  const paginatedJobs = filteredJobs.slice(
+    (currentPage - 1) * JOBS_PER_PAGE,
+    currentPage * JOBS_PER_PAGE
+  );
+
+  const handlePageChange = (_: React.ChangeEvent<unknown>, page: number) => {
+    setCurrentPage(page);
+    // Scroll the opportunities section back to top
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
 
   return (
     <Box sx={{ display: 'flex', height: '100vh', overflow: 'hidden', bgcolor: '#050505', backgroundImage: 'radial-gradient(circle at top left, rgba(250,204,21,0.03) 0%, transparent 50%)' }}>
@@ -538,13 +561,70 @@ export default function Jobs() {
                     ))}
                   </Grid>
                 ) : filteredJobs.length > 0 ? (
-                  <Grid container spacing={3}>
-                    {filteredJobs.map((job, index) => (
-                      <Grid size={{ xs: 12, sm: 6, lg: 4 }} key={job.id}>
-                         <JobCard job={job} index={index} onClick={handleJobClick} />
-                      </Grid>
-                    ))}
-                  </Grid>
+                  <>
+                    <Grid container spacing={3}>
+                      {paginatedJobs.map((job, index) => (
+                        <Grid size={{ xs: 12, sm: 6, lg: 4 }} key={job.id}>
+                           <JobCard job={job} index={index} onClick={handleJobClick} />
+                        </Grid>
+                      ))}
+                    </Grid>
+
+                    {/* ── Pagination ─────────────────────────────────────────── */}
+                    {totalPages > 1 && (
+                      <Box
+                        sx={{
+                          display: 'flex',
+                          justifyContent: 'center',
+                          alignItems: 'center',
+                          mt: 6,
+                          gap: 2,
+                          flexDirection: 'column',
+                        }}
+                      >
+                        <Typography
+                          variant="caption"
+                          sx={{ color: 'rgba(255,255,255,0.35)', letterSpacing: '0.05em' }}
+                        >
+                          Showing {(currentPage - 1) * JOBS_PER_PAGE + 1}–
+                          {Math.min(currentPage * JOBS_PER_PAGE, filteredJobs.length)} of{' '}
+                          {filteredJobs.length} opportunities
+                        </Typography>
+                        <Pagination
+                          count={totalPages}
+                          page={currentPage}
+                          onChange={handlePageChange}
+                          siblingCount={1}
+                          boundaryCount={1}
+                          sx={{
+                            '& .MuiPaginationItem-root': {
+                              color: 'rgba(255,255,255,0.6)',
+                              borderColor: 'rgba(255,255,255,0.1)',
+                              borderRadius: '10px',
+                              fontWeight: 600,
+                              transition: 'all 0.2s ease',
+                              '&:hover': {
+                                bgcolor: 'rgba(250,204,21,0.12)',
+                                borderColor: 'rgba(250,204,21,0.4)',
+                                color: '#facc15',
+                              },
+                              '&.Mui-selected': {
+                                bgcolor: '#facc15',
+                                color: '#000',
+                                fontWeight: 800,
+                                borderColor: '#facc15',
+                                '&:hover': {
+                                  bgcolor: '#eab308',
+                                },
+                              },
+                            },
+                          }}
+                          variant="outlined"
+                          shape="rounded"
+                        />
+                      </Box>
+                    )}
+                  </>
                 ) : (
                   <Box sx={{ textAlign: 'center', py: 8, bgcolor: 'rgba(255,255,255,0.02)', borderRadius: '24px', border: '1px dashed rgba(255,255,255,0.1)' }}>
                     <Typography variant="h6" sx={{ color: 'rgba(255,255,255,0.6)', mb: 1 }}>No opportunities found</Typography>
