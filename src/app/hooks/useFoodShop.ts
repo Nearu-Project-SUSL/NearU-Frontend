@@ -1,5 +1,5 @@
 import {useQuery} from '@tanstack/react-query';
-import {getAllShops, getShopById, getMenuItems} from '../../api/foodapi';
+import {getAllShops, getShopById, getMenuItems, getCategories} from '../../api/foodapi';
 
 export function useFoodShops(){
   return useQuery({
@@ -28,4 +28,13 @@ export function useMenuItems(shopId: string){
     queryFn: ()=> getMenuItems(shopId),
     enabled: !! shopId
   });
+}
+
+export function useFoodCategories(){
+  return useQuery({
+    queryKey: ['foodcategories'],
+
+    queryFn: getCategories,
+    staleTime: Infinity, // never change cache
+  })
 }

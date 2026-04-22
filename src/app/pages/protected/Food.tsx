@@ -79,39 +79,69 @@ export default function FoodPage(){
             <Box sx={{px: { xs: 2, md: 4 }, py: { xs: 4, md: 5 }, pb:8, maxWidth:1400, mx:'auto' }}>
               
               {/*hero section */}
+
               <Box
                 sx={{
                   mb: 8,
                   px: { xs: 3, md: 6 },
-                  py: { xs: 5, md: 7 },
-                  textAlign: "center",
-                  position: "relative",
+                  py: { xs: 6, md: 8 },
+                  display: "flex",
+                  flexDirection: { xs: "column", md: "row" },
+                  alignItems: "center",
+                  justifyContent: "space-between",
+                  background: "rgba(255,255,255,0.03)", 
+                  border: "1px solid rgba(255,255,255,0.1)", 
+                  borderRadius: "20px",
                   overflow: "hidden",
+                  gap: 4,
                 }}>
 
-                    <Typography
-                      variant="h2"
-                      sx={{
-                        fontWeight:900,
-                        color:'#fff',
-                        fontSize:{xs:'2.3rem', md:'3.6rem'},
-                        letterSpacing: '-0.03em',
-                        mb:2
-                      }}>
-                        Food <Box component="span" sx={{color:"#facc15"}}>Near U</Box>
-                    </Typography>
+                {/* LEFT SIDE TEXT */}
+                <Box sx={{ flex: 1 }}>
+                  <Typography
+                    variant="h2"
+                    sx={{
+                      fontWeight: 900,
+                      color: "#fff",
+                      fontSize: { xs: "2.3rem", md: "3.6rem" },
+                      letterSpacing: "-0.03em",
+                      mb: 2,
+                    }}
+                  >
+                    Food{" "}
+                    <Box component="span" sx={{ color: "#facc15" }}>
+                      Near U
+                    </Box>
+                  </Typography>
 
-                    <Typography
-                      variant="body1"
-                      sx={{
-                        color: "rgba(255,255,255,0.65)",
-                        maxWidth: 760,
-                        mx: "auto",
-                        lineHeight: 1.8,
-                        fontSize: { xs: "1rem", md: "1.08rem" },
-                      }}>
-                        Discover the best food shops near Sabagagamuwa University. From rica & currey to cafes and bakeries  all in one place.
-                    </Typography>
+                  <Typography
+                    variant="body1"
+                    sx={{
+                      color: "rgba(255,255,255,0.7)",
+                      maxWidth: 600,
+                      lineHeight: 1.8,
+                      fontSize: { xs: "1rem", md: "1.08rem" },
+                    }}
+                  >
+                    Discover the best food shops near Sabaragamuwa University.
+                    From rice & curry to cafes and bakeries — all in one place.
+                  </Typography>
+                </Box>
+
+                {/* RIGHT SIDE IMAGE */}
+                <Box
+                  component="img"
+                  src="https://www.truefoodkitchen.com/wp-content/uploads/2025/12/TrueFoodKitchenFall-01871-Edit_1200x800_2.jpg.webp"
+                  alt="Food"
+                  sx={{
+                    flex: 1,
+                    width: "100%",
+                    maxWidth: 450,
+                    borderRadius: "16px",
+                    objectFit: "cover",
+                    boxShadow: "0 10px 30px rgba(0,0,0,0.4)",
+                  }}
+                />
               </Box>
               
               {/*search section */}

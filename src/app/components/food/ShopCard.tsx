@@ -110,17 +110,6 @@ export default function ShopCard({shop}: ShopCardProps) {
 
                   </Typography>
 
-                  <Typography
-                  variant="body2"
-                  sx={{
-                    color:'rgba(255,255,255,0.5)',
-                    fontSize:'0.85rem',
-                    lineHeight:1.6,
-                    mb:2
-                  }}>
-                    {shop.description}
-                  </Typography>
-
                     <Box sx={{ display:'flex', alignItems:'center', gap:1}}>
                       <LocationIcon sx={{fontSize:14, color: 'rgba(255,255,255,0.3)'}} />
                       <Typography

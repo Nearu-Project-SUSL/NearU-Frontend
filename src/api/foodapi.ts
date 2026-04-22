@@ -2,7 +2,7 @@ import { error } from "node:console";
 
 const BASE_URL =
   import.meta.env.VITE_API_BASE_URL ||
-  'https://nearu-app-5ldre.ondigitalocean.app';
+  'https://nearu-app-5ldre.ondigitalocean.app/api';
 
   
 export interface ShopResponse{
@@ -54,6 +54,14 @@ export async function getMenuItems(shopId: string): Promise<MenuItemResponse[]> 
     throw new Error(`Failed to fetch menu items: ${response.statusText}`);
   }
 
+  return response.json();
+}
+
+export async function getCategories(): Promise<string[]> {
+  const response = await fetch (`${BASE_URL}/foodshops/categories`);
+  if (!response.ok) {
+    throw new Error('Failed to fetch categories');
+  }
   return response.json();
 }
 
