@@ -68,10 +68,23 @@ export interface UpdateJobData {
 
 const jobService = {
   getAllJobs: async (page: number = 1, pageSize: number = 10): Promise<PagedJobResponse> => {
-    const response = await axios.get<ApiResponse<PagedJobResponse>>('/job', {
+    const response = await axios.get<ApiResponse<PagedJobResponse | JobResponse[]>>('/job', {
       params: { page, pageSize },
     });
-    return response.data.data;
+    const raw = response.data.data;
+
+    // Guard against old backend that returns a flat JobResponse[] array
+    if (Array.isArray(raw)) {
+      return {
+        items: raw as JobResponse[],
+        totalCount: raw.length,
+        totalPages: 1,
+        currentPage: 1,
+        pageSize: raw.length,
+      };
+    }
+
+    return raw as PagedJobResponse;
   },
 
   getNewJobs: async (): Promise<JobResponse[]> => {
