@@ -258,7 +258,7 @@ export default function Jobs() {
 
   // Unpack server response
   const jobs: JobResponse[] = pagedData?.items ?? [];
-  const totalPages = pagedData?.totalPages ?? 1;
+  const totalPages = pagedData?.totalPages ?? 0;  // 0 = hide pagination while loading
   const totalCount = pagedData?.totalCount ?? 0;
 
   // Filters (client-side on the current page)
@@ -267,6 +267,7 @@ export default function Jobs() {
   const [searchQuery, setSearchQuery] = useState('');
 
   const { scrollRef: newJobsRef, scroll: scrollNewJobs } = useHorizontalScroll();
+  const scrollContainerRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     const t = setTimeout(() => setVisible(true), 100);
@@ -306,26 +307,16 @@ export default function Jobs() {
     }
   };
 
-  // New jobs carousel — filtered from current page items
+  // Jobs shown in the current server page (no client-side filter — filters are server-side endpoints)
   const newJobs = jobs.filter(j => j.isNew);
 
   const jobCategories = ['All', 'Campus', 'Delivery', 'Marketing', 'Tutoring', 'Tech', 'Food & Bev', 'Other'];
   const jobTypes = ['All', 'Part-Time', 'Internship', 'Freelance', 'Campus', 'Full-Time'];
 
-  // Client-side filter applied on top of the current server page
-  const filteredJobs = jobs.filter(j => {
-    if (activeCategory !== 'All' && j.category !== activeCategory) return false;
-    if (activeType !== 'All' && j.jobType !== activeType) return false;
-    if (searchQuery.trim() !== '') {
-      const q = searchQuery.toLowerCase();
-      if (!j.title.toLowerCase().includes(q) && !j.company.toLowerCase().includes(q)) return false;
-    }
-    return true;
-  });
-
   const handlePageChange = (_: React.ChangeEvent<unknown>, page: number) => {
     setCurrentPage(page);
-    window.scrollTo({ top: 0, behavior: 'smooth' });
+    // Scroll the inner scrollable container (window.scrollTo won't work in this fixed layout)
+    scrollContainerRef.current?.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
   return (
@@ -335,7 +326,7 @@ export default function Jobs() {
       <Box sx={{ flex: 1, display: 'flex', flexDirection: 'column', minWidth: 0, overflow: 'hidden' }}>
         <Navbar />
 
-        <Box sx={{ flex: 1, overflowY: 'auto', overflowX: 'hidden' }}>
+        <Box ref={scrollContainerRef} sx={{ flex: 1, overflowY: 'auto', overflowX: 'hidden' }}>
             <Box sx={{ px: { xs: 2.5, md: 5 }, py: { xs: 4, md: 5 }, pb: 8, maxWidth: 1400, mx: 'auto', width: '100%' }}>
               
               {/* ── Header Section ─────────────────────────────────────────── */}
@@ -560,10 +551,10 @@ export default function Jobs() {
                       </Grid>
                     ))}
                   </Grid>
-                ) : filteredJobs.length > 0 ? (
+                ) : jobs.length > 0 ? (
                   <>
                     <Grid container spacing={3}>
-                      {filteredJobs.map((job, index) => (
+                      {jobs.map((job, index) => (
                         <Grid size={{ xs: 12, sm: 6, lg: 4 }} key={job.id}>
                            <JobCard job={job} index={index} onClick={handleJobClick} />
                         </Grid>

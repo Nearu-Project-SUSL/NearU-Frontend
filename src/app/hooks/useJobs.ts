@@ -15,7 +15,8 @@ export const useAllJobs = (page: number = 1, pageSize: number = 10) => {
   return useQuery({
     queryKey: JOB_QUERY_KEYS.all(page, pageSize),
     queryFn: () => jobService.getAllJobs(page, pageSize),
-    placeholderData: (prev) => prev, // keep previous page data while next page loads
+    placeholderData: (prev) => prev, // keep previous page visible while next page loads
+    staleTime: 30 * 1000,           // treat data as fresh for 30s — avoids refetch on quick nav
   });
 };
 
