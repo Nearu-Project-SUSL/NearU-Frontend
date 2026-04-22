@@ -13,6 +13,7 @@ export interface ShopResponse{
   phoneNumber: string | null;
   photoUrl: string | null;
   createdAt: string;
+  category:string;
   menuItemCount:number; 
 }
 
@@ -54,6 +55,14 @@ export async function getMenuItems(shopId: string): Promise<MenuItemResponse[]> 
     throw new Error(`Failed to fetch menu items: ${response.statusText}`);
   }
 
+  return response.json();
+}
+
+export async function getCategories(): Promise<string[]> {
+  const response = await fetch (`${BASE_URL}/foodshops/categories`);
+  if (!response.ok) {
+    throw new Error('Failed to fetch categories');
+  }
   return response.json();
 }
 
