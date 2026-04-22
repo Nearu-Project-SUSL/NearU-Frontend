@@ -79,21 +79,6 @@ export default function ShopCard({shop}: ShopCardProps) {
                     height:'60%',
                     background: 'linear-gradient(to top, rgba(0,0,0,0.7), transparent)'
                   }}/>
-
-                  <Box
-                    sx={{
-                      position:'absolute',
-                      bottom:12,
-                      left:12,
-                      px:1.5,
-                      py:0.4,
-                      borderRadius:'8px',
-                      bgcolor: 'rgba(250, 204, 21, 0.15)',
-                      border: '1px solid rgba(250, 204, 21, 0.3)',
-                    }}>
-                      
-                      
-                  </Box>
               </Box>
 
               <Box sx={{p:2.5}}>
@@ -129,15 +114,36 @@ export default function ShopCard({shop}: ShopCardProps) {
                         justifyContent:'space-between',
                         alignItems:'center'
                       }}>
+                        <Box
+                          sx={{
+                            bottom:12,
+                            left:12,
+                            px:1.5,
+                            py:0.4,
+                            borderRadius:'8px',
+                            bgcolor: 'rgba(59,130,246,0.15)',
+                            border: '1px solid rgba(59,130,246,0.3)',
+                          }}>
+                            <Typography
+                              variant='caption'
+                              sx={{
+                                color:'#60a5fa',
+                                fontWeight:700,
+                                fontSize:'0.7rem'
+                              }}>
+                                {shop.category}
+                              </Typography>
+                            
+                        </Box>
 
-                        <Typography
-                          variant='caption'
-                          sx={{color:'#facc15', fontWeight:700, fontSize:'0.78rem'}}>
-                          View Menu
+                            <Typography
+                              variant='caption'
+                              sx={{color:'#facc15', fontWeight:700, fontSize:'0.78rem'}}>
+                              View Menu
 
-                        </Typography>
-                    </Box>
-                </Box>
+                            </Typography>
+                      </Box>
+            </Box>
 
       </CardActionArea>
       

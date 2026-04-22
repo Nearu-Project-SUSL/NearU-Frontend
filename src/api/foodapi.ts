@@ -2,7 +2,7 @@ import { error } from "node:console";
 
 const BASE_URL =
   import.meta.env.VITE_API_BASE_URL ||
-  'https://nearu-app-5ldre.ondigitalocean.app/api';
+  'https://nearu-app-5ldre.ondigitalocean.app';
 
   
 export interface ShopResponse{
@@ -13,6 +13,7 @@ export interface ShopResponse{
   phoneNumber: string | null;
   photoUrl: string | null;
   createdAt: string;
+  category:string;
   menuItemCount:number; 
 }
 
