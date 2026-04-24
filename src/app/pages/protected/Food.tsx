@@ -213,7 +213,7 @@ export default function FoodPage(){
                     size="small"
                     placeholder="Search shops..."
                     value={searchQuery}
-                    onChange={(e) => setSearchQuery(e.target.value)}
+                    onChange={(e) => handleSearchChange(e.target.value)}
                     sx={{
                       minWidth: { xs: "100%", md: 280 },
                       "& .MuiOutlinedInput-root": {
@@ -237,7 +237,7 @@ export default function FoodPage(){
                       ),
                       endAdornment: searchQuery ? (
                         <InputAdornment position="end">
-                          <IconButton size="small" onClick={() => setSearchQuery("")}>
+                          <IconButton size="small" onClick={() => handleSearchChange("")}>
                             <CloseIcon sx={{ color: "rgba(255,255,255,0.5)", fontSize: 18 }} />
                           </IconButton>
                         </InputAdornment>
@@ -266,7 +266,7 @@ export default function FoodPage(){
                     return (
                       <Box
                         key={cat}
-                        onClick={() => setActiveCategory(cat)}
+                        onClick={() => handleCategoryChange(cat)}
                         sx={{
                           px: 2,
                           py: 0.8,
@@ -381,7 +381,7 @@ export default function FoodPage(){
                         return(
                           <Typography
                             key={`dots-${index}`}
-                            sx={{color: 'rgba(255,255,255,0.3), px:1'}}>
+                            sx={{color: 'rgba(255,255,255,0.3)', px:1}}>
                               ...
                             </Typography>
                         );
