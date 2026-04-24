@@ -1,12 +1,19 @@
 import {useQuery} from '@tanstack/react-query';
-import {getAllShops, getShopById, getMenuItems, getCategories} from '../../api/foodapi';
+import {getAllShops, getShopById, getMenuItems, getCategories, GetShopsParams} from '../../api/foodapi';
 
-export function useFoodShops(){
+export function useFoodShops(params: GetShopsParams = {}){
   return useQuery({
-    queryKey: ['foodshops'], // like a cache address in here cache under foodshops key
+    queryKey: ['foodshops',  // when page changes React Query fetches new data automatically
+      params.page ?? 1,
+      params.pageSize ?? 9,
+      params.category ?? '',
+      params.search ?? ''
+    ], // like a cache address in here cache under foodshops key
     //if anotherone calls foodshops it gets cached data
 
-    queryFn: getAllShops  
+    queryFn: () => getAllShops(params),  //calls backend
+  
+    placeholderData:(previousData) => previousData, //old data visible until new data arrive
   });
 }
 
