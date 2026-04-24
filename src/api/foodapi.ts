@@ -35,7 +35,7 @@ export interface GetShopsParams{
 }
 
 export interface PagedShopResponse{
-  item: ShopResponse[];
+  items: ShopResponse[];
   currentPage:number;
   pageSize:number;
   totalCount:number;

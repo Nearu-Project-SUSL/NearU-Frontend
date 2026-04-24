@@ -5,7 +5,13 @@ import {
   Typography,
   Box,
 } from '@mui/material';
-import type { MenuItem } from '../../../../data/foodMockData';
+
+export interface MenuItem {
+  name: string;
+  description: string;
+  price: number;
+  photoUrl: string;
+}
 
 interface MenuItemCardProps {
   item: MenuItem;
