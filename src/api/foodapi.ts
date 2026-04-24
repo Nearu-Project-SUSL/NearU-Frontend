@@ -2,7 +2,7 @@ import { error } from "node:console";
 
 const BASE_URL =
   import.meta.env.VITE_API_BASE_URL ||
-  'https://nearu-app-5ldre.ondigitalocean.app';
+  'https://nearu-app-5ldre.ondigitalocean.app/api';
 
   
 export interface ShopResponse{
@@ -27,8 +27,44 @@ export interface MenuItemResponse {
   createdAt: string;
 }
 
-export async function getAllShops(): Promise<ShopResponse[]>{
-  const response = await fetch(`${BASE_URL}/foodshops`);
+export interface GetShopsParams{
+  page?: number;
+  pageSize?: number;
+  category?: string;
+  search?: string;
+}
+
+export interface PagedShopResponse{
+  item: ShopResponse[];
+  currentPage:number;
+  pageSize:number;
+  totalCount:number;
+  totalPages:number;
+  hasPreviousPage: boolean;
+  hasNextPage: boolean;
+}
+
+export async function getAllShops(params: GetShopsParams = {}): Promise<PagedShopResponse>{
+  const{
+    page = 1,
+    pageSize = 9,
+    category,
+    search,
+  } = params;
+
+  const queryParams = new URLSearchParams();
+  queryParams.set('page', page.toString());
+  queryParams.set('pageSize', pageSize.toString());
+
+  if(category && category !== 'All'){
+    queryParams.set('category', category);
+  }
+
+  if(search && search.trim()){
+    queryParams.set('search', search.trim());
+  }
+  
+  const response = await fetch(`${BASE_URL}/foodshops?${queryParams.toString()}`);
 
   if(!response.ok){
     throw new Error(`Failed to fetch shops: ${response.statusText}`)
