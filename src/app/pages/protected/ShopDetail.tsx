@@ -139,7 +139,7 @@ export default function ShopDetailPage() {
                           onClick={() => navigate('/food')}
                           sx={{
                             position:'absolute',
-                            top:80,
+                            top:{xs:70, md:80},
                             left:24,
                             bgcolor:'rgba(255, 255, 255, 0.5)',
                             color:'#fff',
@@ -162,6 +162,7 @@ export default function ShopDetailPage() {
                                   color:'#fff',
                                   fontWeight:'800',
                                   fontSize:{xs:'1.8rem', md:'2.8rem'},
+                                  left:{xs:24, md:48},
                                   letterSpacing:'-0.02rem',
                                   textShadow:'0 2px 20px rgba(0,0,0,0.8)'
                                 }}>
@@ -175,7 +176,7 @@ export default function ShopDetailPage() {
 
 
                 {/*main content*/}
-                <Box sx={{px:{xs:2.5, md:5}, py:5, maxWidth:'1400', mx:'auto', width:'100%'  }}>
+                <Box sx={{px:{xs:2.5, md:5}, py:5, maxWidth:1400, mx:'auto', width:'100%'  }}>
                   
 
                   <Box sx={{mb:6}}>
@@ -202,7 +203,7 @@ export default function ShopDetailPage() {
                   </Box>
 
 
-                  <Grid container spacing={5}>
+                  <Grid container spacing={{xs:3, md:5}}>
 
                     <Grid size={{xs:12, md:8}}>
                       {/*menu section*/}

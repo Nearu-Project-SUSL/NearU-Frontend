@@ -42,13 +42,13 @@ export default function MenuItemCard({ item, onClick }: MenuItemCardProps) {
           display: 'flex',
           flexDirection: 'row',
           alignItems: 'stretch',
-          height: 120,
+          height: {xs:110, sm:120},
         }}
       >
         {/*image */}
         <Box
           sx={{
-            width: 120,
+            width: {xs:100, md:120},
             flexShrink: 0,
             position: 'relative',
             overflow: 'hidden',

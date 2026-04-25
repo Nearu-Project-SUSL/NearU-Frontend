@@ -175,8 +175,8 @@ export default function FoodPage(){
                 <Box
                   component="img"
                   src="https://www.truefoodkitchen.com/wp-content/uploads/2025/12/TrueFoodKitchenFall-01871-Edit_1200x800_2.jpg.webp"
-                  alt="Food"
                   sx={{
+                    display: { xs: 'none', md: 'block' },
                     flex: 1,
                     width: "100%",
                     maxWidth: 450,
@@ -317,7 +317,7 @@ export default function FoodPage(){
                       md: 'repeat(3, 1fr)'
                     },
                     gap:{xs:2, md:2.5},
-                    ml: 5,
+                    px:{xs:2, md:0} // no side margin
                   }}>
                   {shops.map((shop) => (
                     <ShopCard key={shop.id} shop={shop} />
@@ -332,7 +332,7 @@ export default function FoodPage(){
                     bgcolor: 'rgba(255,255,255,0.02)',
                     borderRadius: '24px',
                     border: '1px dashed rgba(255,255,255,0.08)',
-                    mx: 5,
+                    mx: {xs:0, md:5},
                   }}>
                   <Typography variant="h6" sx={{ color: 'rgba(255,255,255,0.4)', mb: 1 }}>
                     No shops found
