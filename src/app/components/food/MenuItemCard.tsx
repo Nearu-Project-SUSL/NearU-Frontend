@@ -5,7 +5,7 @@ import {
   Typography,
   Box,
 } from '@mui/material';
-import type { MenuItem } from '../../../data/foodMockData';
+import type { MenuItem } from '../../../../data/foodMockData';
 
 interface MenuItemCardProps {
   item: MenuItem;
