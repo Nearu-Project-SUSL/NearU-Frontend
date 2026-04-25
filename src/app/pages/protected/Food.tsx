@@ -15,7 +15,8 @@ import { useState } from "react";
 
 import SearchIcon from "@mui/icons-material/Search";
 import CloseIcon from "@mui/icons-material/Close";
-
+import ChevronLeftIcon from "@mui/icons-material/ChevronLeft";
+import ChevronRightIcon from "@mui/icons-material/ChevronRight";
 
 const FOOD_CATEGORIES = [
   'All',
@@ -31,7 +32,25 @@ export default function FoodPage(){
   const [activeCategory, setActiveCategory] = useState('All');
   const [searchQuery, setSearchQuery] = useState('');
 
-  const {data: shops, isLoading, error} = useFoodShops();
+  const [currentPage, setCurrentPage] = useState(1);
+
+  const {data, isLoading, error} = useFoodShops({   //pas params to hook from there to API
+    page: currentPage,
+    pageSize: 9,
+    category: activeCategory,
+    search: searchQuery, 
+  });
+
+  //when category change reset to page 1 
+  const handleCategoryChange = (cat : string) => {
+    setActiveCategory(cat);
+    setCurrentPage(1);
+  }
+
+  const handleSearchChange = (value: string) => {
+    setSearchQuery(value);
+    setCurrentPage(1);
+  }
 
   if (isLoading) {
     return (
@@ -51,18 +70,41 @@ export default function FoodPage(){
     );
   }
 
-  const filterShops = (shops ?? []).filter((shop) => {
-    // category filter — skip if 'All' selected
-    if (activeCategory !== 'All' && shop.category !== activeCategory) return false;
+  const shops = data?.items??[]; //data  is the pagedshopresponse from backend
+  const totalPages = data?.totalPages ?? 1;
+  const totalCount = data?.totalCount ?? 0;
 
-    // search filter
-    if(searchQuery.trim()){
-      const q = searchQuery.toLowerCase();
-      if (!shop.name.toLowerCase().includes(q)) return false;
+  const getPageNumbers =() =>{
+    const pages:(number | '...')[] = []; //hold numbers or ...
+
+    if (totalPages <=7){
+      for (let i =1; i <= totalPages; i++){
+        pages.push(i)
+      }
+    } else {
+      //always show page 1
+      pages.push(1);
+
+      if (currentPage > 3) {
+        pages.push('...'); //add dots if far from start
+      }
+
+      const start = Math.max(2, currentPage - 1);
+      const end = Math.min(totalPages - 1, currentPage + 1);
+
+      for (let i = start; i <= end; i++) {
+        pages.push(i);
+      }
+
+      if (currentPage < totalPages - 2) {
+        pages.push('...'); // add ... if far from end
+      }
+
+      pages.push(totalPages);
     }
 
-    return true;
-  });
+    return pages;
+  };
 
   return (
     <Box
@@ -133,8 +175,8 @@ export default function FoodPage(){
                 <Box
                   component="img"
                   src="https://www.truefoodkitchen.com/wp-content/uploads/2025/12/TrueFoodKitchenFall-01871-Edit_1200x800_2.jpg.webp"
-                  alt="Food"
                   sx={{
+                    display: { xs: 'none', md: 'block' },
                     flex: 1,
                     width: "100%",
                     maxWidth: 450,
@@ -162,7 +204,8 @@ export default function FoodPage(){
                       Food Shops
                     </Typography>
                     <Typography variant="body2" sx={{ color:'rgba(255,255,255,0.5)'}}>
-                      {filterShops.length} shop{filterShops.length !== 1 ? 's' : ''} found
+                      {totalCount} shop{totalCount !== 1 ? 's' : ''} found
+                      {totalPages > 1 && `. page ${currentPage} of ${totalPages}`}
                     </Typography>
                   </Box>
 
@@ -170,7 +213,7 @@ export default function FoodPage(){
                     size="small"
                     placeholder="Search shops..."
                     value={searchQuery}
-                    onChange={(e) => setSearchQuery(e.target.value)}
+                    onChange={(e) => handleSearchChange(e.target.value)}
                     sx={{
                       minWidth: { xs: "100%", md: 280 },
                       "& .MuiOutlinedInput-root": {
@@ -194,7 +237,7 @@ export default function FoodPage(){
                       ),
                       endAdornment: searchQuery ? (
                         <InputAdornment position="end">
-                          <IconButton size="small" onClick={() => setSearchQuery("")}>
+                          <IconButton size="small" onClick={() => handleSearchChange("")}>
                             <CloseIcon sx={{ color: "rgba(255,255,255,0.5)", fontSize: 18 }} />
                           </IconButton>
                         </InputAdornment>
@@ -223,7 +266,7 @@ export default function FoodPage(){
                     return (
                       <Box
                         key={cat}
-                        onClick={() => setActiveCategory(cat)}
+                        onClick={() => handleCategoryChange(cat)}
                         sx={{
                           px: 2,
                           py: 0.8,
@@ -264,7 +307,7 @@ export default function FoodPage(){
               </Box>
 
               {/* shop grid or empty state */}
-              {filterShops.length > 0 ? (
+              {shops.length > 0 ? (
                 <Box
                   sx={{
                     display:'grid',
@@ -274,9 +317,9 @@ export default function FoodPage(){
                       md: 'repeat(3, 1fr)'
                     },
                     gap:{xs:2, md:2.5},
-                    ml: 5,
+                    px:{xs:2, md:0} // no side margin
                   }}>
-                  {filterShops.map((shop) => (
+                  {shops.map((shop) => (
                     <ShopCard key={shop.id} shop={shop} />
                   ))}
                 </Box>
@@ -289,7 +332,7 @@ export default function FoodPage(){
                     bgcolor: 'rgba(255,255,255,0.02)',
                     borderRadius: '24px',
                     border: '1px dashed rgba(255,255,255,0.08)',
-                    mx: 5,
+                    mx: {xs:0, md:5},
                   }}>
                   <Typography variant="h6" sx={{ color: 'rgba(255,255,255,0.4)', mb: 1 }}>
                     No shops found
@@ -299,6 +342,111 @@ export default function FoodPage(){
                       ? `No ${activeCategory} shops available right now`
                       : 'Try a different search term'}
                   </Typography>
+                </Box>
+              )}
+
+              {/*pagination only show if more than 1 page */}
+              {totalPages > 0 && (
+                <Box
+                  sx={{
+                    display:'flex',
+                    alignItems:'center',
+                    justifyContent:'center',
+                    gap:1,
+                    mt:6,
+                  }}>
+
+                  {/*previous button*/}
+                  <IconButton
+                    onClick={() => setCurrentPage(p => p -1)}
+                    disabled={currentPage === 1}
+                    sx={{
+                      color: currentPage === 1 ? 'rgba(255,255,255,0.2)' : '#fff',
+                      bgcolor: 'rgba(255,255,255,0.03)',
+                      border: '1px solid rgba(255,255,255,0.08)',
+                      borderRadius: '50px',
+                      '&:hover': {
+                        bgcolor: currentPage === 1 ? 'transparent' : 'rgba(255,255,255,0.08)',
+                      },
+                      '&.Mui-disabled': {
+                        color: 'rgba(255,255,255,0.2)',
+                      }
+                    }}>
+                      <ChevronLeftIcon />
+                    </IconButton>
+
+                    {/*page number buttons*/}
+                    {getPageNumbers().map((pageNum, index) => {
+                      if (pageNum === '...'){
+                        return(
+                          <Typography
+                            key={`dots-${index}`}
+                            sx={{color: 'rgba(255,255,255,0.3)', px:1}}>
+                              ...
+                            </Typography>
+                        );
+                      }
+
+                      const isCurrentPage = pageNum === currentPage;
+                      return(
+                        <Box
+                          key={pageNum}
+                          onClick={()=> setCurrentPage(pageNum as number)}
+                          sx={{
+                            width: 38,
+                            height: 38,
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            borderRadius: '50px',
+                            cursor: 'pointer',
+                            fontSize: '0.9rem',
+                            fontWeight: isCurrentPage ? 700 : 400,
+                            transition: 'all 0.2s ease',
+
+                            bgcolor: isCurrentPage
+                              ? '#facc15'
+                              : 'rgba(255,255,255,0.03)',
+                            color: isCurrentPage
+                              ? '#000'
+                              : 'rgba(255,255,255,0.6)',
+                            border: isCurrentPage
+                              ? 'none'
+                              : '1px solid rgba(255,255,255,0.08)',
+
+                            '&:hover': {
+                              bgcolor: isCurrentPage
+                                ? '#facc15'
+                                : 'rgba(255,255,255,0.08)',
+                              color: isCurrentPage ? '#000' : '#fff',
+                            },
+                          }}>
+                            {pageNum}
+
+                          </Box>
+                      );
+
+                    })}
+
+                    {/*next button*/}
+                    <IconButton
+                      onClick={() => setCurrentPage(p => p + 1)}
+                      disabled={currentPage === totalPages}
+                      sx={{
+                        color: currentPage === totalPages ? 'rgba(255,255,255,0.2)' : '#fff',
+                        bgcolor: 'rgba(255,255,255,0.03)',
+                        border: '1px solid rgba(255,255,255,0.08)',
+                        borderRadius: '50px',
+                        '&:hover': {
+                          bgcolor: currentPage === totalPages ? 'transparent' : 'rgba(255,255,255,0.08)',
+                        },
+                        '&.Mui-disabled': {
+                          color: 'rgba(255,255,255,0.2)',
+                        }
+                      }}>
+                      <ChevronRightIcon />
+                    </IconButton>
+                  
                 </Box>
               )}
 
