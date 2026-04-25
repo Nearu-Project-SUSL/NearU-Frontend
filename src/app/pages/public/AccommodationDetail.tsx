@@ -1,3 +1,4 @@
+import { useEffect, useState } from "react";
 import { Link as RouterLink, useParams } from "react-router";
 import {
 	Alert,
@@ -8,6 +9,7 @@ import {
 	CardContent,
 	CardMedia,
 	Chip,
+	CircularProgress,
 	Container,
 	Divider,
 	Grid,
@@ -26,13 +28,84 @@ import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import StarIcon from "@mui/icons-material/Star";
 import { Sidebar } from "../../components/layout/Sidebar";
 import { PageLayout } from "../../components/layout/PageLayout";
-import { accommodations } from "../data/accommodations";
+import accommodationService, { type AccommodationItem } from "../../../api/accommodationService";
+import { accommodations as fallbackAccommodations, type Accommodation } from "../data/accommodations";
 
 export default function AccommodationDetail() {
 	const { id } = useParams();
-	const accommodation = accommodations.find((item) => item.id === id);
+	const [accommodation, setAccommodation] = useState<Accommodation | undefined>(undefined);
+	const [items, setItems] = useState<AccommodationItem[]>([]);
+	const [loading, setLoading] = useState(true);
+	const [error, setError] = useState("");
 	const accentYellow = "#facc15";
 	const deepBlack = "#0b0b0b";
+
+	useEffect(() => {
+		let isMounted = true;
+
+		const loadAccommodationData = async () => {
+			if (!id) {
+				if (isMounted) {
+					setLoading(false);
+				}
+				return;
+			}
+
+			try {
+				const [remoteAccommodations, remoteItems] = await Promise.all([
+					accommodationService.fetchAccommodations(),
+					accommodationService.fetchAccommodationItems(id),
+				]);
+
+				if (isMounted) {
+					setAccommodation(remoteAccommodations.find((item) => item.id === id));
+					setItems(remoteItems);
+					setError("");
+				}
+			} catch {
+				if (isMounted) {
+					setAccommodation(fallbackAccommodations.find((item) => item.id === id));
+					setItems([]);
+					setError("Unable to load live accommodation details. Showing fallback details when available.");
+				}
+			} finally {
+				if (isMounted) {
+					setLoading(false);
+				}
+			}
+		};
+
+		loadAccommodationData();
+
+		return () => {
+			isMounted = false;
+		};
+	}, [id]);
+
+	if (loading) {
+		return (
+			<Box
+				sx={{
+					minHeight: "100vh",
+					background: `radial-gradient(circle at top right, rgba(250, 204, 21, 0.14), transparent 45%), ${deepBlack}`,
+				}}
+			>
+				<Sidebar activeSection="accommodation" />
+				<PageLayout>
+					<Container maxWidth="md" sx={{ py: 5 }}>
+						<Card sx={{ borderRadius: 3, p: { xs: 3, md: 4 }, textAlign: "center", backgroundColor: "#121212", border: "1px solid rgba(250, 204, 21, 0.35)" }}>
+							<Stack direction="row" spacing={1.5} alignItems="center" justifyContent="center">
+								<CircularProgress size={22} sx={{ color: accentYellow }} />
+								<Typography variant="body1" sx={{ color: "#fff" }}>
+									Loading accommodation details...
+								</Typography>
+							</Stack>
+						</Card>
+					</Container>
+				</PageLayout>
+			</Box>
+		);
+	}
 
 	if (!accommodation) {
 		return (
@@ -45,6 +118,11 @@ export default function AccommodationDetail() {
 				<Sidebar activeSection="accommodation" />
 				<PageLayout>
 					<Container maxWidth="md" sx={{ py: 5 }}>
+						{error && (
+							<Alert severity="error" sx={{ mb: 2, borderRadius: 2 }}>
+								{error}
+							</Alert>
+						)}
 						<Alert severity="warning" sx={{ mb: 2, borderRadius: 2 }}>
 							Accommodation not found.
 						</Alert>
@@ -74,6 +152,12 @@ export default function AccommodationDetail() {
 			<PageLayout>
 				<Container maxWidth="xl" sx={{ py: { xs: 2.5, sm: 3.5, md: 5 } }}>
 					<Stack spacing={{ xs: 2, sm: 2.5, md: 3 }}>
+						{error && (
+							<Alert severity="info" sx={{ borderRadius: 2 }}>
+								{error}
+							</Alert>
+						)}
+
 						<Breadcrumbs sx={{ color: "rgba(255,255,255,0.8)" }}>
 							<Link component={RouterLink} underline="hover" color="inherit" to="/home">
 								Home
@@ -140,6 +224,39 @@ export default function AccommodationDetail() {
 													</ListItem>
 												))}
 											</List>
+
+											<Divider />
+
+											<Typography variant="h6" sx={{ fontWeight: 700, color: accentYellow }}>
+												Available Items
+											</Typography>
+											{items.length > 0 ? (
+												<List dense>
+													{items.map((item) => (
+														<ListItem key={item.id} disableGutters>
+															<ListItemText
+																primary={`${item.name} - LKR ${item.price.toLocaleString()}`}
+																secondary={item.description || "No description"}
+																primaryTypographyProps={{ sx: { color: "#f2f2f2" } }}
+																secondaryTypographyProps={{ sx: { color: "rgba(255,255,255,0.66)" } }}
+															/>
+															<Chip
+																label={item.isAvailable ? "Available" : "Unavailable"}
+																size="small"
+																sx={{
+																	fontWeight: 700,
+																	backgroundColor: item.isAvailable ? accentYellow : "rgba(255,255,255,0.18)",
+																	color: item.isAvailable ? deepBlack : "#fff",
+																}}
+															/>
+														</ListItem>
+													))}
+												</List>
+											) : (
+												<Typography variant="body2" sx={{ color: "rgba(255,255,255,0.72)" }}>
+													No items are listed for this accommodation yet.
+												</Typography>
+											)}
 										</Stack>
 									</CardContent>
 								</Card>

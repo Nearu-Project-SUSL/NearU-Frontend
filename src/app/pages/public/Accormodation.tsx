@@ -1,6 +1,7 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router";
 import {
+    Alert,
     Box,
     Button,
     Card,
@@ -8,6 +9,7 @@ import {
     CardContent,
     CardMedia,
     Chip,
+    CircularProgress,
     Container,
     Grid,
     InputAdornment,
@@ -21,7 +23,8 @@ import StarIcon from "@mui/icons-material/Star";
 import HotelIcon from "@mui/icons-material/Hotel";
 import { Sidebar } from "../../components/layout/Sidebar";
 import { PageLayout } from "../../components/layout/PageLayout";
-import { accommodations } from "../data/accommodations";
+import accommodationService from "../../../api/accommodationService";
+import type { Accommodation } from "../data/accommodations";
 
 const accommodationTypes = ["All", "Boarding", "Annex", "Apartment"] as const;
 
@@ -29,8 +32,40 @@ export default function Accommodation() {
     const navigate = useNavigate();
     const [query, setQuery] = useState("");
     const [selectedType, setSelectedType] = useState<(typeof accommodationTypes)[number]>("All");
+    const [accommodations, setAccommodations] = useState<Accommodation[]>([]);
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState("");
     const accentYellow = "#facc15";
     const deepBlack = "#0b0b0b";
+
+    useEffect(() => {
+        let isMounted = true;
+
+        const loadAccommodations = async () => {
+            try {
+                const rows = await accommodationService.fetchAccommodations();
+
+                if (isMounted) {
+                    setAccommodations(rows);
+                    setError("");
+                }
+            } catch {
+                if (isMounted) {
+                    setError("Unable to load accommodations right now. Please try again shortly.");
+                }
+            } finally {
+                if (isMounted) {
+                    setLoading(false);
+                }
+            }
+        };
+
+        loadAccommodations();
+
+        return () => {
+            isMounted = false;
+        };
+    }, []);
 
     const filteredAccommodations = useMemo(() => {
         return accommodations.filter((item) => {
@@ -131,6 +166,27 @@ export default function Accommodation() {
                         </Card>
 
                         <Grid container spacing={{ xs: 2, sm: 2.5, md: 3 }}>
+                            {loading && (
+                                <Grid size={{ xs: 12 }}>
+                                    <Card sx={{ borderRadius: 3, p: { xs: 3, md: 4 }, textAlign: "center", backgroundColor: "#121212", border: "1px solid rgba(250, 204, 21, 0.35)" }}>
+                                        <Stack direction="row" spacing={1.5} alignItems="center" justifyContent="center">
+                                            <CircularProgress size={22} sx={{ color: accentYellow }} />
+                                            <Typography variant="body1" sx={{ color: "#fff" }}>
+                                                Loading accommodations...
+                                            </Typography>
+                                        </Stack>
+                                    </Card>
+                                </Grid>
+                            )}
+
+                            {!loading && error && (
+                                <Grid size={{ xs: 12 }}>
+                                    <Alert severity="error" sx={{ borderRadius: 2 }}>
+                                        {error}
+                                    </Alert>
+                                </Grid>
+                            )}
+
                             {filteredAccommodations.map((item) => (
                                 <Grid size={{ xs: 12, sm: 6, xl: 4 }} key={item.id}>
                                     <Card
@@ -223,7 +279,7 @@ export default function Accommodation() {
                             ))}
                         </Grid>
 
-                        {filteredAccommodations.length === 0 && (
+                        {!loading && filteredAccommodations.length === 0 && (
                             <Card sx={{ borderRadius: 3, p: { xs: 3, md: 4 }, textAlign: "center", backgroundColor: "#121212", border: "1px solid rgba(250, 204, 21, 0.35)" }}>
                                 <Typography variant="h6" sx={{ fontWeight: 700, color: "#fff" }}>
                                     No places found
