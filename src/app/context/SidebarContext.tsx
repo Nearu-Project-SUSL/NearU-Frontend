@@ -4,19 +4,27 @@ interface SidebarContextType {
   isExpanded: boolean;
   setIsExpanded: (expanded: boolean) => void;
   toggleSidebar: () => void;
+  isMobileOpen: boolean;
+  setIsMobileOpen: (open: boolean) => void;
+  toggleMobileSidebar: () => void;
 }
 
 const SidebarContext = createContext<SidebarContextType | undefined>(undefined);
 
 export function SidebarProvider({ children }: { children: ReactNode }) {
   const [isExpanded, setIsExpanded] = useState(false);
+  const [isMobileOpen, setIsMobileOpen] = useState(false);
 
   const toggleSidebar = () => {
     setIsExpanded(!isExpanded);
   };
 
+  const toggleMobileSidebar = () => {
+    setIsMobileOpen(!isMobileOpen);
+  };
+
   return (
-    <SidebarContext.Provider value={{ isExpanded, setIsExpanded, toggleSidebar }}>
+    <SidebarContext.Provider value={{ isExpanded, setIsExpanded, toggleSidebar, isMobileOpen, setIsMobileOpen, toggleMobileSidebar }}>
       {children}
     </SidebarContext.Provider>
   );

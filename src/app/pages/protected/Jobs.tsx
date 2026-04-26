@@ -29,7 +29,9 @@ import {
   TextField,
   InputAdornment,
   Skeleton,
-  Pagination
+  Pagination,
+  useTheme,
+  useMediaQuery
 } from '@mui/material';
 
 import {
@@ -248,6 +250,8 @@ export default function Jobs() {
   const [selectedJob, setSelectedJob] = useState<JobResponse | null>(null);
   const [isDetailsOpen, setIsDetailsOpen] = useState(false);
   const [visible, setVisible] = useState(false);
+  const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down('md'));
 
   // Pagination — drives the server-side fetch
   const [currentPage, setCurrentPage] = useState(1);
@@ -441,7 +445,7 @@ export default function Jobs() {
                             <Typography variant="caption" sx={{ color: 'rgba(255,255,255,0.4)' }}>Recently added opportunities for you</Typography>
                           </Box>
                         </Box>
-                        <Box sx={{ display: 'flex', gap: 1.5 }}>
+                        <Box sx={{ display: { xs: 'none', md: 'flex' }, gap: 1.5 }}>
                           <IconButton onClick={() => scrollNewJobs('left')} sx={{ bgcolor: 'rgba(255,255,255,0.03)', color: '#fff', border: '1px solid rgba(255,255,255,0.08)', '&:hover': { bgcolor: 'rgba(250,204,21,0.15)', borderColor: '#facc15' } }}>
                             <ChevronLeftIcon />
                           </IconButton>
@@ -455,21 +459,22 @@ export default function Jobs() {
                         ref={newJobsRef}
                         sx={{ 
                           display: 'flex', 
+                          flexDirection: { xs: 'column', md: 'row' },
                           gap: 3, 
-                          overflowX: 'auto', 
+                          overflowX: { xs: 'visible', md: 'auto' }, 
                           pb: 4, 
                           px: 1, 
                           mx: -1,
                           scrollbarWidth: 'none', 
                           '&::-webkit-scrollbar': { display: 'none' },
                           scrollBehavior: 'smooth',
-                          scrollSnapType: 'x mandatory',
-                          '& > *': { scrollSnapAlign: 'start' }
+                          scrollSnapType: { xs: 'none', md: 'x mandatory' },
+                          '& > *': { scrollSnapAlign: { xs: 'none', md: 'start' } }
                         }}
                       >
                         {loading 
-                          ? [1, 2, 3, 4].map((i) => <Box key={i} sx={{ minWidth: { xs: '100%', sm: 340 }, maxWidth: { sm: 380 } }}><JobSkeleton index={i} /></Box>)
-                          : newJobs.map((job, i) => <JobCard key={job.id} job={job} index={i} onClick={handleJobClick} />)
+                          ? (isMobile ? [1, 2] : [1, 2, 3, 4]).map((i) => <Box key={i} sx={{ width: { xs: '100%', md: 'auto' }, minWidth: { xs: '100%', sm: 340 }, maxWidth: { sm: 380 } }}><JobSkeleton index={i} /></Box>)
+                          : (isMobile ? newJobs.slice(0, 3) : newJobs).map((job, i) => <Box key={job.id} sx={{ width: { xs: '100%', md: 'auto' } }}><JobCard job={job} index={i} onClick={handleJobClick} /></Box>)
                         }
                       </Box>
                     </Box>

@@ -14,6 +14,8 @@ import {
   Grow,
   IconButton,
   Button,
+  useTheme,
+  useMediaQuery,
 } from '@mui/material';
 
 import {
@@ -343,6 +345,8 @@ function TestimonialCard({ t, index }: { t: typeof testimonials[0], index: numbe
 export default function Home() {
   const { auth } = useAuth();
   const [visible, setVisible] = useState(false);
+  const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down('md'));
 
   const { scrollRef: servicesRef, scroll: scrollServices } = useHorizontalScroll();
   const { scrollRef: dealsRef, scroll: scrollDeals } = useHorizontalScroll();
@@ -399,7 +403,7 @@ export default function Home() {
                       Explore Services
                     </Typography>
                   </Box>
-                  <Box sx={{ display: 'flex', gap: 1 }}>
+                  <Box sx={{ display: { xs: 'none', md: 'flex' }, gap: 1 }}>
                     <IconButton onClick={() => scrollServices('left')} sx={{ bgcolor: 'rgba(255,255,255,0.05)', color: '#fff', '&:hover': { bgcolor: 'rgba(250,204,21,0.2)' } }}>
                       <ChevronLeftIcon />
                     </IconButton>
@@ -413,20 +417,23 @@ export default function Home() {
                   ref={servicesRef}
                   sx={{ 
                     display: 'flex', 
+                    flexDirection: { xs: 'column', md: 'row' },
                     gap: 3, 
-                    overflowX: 'auto', 
+                    overflowX: { xs: 'visible', md: 'auto' }, 
                     pb: 4, 
                     px: 1, 
                     mx: -1,
                     scrollbarWidth: 'none', 
                     '&::-webkit-scrollbar': { display: 'none' },
                     scrollBehavior: 'smooth',
-                    scrollSnapType: 'x mandatory',
-                    '& > *': { scrollSnapAlign: 'start' }
+                    scrollSnapType: { xs: 'none', md: 'x mandatory' },
+                    '& > *': { scrollSnapAlign: { xs: 'none', md: 'start' } }
                   }}
                 >
-                  {services.map((service, i) => (
-                    <ServiceCard key={service.id} service={service} index={i} />
+                  {(isMobile ? services.slice(0, 3) : services).map((service, i) => (
+                    <Box key={service.id} sx={{ width: { xs: '100%', md: 'auto' } }}>
+                      <ServiceCard service={service} index={i} />
+                    </Box>
                   ))}
                 </Box>
               </Box>
@@ -445,7 +452,7 @@ export default function Home() {
                       </Typography>
                     </Box>
                   </Box>
-                  <Box sx={{ display: 'flex', gap: 1 }}>
+                  <Box sx={{ display: { xs: 'none', md: 'flex' }, gap: 1 }}>
                     <IconButton onClick={() => scrollDeals('left')} sx={{ bgcolor: 'rgba(255,255,255,0.05)', color: '#fff', '&:hover': { bgcolor: 'rgba(250,204,21,0.2)' } }}>
                       <ChevronLeftIcon />
                     </IconButton>
@@ -459,20 +466,23 @@ export default function Home() {
                   ref={dealsRef}
                   sx={{ 
                     display: 'flex', 
+                    flexDirection: { xs: 'column', md: 'row' },
                     gap: 3, 
-                    overflowX: 'auto', 
+                    overflowX: { xs: 'visible', md: 'auto' }, 
                     pb: 4, 
                     px: 1, 
                     mx: -1,
                     scrollbarWidth: 'none', 
                     '&::-webkit-scrollbar': { display: 'none' },
                     scrollBehavior: 'smooth',
-                    scrollSnapType: 'x mandatory',
-                    '& > *': { scrollSnapAlign: 'start' }
+                    scrollSnapType: { xs: 'none', md: 'x mandatory' },
+                    '& > *': { scrollSnapAlign: { xs: 'none', md: 'start' } }
                   }}
                 >
-                  {hotDeals.map((deal, i) => (
-                    <DealCard key={deal.id} deal={deal} index={i} />
+                  {(isMobile ? hotDeals.slice(0, 2) : hotDeals).map((deal, i) => (
+                    <Box key={deal.id} sx={{ width: { xs: '100%', md: 'auto' } }}>
+                      <DealCard deal={deal} index={i} />
+                    </Box>
                   ))}
                 </Box>
               </Box>
@@ -491,7 +501,7 @@ export default function Home() {
                       </Typography>
                     </Box>
                   </Box>
-                   <Box sx={{ display: 'flex', gap: 1 }}>
+                   <Box sx={{ display: { xs: 'none', md: 'flex' }, gap: 1 }}>
                     <IconButton onClick={() => scrollTest('left')} sx={{ bgcolor: 'rgba(255,255,255,0.05)', color: '#fff', '&:hover': { bgcolor: 'rgba(250,204,21,0.2)' } }}>
                       <ChevronLeftIcon />
                     </IconButton>
@@ -505,20 +515,23 @@ export default function Home() {
                   ref={testRef}
                   sx={{ 
                     display: 'flex', 
+                    flexDirection: { xs: 'column', md: 'row' },
                     gap: 3, 
-                    overflowX: 'auto', 
+                    overflowX: { xs: 'visible', md: 'auto' }, 
                     pb: 2, 
                     px: 1, 
                     mx: -1,
                     scrollbarWidth: 'none', 
                     '&::-webkit-scrollbar': { display: 'none' },
                     scrollBehavior: 'smooth',
-                    scrollSnapType: 'x mandatory',
-                    '& > *': { scrollSnapAlign: 'start' }
+                    scrollSnapType: { xs: 'none', md: 'x mandatory' },
+                    '& > *': { scrollSnapAlign: { xs: 'none', md: 'start' } }
                   }}
                 >
-                  {testimonials.map((t, i) => (
-                    <TestimonialCard key={t.id} t={t} index={i} />
+                  {(isMobile ? testimonials.slice(0, 2) : testimonials).map((t, i) => (
+                    <Box key={t.id} sx={{ width: { xs: '100%', md: 'auto' } }}>
+                      <TestimonialCard t={t} index={i} />
+                    </Box>
                   ))}
                 </Box>
                 

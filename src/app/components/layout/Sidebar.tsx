@@ -41,7 +41,7 @@ const COLLAPSED_WIDTH = 68;
 export { DRAWER_WIDTH, COLLAPSED_WIDTH };
 
 export function Sidebar({ activeSection }: SidebarProps) {
-  const { isExpanded, toggleSidebar } = useSidebar();
+  const { isExpanded, toggleSidebar, isMobileOpen, toggleMobileSidebar } = useSidebar();
   const navigate = useNavigate();
 
   const navItems = [
@@ -55,32 +55,8 @@ export function Sidebar({ activeSection }: SidebarProps) {
     { icon: OffersIcon,        label: 'Deals and Offers', id: 'offers',        path: '/deals' },
   ];
 
-  return (
-    <Box
-      component="nav"
-      sx={{
-        width: isExpanded ? DRAWER_WIDTH : COLLAPSED_WIDTH,
-        flexShrink: 0,
-        transition: 'width 0.28s cubic-bezier(0.4, 0, 0.2, 1)',
-        overflow: 'hidden',
-      }}
-    >
-      <Drawer
-        variant="permanent"
-        sx={{
-          '& .MuiDrawer-paper': {
-            width: isExpanded ? DRAWER_WIDTH : COLLAPSED_WIDTH,
-            boxSizing: 'border-box',
-            bgcolor: '#0c0c0c',
-            borderRight: '1px solid rgba(250, 204, 21, 0.1)',
-            transition: 'width 0.28s cubic-bezier(0.4, 0, 0.2, 1)',
-            overflowX: 'hidden',
-            overflowY: 'auto',
-            scrollbarWidth: 'none',
-            '&::-webkit-scrollbar': { display: 'none' },
-          },
-        }}
-      >
+  const drawerContent = (
+    <>
         {/* Header */}
         <Box
           sx={{
@@ -110,6 +86,7 @@ export function Sidebar({ activeSection }: SidebarProps) {
             onClick={toggleSidebar}
             size="small"
             sx={{
+              display: { xs: 'none', md: 'inline-flex' },
               color: 'rgba(250, 204, 21, 0.6)',
               bgcolor: 'rgba(250, 204, 21, 0.07)',
               borderRadius: '9px',
@@ -121,6 +98,23 @@ export function Sidebar({ activeSection }: SidebarProps) {
           >
             {isExpanded ? <CloseIcon sx={{ fontSize: 16 }} /> : <MenuIcon sx={{ fontSize: 18 }} />}
           </IconButton>
+          {/* Mobile close button inside the sliding drawer */}
+          <IconButton
+            onClick={toggleMobileSidebar}
+            size="small"
+            sx={{
+              display: { xs: 'inline-flex', md: 'none' },
+              color: 'rgba(250, 204, 21, 0.6)',
+              bgcolor: 'rgba(250, 204, 21, 0.07)',
+              borderRadius: '9px',
+              width: 34, height: 34,
+              '&:hover': { bgcolor: 'rgba(250, 204, 21, 0.14)', color: '#facc15' },
+              transition: 'all 0.2s ease',
+              flexShrink: 0,
+            }}
+          >
+            <CloseIcon sx={{ fontSize: 16 }} />
+          </IconButton>
         </Box>
 
         {/* Nav Items */}
@@ -131,7 +125,10 @@ export function Sidebar({ activeSection }: SidebarProps) {
               <ListItem key={item.id} disablePadding sx={{ display: 'block', mb: 0.5 }}>
                 <Tooltip title={!isExpanded ? item.label : ''} placement="right" arrow>
                   <ListItemButton
-                    onClick={() => navigate(item.path)}
+                    onClick={() => {
+                        navigate(item.path);
+                        if (isMobileOpen) toggleMobileSidebar();
+                    }}
                     sx={{
                       minHeight: 44,
                       justifyContent: isExpanded ? 'flex-start' : 'center',
@@ -183,6 +180,7 @@ export function Sidebar({ activeSection }: SidebarProps) {
           <ListItemButton
             component={Link}
             to="/profile"
+            onClick={() => { if (isMobileOpen) toggleMobileSidebar(); }}
             sx={{
               p: 1.25,
               borderRadius: '11px',
@@ -214,6 +212,63 @@ export function Sidebar({ activeSection }: SidebarProps) {
             </Box>
           </ListItemButton>
         </Box>
+    </>
+  );
+
+  return (
+    <Box
+      component="nav"
+      sx={{
+        width: { md: isExpanded ? DRAWER_WIDTH : COLLAPSED_WIDTH },
+        flexShrink: { md: 0 },
+        transition: 'width 0.28s cubic-bezier(0.4, 0, 0.2, 1)',
+        overflow: 'hidden',
+      }}
+    >
+      {/* Mobile Drawer */}
+      <Drawer
+        variant="temporary"
+        open={isMobileOpen}
+        onClose={toggleMobileSidebar}
+        ModalProps={{
+          keepMounted: true, // Better open performance on mobile.
+        }}
+        sx={{
+          display: { xs: 'block', md: 'none' },
+          '& .MuiDrawer-paper': {
+            width: DRAWER_WIDTH,
+            boxSizing: 'border-box',
+            bgcolor: '#0c0c0c',
+            borderRight: '1px solid rgba(250, 204, 21, 0.1)',
+            overflowX: 'hidden',
+            overflowY: 'auto',
+            scrollbarWidth: 'none',
+            '&::-webkit-scrollbar': { display: 'none' },
+          },
+        }}
+      >
+        {drawerContent}
+      </Drawer>
+
+      {/* Desktop Drawer */}
+      <Drawer
+        variant="permanent"
+        sx={{
+          display: { xs: 'none', md: 'block' },
+          '& .MuiDrawer-paper': {
+            width: isExpanded ? DRAWER_WIDTH : COLLAPSED_WIDTH,
+            boxSizing: 'border-box',
+            bgcolor: '#0c0c0c',
+            borderRight: '1px solid rgba(250, 204, 21, 0.1)',
+            transition: 'width 0.28s cubic-bezier(0.4, 0, 0.2, 1)',
+            overflowX: 'hidden',
+            overflowY: 'auto',
+            scrollbarWidth: 'none',
+            '&::-webkit-scrollbar': { display: 'none' },
+          },
+        }}
+      >
+        {drawerContent}
       </Drawer>
     </Box>
   );
