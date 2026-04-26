@@ -6,6 +6,7 @@ import { useAllJobs, useDeleteJob } from '../../hooks/useJobs';
 import { useNavigate } from 'react-router';
 import { toast } from 'sonner';
 import { formatDistanceToNow } from 'date-fns';
+import useAuth from '../../hooks/useAuth';
 
 import {
   Box,
@@ -92,7 +93,8 @@ export default function MyJobs() {
   const { data: allJobs = [], isLoading: loading, isError, error } = useAllJobs();
   const deleteJobMutation = useDeleteJob();
   
-  const userId = localStorage.getItem('userId');
+  const { auth } = useAuth();
+  const userId = auth?.user?.id;
   const myJobs = allJobs.filter(job => job.postedBy.userId === userId);
 
   useEffect(() => {

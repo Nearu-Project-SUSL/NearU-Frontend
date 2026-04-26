@@ -7,6 +7,7 @@ import { useAllJobs, useDeleteJob } from '../../hooks/useJobs';
 import { toast } from 'sonner';
 import { formatDistanceToNow } from 'date-fns';
 import CircularProgress from '@mui/material/CircularProgress';
+import useAuth from '../../hooks/useAuth';
 
 import {
   Box,
@@ -254,7 +255,8 @@ export default function Jobs() {
   // React Query — fetches only the current page from the backend
   const { data: pagedData, isLoading: loading, isFetching, isError, error } = useAllJobs(currentPage, JOBS_PER_PAGE);
   const deleteJobMutation = useDeleteJob();
-  const userId = localStorage.getItem('userId');
+  const { auth } = useAuth();
+  const userId = auth?.user?.id;
 
   // Unpack server response
   const jobs: JobResponse[] = pagedData?.items ?? [];
