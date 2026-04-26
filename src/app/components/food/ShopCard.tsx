@@ -33,8 +33,7 @@ export default function ShopCard({shop}: ShopCardProps) {
     onMouseEnter={() => setHovered(true)}
     onMouseLeave={() => setHovered(false)}
     sx={{
-      minWidth: { xs: '100%', sm: 320 },
-      maxWidth: { sm: 360 },
+      width:'100%',
       bgcolor: 'rgba(255,255,255,0.02)',
       overflow: 'hidden',
       borderRadius:"24px",
@@ -59,7 +58,7 @@ export default function ShopCard({shop}: ShopCardProps) {
         onClick={() => navigate(`/food/${shop.id}`)}
         sx={{display:'flex', flexDirection:'column', alignItems:'stretch'}}>
 
-          <Box sx={{position:'relative', height:180, overflow:'hidden'}}>
+          <Box sx={{position:'relative', height:{xs:160, sm:180}, overflow:'hidden'}}>
              <Box 
               component= "img"
               src={shop.photoUrl || "https://placehold.co/400x300/1a1a1a/FFFFFF?text=No+Image"}
