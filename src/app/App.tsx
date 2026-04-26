@@ -7,6 +7,7 @@ import { AuthProvider } from './context/AuthContext';
 import { Toaster } from 'sonner';
 import { ThemeProvider, createTheme } from '@mui/material/styles';
 import CssBaseline from '@mui/material/CssBaseline';
+import { Analytics } from '@vercel/analytics/react';
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -78,6 +79,7 @@ export default function App() {
         </ThemeProvider>
       </AuthProvider>
       <ReactQueryDevtools initialIsOpen={false} />
+      <Analytics />
     </QueryClientProvider>
   );
 }
