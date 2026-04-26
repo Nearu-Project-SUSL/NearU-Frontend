@@ -1,4 +1,5 @@
-import { Link } from 'react-router';
+
+import { Link, useNavigate } from 'react-router';
 import useAuth from '../../hooks/useAuth';
 import { useSidebar } from '../../context/SidebarContext';
 
@@ -7,98 +8,81 @@ import {
   AppBar,
   Toolbar,
   IconButton,
-  Typography,
   Badge,
   Box,
   Avatar,
   Tooltip,
+  Typography,
 } from '@mui/material';
 
 // MUI Icons
 import {
   Notifications as BellIcon,
-  School as GraduationCapIcon,
-  LocationOn as LocationIcon,
-  AutoAwesome as SparkleIcon,
   Person as UserIcon,
+  Work as WorkIcon,
 } from '@mui/icons-material';
-
-function getTimeGreeting(): string {
-  const hour = new Date().getHours();
-  if (hour < 12) return 'Good Morning';
-  if (hour < 17) return 'Good Afternoon';
-  return 'Good Evening';
-}
 
 export default function Navbar() {
   const { auth } = useAuth();
+  const navigate = useNavigate();
   const { isExpanded } = useSidebar();
-
-  const userName = auth?.user?.username || auth?.user?.email?.split('@')[0] || 'Student';
-  const greeting = getTimeGreeting();
 
   return (
     <AppBar
       position="sticky"
       sx={{
         width: '100%',
-        bgcolor: 'rgba(14, 14, 14, 0.85)',
+        bgcolor: 'rgba(18, 18, 18, 0.65)',
         backdropFilter: 'blur(20px)',
-        borderBottom: '1px solid rgba(250, 204, 21, 0.12)',
-        boxShadow: 'none',
+        WebkitBackdropFilter: 'blur(20px)',
+        borderBottom: '1px solid rgba(250, 204, 21, 0.15)',
+        boxShadow: '0 8px 32px rgba(0, 0, 0, 0.4)',
         zIndex: 10,
       }}
     >
-      <Toolbar sx={{ px: { xs: 2, sm: 3 }, minHeight: '68px !important', gap: 2 }}>
-        {/* Left: Avatar + Greeting */}
-        <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, flex: 1 }}>
-          {/* Logo icon */}
+      <Toolbar sx={{ px: { xs: 2, sm: 3 }, minHeight: '64px !important', gap: 2 }}>
+
+        {/* Left: Logo wordmark */}
+        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5, flexShrink: 0 }}>
           <Box
             sx={{
-              width: 48,
-              height: 48,
+              width: 34,
+              height: 34,
               bgcolor: '#facc15',
-              backgroundImage: 'linear-gradient(135deg, #fde68a 0%, #facc15 50%, #ca8a04 100%)',
-              borderRadius: '14px',
+              backgroundImage: 'linear-gradient(135deg, #fde68a 0%, #facc15 60%, #ca8a04 100%)',
+              borderRadius: '10px',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
-              boxShadow: '0 0 20px rgba(250, 204, 21, 0.35)',
+              boxShadow: '0 0 14px rgba(250, 204, 21, 0.3)',
               flexShrink: 0,
             }}
           >
-            <GraduationCapIcon sx={{ color: '#1a0a00', fontSize: 26 }} />
+            <WorkIcon sx={{ color: '#1a0a00', fontSize: 18 }} />
           </Box>
-
-          {/* Greeting text */}
-          <Box>
-            <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.75 }}>
-              <Typography
-                variant="h6"
-                sx={{ color: '#fff', fontWeight: 600, fontSize: '1.05rem', lineHeight: 1.2 }}
-              >
-                {greeting},{' '}
-                <Box component="span" sx={{ color: '#facc15', fontWeight: 700 }}>
-                  {userName}
-                </Box>
-              </Typography>
-              <SparkleIcon sx={{ color: '#facc15', fontSize: 18 }} />
-            </Box>
-            <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.4 }}>
-              <LocationIcon sx={{ color: 'rgba(255,255,255,0.35)', fontSize: 13 }} />
-              <Typography variant="caption" sx={{ color: 'rgba(255,255,255,0.4)', fontSize: '0.75rem' }}>
-                Sabaragamuwa University
-              </Typography>
-            </Box>
-          </Box>
+          <Typography
+            sx={{
+              color: '#facc15',
+              fontWeight: 800,
+              fontStyle: 'italic',
+              fontSize: '1.15rem',
+              letterSpacing: '-0.02em',
+              lineHeight: 1,
+              display: { xs: 'none', sm: 'block' },
+            }}
+          >
+            NearU
+          </Typography>
         </Box>
 
+        <Box sx={{ flex: 1 }} />
+
         {/* Right: Actions */}
-        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+        <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5, flexShrink: 0 }}>
           <Tooltip title="Notifications">
             <IconButton
               sx={{
-                color: 'rgba(255,255,255,0.55)',
+                color: 'rgba(255,255,255,0.5)',
                 borderRadius: '10px',
                 '&:hover': { color: '#facc15', bgcolor: 'rgba(250, 204, 21, 0.08)' },
               }}
@@ -116,7 +100,7 @@ export default function Navbar() {
                   },
                 }}
               >
-                <BellIcon sx={{ fontSize: 22 }} />
+                <BellIcon sx={{ fontSize: 21 }} />
               </Badge>
             </IconButton>
           </Tooltip>
@@ -125,22 +109,20 @@ export default function Navbar() {
             <IconButton
               component={Link}
               to="/profile"
-              sx={{
-                p: 0.5,
-                '&:hover': { opacity: 0.85 },
-              }}
+              sx={{ p: 0.5, ml: 0.5, '&:hover': { opacity: 0.85 } }}
             >
               <Avatar
                 sx={{
-                  width: 36,
-                  height: 36,
-                  bgcolor: '#facc15',
-                  color: '#000',
+                  width: 34,
+                  height: 34,
+                  bgcolor: 'rgba(250,204,21,0.15)',
+                  border: '1.5px solid rgba(250,204,21,0.35)',
+                  color: '#facc15',
                   fontWeight: 700,
-                  fontSize: '0.9rem',
+                  fontSize: '0.85rem',
                 }}
               >
-                <UserIcon fontSize="small" />
+                <UserIcon sx={{ fontSize: 18 }} />
               </Avatar>
             </IconButton>
           </Tooltip>

@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { Link as RouterLink, useParams } from "react-router";
+import Navbar from "../../components/layout/Navbar";
 import {
 	Alert,
 	Box,
@@ -34,7 +35,7 @@ import { accommodations as fallbackAccommodations, type Accommodation } from "..
 export default function AccommodationDetail() {
 	const { id } = useParams();
 	const [accommodation, setAccommodation] = useState<Accommodation | undefined>(undefined);
-	const [items, setItems] = useState<AccommodationItem[]>([]);
+	const [items, setItems] = useS
 	const [loading, setLoading] = useState(true);
 	const [error, setError] = useState("");
 	const accentYellow = "#facc15";
@@ -44,7 +45,7 @@ export default function AccommodationDetail() {
 		let isMounted = true;
 
 		const loadAccommodationData = async () => {
-			if (!id) {
+tate<AccommodationItem[]>([]);			if (!id) {
 				if (isMounted) {
 					setLoading(false);
 				}
@@ -108,15 +109,19 @@ export default function AccommodationDetail() {
 	}
 
 	if (!accommodation) {
-		return (
-			<Box
-				sx={{
-					minHeight: "100vh",
-					background: `radial-gradient(circle at top right, rgba(250, 204, 21, 0.14), transparent 45%), ${deepBlack}`,
-				}}
-			>
-				<Sidebar activeSection="accommodation" />
-				<PageLayout>
+	return (
+		<Box
+			sx={{
+				display: "flex",
+				height: "100vh",
+				overflow: "hidden",
+				background: `radial-gradient(circle at top right, rgba(250, 204, 21, 0.14), transparent 45%), ${deepBlack}`,
+			}}
+		>
+			<Sidebar activeSection="accommodation" />
+			<Box sx={{ flex: 1, display: "flex", flexDirection: "column", minWidth: 0, overflow: "hidden" }}>
+				<Navbar />
+				<Box sx={{ flex: 1, overflowY: "auto", overflowX: "hidden" }}>
 					<Container maxWidth="md" sx={{ py: 5 }}>
 						{error && (
 							<Alert severity="error" sx={{ mb: 2, borderRadius: 2 }}>
@@ -136,20 +141,25 @@ export default function AccommodationDetail() {
 							Back to Accommodation List
 						</Button>
 					</Container>
-				</PageLayout>
+				</Box>
 			</Box>
-		);
+		</Box>
+	);
 	}
 
 	return (
 		<Box
 			sx={{
-				minHeight: "100vh",
+				display: "flex",
+				height: "100vh",
+				overflow: "hidden",
 				background: `radial-gradient(circle at top right, rgba(250, 204, 21, 0.16), transparent 45%), ${deepBlack}`,
 			}}
 		>
 			<Sidebar activeSection="accommodation" />
-			<PageLayout>
+			<Box sx={{ flex: 1, display: "flex", flexDirection: "column", minWidth: 0, overflow: "hidden" }}>
+				<Navbar />
+				<Box sx={{ flex: 1, overflowY: "auto", overflowX: "hidden" }}>
 				<Container maxWidth="xl" sx={{ py: { xs: 2.5, sm: 3.5, md: 5 } }}>
 					<Stack spacing={{ xs: 2, sm: 2.5, md: 3 }}>
 						{error && (
@@ -306,7 +316,8 @@ export default function AccommodationDetail() {
 						</Grid>
 					</Stack>
 				</Container>
-			</PageLayout>
+				</Box>
+			</Box>
 		</Box>
 	);
 }
