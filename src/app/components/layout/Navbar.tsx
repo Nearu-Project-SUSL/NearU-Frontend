@@ -20,12 +20,13 @@ import {
   Notifications as BellIcon,
   Person as UserIcon,
   Work as WorkIcon,
+  Menu as MenuIcon,
 } from '@mui/icons-material';
 
 export default function Navbar() {
   const { auth } = useAuth();
   const navigate = useNavigate();
-  const { isExpanded } = useSidebar();
+  const { isExpanded, toggleMobileSidebar } = useSidebar();
 
   return (
     <AppBar
@@ -44,6 +45,19 @@ export default function Navbar() {
 
         {/* Left: Logo wordmark */}
         <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5, flexShrink: 0 }}>
+          {/* Hamburger Menu (Mobile Only) */}
+          <IconButton
+            onClick={toggleMobileSidebar}
+            edge="start"
+            sx={{
+              display: { xs: 'flex', md: 'none' },
+              color: 'rgba(255,255,255,0.7)',
+              mr: 1,
+            }}
+          >
+            <MenuIcon />
+          </IconButton>
+          
           <Box
             sx={{
               width: 34,

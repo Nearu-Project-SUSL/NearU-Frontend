@@ -41,7 +41,7 @@ export const router = createBrowserRouter([
   // Public Routes - Accessible to anyone
   {
     path: "/",
-    Component: LoadingScreen,
+    element: <LoadingScreen isSplashScreen={true} />,
   },
   {
     path: "/register",
