@@ -1,11 +1,13 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router';
 
-export default function LoadingScreen() {
+export default function LoadingScreen({ isSplashScreen = false }: { isSplashScreen?: boolean }) {
   const navigate = useNavigate();
   const [progress, setProgress] = useState(0);
 
   useEffect(() => {
+    if (!isSplashScreen) return;
+
     // Simulate loading progress
     const interval = setInterval(() => {
       setProgress((prev) => {
@@ -19,7 +21,7 @@ export default function LoadingScreen() {
     }, 30);
 
     return () => clearInterval(interval);
-  }, [navigate]);
+  }, [navigate, isSplashScreen]);
 
   return (
     <div className="min-h-screen w-full relative overflow-hidden bg-gradient-to-br from-black via-gray-900 to-black flex items-center justify-center">
@@ -68,14 +70,14 @@ export default function LoadingScreen() {
         <div className="w-80 space-y-3 animate-fadeIn" style={{ animationDelay: '0.6s' }}>
           <div className="relative h-2 bg-gray-800 rounded-full overflow-hidden">
             <div 
-              className="absolute inset-y-0 left-0 bg-gradient-to-r from-yellow-400 to-yellow-600 rounded-full transition-all duration-300 ease-out"
-              style={{ width: `${progress}%` }}
+              className={`absolute inset-y-0 left-0 bg-gradient-to-r from-yellow-400 to-yellow-600 rounded-full transition-all duration-300 ease-out ${!isSplashScreen ? 'animate-pulse w-full' : ''}`}
+              style={isSplashScreen ? { width: `${progress}%` } : {}}
             >
               <div className="absolute inset-0 bg-white/30 animate-pulse"></div>
             </div>
           </div>
           <p className="text-center text-yellow-400/60 text-sm">
-            Loading {progress}%
+            {isSplashScreen ? `Loading ${progress}%` : 'Loading...'}
           </p>
         </div>
 
