@@ -14,6 +14,8 @@ import {
   Grow,
   IconButton,
   Button,
+  useTheme,
+  useMediaQuery,
 } from '@mui/material';
 
 import {
@@ -343,6 +345,9 @@ function TestimonialCard({ t, index }: { t: typeof testimonials[0], index: numbe
 export default function Home() {
   const { auth } = useAuth();
   const [visible, setVisible] = useState(false);
+  const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down('md'));
+  const [showAllServices, setShowAllServices] = useState(false);
 
   const { scrollRef: servicesRef, scroll: scrollServices } = useHorizontalScroll();
   const { scrollRef: dealsRef, scroll: scrollDeals } = useHorizontalScroll();
@@ -399,7 +404,7 @@ export default function Home() {
                       Explore Services
                     </Typography>
                   </Box>
-                  <Box sx={{ display: 'flex', gap: 1 }}>
+                  <Box sx={{ display: { xs: 'none', md: 'flex' }, gap: 1 }}>
                     <IconButton onClick={() => scrollServices('left')} sx={{ bgcolor: 'rgba(255,255,255,0.05)', color: '#fff', '&:hover': { bgcolor: 'rgba(250,204,21,0.2)' } }}>
                       <ChevronLeftIcon />
                     </IconButton>
@@ -413,22 +418,46 @@ export default function Home() {
                   ref={servicesRef}
                   sx={{ 
                     display: 'flex', 
+                    flexDirection: { xs: 'column', md: 'row' },
                     gap: 3, 
-                    overflowX: 'auto', 
-                    pb: 4, 
+                    overflowX: { xs: 'visible', md: 'auto' }, 
+                    pb: { xs: 2, md: 4 }, 
                     px: 1, 
                     mx: -1,
                     scrollbarWidth: 'none', 
                     '&::-webkit-scrollbar': { display: 'none' },
                     scrollBehavior: 'smooth',
-                    scrollSnapType: 'x mandatory',
-                    '& > *': { scrollSnapAlign: 'start' }
+                    scrollSnapType: { xs: 'none', md: 'x mandatory' },
+                    '& > *': { scrollSnapAlign: { xs: 'none', md: 'start' } }
                   }}
                 >
-                  {services.map((service, i) => (
-                    <ServiceCard key={service.id} service={service} index={i} />
+                  {(isMobile && !showAllServices ? services.slice(0, 3) : services).map((service, i) => (
+                    <Box key={service.id} sx={{ width: { xs: '100%', md: 'auto' } }}>
+                      <ServiceCard service={service} index={i} />
+                    </Box>
                   ))}
                 </Box>
+                
+                {isMobile && services.length > 3 && (
+                  <Box sx={{ display: 'flex', justifyContent: 'center', mt: 1 }}>
+                    <Button 
+                      variant="outlined" 
+                      onClick={() => setShowAllServices(!showAllServices)}
+                      sx={{ 
+                        color: '#facc15', 
+                        borderColor: 'rgba(250, 204, 21, 0.4)', 
+                        borderRadius: '12px', 
+                        px: 4, 
+                        py: 1.2, 
+                        fontWeight: 700, 
+                        textTransform: 'none',
+                        '&:hover': { borderColor: '#facc15', bgcolor: 'rgba(250, 204, 21, 0.1)' } 
+                      }}
+                    >
+                      {showAllServices ? 'Show Less' : `View All Services (${services.length})`}
+                    </Button>
+                  </Box>
+                )}
               </Box>
 
               {/* ── Hot Deals & Offers (Carousel) ───────────────────────── */}
@@ -445,7 +474,7 @@ export default function Home() {
                       </Typography>
                     </Box>
                   </Box>
-                  <Box sx={{ display: 'flex', gap: 1 }}>
+                  <Box sx={{ display: { xs: 'none', md: 'flex' }, gap: 1 }}>
                     <IconButton onClick={() => scrollDeals('left')} sx={{ bgcolor: 'rgba(255,255,255,0.05)', color: '#fff', '&:hover': { bgcolor: 'rgba(250,204,21,0.2)' } }}>
                       <ChevronLeftIcon />
                     </IconButton>
@@ -459,20 +488,23 @@ export default function Home() {
                   ref={dealsRef}
                   sx={{ 
                     display: 'flex', 
+                    flexDirection: { xs: 'column', md: 'row' },
                     gap: 3, 
-                    overflowX: 'auto', 
+                    overflowX: { xs: 'visible', md: 'auto' }, 
                     pb: 4, 
                     px: 1, 
                     mx: -1,
                     scrollbarWidth: 'none', 
                     '&::-webkit-scrollbar': { display: 'none' },
                     scrollBehavior: 'smooth',
-                    scrollSnapType: 'x mandatory',
-                    '& > *': { scrollSnapAlign: 'start' }
+                    scrollSnapType: { xs: 'none', md: 'x mandatory' },
+                    '& > *': { scrollSnapAlign: { xs: 'none', md: 'start' } }
                   }}
                 >
                   {hotDeals.map((deal, i) => (
-                    <DealCard key={deal.id} deal={deal} index={i} />
+                    <Box key={deal.id} sx={{ width: { xs: '100%', md: 'auto' } }}>
+                      <DealCard deal={deal} index={i} />
+                    </Box>
                   ))}
                 </Box>
               </Box>
@@ -491,7 +523,7 @@ export default function Home() {
                       </Typography>
                     </Box>
                   </Box>
-                   <Box sx={{ display: 'flex', gap: 1 }}>
+                   <Box sx={{ display: { xs: 'none', md: 'flex' }, gap: 1 }}>
                     <IconButton onClick={() => scrollTest('left')} sx={{ bgcolor: 'rgba(255,255,255,0.05)', color: '#fff', '&:hover': { bgcolor: 'rgba(250,204,21,0.2)' } }}>
                       <ChevronLeftIcon />
                     </IconButton>
@@ -505,20 +537,23 @@ export default function Home() {
                   ref={testRef}
                   sx={{ 
                     display: 'flex', 
+                    flexDirection: { xs: 'column', md: 'row' },
                     gap: 3, 
-                    overflowX: 'auto', 
+                    overflowX: { xs: 'visible', md: 'auto' }, 
                     pb: 2, 
                     px: 1, 
                     mx: -1,
                     scrollbarWidth: 'none', 
                     '&::-webkit-scrollbar': { display: 'none' },
                     scrollBehavior: 'smooth',
-                    scrollSnapType: 'x mandatory',
-                    '& > *': { scrollSnapAlign: 'start' }
+                    scrollSnapType: { xs: 'none', md: 'x mandatory' },
+                    '& > *': { scrollSnapAlign: { xs: 'none', md: 'start' } }
                   }}
                 >
                   {testimonials.map((t, i) => (
-                    <TestimonialCard key={t.id} t={t} index={i} />
+                    <Box key={t.id} sx={{ width: { xs: '100%', md: 'auto' } }}>
+                      <TestimonialCard t={t} index={i} />
+                    </Box>
                   ))}
                 </Box>
                 

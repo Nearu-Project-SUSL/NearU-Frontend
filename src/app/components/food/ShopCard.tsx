@@ -61,7 +61,7 @@ export default function ShopCard({shop}: ShopCardProps) {
           <Box sx={{position:'relative', height:{xs:160, sm:180}, overflow:'hidden'}}>
              <Box 
               component= "img"
-              src={shop.photoUrl || "https://via.placeholder.com/400x300?text=No+Image"}
+              src={shop.photoUrl || "https://placehold.co/400x300/1a1a1a/FFFFFF?text=No+Image"}
               alt={shop.name}
               sx={{
                 width:'100%',
