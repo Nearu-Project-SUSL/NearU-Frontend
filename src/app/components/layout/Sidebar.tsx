@@ -1,5 +1,6 @@
 import { Link, useNavigate } from 'react-router';
 import { useSidebar } from '../../context/SidebarContext';
+import useAuth from '../../hooks/useAuth';
 
 // MUI Components
 import {
@@ -43,6 +44,9 @@ export { DRAWER_WIDTH, COLLAPSED_WIDTH };
 export function Sidebar({ activeSection }: SidebarProps) {
   const { isExpanded, toggleSidebar, isMobileOpen, toggleMobileSidebar } = useSidebar();
   const navigate = useNavigate();
+  const { auth } = useAuth();
+  
+  const userName = auth?.user?.username || auth?.user?.email?.split('@')[0] || 'Student';
 
   const navItems = [
     { icon: HomeIcon,          label: 'Home',             id: 'home',          path: '/home' },
@@ -55,22 +59,22 @@ export function Sidebar({ activeSection }: SidebarProps) {
     { icon: OffersIcon,        label: 'Deals and Offers', id: 'offers',        path: '/deals' },
   ];
 
-  const drawerContent = (
+  const renderDrawerContent = (expanded: boolean) => (
     <>
         {/* Header */}
         <Box
           sx={{
             display: 'flex',
             alignItems: 'center',
-            justifyContent: isExpanded ? 'space-between' : 'center',
-            px: isExpanded ? 2.5 : 1,
+            justifyContent: expanded ? 'space-between' : 'center',
+            px: expanded ? 2.5 : 1,
             height: 70,
             borderBottom: '1px solid rgba(250, 204, 21, 0.08)',
             flexShrink: 0,
           }}
         >
-          {isExpanded && (
-            <Box sx={{ opacity: isExpanded ? 1 : 0, transition: 'opacity 0.2s ease' }}>
+          {expanded && (
+            <Box sx={{ opacity: expanded ? 1 : 0, transition: 'opacity 0.2s ease' }}>
               <Typography
                 variant="h6"
                 sx={{ color: '#facc15', fontWeight: 800, fontStyle: 'italic', lineHeight: 1.1, fontSize: '1.1rem' }}
@@ -123,7 +127,7 @@ export function Sidebar({ activeSection }: SidebarProps) {
             const isActive = activeSection === item.id;
             return (
               <ListItem key={item.id} disablePadding sx={{ display: 'block', mb: 0.5 }}>
-                <Tooltip title={!isExpanded ? item.label : ''} placement="right" arrow>
+                <Tooltip title={!expanded ? item.label : ''} placement="right" arrow>
                   <ListItemButton
                     onClick={() => {
                         navigate(item.path);
@@ -131,8 +135,8 @@ export function Sidebar({ activeSection }: SidebarProps) {
                     }}
                     sx={{
                       minHeight: 44,
-                      justifyContent: isExpanded ? 'flex-start' : 'center',
-                      px: isExpanded ? 1.75 : 1.25,
+                      justifyContent: expanded ? 'flex-start' : 'center',
+                      px: expanded ? 1.75 : 1.25,
                       borderRadius: '11px',
                       bgcolor: isActive ? 'rgba(250, 204, 21, 0.13)' : 'transparent',
                       color: isActive ? '#facc15' : 'rgba(255,255,255,0.4)',
@@ -147,7 +151,7 @@ export function Sidebar({ activeSection }: SidebarProps) {
                     <ListItemIcon
                       sx={{
                         minWidth: 0,
-                        mr: isExpanded ? 1.5 : 'auto',
+                        mr: expanded ? 1.5 : 'auto',
                         color: 'inherit',
                         transition: 'margin 0.28s ease',
                       }}
@@ -157,8 +161,8 @@ export function Sidebar({ activeSection }: SidebarProps) {
                     <ListItemText
                       primary={item.label}
                       sx={{
-                        opacity: isExpanded ? 1 : 0,
-                        width: isExpanded ? 'auto' : 0,
+                        opacity: expanded ? 1 : 0,
+                        width: expanded ? 'auto' : 0,
                         overflow: 'hidden',
                         whiteSpace: 'nowrap',
                         transition: 'opacity 0.2s ease, width 0.28s ease',
@@ -186,25 +190,25 @@ export function Sidebar({ activeSection }: SidebarProps) {
               borderRadius: '11px',
               border: '1px solid rgba(250, 204, 21, 0.12)',
               bgcolor: 'rgba(250, 204, 21, 0.04)',
-              justifyContent: isExpanded ? 'flex-start' : 'center',
+              justifyContent: expanded ? 'flex-start' : 'center',
               '&:hover': { bgcolor: 'rgba(250, 204, 21, 0.09)', borderColor: 'rgba(250, 204, 21, 0.25)' },
               transition: 'all 0.18s ease',
             }}
           >
-            <Avatar sx={{ width: 32, height: 32, bgcolor: '#facc15', color: '#000', mr: isExpanded ? 1.25 : 0, transition: 'margin 0.28s ease', flexShrink: 0 }}>
+            <Avatar sx={{ width: 32, height: 32, bgcolor: '#facc15', color: '#000', mr: expanded ? 1.25 : 0, transition: 'margin 0.28s ease', flexShrink: 0 }}>
               <UserIcon sx={{ fontSize: 17 }} />
             </Avatar>
             <Box
               sx={{
-                opacity: isExpanded ? 1 : 0,
-                width: isExpanded ? 'auto' : 0,
+                opacity: expanded ? 1 : 0,
+                width: expanded ? 'auto' : 0,
                 overflow: 'hidden',
                 whiteSpace: 'nowrap',
                 transition: 'opacity 0.2s ease, width 0.28s ease',
               }}
             >
               <Typography variant="body2" sx={{ fontWeight: 700, color: '#fff', fontSize: '0.82rem' }}>
-                Student Name
+                {userName}
               </Typography>
               <Typography variant="caption" sx={{ color: 'rgba(250, 204, 21, 0.5)', fontSize: '0.68rem' }}>
                 View Profile
@@ -247,7 +251,7 @@ export function Sidebar({ activeSection }: SidebarProps) {
           },
         }}
       >
-        {drawerContent}
+        {renderDrawerContent(true)}
       </Drawer>
 
       {/* Desktop Drawer */}
@@ -268,7 +272,7 @@ export function Sidebar({ activeSection }: SidebarProps) {
           },
         }}
       >
-        {drawerContent}
+        {renderDrawerContent(isExpanded)}
       </Drawer>
     </Box>
   );
