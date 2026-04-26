@@ -347,6 +347,7 @@ export default function Home() {
   const [visible, setVisible] = useState(false);
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('md'));
+  const [showAllServices, setShowAllServices] = useState(false);
 
   const { scrollRef: servicesRef, scroll: scrollServices } = useHorizontalScroll();
   const { scrollRef: dealsRef, scroll: scrollDeals } = useHorizontalScroll();
@@ -420,7 +421,7 @@ export default function Home() {
                     flexDirection: { xs: 'column', md: 'row' },
                     gap: 3, 
                     overflowX: { xs: 'visible', md: 'auto' }, 
-                    pb: 4, 
+                    pb: { xs: 2, md: 4 }, 
                     px: 1, 
                     mx: -1,
                     scrollbarWidth: 'none', 
@@ -430,12 +431,33 @@ export default function Home() {
                     '& > *': { scrollSnapAlign: { xs: 'none', md: 'start' } }
                   }}
                 >
-                  {(isMobile ? services.slice(0, 3) : services).map((service, i) => (
+                  {(isMobile && !showAllServices ? services.slice(0, 3) : services).map((service, i) => (
                     <Box key={service.id} sx={{ width: { xs: '100%', md: 'auto' } }}>
                       <ServiceCard service={service} index={i} />
                     </Box>
                   ))}
                 </Box>
+                
+                {isMobile && services.length > 3 && (
+                  <Box sx={{ display: 'flex', justifyContent: 'center', mt: 1 }}>
+                    <Button 
+                      variant="outlined" 
+                      onClick={() => setShowAllServices(!showAllServices)}
+                      sx={{ 
+                        color: '#facc15', 
+                        borderColor: 'rgba(250, 204, 21, 0.4)', 
+                        borderRadius: '12px', 
+                        px: 4, 
+                        py: 1.2, 
+                        fontWeight: 700, 
+                        textTransform: 'none',
+                        '&:hover': { borderColor: '#facc15', bgcolor: 'rgba(250, 204, 21, 0.1)' } 
+                      }}
+                    >
+                      {showAllServices ? 'Show Less' : `View All Services (${services.length})`}
+                    </Button>
+                  </Box>
+                )}
               </Box>
 
               {/* ── Hot Deals & Offers (Carousel) ───────────────────────── */}
@@ -479,7 +501,7 @@ export default function Home() {
                     '& > *': { scrollSnapAlign: { xs: 'none', md: 'start' } }
                   }}
                 >
-                  {(isMobile ? hotDeals.slice(0, 2) : hotDeals).map((deal, i) => (
+                  {hotDeals.map((deal, i) => (
                     <Box key={deal.id} sx={{ width: { xs: '100%', md: 'auto' } }}>
                       <DealCard deal={deal} index={i} />
                     </Box>
@@ -528,7 +550,7 @@ export default function Home() {
                     '& > *': { scrollSnapAlign: { xs: 'none', md: 'start' } }
                   }}
                 >
-                  {(isMobile ? testimonials.slice(0, 2) : testimonials).map((t, i) => (
+                  {testimonials.map((t, i) => (
                     <Box key={t.id} sx={{ width: { xs: '100%', md: 'auto' } }}>
                       <TestimonialCard t={t} index={i} />
                     </Box>
