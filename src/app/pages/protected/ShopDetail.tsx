@@ -100,7 +100,7 @@ export default function ShopDetailPage() {
     price: number;
     photo: File | null;
   }) => {
-    if(!id || itemToEdit) return;
+    if(!id || !itemToEdit) return;
 
     await updateMenuItem(id, itemToEdit.id, data);
 
