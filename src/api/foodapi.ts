@@ -135,3 +135,49 @@ export async function addMenuItem(
 
   return response.json();
 }
+
+export async function deleteMenuItem(
+  shopId: string,
+  itemId: string
+): Promise<void>{
+  const response = await fetch(
+    `${BASE_URL}/foodshops/${shopId}/menuItems/${itemId}`,
+    {method: "DELETE"}
+  );
+
+  if(!response.ok){
+    throw new Error(`Failed to delete menu item: ${response.statusText}`);
+  }
+}
+
+export async function updateMenuItem(
+  shopId: string,
+  itemId: string,
+  data: {
+    name?: string;
+    description?: string;
+    price?: number;
+    photo?: File | null;
+  }
+): Promise<MenuItemResponse> {
+  const formData = new FormData();
+
+  if (data.name) formData.append('name', data.name);
+  if (data.description !== undefined) formData.append('description', data.description);
+  if (data.price !== undefined) formData.append('price', String(data.price));
+  if (data.photo) formData.append('photo', data.photo);
+
+  const response = await fetch(
+    `${BASE_URL}/foodshops/${shopId}/menuItems/${itemId}`,
+    {
+      method: 'PUT',
+      body: formData
+    }
+  );
+
+  if (!response.ok) {
+    throw new Error(`Failed to update menu item: ${response.statusText}`);
+  }
+
+  return response.json();
+}

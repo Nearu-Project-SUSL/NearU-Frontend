@@ -81,7 +81,7 @@ export default function MenuItemCard({ item, onClick }: MenuItemCardProps) {
           <Box>
             <Typography
               variant="body1"
-              sx={{ color: '#fff', fontWeight: 700, mb: 0.5, fontSize: '0.95rem' }}
+              sx={{ color: '#fff', fontWeight: 700, mb: 0.5, fontSize: '1.25rem' }}
             >
               {item.name}
             </Typography>
