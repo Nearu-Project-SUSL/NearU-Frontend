@@ -296,6 +296,10 @@ export default function Accommodation() {
         formData.append("Address", data.location);
         formData.append("PhoneNumber", data.contactPhone);
         formData.append("Description", data.description || "");
+        formData.append("Type", data.type);
+        formData.append("DistanceKm", String(data.distanceKm ?? 0));
+        formData.append("MonthlyRent", String(data.monthlyRent ?? 0));
+        formData.append("AvailableBeds", String(data.availableBeds ?? 0));
         if (data.photo) {
             formData.append("Photo", data.photo);
         }

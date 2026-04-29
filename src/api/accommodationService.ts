@@ -46,6 +46,7 @@ function toAccommodationType(type: unknown): Accommodation["type"] {
 }
 
 function mapAccommodation(raw: Record<string, unknown>, index: number): Accommodation {
+    // Backend returns amenities as a List<string> array
     const amenitiesRaw = raw.amenities;
     const amenities = Array.isArray(amenitiesRaw)
         ? amenitiesRaw.map((item) => String(item)).filter((item) => item.length > 0)
@@ -53,6 +54,8 @@ function mapAccommodation(raw: Record<string, unknown>, index: number): Accommod
 
     const imagesRaw = raw.images;
     const imageFromArray = Array.isArray(imagesRaw) ? imagesRaw.find((img) => typeof img === "string") : undefined;
+
+    // Backend uses `address` for location
     const locationParts = [raw.location, raw.address, raw.city].filter((item) => typeof item === "string").map(String);
 
     return {
@@ -74,7 +77,8 @@ function mapAccommodation(raw: Record<string, unknown>, index: number): Accommod
         amenities,
         monthlyRent: Number(raw.monthlyRent ?? raw.rent ?? raw.price ?? 0),
         availableBeds: Number(raw.availableBeds ?? raw.bedsAvailable ?? 0),
-        contactPhone: String(raw.contactPhone ?? raw.phone ?? raw.ownerPhone ?? ""),
+        // Backend stores as phoneNumber (camelCase in JSON)
+        contactPhone: String(raw.phoneNumber ?? raw.contactPhone ?? raw.phone ?? raw.ownerPhone ?? ""),
     };
 }
 
