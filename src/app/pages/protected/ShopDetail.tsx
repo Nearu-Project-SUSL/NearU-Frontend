@@ -20,9 +20,12 @@ import {
 import { Sidebar } from '../../components/layout/Sidebar';
 import Navbar from '../../components/layout/Navbar';
 import { PageLayout } from '../../components/layout/PageLayout';
-import MenuItemCard from '../../components/food/MenuItemCard';
+import MenuItemCard, { MenuItem } from '../../components/food/MenuItemCard';
 import MenuItemDialog from '../../components/food/MenuItemDialog';
 import AddMenuItem,{AddMenuItemFormData} from '../../../app/components/food/AddMenuItem';
+import UpdateMenuItemDialog from '../../components/food/UpdateMenuItemDialog';
+import DeleteMenuItemDialog from '../../components/food/DeleteMenuItemDialog';
+import { deleteMenuItem, updateMenuItem } from '../../../api/foodapi';
 
 import { type MenuItemResponse } from '../../../api/foodapi';
 import { addMenuItem } from '../../../api/foodapi';
@@ -44,6 +47,9 @@ export default function ShopDetailPage() {
 
   const [selectedItem, setSelectedItem] = useState<MenuItemResponse | null>(null);
   const [openAddItem, setOpenAddItem] = useState(false);
+
+  const [itemToEdit, setItemToEdit] = useState<MenuItem | null>(null);
+  const [itemToDelete, setItemToDelete] = useState<MenuItem | null>(null);
 
   if (shopLoading || menuLoading) {
     return (
@@ -88,7 +94,34 @@ export default function ShopDetailPage() {
     setOpenAddItem(false);
   };
 
+  const handleUpdateMenuItem = async (data: {
+    name:string;
+    description: string;
+    price: number;
+    photo: File | null;
+  }) => {
+    if(!id || !itemToEdit) return;
 
+    await updateMenuItem(id, itemToEdit.id, data);
+
+    await queryClient.invalidateQueries({
+      queryKey:['menuitems', id]
+    });
+
+    setItemToEdit(null);
+  };
+
+  const handleDeleteMenuItem = async () => {
+    if (!id || !itemToDelete) return;
+
+    await deleteMenuItem(id, itemToDelete.id);
+
+    await queryClient.invalidateQueries({
+      queryKey:['menuitems', id]
+    });
+
+    setItemToDelete(null);
+  }
 
   return(
     <Box
@@ -248,11 +281,16 @@ export default function ShopDetailPage() {
                               <Grid size={{ xs: 12, sm: 6 }}>
                                 <MenuItemCard
                                   item={{
-                                    ...item,
+                                    id: item.id,
+                                    foodShopId: item.foodShopId,
+                                    name: item.name,
                                     description: item.description ?? '',
+                                    price: item.price,
                                     photoUrl: item.photoUrl ?? '',
                                   }}
                                   onClick={(menuItem) => setSelectedItem(item)}
+                                  onEdit={(menuItem) => setItemToEdit(menuItem)}
+                                  onDelete={(menuItem) => setItemToDelete(menuItem)}
                                 />
                               </Grid>
                             ))}
@@ -355,6 +393,18 @@ export default function ShopDetailPage() {
           open={openAddItem}
           onClose={() => setOpenAddItem(false)}
           onSubmit={handleAddMenuItem}
+        />
+
+        <UpdateMenuItemDialog
+          item={itemToEdit}
+          onClose={() => setItemToEdit(null)}
+          onSubmit={handleUpdateMenuItem}
+        />
+
+        <DeleteMenuItemDialog
+          item={itemToDelete}
+          onClose={() => setItemToDelete(null)}
+          onConfirm={handleDeleteMenuItem}
         />
       </Box>
   );

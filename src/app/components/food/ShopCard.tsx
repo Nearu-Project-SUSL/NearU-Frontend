@@ -138,7 +138,7 @@ export default function ShopCard({shop}: ShopCardProps) {
                             <Typography
                               variant='caption'
                               sx={{color:'#facc15', fontWeight:700, fontSize:'0.78rem'}}>
-                              View Menu
+                              Tap to View Menu
 
                             </Typography>
                       </Box>
