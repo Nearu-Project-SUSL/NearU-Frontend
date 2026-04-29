@@ -29,16 +29,25 @@ import useAuth from '../../hooks/useAuth';
 import Navbar from '../../components/layout/Navbar';
 import { useNavigate } from 'react-router';
 import { toast } from 'sonner';
+import authService from '../../../api/authService';
 
 export default function RiderProfile() {
   const { auth, setAuth } = useAuth();
   const navigate = useNavigate();
 
-  const handleLogout = () => {
-    setAuth({ user: null, accessToken: null, refreshToken: null });
-    localStorage.removeItem('accessToken');
-    toast.success('Logged out successfully');
-    navigate('/login');
+  const handleLogout = async () => {
+    try {
+      if (auth.refreshToken) {
+        await authService.logout(auth.refreshToken);
+      }
+    } catch (error) {
+      console.error('Logout failed on the backend:', error);
+    } finally {
+      setAuth({ user: null, accessToken: null, refreshToken: null });
+      localStorage.removeItem('accessToken');
+      toast.success('Logged out successfully');
+      navigate('/login');
+    }
   };
 
   return (
