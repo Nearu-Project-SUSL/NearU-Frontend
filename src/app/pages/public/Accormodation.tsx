@@ -1,5 +1,6 @@
-import { useEffect, useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 import { useNavigate } from "react-router";
+import { useQueryClient } from "@tanstack/react-query";
 import {
     Alert,
     Box,
@@ -10,7 +11,7 @@ import {
     CardMedia,
     Chip,
     CircularProgress,
-    Container,xttg
+    Container,
     Grid,
     InputAdornment,
     Stack,
@@ -21,51 +22,25 @@ import SearchIcon from "@mui/icons-material/Search";
 import PlaceIcon from "@mui/icons-material/Place";
 import StarIcon from "@mui/icons-material/Star";
 import HotelIcon from "@mui/icons-material/Hotel";
+import AddIcon from "@mui/icons-material/Add";
 import { Sidebar } from "../../components/layout/Sidebar";
 import { PageLayout } from "../../components/layout/PageLayout";
-import accommodationService from "../../../api/accommodationService";
-import type { Accommodation } from "../data/accommodations";
+import { useAccommodations } from "../../hooks/useAccommodation";
+import { createAccommodation } from "../../../api/accommodationService";
+import AddAccommodationDialog, { AddAccommodationFormData } from "../../components/accommodation/AddAccommodationDialog";
 
 const accommodationTypes = ["All", "Boarding", "Annex", "Apartment"] as const;
 
 export default function Accommodation() {
     const navigate = useNavigate();
+    const queryClient = useQueryClient();
     const [query, setQuery] = useState("");
     const [selectedType, setSelectedType] = useState<(typeof accommodationTypes)[number]>("All");
-    const [accommodations, setAccommodations] = useState<Accommodation[]>([]);
-    const [loading, setLoading] = useState(true);
-    const [error, setError] = useState("");
+    const [openAddDialog, setOpenAddDialog] = useState(false);
     const accentYellow = "#facc15";
     const deepBlack = "#0b0b0b";
 
-    useEffect(() => {
-        let isMounted = true;
-
-        const loadAccommodations = async () => {
-            try {
-                const rows = await accommodationService.fetchAccommodations();
-
-                if (isMounted) {
-                    setAccommodations(rows);
-                    setError("");
-                }
-            } catch {
-                if (isMounted) {
-                    setError("Unable to load accommodations right now. Please try again shortly.");
-                }
-            } finally {
-                if (isMounted) {
-                    setLoading(false);
-                }
-            }
-        };
-
-        loadAccommodations();
-
-        return () => {
-            isMounted = false;
-        };
-    }, []);
+    const { data: accommodations = [], isLoading: loading, error } = useAccommodations();
 
     const filteredAccommodations = useMemo(() => {
         return accommodations.filter((item) => {
@@ -79,7 +54,26 @@ export default function Accommodation() {
 
             return matchesType && matchesQuery;
         });
-    }, [query, selectedType]);
+    }, [accommodations, query, selectedType]);
+
+    const handleAddAccommodation = async (data: AddAccommodationFormData) => {
+        const formData = new FormData();
+        formData.append("title", data.title);
+        formData.append("type", data.type);
+        formData.append("location", data.location);
+        formData.append("distanceKm", String(data.distanceKm));
+        formData.append("monthlyRent", String(data.monthlyRent));
+        formData.append("availableBeds", String(data.availableBeds));
+        formData.append("contactPhone", data.contactPhone);
+        formData.append("description", data.description);
+        if (data.photo) {
+            formData.append("photo", data.photo);
+        }
+
+        await createAccommodation(formData);
+        await queryClient.invalidateQueries({ queryKey: ['accommodations'] });
+        setOpenAddDialog(false);
+    };
 
     return (
         <Box
@@ -92,20 +86,37 @@ export default function Accommodation() {
             <PageLayout>
                 <Container maxWidth="xl" sx={{ py: { xs: 2.5, sm: 3.5, md: 5 } }}>
                     <Stack spacing={{ xs: 2, sm: 2.5, md: 3 }}>
-                        <Box>
-                            <Typography
-                                variant="h4"
+                        <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", flexWrap: "wrap", gap: 2 }}>
+                            <Box>
+                                <Typography
+                                    variant="h4"
+                                    sx={{
+                                        fontWeight: 800,
+                                        color: "#ffffff",
+                                        fontSize: { xs: "1.65rem", sm: "2rem", md: "2.2rem" },
+                                    }}
+                                >
+                                    Student Accommodation
+                                </Typography>
+                                <Typography variant="body1" sx={{ mt: 1, color: "rgba(255,255,255,0.82)", maxWidth: 760 }}>
+                                    Verified places for students only. Browse by budget, location, and facilities.
+                                </Typography>
+                            </Box>
+                            <Button
+                                variant="contained"
+                                startIcon={<AddIcon />}
+                                onClick={() => setOpenAddDialog(true)}
                                 sx={{
+                                    backgroundColor: accentYellow,
+                                    color: deepBlack,
                                     fontWeight: 800,
-                                    color: "#ffffff",
-                                    fontSize: { xs: "1.65rem", sm: "2rem", md: "2.2rem" },
+                                    borderRadius: 2,
+                                    textTransform: "none",
+                                    "&:hover": { backgroundColor: "#eab308" },
                                 }}
                             >
-                                Student Accommodation
-                            </Typography>
-                            <Typography variant="body1" sx={{ mt: 1, color: "rgba(255,255,255,0.82)", maxWidth: 760 }}>
-                                Verified places for students only. Browse by budget, location, and facilities.
-                            </Typography>
+                                Add Place
+                            </Button>
                         </Box>
 
                         <Card
@@ -182,7 +193,7 @@ export default function Accommodation() {
                             {!loading && error && (
                                 <Grid size={{ xs: 12 }}>
                                     <Alert severity="error" sx={{ borderRadius: 2 }}>
-                                        {error}
+                                        Unable to load accommodations right now. Please try again shortly.
                                     </Alert>
                                 </Grid>
                             )}
@@ -240,7 +251,7 @@ export default function Accommodation() {
                                                 </Typography>
 
                                                 <Stack direction="row" spacing={1} flexWrap="wrap" useFlexGap>
-                                                    {item.amenities.slice(0, 3).map((amenity) => (
+                                                    {item.amenities && item.amenities.slice(0, 3).map((amenity) => (
                                                         <Chip
                                                             key={amenity}
                                                             label={amenity}
@@ -252,7 +263,7 @@ export default function Accommodation() {
                                                 </Stack>
 
                                                 <Typography variant="h6" sx={{ fontWeight: 800, color: accentYellow }}>
-                                                    LKR {item.monthlyRent.toLocaleString()} / month
+                                                    LKR {item.monthlyRent?.toLocaleString() || 0} / month
                                                 </Typography>
                                                 <Typography variant="body2" sx={{ color: "rgba(255,255,255,0.7)" }}>
                                                     {item.availableBeds} beds available now
@@ -279,7 +290,7 @@ export default function Accommodation() {
                             ))}
                         </Grid>
 
-                        {!loading && filteredAccommodations.length === 0 && (
+                        {!loading && !error && filteredAccommodations.length === 0 && (
                             <Card sx={{ borderRadius: 3, p: { xs: 3, md: 4 }, textAlign: "center", backgroundColor: "#121212", border: "1px solid rgba(250, 204, 21, 0.35)" }}>
                                 <Typography variant="h6" sx={{ fontWeight: 700, color: "#fff" }}>
                                     No places found
@@ -292,6 +303,11 @@ export default function Accommodation() {
                     </Stack>
                 </Container>
             </PageLayout>
+            <AddAccommodationDialog
+                open={openAddDialog}
+                onClose={() => setOpenAddDialog(false)}
+                onSubmit={handleAddAccommodation}
+            />
         </Box>
     );
 }
