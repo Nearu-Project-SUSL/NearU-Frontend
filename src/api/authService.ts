@@ -179,8 +179,8 @@ const authService = {
     return { message: response.data.message };
   },
 
-  logout: async (): Promise<void> => {
-    await axios.post('/auth/logout');
+  logout: async (refreshToken: string): Promise<void> => {
+    await axios.post('/auth/logout', { refreshToken });
   },
 };
 
