@@ -5,7 +5,7 @@ const BASE_URL =
   import.meta.env.VITE_API_BASE_URL ||
   "https://nearu-app-5ldre.ondigitalocean.app";
 
-const ACCOMMODATIONS_ENDPOINT = `${BASE_URL}/accommodations`;
+const ACCOMMODATIONS_ENDPOINT = `${BASE_URL}/api/accommodations`;
 
 interface ApiWrapper<T> {
     data?: T;
@@ -60,7 +60,8 @@ function mapAccommodation(raw: Record<string, unknown>, index: number): Accommod
         title: String(raw.title ?? raw.name ?? "Untitled Accommodation"),
         type: toAccommodationType(raw.type ?? raw.category),
         image: String(
-            raw.image ??
+            raw.photoUrl ??
+                raw.image ??
                 raw.imageUrl ??
                 imageFromArray ??
                 "https://images.unsplash.com/photo-1554995207-c18c203602cb?auto=format&fit=crop&w=1400&q=80"
