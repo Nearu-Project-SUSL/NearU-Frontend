@@ -110,18 +110,19 @@ export default function FoodPage(){
     <Box
       sx={{
         display:'flex',
-        minHeight:'100vh',
+        height:'100vh',           
+        overflow:'hidden',        
         bgcolor:'#050505',
         backgroundImage:'radial-gradient(circle at top right, rgba(250,204,21,0.03) 0%, transparent 50%)',
       }}>
 
       <Sidebar activeSection="food" />
 
-      <Box sx={{ flexGrow: 1, display:'flex', flexDirection:'column', minWidth: 0 }}>
+      <Box sx={{ flexGrow: 1, display:'flex', flexDirection:'column', minWidth: 0 , overflow:'hidden'}}>
         <Navbar />
 
         <PageLayout>
-          <Box sx={{height:'100vh', overflowY:'auto', overflowX:'hidden', mt:'-64px', pt:'64px'}}>
+          <Box sx={{ flex: 1, overflowY: 'auto', overflowX: 'hidden' }}>
             <Box sx={{px: { xs: 2, md: 4 }, py: { xs: 4, md: 5 }, pb:8, maxWidth:1400, mx:'auto' }}>
 
               {/* hero section  */}
