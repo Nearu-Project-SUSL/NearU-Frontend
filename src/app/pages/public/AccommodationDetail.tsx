@@ -74,15 +74,11 @@ export default function AccommodationDetail() {
 	const handleUpdateAccommodation = async (data: any) => {
 		if (!id) return;
 		const formData = new FormData();
-		formData.append("title", data.title);
-		formData.append("type", data.type);
-		formData.append("location", data.location);
-		formData.append("distanceKm", String(data.distanceKm));
-		formData.append("monthlyRent", String(data.monthlyRent));
-		formData.append("availableBeds", String(data.availableBeds));
-		formData.append("contactPhone", data.contactPhone);
-		formData.append("description", data.description);
-		if (data.photo) formData.append("photo", data.photo);
+		formData.append("Name", data.title);
+		formData.append("Address", data.location);
+		formData.append("PhoneNumber", data.contactPhone);
+		formData.append("Description", data.description || "");
+		if (data.photo) formData.append("Photo", data.photo);
 
 		await updateAccommodation(id, formData);
 		await queryClient.invalidateQueries({ queryKey: ["accommodations", id] });
@@ -101,9 +97,9 @@ export default function AccommodationDetail() {
 	const handleAddItem = async (data: AddAccommodationItemFormData) => {
 		if (!id) return;
 		const formData = new FormData();
-		formData.append("name", data.name);
-		formData.append("description", data.description);
-		formData.append("price", String(data.price));
+		formData.append("Name", data.name);
+		formData.append("Description", data.description);
+		formData.append("Price", String(data.price));
 
 		await createAccommodationItem(id, formData);
 		await queryClient.invalidateQueries({ queryKey: ["accommodationItems", id] });
@@ -113,9 +109,9 @@ export default function AccommodationDetail() {
 	const handleUpdateItem = async (data: UpdateAccommodationItemFormData) => {
 		if (!id || !itemToEdit) return;
 		const formData = new FormData();
-		formData.append("name", data.name);
-		formData.append("description", data.description);
-		formData.append("price", String(data.price));
+		formData.append("Name", data.name);
+		formData.append("Description", data.description);
+		formData.append("Price", String(data.price));
 
 		await updateAccommodationItem(id, itemToEdit.id, formData);
 		await queryClient.invalidateQueries({ queryKey: ["accommodationItems", id] });
