@@ -1,5 +1,6 @@
-import { useEffect, useState } from "react";
-import { Link as RouterLink, useParams } from "react-router";
+import { useState } from "react";
+import { Link as RouterLink, useParams, useNavigate } from "react-router";
+import { useQueryClient } from "@tanstack/react-query";
 import Navbar from "../../components/layout/Navbar";
 import {
 	Alert,
@@ -21,67 +22,112 @@ import {
 	ListItemText,
 	Stack,
 	Typography,
+	IconButton,
 } from "@mui/material";
 import CheckCircleIcon from "@mui/icons-material/CheckCircle";
 import PhoneIcon from "@mui/icons-material/Phone";
 import PlaceIcon from "@mui/icons-material/Place";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import StarIcon from "@mui/icons-material/Star";
+import EditIcon from "@mui/icons-material/Edit";
+import DeleteIcon from "@mui/icons-material/Delete";
+import AddIcon from "@mui/icons-material/Add";
 import { Sidebar } from "../../components/layout/Sidebar";
 import { PageLayout } from "../../components/layout/PageLayout";
-import accommodationService, { type AccommodationItem } from "../../../api/accommodationService";
-import { accommodations as fallbackAccommodations, type Accommodation } from "../data/accommodations";
+
+import { useAccommodation, useAccommodationItems } from "../../hooks/useAccommodation";
+import {
+	updateAccommodation,
+	deleteAccommodation,
+	createAccommodationItem,
+	updateAccommodationItem,
+	deleteAccommodationItem,
+	type AccommodationItem,
+} from "../../../api/accommodationService";
+
+import UpdateAccommodationDialog from "../../components/accommodation/UpdateAccommodationDialog";
+import DeleteAccommodationDialog from "../../components/accommodation/DeleteAccommodationDialog";
+import AddAccommodationItemDialog, { AddAccommodationItemFormData } from "../../components/accommodation/AddAccommodationItemDialog";
+import UpdateAccommodationItemDialog, { UpdateAccommodationItemFormData } from "../../components/accommodation/UpdateAccommodationItemDialog";
+import DeleteAccommodationItemDialog from "../../components/accommodation/DeleteAccommodationItemDialog";
 
 export default function AccommodationDetail() {
 	const { id } = useParams();
-	const [accommodation, setAccommodation] = useState<Accommodation | undefined>(undefined);
-	const [items, setItems] = useS
-	const [loading, setLoading] = useState(true);
-	const [error, setError] = useState("");
+	const navigate = useNavigate();
+	const queryClient = useQueryClient();
+
 	const accentYellow = "#facc15";
 	const deepBlack = "#0b0b0b";
 
-	useEffect(() => {
-		let isMounted = true;
+	const { data: accommodation, isLoading: loadingAcc, error: errorAcc } = useAccommodation(id || "");
+	const { data: items = [], isLoading: loadingItems } = useAccommodationItems(id || "");
 
-		const loadAccommodationData = async () => {
-tate<AccommodationItem[]>([]);			if (!id) {
-				if (isMounted) {
-					setLoading(false);
-				}
-				return;
-			}
+	const [openEditAcc, setOpenEditAcc] = useState(false);
+	const [openDeleteAcc, setOpenDeleteAcc] = useState(false);
 
-			try {
-				const [remoteAccommodations, remoteItems] = await Promise.all([
-					accommodationService.fetchAccommodations(),
-					accommodationService.fetchAccommodationItems(id),
-				]);
+	const [openAddItem, setOpenAddItem] = useState(false);
+	const [itemToEdit, setItemToEdit] = useState<AccommodationItem | null>(null);
+	const [itemToDelete, setItemToDelete] = useState<AccommodationItem | null>(null);
 
-				if (isMounted) {
-					setAccommodation(remoteAccommodations.find((item) => item.id === id));
-					setItems(remoteItems);
-					setError("");
-				}
-			} catch {
-				if (isMounted) {
-					setAccommodation(fallbackAccommodations.find((item) => item.id === id));
-					setItems([]);
-					setError("Unable to load live accommodation details. Showing fallback details when available.");
-				}
-			} finally {
-				if (isMounted) {
-					setLoading(false);
-				}
-			}
-		};
+	const loading = loadingAcc || loadingItems;
 
-		loadAccommodationData();
+	const handleUpdateAccommodation = async (data: any) => {
+		if (!id) return;
+		const formData = new FormData();
+		formData.append("title", data.title);
+		formData.append("type", data.type);
+		formData.append("location", data.location);
+		formData.append("distanceKm", String(data.distanceKm));
+		formData.append("monthlyRent", String(data.monthlyRent));
+		formData.append("availableBeds", String(data.availableBeds));
+		formData.append("contactPhone", data.contactPhone);
+		formData.append("description", data.description);
+		if (data.photo) formData.append("photo", data.photo);
 
-		return () => {
-			isMounted = false;
-		};
-	}, [id]);
+		await updateAccommodation(id, formData);
+		await queryClient.invalidateQueries({ queryKey: ["accommodations", id] });
+		await queryClient.invalidateQueries({ queryKey: ["accommodations"] });
+		setOpenEditAcc(false);
+	};
+
+	const handleDeleteAccommodation = async () => {
+		if (!id) return;
+		await deleteAccommodation(id);
+		await queryClient.invalidateQueries({ queryKey: ["accommodations"] });
+		setOpenDeleteAcc(false);
+		navigate("/accommodation");
+	};
+
+	const handleAddItem = async (data: AddAccommodationItemFormData) => {
+		if (!id) return;
+		const formData = new FormData();
+		formData.append("name", data.name);
+		formData.append("description", data.description);
+		formData.append("price", String(data.price));
+
+		await createAccommodationItem(id, formData);
+		await queryClient.invalidateQueries({ queryKey: ["accommodationItems", id] });
+		setOpenAddItem(false);
+	};
+
+	const handleUpdateItem = async (data: UpdateAccommodationItemFormData) => {
+		if (!id || !itemToEdit) return;
+		const formData = new FormData();
+		formData.append("name", data.name);
+		formData.append("description", data.description);
+		formData.append("price", String(data.price));
+
+		await updateAccommodationItem(id, itemToEdit.id, formData);
+		await queryClient.invalidateQueries({ queryKey: ["accommodationItems", id] });
+		setItemToEdit(null);
+	};
+
+	const handleDeleteItem = async () => {
+		if (!id || !itemToDelete) return;
+		await deleteAccommodationItem(id, itemToDelete.id);
+		await queryClient.invalidateQueries({ queryKey: ["accommodationItems", id] });
+		setItemToDelete(null);
+	};
 
 	if (loading) {
 		return (
@@ -108,43 +154,38 @@ tate<AccommodationItem[]>([]);			if (!id) {
 		);
 	}
 
-	if (!accommodation) {
-	return (
-		<Box
-			sx={{
-				display: "flex",
-				height: "100vh",
-				overflow: "hidden",
-				background: `radial-gradient(circle at top right, rgba(250, 204, 21, 0.14), transparent 45%), ${deepBlack}`,
-			}}
-		>
-			<Sidebar activeSection="accommodation" />
-			<Box sx={{ flex: 1, display: "flex", flexDirection: "column", minWidth: 0, overflow: "hidden" }}>
-				<Navbar />
-				<Box sx={{ flex: 1, overflowY: "auto", overflowX: "hidden" }}>
-					<Container maxWidth="md" sx={{ py: 5 }}>
-						{error && (
-							<Alert severity="error" sx={{ mb: 2, borderRadius: 2 }}>
-								{error}
+	if (errorAcc || !accommodation) {
+		return (
+			<Box
+				sx={{
+					display: "flex",
+					height: "100vh",
+					overflow: "hidden",
+					background: `radial-gradient(circle at top right, rgba(250, 204, 21, 0.14), transparent 45%), ${deepBlack}`,
+				}}
+			>
+				<Sidebar activeSection="accommodation" />
+				<Box sx={{ flex: 1, display: "flex", flexDirection: "column", minWidth: 0, overflow: "hidden" }}>
+					<Navbar />
+					<Box sx={{ flex: 1, overflowY: "auto", overflowX: "hidden" }}>
+						<Container maxWidth="md" sx={{ py: 5 }}>
+							<Alert severity="warning" sx={{ mb: 2, borderRadius: 2 }}>
+								Accommodation not found or an error occurred.
 							</Alert>
-						)}
-						<Alert severity="warning" sx={{ mb: 2, borderRadius: 2 }}>
-							Accommodation not found.
-						</Alert>
-						<Button
-							component={RouterLink}
-							to="/accommodation"
-							variant="contained"
-							startIcon={<ArrowBackIcon />}
-							sx={{ backgroundColor: accentYellow, color: deepBlack, fontWeight: 800 }}
-						>
-							Back to Accommodation List
-						</Button>
-					</Container>
+							<Button
+								component={RouterLink}
+								to="/accommodation"
+								variant="contained"
+								startIcon={<ArrowBackIcon />}
+								sx={{ backgroundColor: accentYellow, color: deepBlack, fontWeight: 800 }}
+							>
+								Back to Accommodation List
+							</Button>
+						</Container>
+					</Box>
 				</Box>
 			</Box>
-		</Box>
-	);
+		);
 	}
 
 	return (
@@ -162,12 +203,6 @@ tate<AccommodationItem[]>([]);			if (!id) {
 				<Box sx={{ flex: 1, overflowY: "auto", overflowX: "hidden" }}>
 				<Container maxWidth="xl" sx={{ py: { xs: 2.5, sm: 3.5, md: 5 } }}>
 					<Stack spacing={{ xs: 2, sm: 2.5, md: 3 }}>
-						{error && (
-							<Alert severity="info" sx={{ borderRadius: 2 }}>
-								{error}
-							</Alert>
-						)}
-
 						<Breadcrumbs sx={{ color: "rgba(255,255,255,0.8)" }}>
 							<Link component={RouterLink} underline="hover" color="inherit" to="/home">
 								Home
@@ -178,7 +213,7 @@ tate<AccommodationItem[]>([]);			if (!id) {
 							<Typography sx={{ color: accentYellow }}>{accommodation.title}</Typography>
 						</Breadcrumbs>
 
-						<Card sx={{ borderRadius: 4, overflow: "hidden", border: "1px solid rgba(250, 204, 21, 0.35)" }}>
+						<Card sx={{ borderRadius: 4, overflow: "hidden", border: "1px solid rgba(250, 204, 21, 0.35)", position: "relative" }}>
 							<CardMedia
 								component="img"
 								image={accommodation.image}
@@ -186,6 +221,20 @@ tate<AccommodationItem[]>([]);			if (!id) {
 								height="360"
 								sx={{ height: { xs: 220, sm: 280, md: 360 } }}
 							/>
+							<Box sx={{ position: 'absolute', top: 16, right: 16, display: 'flex', gap: 1 }}>
+								<IconButton
+									sx={{ bgcolor: 'rgba(0,0,0,0.5)', color: '#fff', '&:hover': { bgcolor: accentYellow, color: '#000' } }}
+									onClick={() => setOpenEditAcc(true)}
+								>
+									<EditIcon />
+								</IconButton>
+								<IconButton
+									sx={{ bgcolor: 'rgba(0,0,0,0.5)', color: '#fff', '&:hover': { bgcolor: '#ef4444' } }}
+									onClick={() => setOpenDeleteAcc(true)}
+								>
+									<DeleteIcon />
+								</IconButton>
+							</Box>
 						</Card>
 
 						<Grid container spacing={{ xs: 2, sm: 2.5, md: 3 }}>
@@ -225,7 +274,7 @@ tate<AccommodationItem[]>([]);			if (!id) {
 												Amenities
 											</Typography>
 											<List dense>
-												{accommodation.amenities.map((amenity) => (
+												{accommodation.amenities?.map((amenity) => (
 													<ListItem key={amenity} disableGutters>
 														<ListItemIcon sx={{ minWidth: 32 }}>
 															<CheckCircleIcon sx={{ color: accentYellow }} fontSize="small" />
@@ -237,27 +286,39 @@ tate<AccommodationItem[]>([]);			if (!id) {
 
 											<Divider />
 
-											<Typography variant="h6" sx={{ fontWeight: 700, color: accentYellow }}>
-												Available Items
-											</Typography>
+											<Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+												<Typography variant="h6" sx={{ fontWeight: 700, color: accentYellow }}>
+													Available Items
+												</Typography>
+												<Button
+													size="small"
+													variant="outlined"
+													startIcon={<AddIcon />}
+													onClick={() => setOpenAddItem(true)}
+													sx={{ borderColor: accentYellow, color: accentYellow, borderRadius: 2 }}
+												>
+													Add Item
+												</Button>
+											</Box>
+
 											{items.length > 0 ? (
 												<List dense>
 													{items.map((item) => (
-														<ListItem key={item.id} disableGutters>
+														<ListItem key={item.id} disableGutters secondaryAction={
+															<Box>
+																<IconButton edge="end" onClick={() => setItemToEdit(item)} sx={{ color: 'rgba(255,255,255,0.6)', '&:hover': { color: accentYellow } }}>
+																	<EditIcon fontSize="small" />
+																</IconButton>
+																<IconButton edge="end" onClick={() => setItemToDelete(item)} sx={{ color: 'rgba(255,255,255,0.6)', '&:hover': { color: '#ef4444' } }}>
+																	<DeleteIcon fontSize="small" />
+																</IconButton>
+															</Box>
+														}>
 															<ListItemText
 																primary={`${item.name} - LKR ${item.price.toLocaleString()}`}
 																secondary={item.description || "No description"}
-																primaryTypographyProps={{ sx: { color: "#f2f2f2" } }}
+																primaryTypographyProps={{ sx: { color: "#f2f2f2", fontWeight: 600 } }}
 																secondaryTypographyProps={{ sx: { color: "rgba(255,255,255,0.66)" } }}
-															/>
-															<Chip
-																label={item.isAvailable ? "Available" : "Unavailable"}
-																size="small"
-																sx={{
-																	fontWeight: 700,
-																	backgroundColor: item.isAvailable ? accentYellow : "rgba(255,255,255,0.18)",
-																	color: item.isAvailable ? deepBlack : "#fff",
-																}}
 															/>
 														</ListItem>
 													))}
@@ -318,6 +379,33 @@ tate<AccommodationItem[]>([]);			if (!id) {
 				</Container>
 				</Box>
 			</Box>
+
+			{/* Dialogs */}
+			<UpdateAccommodationDialog
+				accommodation={openEditAcc ? accommodation : null}
+				onClose={() => setOpenEditAcc(false)}
+				onSubmit={handleUpdateAccommodation}
+			/>
+			<DeleteAccommodationDialog
+				accommodation={openDeleteAcc ? accommodation : null}
+				onClose={() => setOpenDeleteAcc(false)}
+				onConfirm={handleDeleteAccommodation}
+			/>
+			<AddAccommodationItemDialog
+				open={openAddItem}
+				onClose={() => setOpenAddItem(false)}
+				onSubmit={handleAddItem}
+			/>
+			<UpdateAccommodationItemDialog
+				item={itemToEdit}
+				onClose={() => setItemToEdit(null)}
+				onSubmit={handleUpdateItem}
+			/>
+			<DeleteAccommodationItemDialog
+				item={itemToDelete}
+				onClose={() => setItemToDelete(null)}
+				onConfirm={handleDeleteItem}
+			/>
 		</Box>
 	);
 }

@@ -1,8 +1,11 @@
 import axios from "./axios";
 import type { Accommodation } from "../app/pages/data/accommodations";
 
-const ACCOMMODATIONS_ENDPOINT = "https://localhost:7189/api/accommodations";
-const ACCOMMODATION_ITEMS_BASE_ENDPOINT = "http://localhost:5059/api/accommodations";
+const BASE_URL =
+  import.meta.env.VITE_API_BASE_URL ||
+  "https://nearu-app-5ldre.ondigitalocean.app";
+
+const ACCOMMODATIONS_ENDPOINT = `${BASE_URL}/accommodations`;
 
 interface ApiWrapper<T> {
     data?: T;
@@ -84,23 +87,98 @@ function mapAccommodationItem(raw: Record<string, unknown>, index: number): Acco
     };
 }
 
+export const fetchAccommodations = async (): Promise<Accommodation[]> => {
+    const response = await axios.get<unknown>(ACCOMMODATIONS_ENDPOINT);
+    const payload = unwrapResponse<unknown>(response.data);
+    const rows = Array.isArray(payload) ? payload : [];
+
+    return rows.map((row, index) => mapAccommodation(row as Record<string, unknown>, index));
+};
+
+export const getAccommodationById = async (id: string): Promise<Accommodation> => {
+    const response = await axios.get<unknown>(`${ACCOMMODATIONS_ENDPOINT}/${encodeURIComponent(id)}`);
+    const payload = unwrapResponse<Record<string, unknown>>(response.data);
+    return mapAccommodation(payload, 0);
+};
+
+export const createAccommodation = async (data: FormData): Promise<Accommodation> => {
+    const response = await axios.post<unknown>(ACCOMMODATIONS_ENDPOINT, data, {
+        headers: {
+            "Content-Type": "multipart/form-data",
+        },
+    });
+    const payload = unwrapResponse<Record<string, unknown>>(response.data);
+    return mapAccommodation(payload, 0);
+};
+
+export const updateAccommodation = async (id: string, data: FormData): Promise<Accommodation> => {
+    const response = await axios.put<unknown>(`${ACCOMMODATIONS_ENDPOINT}/${encodeURIComponent(id)}`, data, {
+        headers: {
+            "Content-Type": "multipart/form-data",
+        },
+    });
+    const payload = unwrapResponse<Record<string, unknown>>(response.data);
+    return mapAccommodation(payload, 0);
+};
+
+export const deleteAccommodation = async (id: string): Promise<void> => {
+    await axios.delete(`${ACCOMMODATIONS_ENDPOINT}/${encodeURIComponent(id)}`);
+};
+
+export const fetchAccommodationItems = async (accommodationId: string): Promise<AccommodationItem[]> => {
+    const endpoint = `${ACCOMMODATIONS_ENDPOINT}/${encodeURIComponent(accommodationId)}/items`;
+    const response = await axios.get<unknown>(endpoint);
+    const payload = unwrapResponse<unknown>(response.data);
+    const rows = Array.isArray(payload) ? payload : [];
+
+    return rows.map((row, index) => mapAccommodationItem(row as Record<string, unknown>, index));
+};
+
+export const getAccommodationItemById = async (accommodationId: string, itemId: string): Promise<AccommodationItem> => {
+    const endpoint = `${ACCOMMODATIONS_ENDPOINT}/${encodeURIComponent(accommodationId)}/items/${encodeURIComponent(itemId)}`;
+    const response = await axios.get<unknown>(endpoint);
+    const payload = unwrapResponse<Record<string, unknown>>(response.data);
+    return mapAccommodationItem(payload, 0);
+};
+
+export const createAccommodationItem = async (accommodationId: string, data: FormData): Promise<AccommodationItem> => {
+    const endpoint = `${ACCOMMODATIONS_ENDPOINT}/${encodeURIComponent(accommodationId)}/items`;
+    const response = await axios.post<unknown>(endpoint, data, {
+        headers: {
+            "Content-Type": "multipart/form-data",
+        },
+    });
+    const payload = unwrapResponse<Record<string, unknown>>(response.data);
+    return mapAccommodationItem(payload, 0);
+};
+
+export const updateAccommodationItem = async (accommodationId: string, itemId: string, data: FormData): Promise<AccommodationItem> => {
+    const endpoint = `${ACCOMMODATIONS_ENDPOINT}/${encodeURIComponent(accommodationId)}/items/${encodeURIComponent(itemId)}`;
+    const response = await axios.put<unknown>(endpoint, data, {
+        headers: {
+            "Content-Type": "multipart/form-data",
+        },
+    });
+    const payload = unwrapResponse<Record<string, unknown>>(response.data);
+    return mapAccommodationItem(payload, 0);
+};
+
+export const deleteAccommodationItem = async (accommodationId: string, itemId: string): Promise<void> => {
+    const endpoint = `${ACCOMMODATIONS_ENDPOINT}/${encodeURIComponent(accommodationId)}/items/${encodeURIComponent(itemId)}`;
+    await axios.delete(endpoint);
+};
+
 const accommodationService = {
-    fetchAccommodations: async (): Promise<Accommodation[]> => {
-        const response = await axios.get<unknown>(ACCOMMODATIONS_ENDPOINT);
-        const payload = unwrapResponse<unknown>(response.data);
-        const rows = Array.isArray(payload) ? payload : [];
-
-        return rows.map((row, index) => mapAccommodation(row as Record<string, unknown>, index));
-    },
-
-    fetchAccommodationItems: async (accommodationId: string): Promise<AccommodationItem[]> => {
-        const endpoint = `${ACCOMMODATION_ITEMS_BASE_ENDPOINT}/${encodeURIComponent(accommodationId)}/items`;
-        const response = await axios.get<unknown>(endpoint);
-        const payload = unwrapResponse<unknown>(response.data);
-        const rows = Array.isArray(payload) ? payload : [];
-
-        return rows.map((row, index) => mapAccommodationItem(row as Record<string, unknown>, index));
-    },
+    fetchAccommodations,
+    getAccommodationById,
+    createAccommodation,
+    updateAccommodation,
+    deleteAccommodation,
+    fetchAccommodationItems,
+    getAccommodationItemById,
+    createAccommodationItem,
+    updateAccommodationItem,
+    deleteAccommodationItem,
 };
 
 export default accommodationService;
