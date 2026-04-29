@@ -29,7 +29,7 @@ import useAuth from '../../hooks/useAuth';
 import Navbar from '../../components/layout/Navbar';
 import { useNavigate } from 'react-router';
 import { toast } from 'sonner';
-import authService from '../../api/authService';
+import authService from '../../../api/authService';
 
 export default function RiderProfile() {
   const { auth, setAuth } = useAuth();
