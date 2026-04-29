@@ -316,7 +316,7 @@ export default function Register() {
                   { type: 'business', icon: BuildingIcon, label: 'Business' },
                   { type: 'rider', icon: BikeIcon, label: 'Rider' }
                 ].map((item) => (
-                  <Grid xs={4} key={item.type}>
+                  <Grid size={{ xs: 4 }} key={item.type}>
                     <Button
                       fullWidth
                       onClick={() => setUserType(item.type as UserType)}
@@ -464,7 +464,7 @@ export default function Register() {
                     {activeStep === 1 && (
                       <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
                         <Grid container spacing={2}>
-                          <Grid xs={6}>
+                          <Grid size={{ xs: 6 }}>
                             <TextField
                               fullWidth
                               label="Student ID"
@@ -473,7 +473,7 @@ export default function Register() {
                               onChange={(e) => setStudentForm({...studentForm, studentId: e.target.value})}
                             />
                           </Grid>
-                          <Grid xs={6}>
+                          <Grid size={{ xs: 6 }}>
                             <TextField
                               fullWidth
                               label="Phone Number"
@@ -485,7 +485,7 @@ export default function Register() {
                           </Grid>
                         </Grid>
                         <Grid container spacing={2}>
-                          <Grid xs={6}>
+                          <Grid size={{ xs: 6 }}>
                             <FormControl fullWidth>
                               <InputLabel>Faculty</InputLabel>
                               <Select
@@ -500,7 +500,7 @@ export default function Register() {
                               </Select>
                             </FormControl>
                           </Grid>
-                          <Grid xs={6}>
+                          <Grid size={{ xs: 6 }}>
                             <FormControl fullWidth>
                               <InputLabel>Year</InputLabel>
                               <Select
@@ -560,7 +560,7 @@ export default function Register() {
                           }}
                         />
                         <Grid container spacing={2}>
-                          <Grid xs={6}>
+                          <Grid size={{ xs: 6 }}>
                             <TextField
                               fullWidth
                               label="City"
@@ -569,7 +569,7 @@ export default function Register() {
                               onChange={(e) => setStudentForm({...studentForm, city: e.target.value})}
                             />
                           </Grid>
-                          <Grid xs={6}>
+                          <Grid size={{ xs: 6 }}>
                             <TextField
                               fullWidth
                               label="Date of Birth"
@@ -613,26 +613,26 @@ export default function Register() {
                 <Box className="animate-fadeIn">
                   <form onSubmit={handleBusinessSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '1rem', maxHeight: '400px', overflowY: 'auto', paddingRight: '8px' }} className="custom-scrollbar">
                     <Grid container spacing={2}>
-                      <Grid xs={6}>
+                      <Grid size={{ xs: 6 }}>
                         <TextField fullWidth label="Business Name" required value={businessForm.businessName} onChange={(e) => setBusinessForm({...businessForm, businessName: e.target.value})} />
                       </Grid>
-                      <Grid xs={6}>
+                      <Grid size={{ xs: 6 }}>
                         <TextField fullWidth label="Owner Name" required value={businessForm.ownerName} onChange={(e) => setBusinessForm({...businessForm, ownerName: e.target.value})} />
                       </Grid>
                     </Grid>
                     <Grid container spacing={2}>
-                      <Grid xs={6}>
+                      <Grid size={{ xs: 6 }}>
                         <TextField fullWidth label="Email" type="email" required value={businessForm.email} onChange={(e) => setBusinessForm({...businessForm, email: e.target.value})} />
                       </Grid>
-                      <Grid xs={6}>
+                      <Grid size={{ xs: 6 }}>
                         <TextField fullWidth label="Phone" type="tel" required value={businessForm.phone} onChange={(e) => setBusinessForm({...businessForm, phone: e.target.value})} />
                       </Grid>
                     </Grid>
                     <Grid container spacing={2}>
-                      <Grid xs={6}>
+                      <Grid size={{ xs: 6 }}>
                         <TextField fullWidth label="Password" type={showPassword ? "text" : "password"} required value={businessForm.password} onChange={(e) => setBusinessForm({...businessForm, password: e.target.value})} />
                       </Grid>
-                      <Grid xs={6}>
+                      <Grid size={{ xs: 6 }}>
                         <TextField fullWidth label="Confirm" type={showConfirmPassword ? "text" : "password"} required value={businessForm.confirmPassword} onChange={(e) => setBusinessForm({...businessForm, confirmPassword: e.target.value})} />
                       </Grid>
                     </Grid>
@@ -647,10 +647,10 @@ export default function Register() {
                     <TextField fullWidth label="Address" multiline rows={2} required value={businessForm.address} onChange={(e) => setBusinessForm({...businessForm, address: e.target.value})} />
                     <TextField fullWidth label="Description" multiline rows={2} required value={businessForm.description} onChange={(e) => setBusinessForm({...businessForm, description: e.target.value})} />
                     <Grid container spacing={2}>
-                      <Grid xs={6}>
+                      <Grid size={{ xs: 6 }}>
                         <TextField fullWidth label="Registration No." required value={businessForm.registrationNumber} onChange={(e) => setBusinessForm({...businessForm, registrationNumber: e.target.value})} />
                       </Grid>
-                      <Grid xs={6}>
+                      <Grid size={{ xs: 6 }}>
                         <TextField fullWidth label="Tax ID" value={businessForm.taxId} onChange={(e) => setBusinessForm({...businessForm, taxId: e.target.value})} />
                       </Grid>
                     </Grid>
@@ -671,24 +671,24 @@ export default function Register() {
                 <Box className="animate-fadeIn">
                   <form onSubmit={handleRiderSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '1rem', maxHeight: '400px', overflowY: 'auto', paddingRight: '8px' }} className="custom-scrollbar">
                     <Grid container spacing={2}>
-                      <Grid xs={6}>
+                      <Grid size={{ xs: 6 }}>
                         <TextField fullWidth label="Full Name" required value={riderForm.fullName} onChange={(e) => setRiderForm({...riderForm, fullName: e.target.value})} />
                       </Grid>
-                      <Grid xs={6}>
+                      <Grid size={{ xs: 6 }}>
                         <TextField fullWidth label="Phone" type="tel" required value={riderForm.phone} onChange={(e) => setRiderForm({...riderForm, phone: e.target.value})} />
                       </Grid>
                     </Grid>
                     <TextField fullWidth label="Email" type="email" required value={riderForm.email} onChange={(e) => setRiderForm({...riderForm, email: e.target.value})} />
                     <Grid container spacing={2}>
-                      <Grid xs={6}>
+                      <Grid size={{ xs: 6 }}>
                         <TextField fullWidth label="Password" type={showPassword ? "text" : "password"} required value={riderForm.password} onChange={(e) => setRiderForm({...riderForm, password: e.target.value})} />
                       </Grid>
-                      <Grid xs={6}>
+                      <Grid size={{ xs: 6 }}>
                         <TextField fullWidth label="Confirm" type={showConfirmPassword ? "text" : "password"} required value={riderForm.confirmPassword} onChange={(e) => setRiderForm({...riderForm, confirmPassword: e.target.value})} />
                       </Grid>
                     </Grid>
                     <Grid container spacing={2}>
-                      <Grid xs={6}>
+                      <Grid size={{ xs: 6 }}>
                         <FormControl fullWidth>
                           <InputLabel>Vehicle Type</InputLabel>
                           <Select value={riderForm.vehicleType} label="Vehicle Type" onChange={(e) => setRiderForm({...riderForm, vehicleType: e.target.value})} required>
@@ -698,7 +698,7 @@ export default function Register() {
                           </Select>
                         </FormControl>
                       </Grid>
-                      <Grid xs={6}>
+                      <Grid size={{ xs: 6 }}>
                         <TextField fullWidth label="Vehicle No." required value={riderForm.vehicleNumber} onChange={(e) => setRiderForm({...riderForm, vehicleNumber: e.target.value})} />
                       </Grid>
                     </Grid>
