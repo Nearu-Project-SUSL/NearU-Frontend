@@ -1,11 +1,7 @@
 import axios from "./axios";
 import type { Accommodation } from "../app/pages/data/accommodations";
 
-const BASE_URL =
-  import.meta.env.VITE_API_BASE_URL ||
-  "https://nearu-app-5ldre.ondigitalocean.app";
-
-const ACCOMMODATIONS_ENDPOINT = `${BASE_URL}/accommodations`;
+const ACCOMMODATIONS_ENDPOINT = `/accommodations`;
 
 interface ApiWrapper<T> {
     data?: T;
@@ -46,6 +42,7 @@ function toAccommodationType(type: unknown): Accommodation["type"] {
 }
 
 function mapAccommodation(raw: Record<string, unknown>, index: number): Accommodation {
+    // Backend returns amenities as a List<string> array
     const amenitiesRaw = raw.amenities;
     const amenities = Array.isArray(amenitiesRaw)
         ? amenitiesRaw.map((item) => String(item)).filter((item) => item.length > 0)
@@ -53,6 +50,8 @@ function mapAccommodation(raw: Record<string, unknown>, index: number): Accommod
 
     const imagesRaw = raw.images;
     const imageFromArray = Array.isArray(imagesRaw) ? imagesRaw.find((img) => typeof img === "string") : undefined;
+
+    // Backend uses `address` for location
     const locationParts = [raw.location, raw.address, raw.city].filter((item) => typeof item === "string").map(String);
 
     return {
@@ -60,7 +59,8 @@ function mapAccommodation(raw: Record<string, unknown>, index: number): Accommod
         title: String(raw.title ?? raw.name ?? "Untitled Accommodation"),
         type: toAccommodationType(raw.type ?? raw.category),
         image: String(
-            raw.image ??
+            raw.photoUrl ??
+                raw.image ??
                 raw.imageUrl ??
                 imageFromArray ??
                 "https://images.unsplash.com/photo-1554995207-c18c203602cb?auto=format&fit=crop&w=1400&q=80"
@@ -73,7 +73,8 @@ function mapAccommodation(raw: Record<string, unknown>, index: number): Accommod
         amenities,
         monthlyRent: Number(raw.monthlyRent ?? raw.rent ?? raw.price ?? 0),
         availableBeds: Number(raw.availableBeds ?? raw.bedsAvailable ?? 0),
-        contactPhone: String(raw.contactPhone ?? raw.phone ?? raw.ownerPhone ?? ""),
+        // Backend stores as phoneNumber (camelCase in JSON)
+        contactPhone: String(raw.phoneNumber ?? raw.contactPhone ?? raw.phone ?? raw.ownerPhone ?? ""),
     };
 }
 
