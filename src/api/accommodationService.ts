@@ -1,11 +1,7 @@
 import axios from "./axios";
 import type { Accommodation } from "../app/pages/data/accommodations";
 
-const BASE_URL =
-  import.meta.env.VITE_API_BASE_URL ||
-  "https://nearu-app-5ldre.ondigitalocean.app";
-
-const ACCOMMODATIONS_ENDPOINT = `${BASE_URL}/api/accommodations`;
+const ACCOMMODATIONS_ENDPOINT = `/accommodations`;
 
 interface ApiWrapper<T> {
     data?: T;
