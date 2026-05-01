@@ -17,6 +17,11 @@ import SearchIcon from "@mui/icons-material/Search";
 import CloseIcon from "@mui/icons-material/Close";
 import ChevronLeftIcon from "@mui/icons-material/ChevronLeft";
 import ChevronRightIcon from "@mui/icons-material/ChevronRight";
+import UpdateShopDialog from '../../components/food/UpdateShopDialog';
+import DeleteShopDialog from '../../components/food/DeleteShopDialog';
+import { deleteShop, updateShop } from '../../../api/foodapi';
+import { useQueryClient } from '@tanstack/react-query';
+import type { ShopResponse } from '../../../api/foodapi';
 
 const FOOD_CATEGORIES = [
   'All',
@@ -40,6 +45,10 @@ export default function FoodPage(){
     category: activeCategory,
     search: searchQuery, 
   });
+
+  const queryClient = useQueryClient();
+  const [shopToEdit, setShopToEdit] = useState<ShopResponse | null>(null);
+  const [shopToDelete, setShopToDelete] = useState<ShopResponse | null>(null);
 
   //when category change reset to page 1 
   const handleCategoryChange = (cat : string) => {
@@ -105,6 +114,31 @@ export default function FoodPage(){
 
     return pages;
   };
+
+  const handleUpdateShop =async (data:{
+    name:string;
+    description: string;
+    address: string;
+    phoneNumber: string;
+    category: string;
+    photo: File | null;
+  }) => {
+    if(!shopToEdit) return;
+
+    await updateShop(shopToEdit.id, data);
+    //refresh shop list
+    await queryClient.invalidateQueries({queryKey: ['foodshops']});
+    setShopToEdit(null);
+  };
+
+  const handleDeleteShop = async () => {
+    if(!shopToDelete) return;
+
+    await deleteShop(shopToDelete.id);
+    //refresh shop list
+    await queryClient.invalidateQueries({queryKey: ['foodshops']});
+    setShopToDelete(null);
+  }
 
   return (
     <Box
@@ -321,7 +355,12 @@ export default function FoodPage(){
                     px:{xs:2, md:0} // no side margin
                   }}>
                   {shops.map((shop) => (
-                    <ShopCard key={shop.id} shop={shop} />
+                    <ShopCard 
+                    key={shop.id} 
+                    shop={shop}
+                    onEdit={(s) => setShopToEdit(s)}
+                    onDelete={(s) => setShopToDelete(s)}
+                    />
                   ))}
                 </Box>
               ) : (
@@ -455,6 +494,18 @@ export default function FoodPage(){
           </Box>
         </PageLayout>
       </Box>
+
+      <UpdateShopDialog
+        shop={shopToEdit}
+        onClose={() => setShopToEdit(null)}
+        onSubmit={handleUpdateShop}
+      />
+
+      <DeleteShopDialog
+        shop={shopToDelete}
+        onClose={() => setShopToDelete(null)}
+        onConfirm={handleDeleteShop}
+      />
     </Box>
   );
 }
