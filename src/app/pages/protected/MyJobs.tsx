@@ -95,7 +95,7 @@ export default function MyJobs() {
   
   const { auth } = useAuth();
   const userId = auth?.user?.id;
-  const myJobs = allJobs.filter(job => job.postedBy.userId === userId);
+  const myJobs = allJobs.filter(job => job.postedBy?.userId === userId);
 
   useEffect(() => {
     if (isError) {
