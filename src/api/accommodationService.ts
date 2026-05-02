@@ -103,21 +103,13 @@ export const getAccommodationById = async (id: string): Promise<Accommodation> =
 };
 
 export const createAccommodation = async (data: FormData): Promise<Accommodation> => {
-    const response = await axios.post<unknown>(ACCOMMODATIONS_ENDPOINT, data, {
-        headers: {
-            "Content-Type": "multipart/form-data",
-        },
-    });
+    const response = await axios.post<unknown>(ACCOMMODATIONS_ENDPOINT, data);
     const payload = unwrapResponse<Record<string, unknown>>(response.data);
     return mapAccommodation(payload, 0);
 };
 
 export const updateAccommodation = async (id: string, data: FormData): Promise<Accommodation> => {
-    const response = await axios.put<unknown>(`${ACCOMMODATIONS_ENDPOINT}/${encodeURIComponent(id)}`, data, {
-        headers: {
-            "Content-Type": "multipart/form-data",
-        },
-    });
+    const response = await axios.put<unknown>(`${ACCOMMODATIONS_ENDPOINT}/${encodeURIComponent(id)}`, data);
     const payload = unwrapResponse<Record<string, unknown>>(response.data);
     return mapAccommodation(payload, 0);
 };
@@ -144,22 +136,14 @@ export const getAccommodationItemById = async (accommodationId: string, itemId: 
 
 export const createAccommodationItem = async (accommodationId: string, data: FormData): Promise<AccommodationItem> => {
     const endpoint = `${ACCOMMODATIONS_ENDPOINT}/${encodeURIComponent(accommodationId)}/items`;
-    const response = await axios.post<unknown>(endpoint, data, {
-        headers: {
-            "Content-Type": "multipart/form-data",
-        },
-    });
+    const response = await axios.post<unknown>(endpoint, data);
     const payload = unwrapResponse<Record<string, unknown>>(response.data);
     return mapAccommodationItem(payload, 0);
 };
 
 export const updateAccommodationItem = async (accommodationId: string, itemId: string, data: FormData): Promise<AccommodationItem> => {
     const endpoint = `${ACCOMMODATIONS_ENDPOINT}/${encodeURIComponent(accommodationId)}/items/${encodeURIComponent(itemId)}`;
-    const response = await axios.put<unknown>(endpoint, data, {
-        headers: {
-            "Content-Type": "multipart/form-data",
-        },
-    });
+    const response = await axios.put<unknown>(endpoint, data);
     const payload = unwrapResponse<Record<string, unknown>>(response.data);
     return mapAccommodationItem(payload, 0);
 };
