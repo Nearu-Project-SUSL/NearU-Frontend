@@ -121,7 +121,7 @@ const jobService = {
 
     const response = await axiosPrivate.post<ApiResponse<{ url: string }>>('/job/upload-logo', formData, {
       headers: {
-        Authorization: `Bearer ${token}`
+        Authorization: `Bearer ${token}`,
       }
     });
     return response.data.data.url;

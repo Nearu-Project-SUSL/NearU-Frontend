@@ -141,9 +141,11 @@ export default function AddMenuItem({
           <Button
             variant="outlined"
             component="label"
+            htmlFor="add-menu-item-photo"
           >
             Upload Photo
             <input
+              id="add-menu-item-photo"
               type="file"
               hidden
               accept="image/*"
