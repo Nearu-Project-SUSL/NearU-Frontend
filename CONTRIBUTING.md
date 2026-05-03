@@ -6,7 +6,7 @@ Following these guidelines helps to communicate that you respect the time of the
 
 ## Code of Conduct
 
-By participating in this project, you are expected to uphold our Code of Conduct. Please be welcoming, inclusive, and respectful to all members of the community.
+By participating in this project, you are expected to uphold our [Code of Conduct](./CODE_OF_CONDUCT.md). Please be welcoming, inclusive, and respectful to all members of the community.
 
 ## Getting Started
 
