@@ -11,6 +11,7 @@ import {
   TextField,
   InputAdornment,
 } from '@mui/material';
+import { useTheme } from '@mui/material';
 import { useState } from "react";
 
 import SearchIcon from "@mui/icons-material/Search";
@@ -140,14 +141,18 @@ export default function FoodPage(){
     setShopToDelete(null);
   }
 
+  const theme = useTheme();
+  const accent = theme.palette.primary.main;
+  const accentAlpha = (a: number) => `rgba(61, 103, 138, ${a})`;
+
   return (
     <Box
       sx={{
         display:'flex',
         height:'100vh',           
         overflow:'hidden',        
-        bgcolor:'#050505',
-        backgroundImage:'radial-gradient(circle at top right, rgba(250,204,21,0.03) 0%, transparent 50%)',
+        bgcolor:'background.default',
+        backgroundImage:`radial-gradient(circle at top right, ${accentAlpha(0.04)} 0%, transparent 50%)`,
       }}>
 
       <Sidebar activeSection="food" />
@@ -181,14 +186,14 @@ export default function FoodPage(){
                     variant="h2"
                     sx={{
                       fontWeight: 900,
-                      color: "#fff",
+                      color: theme.palette.text.primary,
                       fontSize: { xs: "2.3rem", md: "3.6rem" },
                       letterSpacing: "-0.03em",
                       mb: 2,
                     }}
                   >
                     Food{" "}
-                    <Box component="span" sx={{ color: "#facc15" }}>
+                    <Box component="span" sx={{ color: accent }}>
                       Near U
                     </Box>
                   </Typography>
@@ -196,7 +201,7 @@ export default function FoodPage(){
                   <Typography
                     variant="body1"
                     sx={{
-                      color: "rgba(255,255,255,0.7)",
+                      color: theme.palette.text.secondary,
                       maxWidth: 600,
                       lineHeight: 1.8,
                       fontSize: { xs: "1rem", md: "1.08rem" },
@@ -235,10 +240,10 @@ export default function FoodPage(){
                   }}>
 
                   <Box>
-                    <Typography variant="h5" sx={{color:'#fff', fontWeight:'800'}}>
+                    <Typography variant="h5" sx={{color: theme.palette.text.primary, fontWeight:'800'}}>
                       Food Shops
                     </Typography>
-                    <Typography variant="body2" sx={{ color:'rgba(255,255,255,0.5)'}}>
+                    <Typography variant="body2" sx={{ color: theme.palette.text.secondary}}>
                       {totalCount} shop{totalCount !== 1 ? 's' : ''} found
                       {totalPages > 1 && `. page ${currentPage} of ${totalPages}`}
                     </Typography>
@@ -253,14 +258,14 @@ export default function FoodPage(){
                       minWidth: { xs: "100%", md: 280 },
                       "& .MuiOutlinedInput-root": {
                         borderRadius: "14px",
-                        bgcolor: "rgba(255,255,255,0.03)",
-                        color: "#fff",
-                        "& fieldset": { borderColor: "rgba(255,255,255,0.08)" },
-                        "&:hover fieldset": { borderColor: "#facc15" },
-                        "&.Mui-focused fieldset": { borderColor: "#facc15" },
+                        bgcolor: accentAlpha(0.04),
+                        color: theme.palette.text.primary,
+                        "& fieldset": { borderColor: theme.palette.divider },
+                        "&:hover fieldset": { borderColor: accent },
+                        "&.Mui-focused fieldset": { borderColor: accent },
                       },
                       "& input::placeholder": {
-                        color: "rgba(255,255,255,0.4)",
+                        color: theme.palette.text.secondary,
                         opacity: 1,
                       }
                     }}
@@ -315,23 +320,21 @@ export default function FoodPage(){
 
                           
                           bgcolor: isActive
-                            ? 'rgba(250, 204, 21, 0.2)'
-                            : 'rgba(255,255,255,0.03)',
+                            ? accentAlpha(0.15)
+                            : accentAlpha(0.03),
                           border: isActive
-                            ? '1px solid rgba(250, 204, 21, 1)'
-                            : '1px solid rgba(255,255,255,0.08)',
+                            ? `1px solid ${accent}`
+                            : `1px solid ${theme.palette.divider}`,
                           color: isActive
-                            ? '#facc15'
-                            : 'rgba(255,255,255,0.5)',
+                            ? accent
+                            : theme.palette.text.secondary,
 
                           '&:hover': {
                             bgcolor: isActive
-                              ? 'rgba(250, 204, 21, 0.25)'
-                              : 'rgba(255,255,255,0.06)',
-                            borderColor: isActive
-                              ? 'rgba(250, 204, 21, 0.8)'
-                              : 'rgba(255,255,255,0.15)',
-                            color: isActive ? '#facc15' : '#fff',
+                              ? accentAlpha(0.2)
+                              : accentAlpha(0.06),
+                            borderColor: accent,
+                            color: accent,
                           },
                         }}>
                         {cat}
@@ -445,20 +448,20 @@ export default function FoodPage(){
                             transition: 'all 0.2s ease',
 
                             bgcolor: isCurrentPage
-                              ? '#facc15'
-                              : 'rgba(255,255,255,0.03)',
+                              ? accent
+                              : accentAlpha(0.03),
                             color: isCurrentPage
-                              ? '#000'
-                              : 'rgba(255,255,255,0.6)',
+                              ? '#fff'
+                              : theme.palette.text.secondary,
                             border: isCurrentPage
                               ? 'none'
-                              : '1px solid rgba(255,255,255,0.08)',
+                              : `1px solid ${theme.palette.divider}`,
 
                             '&:hover': {
                               bgcolor: isCurrentPage
-                                ? '#facc15'
-                                : 'rgba(255,255,255,0.08)',
-                              color: isCurrentPage ? '#000' : '#fff',
+                                ? accent
+                                : accentAlpha(0.08),
+                              color: '#fff',
                             },
                           }}>
                             {pageNum}

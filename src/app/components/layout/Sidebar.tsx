@@ -1,6 +1,7 @@
 import { Link, useNavigate } from 'react-router';
 import { useSidebar } from '../../context/SidebarContext';
 import useAuth from '../../hooks/useAuth';
+import { useNearUTheme } from '../../context/ThemeContext';
 
 // MUI Components
 import {
@@ -14,7 +15,8 @@ import {
   Typography,
   IconButton,
   Avatar,
-  Tooltip
+  Tooltip,
+  useTheme,
 } from '@mui/material';
 
 // MUI Icons
@@ -45,8 +47,17 @@ export function Sidebar({ activeSection }: SidebarProps) {
   const { isExpanded, toggleSidebar, isMobileOpen, toggleMobileSidebar } = useSidebar();
   const navigate = useNavigate();
   const { auth } = useAuth();
-  
+  const { isDark } = useNearUTheme();
+  const theme = useTheme();
+
   const userName = auth?.user?.username || auth?.user?.email?.split('@')[0] || 'Student';
+  const accent = theme.palette.primary.main;           // #3d678a
+  const accentAlpha = (a: number) => `rgba(61, 103, 138, ${a})`;
+
+  const drawerBg = isDark ? '#0e0e0e' : '#ffffff';
+  const drawerBorder = accentAlpha(0.12);
+  const textMuted = theme.palette.text.secondary;
+  const textPrimary = theme.palette.text.primary;
 
   const navItems = [
     { icon: HomeIcon,          label: 'Home',             id: 'home',          path: '/home' },
@@ -69,7 +80,7 @@ export function Sidebar({ activeSection }: SidebarProps) {
             justifyContent: expanded ? 'space-between' : 'center',
             px: expanded ? 2.5 : 1,
             height: 70,
-            borderBottom: '1px solid rgba(250, 204, 21, 0.08)',
+            borderBottom: `1px solid ${accentAlpha(0.1)}`,
             flexShrink: 0,
           }}
         >
@@ -77,11 +88,11 @@ export function Sidebar({ activeSection }: SidebarProps) {
             <Box sx={{ opacity: expanded ? 1 : 0, transition: 'opacity 0.2s ease' }}>
               <Typography
                 variant="h6"
-                sx={{ color: '#facc15', fontWeight: 800, fontStyle: 'italic', lineHeight: 1.1, fontSize: '1.1rem' }}
+                sx={{ color: accent, fontWeight: 800, fontStyle: 'italic', lineHeight: 1.1, fontSize: '1.1rem' }}
               >
                 NearU
               </Typography>
-              <Typography variant="caption" sx={{ color: 'rgba(250, 204, 21, 0.45)', fontSize: '0.65rem' }}>
+              <Typography variant="caption" sx={{ color: accentAlpha(0.55), fontSize: '0.65rem' }}>
                 Uni Life Assistant
               </Typography>
             </Box>
@@ -91,11 +102,11 @@ export function Sidebar({ activeSection }: SidebarProps) {
             size="small"
             sx={{
               display: { xs: 'none', md: 'inline-flex' },
-              color: 'rgba(250, 204, 21, 0.6)',
-              bgcolor: 'rgba(250, 204, 21, 0.07)',
+              color: accentAlpha(0.7),
+              bgcolor: accentAlpha(0.07),
               borderRadius: '9px',
               width: 34, height: 34,
-              '&:hover': { bgcolor: 'rgba(250, 204, 21, 0.14)', color: '#facc15' },
+              '&:hover': { bgcolor: accentAlpha(0.15), color: accent },
               transition: 'all 0.2s ease',
               flexShrink: 0,
             }}
@@ -108,11 +119,11 @@ export function Sidebar({ activeSection }: SidebarProps) {
             size="small"
             sx={{
               display: { xs: 'inline-flex', md: 'none' },
-              color: 'rgba(250, 204, 21, 0.6)',
-              bgcolor: 'rgba(250, 204, 21, 0.07)',
+              color: accentAlpha(0.7),
+              bgcolor: accentAlpha(0.07),
               borderRadius: '9px',
               width: 34, height: 34,
-              '&:hover': { bgcolor: 'rgba(250, 204, 21, 0.14)', color: '#facc15' },
+              '&:hover': { bgcolor: accentAlpha(0.15), color: accent },
               transition: 'all 0.2s ease',
               flexShrink: 0,
             }}
@@ -138,12 +149,12 @@ export function Sidebar({ activeSection }: SidebarProps) {
                       justifyContent: expanded ? 'flex-start' : 'center',
                       px: expanded ? 1.75 : 1.25,
                       borderRadius: '11px',
-                      bgcolor: isActive ? 'rgba(250, 204, 21, 0.13)' : 'transparent',
-                      color: isActive ? '#facc15' : 'rgba(255,255,255,0.4)',
-                      borderLeft: isActive ? '3px solid #facc15' : '3px solid transparent',
+                      bgcolor: isActive ? accentAlpha(0.12) : 'transparent',
+                      color: isActive ? accent : textMuted,
+                      borderLeft: isActive ? `3px solid ${accent}` : '3px solid transparent',
                       '&:hover': {
-                        bgcolor: isActive ? 'rgba(250, 204, 21, 0.17)' : 'rgba(255,255,255,0.04)',
-                        color: isActive ? '#facc15' : 'rgba(255,255,255,0.75)',
+                        bgcolor: isActive ? accentAlpha(0.18) : accentAlpha(0.05),
+                        color: isActive ? accent : textPrimary,
                       },
                       transition: 'all 0.18s ease',
                     }}
@@ -188,14 +199,14 @@ export function Sidebar({ activeSection }: SidebarProps) {
             sx={{
               p: 1.25,
               borderRadius: '11px',
-              border: '1px solid rgba(250, 204, 21, 0.12)',
-              bgcolor: 'rgba(250, 204, 21, 0.04)',
+              border: `1px solid ${accentAlpha(0.15)}`,
+              bgcolor: accentAlpha(0.04),
               justifyContent: expanded ? 'flex-start' : 'center',
-              '&:hover': { bgcolor: 'rgba(250, 204, 21, 0.09)', borderColor: 'rgba(250, 204, 21, 0.25)' },
+              '&:hover': { bgcolor: accentAlpha(0.1), borderColor: accentAlpha(0.3) },
               transition: 'all 0.18s ease',
             }}
           >
-            <Avatar sx={{ width: 32, height: 32, bgcolor: '#facc15', color: '#000', mr: expanded ? 1.25 : 0, transition: 'margin 0.28s ease', flexShrink: 0 }}>
+            <Avatar sx={{ width: 32, height: 32, bgcolor: accent, color: '#111', mr: expanded ? 1.25 : 0, transition: 'margin 0.28s ease', flexShrink: 0 }}>
               <UserIcon sx={{ fontSize: 17 }} />
             </Avatar>
             <Box
@@ -207,10 +218,10 @@ export function Sidebar({ activeSection }: SidebarProps) {
                 transition: 'opacity 0.2s ease, width 0.28s ease',
               }}
             >
-              <Typography variant="body2" sx={{ fontWeight: 700, color: '#fff', fontSize: '0.82rem' }}>
+              <Typography variant="body2" sx={{ fontWeight: 700, color: textPrimary, fontSize: '0.82rem' }}>
                 {userName}
               </Typography>
-              <Typography variant="caption" sx={{ color: 'rgba(250, 204, 21, 0.5)', fontSize: '0.68rem' }}>
+              <Typography variant="caption" sx={{ color: accentAlpha(0.6), fontSize: '0.68rem' }}>
                 View Profile
               </Typography>
             </Box>
@@ -235,19 +246,20 @@ export function Sidebar({ activeSection }: SidebarProps) {
         open={isMobileOpen}
         onClose={toggleMobileSidebar}
         ModalProps={{
-          keepMounted: true, // Better open performance on mobile.
+          keepMounted: true,
         }}
         sx={{
           display: { xs: 'block', md: 'none' },
           '& .MuiDrawer-paper': {
             width: DRAWER_WIDTH,
             boxSizing: 'border-box',
-            bgcolor: '#0c0c0c',
-            borderRight: '1px solid rgba(250, 204, 21, 0.1)',
+            bgcolor: drawerBg,
+            borderRight: `1px solid ${drawerBorder}`,
             overflowX: 'hidden',
             overflowY: 'auto',
             scrollbarWidth: 'none',
             '&::-webkit-scrollbar': { display: 'none' },
+            transition: 'background-color 0.25s ease',
           },
         }}
       >
@@ -262,9 +274,9 @@ export function Sidebar({ activeSection }: SidebarProps) {
           '& .MuiDrawer-paper': {
             width: isExpanded ? DRAWER_WIDTH : COLLAPSED_WIDTH,
             boxSizing: 'border-box',
-            bgcolor: '#0c0c0c',
-            borderRight: '1px solid rgba(250, 204, 21, 0.1)',
-            transition: 'width 0.28s cubic-bezier(0.4, 0, 0.2, 1)',
+            bgcolor: drawerBg,
+            borderRight: `1px solid ${drawerBorder}`,
+            transition: 'width 0.28s cubic-bezier(0.4, 0, 0.2, 1), background-color 0.25s ease',
             overflowX: 'hidden',
             overflowY: 'auto',
             scrollbarWidth: 'none',

@@ -126,7 +126,7 @@ export default function MyJobs() {
   };
 
   return (
-    <Box sx={{ display: 'flex', height: '100vh', overflow: 'hidden', bgcolor: '#050505', backgroundImage: 'radial-gradient(circle at top right, rgba(236, 72, 153, 0.03) 0%, transparent 50%)' }}>
+    <Box sx={{ display: 'flex', height: '100vh', overflow: 'hidden', bgcolor: 'background.default' }}>
       <Sidebar activeSection="profile" />
       <Box sx={{ flex: 1, display: 'flex', flexDirection: 'column', minWidth: 0, overflow: 'hidden' }}>
         <Navbar />
@@ -135,10 +135,10 @@ export default function MyJobs() {
               
               <Fade in={true} timeout={600}>
                 <Box>
-                  <Typography variant="h3" sx={{ fontWeight: 800, color: '#fff', letterSpacing: '-0.02em', mb: 2 }}>
-                    My Posted <span style={{ color: '#facc15' }}>Jobs</span>
+                  <Typography variant="h3" sx={{ fontWeight: 800, color: 'text.primary', letterSpacing: '-0.02em', mb: 2 }}>
+                    My Posted <span style={{ color: '#3d678a' }}>Jobs</span>
                   </Typography>
-                  <Typography variant="body1" sx={{ color: 'rgba(255,255,255,0.6)', mb: 6 }}>
+                  <Typography variant="body1" sx={{ color: 'text.secondary', mb: 6 }}>
                     Manage the job opportunities you have posted.
                   </Typography>
 
@@ -167,10 +167,10 @@ export default function MyJobs() {
                                   }}
                               >
                                   <Box sx={{ p: 4, flex: 1, display: 'flex', gap: 3, alignItems: 'center' }}>
-                                      <Avatar src={job.logo || `https://ui-avatars.com/api/?name=${job.company}&background=facc15&color=000&bold=true`} variant="rounded" sx={{ width: 64, height: 64, borderRadius: '16px' }} />
+                                      <Avatar src={job.logo || `https://ui-avatars.com/api/?name=${job.company}&background=00C9A7&color=111&bold=true`} variant="rounded" sx={{ width: 64, height: 64, borderRadius: '16px' }} />
                                       <Box flex={1}>
-                                          <Typography variant="h5" sx={{ color: '#fff', fontWeight: 700, mb: 0.5 }}>{job.title}</Typography>
-                                          <Typography variant="body2" sx={{ color: 'rgba(255,255,255,0.6)', mb: 1.5 }}>{job.company}</Typography>
+                                          <Typography variant="h5" sx={{ color: 'text.primary', fontWeight: 700, mb: 0.5 }}>{job.title}</Typography>
+                                          <Typography variant="body2" sx={{ color: 'text.secondary', mb: 1.5 }}>{job.company}</Typography>
                                           <Box sx={{ display: 'flex', gap: 2 }}>
                                               <Typography variant="caption" sx={{ color: 'rgba(255,255,255,0.4)', display: 'flex', alignItems: 'center', gap: 0.5 }}>
                                                   <TimeIcon sx={{ fontSize: 14 }} /> Posted on {formatDate(job.createdAt)}
@@ -182,7 +182,7 @@ export default function MyJobs() {
                                       </Box>
                                   </Box>
                                   <Box sx={{ p: 4, borderLeft: { xs: 'none', md: '1px solid rgba(255,255,255,0.05)' }, borderTop: { xs: '1px solid rgba(255,255,255,0.05)', md: 'none' }, display: 'flex', flexDirection: 'column', justifyContent: 'center', gap: 1.5, bgcolor: 'rgba(255,255,255,0.01)', minWidth: 200 }}>
-                                      <Button onClick={() => handleJobClick(job)} variant="outlined" sx={{ color: '#facc15', borderColor: 'rgba(250, 204, 21, 0.4)', borderRadius: '12px' }}>
+                                      <Button onClick={() => handleJobClick(job)} variant="outlined" sx={{ color: '#3d678a', borderColor: 'rgba(61, 103, 138, 0.4)', borderRadius: '12px', '&:hover': { bgcolor: 'rgba(61,103,138,0.06)' } }}>
                                           View Details
                                       </Button>
                                       <Button onClick={() => navigate(`/jobs/update/${job.id}`)} variant="contained" sx={{ bgcolor: '#3b82f6', '&:hover': { bgcolor: '#2563eb' }, borderRadius: '12px', fontWeight: 700 }}>
@@ -200,8 +200,8 @@ export default function MyJobs() {
                   ) : (
                     <Box sx={{ p: 8, textAlign: 'center', bgcolor: 'rgba(255,255,255,0.02)', borderRadius: '32px', border: '1px dashed rgba(255,255,255,0.1)' }}>
                         <WorkIcon sx={{ fontSize: 64, color: 'rgba(255,255,255,0.2)', mb: 2 }} />
-                        <Typography variant="h6" sx={{ color: '#fff', mb: 1 }}>You haven't posted any jobs yet.</Typography>
-                        <Button href="/jobs/create" variant="contained" sx={{ mt: 3, bgcolor: '#facc15', color: '#000', fontWeight: 700, borderRadius: '12px' }}>
+                        <Typography variant="h6" sx={{ color: 'text.primary', mb: 1 }}>You haven't posted any jobs yet.</Typography>
+                        <Button href="/jobs/create" variant="contained" color="primary" sx={{ mt: 3, color: '#111111', fontWeight: 700, borderRadius: '12px' }}>
                             Post a Job Now
                         </Button>
                     </Box>
@@ -223,9 +223,9 @@ export default function MyJobs() {
         scroll="body"
         PaperProps={{
           sx: {
-            bgcolor: '#0a0a0a',
+            bgcolor: 'background.paper',
             borderRadius: { xs: 0, md: '32px' },
-            border: '1px solid rgba(255, 255, 255, 0.1)',
+            border: '1px solid rgba(61, 103, 138, 0.12)',
             backgroundImage: 'none',
             boxShadow: '0 25px 50px -12px rgba(0,0,0,0.8)',
             m: { xs: 0, md: 2 }

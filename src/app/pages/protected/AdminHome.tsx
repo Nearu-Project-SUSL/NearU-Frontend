@@ -35,7 +35,7 @@ export default function AdminHome() {
               <Grid container spacing={3}>
                 {[
                   { title: 'Users', count: '1,240', color: '#ef4444' },
-                  { title: 'Business Apps', count: '12 Pending', color: '#facc15' },
+                  { title: 'Business Apps', count: '12 Pending', color: '#3d678a' },
                   { title: 'System Health', count: '99.9%', color: '#34d399' }
                 ].map((stat, i) => (
                   <Grid xs={12} sm={4} key={i}>
