@@ -35,7 +35,7 @@ import { accommodations as fallbackAccommodations, type Accommodation } from "..
 export default function AccommodationDetail() {
 	const { id } = useParams();
 	const [accommodation, setAccommodation] = useState<Accommodation | undefined>(undefined);
-	const [items, setItems] = useS
+	const [items, setItems] = useState<AccommodationItem[]>([]);
 	const [loading, setLoading] = useState(true);
 	const [error, setError] = useState("");
 	const accentYellow = "#facc15";
@@ -45,7 +45,7 @@ export default function AccommodationDetail() {
 		let isMounted = true;
 
 		const loadAccommodationData = async () => {
-tate<AccommodationItem[]>([]);			if (!id) {
+			if (!id) {
 				if (isMounted) {
 					setLoading(false);
 				}
