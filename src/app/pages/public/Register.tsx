@@ -236,13 +236,13 @@ export default function Register() {
             to="/login"
             variant="outlined"
             sx={{
-              color: '#3d678a',
-              borderColor: 'rgba(61, 103, 138, 0.2)',
+              color: '#2E9EBF',
+              borderColor: 'rgba(46, 158, 191, 0.2)',
               borderRadius: '0.75rem',
               px: 3,
               '&:hover': {
-                borderColor: '#3d678a',
-                bgcolor: 'rgba(61, 103, 138, 0.1)',
+                borderColor: '#2E9EBF',
+                bgcolor: 'rgba(46, 158, 191, 0.1)',
                 transform: 'scale(1.05)',
               },
               transition: 'all 0.3s',
@@ -273,16 +273,16 @@ export default function Register() {
 
                   {/* Orbiting icons */}
                   <div className="absolute top-8 left-1/2 -translate-x-1/2 w-12 h-12 bg-blue-400/20 rounded-full flex items-center justify-center border border-blue-400/40 animate-float">
-                    <UserIcon sx={{ fontSize: 24, color: '#3d678a' }} />
+                    <UserIcon sx={{ fontSize: 24, color: '#2E9EBF' }} />
                   </div>
                   <div className="absolute bottom-8 left-1/2 -translate-x-1/2 w-12 h-12 bg-blue-400/20 rounded-full flex items-center justify-center border border-blue-400/40 animate-float" style={{ animationDelay: '1s' }}>
-                    <BikeIcon sx={{ fontSize: 24, color: '#3d678a' }} />
+                    <BikeIcon sx={{ fontSize: 24, color: '#2E9EBF' }} />
                   </div>
                   <div className="absolute left-8 top-1/2 -translate-y-1/2 w-12 h-12 bg-blue-400/20 rounded-full flex items-center justify-center border border-blue-400/40 animate-float" style={{ animationDelay: '2s' }}>
-                    <StoreIcon sx={{ fontSize: 24, color: '#3d678a' }} />
+                    <StoreIcon sx={{ fontSize: 24, color: '#2E9EBF' }} />
                   </div>
                   <div className="absolute right-8 top-1/2 -translate-y-1/2 w-12 h-12 bg-blue-400/20 rounded-full flex items-center justify-center border border-blue-400/40 animate-float" style={{ animationDelay: '3s' }}>
-                    <BuildingIcon sx={{ fontSize: 24, color: '#3d678a' }} />
+                    <BuildingIcon sx={{ fontSize: 24, color: '#2E9EBF' }} />
                   </div>
                 </div>
               </div>
@@ -325,17 +325,17 @@ export default function Register() {
                         py: 2,
                         borderRadius: '0.75rem',
                         border: '2px solid',
-                        borderColor: userType === item.type ? '#3d678a' : 'rgba(61, 103, 138, 0.2)',
-                        bgcolor: userType === item.type ? 'rgba(61, 103, 138, 0.1)' : 'rgba(0,0,0,0.4)',
+                        borderColor: userType === item.type ? '#2E9EBF' : 'rgba(46, 158, 191, 0.2)',
+                        bgcolor: userType === item.type ? 'rgba(46, 158, 191, 0.1)' : 'rgba(0,0,0,0.4)',
                         color: 'white',
                         '&:hover': {
-                          borderColor: userType === item.type ? '#3d678a' : 'rgba(61, 103, 138, 0.4)',
-                          bgcolor: userType === item.type ? 'rgba(61, 103, 138, 0.15)' : 'rgba(0,0,0,0.6)',
+                          borderColor: userType === item.type ? '#2E9EBF' : 'rgba(46, 158, 191, 0.4)',
+                          bgcolor: userType === item.type ? 'rgba(46, 158, 191, 0.15)' : 'rgba(0,0,0,0.6)',
                         },
                       }}
                     >
                       <Box sx={{ 
-                        bgcolor: userType === item.type ? '#3d678a' : 'rgba(156, 163, 175, 0.2)',
+                        bgcolor: userType === item.type ? '#2E9EBF' : 'rgba(156, 163, 175, 0.2)',
                         p: 1, 
                         borderRadius: '0.5rem',
                         mb: 1,
@@ -353,7 +353,7 @@ export default function Register() {
               {/* Form Content */}
               {userType === 'student' && (
                 <Box className="animate-fadeIn">
-                  <Stepper activeStep={activeStep} alternativeLabel sx={{ mb: 4, '& .MuiStepIcon-root.Mui-active': { color: '#3d678a' }, '& .MuiStepIcon-root.Mui-completed': { color: '#3d678a' } }}>
+                  <Stepper activeStep={activeStep} alternativeLabel sx={{ mb: 4, '& .MuiStepIcon-root.Mui-active': { color: '#2E9EBF' }, '& .MuiStepIcon-root.Mui-completed': { color: '#2E9EBF' } }}>
                     {steps.map((label) => (
                       <Step key={label}>
                         <StepLabel sx={{ '& .MuiStepLabel-label': { color: 'gray' }, '& .MuiStepLabel-label.Mui-active': { color: 'white' } }}>{label}</StepLabel>
@@ -453,7 +453,7 @@ export default function Register() {
                           fullWidth
                           variant="contained"
                           onClick={handleNext}
-                          sx={{ mt: 2, bgcolor: '#3d678a', color: 'black', '&:hover': { bgcolor: '#2e5270' } }}
+                          sx={{ mt: 2, bgcolor: '#2E9EBF', color: 'black', '&:hover': { bgcolor: '#1a7a9a' } }}
                           endIcon={<ChevronRightIcon />}
                         >
                           Next Step
@@ -522,7 +522,7 @@ export default function Register() {
                             variant="outlined"
                             onClick={handleBack}
                             startIcon={<ChevronLeftIcon />}
-                            sx={{ color: 'white', borderColor: 'rgba(61, 103, 138, 0.2)' }}
+                            sx={{ color: 'white', borderColor: 'rgba(46, 158, 191, 0.2)' }}
                           >
                             Back
                           </Button>
@@ -531,7 +531,7 @@ export default function Register() {
                             variant="contained"
                             onClick={handleNext}
                             endIcon={<ChevronRightIcon />}
-                            sx={{ bgcolor: '#3d678a', color: 'black', '&:hover': { bgcolor: '#2e5270' } }}
+                            sx={{ bgcolor: '#2E9EBF', color: 'black', '&:hover': { bgcolor: '#1a7a9a' } }}
                           >
                             Next Step
                           </Button>
@@ -587,7 +587,7 @@ export default function Register() {
                             variant="outlined"
                             onClick={handleBack}
                             startIcon={<ChevronLeftIcon />}
-                            sx={{ color: 'white', borderColor: 'rgba(61, 103, 138, 0.2)' }}
+                            sx={{ color: 'white', borderColor: 'rgba(46, 158, 191, 0.2)' }}
                           >
                             Back
                           </Button>
@@ -654,12 +654,12 @@ export default function Register() {
                         <TextField fullWidth label="Tax ID" value={businessForm.taxId} onChange={(e) => setBusinessForm({...businessForm, taxId: e.target.value})} />
                       </Grid>
                     </Grid>
-                    <Paper sx={{ p: 2, bgcolor: 'rgba(61, 103, 138, 0.05)', border: '1px solid rgba(61, 103, 138, 0.2)' }}>
-                      <Typography variant="caption" sx={{ color: '#3d678a' }}>
+                    <Paper sx={{ p: 2, bgcolor: 'rgba(46, 158, 191, 0.05)', border: '1px solid rgba(46, 158, 191, 0.2)' }}>
+                      <Typography variant="caption" sx={{ color: '#2E9EBF' }}>
                         Note: Your application will be reviewed by our admin team.
                       </Typography>
                     </Paper>
-                    <Button fullWidth variant="contained" type="submit" disabled={isLoading} endIcon={isLoading ? undefined : <ArrowRightIcon />} startIcon={isLoading ? <CircularProgress size={20} color="inherit" /> : null} sx={{ mt: 2, bgcolor: '#3d678a', color: 'black', '&:hover': { bgcolor: '#2e5270' } }}>
+                    <Button fullWidth variant="contained" type="submit" disabled={isLoading} endIcon={isLoading ? undefined : <ArrowRightIcon />} startIcon={isLoading ? <CircularProgress size={20} color="inherit" /> : null} sx={{ mt: 2, bgcolor: '#2E9EBF', color: 'black', '&:hover': { bgcolor: '#1a7a9a' } }}>
                       {isLoading ? 'Processing...' : 'Submit for Review'}
                     </Button>
                   </form>
@@ -704,12 +704,12 @@ export default function Register() {
                     </Grid>
                     <TextField fullWidth label="License No." required value={riderForm.licenseNumber} onChange={(e) => setRiderForm({...riderForm, licenseNumber: e.target.value})} />
                     <TextField fullWidth label="Address" multiline rows={2} required value={riderForm.address} onChange={(e) => setRiderForm({...riderForm, address: e.target.value})} />
-                    <Paper sx={{ p: 2, bgcolor: 'rgba(61, 103, 138, 0.05)', border: '1px solid rgba(61, 103, 138, 0.2)' }}>
-                      <Typography variant="caption" sx={{ color: '#3d678a' }}>
+                    <Paper sx={{ p: 2, bgcolor: 'rgba(46, 158, 191, 0.05)', border: '1px solid rgba(46, 158, 191, 0.2)' }}>
+                      <Typography variant="caption" sx={{ color: '#2E9EBF' }}>
                         Note: Your application will be reviewed by our admin team.
                       </Typography>
                     </Paper>
-                    <Button fullWidth variant="contained" type="submit" disabled={isLoading} endIcon={isLoading ? undefined : <ArrowRightIcon />} startIcon={isLoading ? <CircularProgress size={20} color="inherit" /> : null} sx={{ mt: 2, bgcolor: '#3d678a', color: 'black', '&:hover': { bgcolor: '#2e5270' } }}>
+                    <Button fullWidth variant="contained" type="submit" disabled={isLoading} endIcon={isLoading ? undefined : <ArrowRightIcon />} startIcon={isLoading ? <CircularProgress size={20} color="inherit" /> : null} sx={{ mt: 2, bgcolor: '#2E9EBF', color: 'black', '&:hover': { bgcolor: '#1a7a9a' } }}>
                       {isLoading ? 'Processing...' : 'Submit for Review'}
                     </Button>
                   </form>

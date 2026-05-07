@@ -136,7 +136,7 @@ export default function MyJobs() {
               <Fade in={true} timeout={600}>
                 <Box>
                   <Typography variant="h3" sx={{ fontWeight: 800, color: 'text.primary', letterSpacing: '-0.02em', mb: 2 }}>
-                    My Posted <span style={{ color: '#3d678a' }}>Jobs</span>
+                    My Posted <span style={{ color: '#2E9EBF' }}>Jobs</span>
                   </Typography>
                   <Typography variant="body1" sx={{ color: 'text.secondary', mb: 6 }}>
                     Manage the job opportunities you have posted.
@@ -182,7 +182,7 @@ export default function MyJobs() {
                                       </Box>
                                   </Box>
                                   <Box sx={{ p: 4, borderLeft: { xs: 'none', md: '1px solid rgba(255,255,255,0.05)' }, borderTop: { xs: '1px solid rgba(255,255,255,0.05)', md: 'none' }, display: 'flex', flexDirection: 'column', justifyContent: 'center', gap: 1.5, bgcolor: 'rgba(255,255,255,0.01)', minWidth: 200 }}>
-                                      <Button onClick={() => handleJobClick(job)} variant="outlined" sx={{ color: '#3d678a', borderColor: 'rgba(61, 103, 138, 0.4)', borderRadius: '12px', '&:hover': { bgcolor: 'rgba(61,103,138,0.06)' } }}>
+                                      <Button onClick={() => handleJobClick(job)} variant="outlined" sx={{ color: '#2E9EBF', borderColor: 'rgba(46, 158, 191, 0.4)', borderRadius: '12px', '&:hover': { bgcolor: 'rgba(46,158,191,0.06)' } }}>
                                           View Details
                                       </Button>
                                       <Button onClick={() => navigate(`/jobs/update/${job.id}`)} variant="contained" sx={{ bgcolor: '#3b82f6', '&:hover': { bgcolor: '#2563eb' }, borderRadius: '12px', fontWeight: 700 }}>
@@ -225,7 +225,7 @@ export default function MyJobs() {
           sx: {
             bgcolor: 'background.paper',
             borderRadius: { xs: 0, md: '32px' },
-            border: '1px solid rgba(61, 103, 138, 0.12)',
+            border: '1px solid rgba(46, 158, 191, 0.12)',
             backgroundImage: 'none',
             boxShadow: '0 25px 50px -12px rgba(0,0,0,0.8)',
             m: { xs: 0, md: 2 }

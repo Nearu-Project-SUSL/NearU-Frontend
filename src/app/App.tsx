@@ -31,7 +31,7 @@ function MuiThemeWrapper({ children }: { children: React.ReactNode }) {
         palette: {
           mode: isDark ? 'dark' : 'light',
           primary: {
-            main: '#3d678a',
+            main: '#2E9EBF',
             contrastText: '#ffffff',
           },
           background: {
@@ -58,7 +58,7 @@ function MuiThemeWrapper({ children }: { children: React.ReactNode }) {
               containedPrimary: {
                 color: '#ffffff',
                 '&:hover': {
-                  backgroundColor: '#2e5270',
+                  backgroundColor: '#1a7a9a',
                 },
               },
             },
@@ -108,7 +108,7 @@ export default function App() {
                 toastOptions={{
                   style: {
                     background: 'rgba(0, 0, 0, 0.9)',
-                    border: '1px solid rgba(61, 103, 138, 0.3)',
+                    border: '1px solid rgba(46, 158, 191, 0.3)',
                     color: 'white',
                   },
                 }}

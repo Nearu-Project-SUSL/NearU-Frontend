@@ -145,8 +145,8 @@ function JobCard({ job, index, onClick }: { job: JobResponse, index: number, onC
           transform: hovered ? 'translateY(-8px)' : 'translateY(0)',
           border: '1px solid rgba(255, 255, 255, 0.05)',
           '&:hover': {
-             borderColor: 'rgba(61, 103, 138, 0.3)',
-             bgcolor: 'rgba(61, 103, 138, 0.02)',
+             borderColor: 'rgba(46, 158, 191, 0.3)',
+             bgcolor: 'rgba(46, 158, 191, 0.02)',
              boxShadow: '0 20px 40px rgba(0,0,0,0.3)',
           }
         }}
@@ -177,7 +177,7 @@ function JobCard({ job, index, onClick }: { job: JobResponse, index: number, onC
                         label="NEW" 
                         size="small" 
                         sx={{ 
-                            bgcolor: '#3d678a', 
+                            bgcolor: '#2E9EBF', 
                             color: '#111111', 
                             fontWeight: 800, 
                             fontSize: '0.65rem',
@@ -195,7 +195,7 @@ function JobCard({ job, index, onClick }: { job: JobResponse, index: number, onC
             {job.title}
           </Typography>
           
-          <Typography variant="body2" sx={{ color: '#3d678a', fontWeight: 600, mb: 2, fontSize: '0.9rem', display: 'flex', alignItems: 'center', gap: 0.5 }}>
+          <Typography variant="body2" sx={{ color: '#2E9EBF', fontWeight: 600, mb: 2, fontSize: '0.9rem', display: 'flex', alignItems: 'center', gap: 0.5 }}>
             {job.company} <VerifiedIcon sx={{ fontSize: 14 }} />
           </Typography>
 
@@ -233,11 +233,11 @@ const textFieldStyles = {
     color: 'inherit',
     borderRadius: '12px',
     height: 48,
-    bgcolor: 'rgba(61,103,138,0.03)',
-    '& fieldset': { borderColor: 'rgba(61,103,138,0.15)', borderWidth: '1px' },
-    '&:hover fieldset': { borderColor: 'rgba(61,103,138,0.4)' },
-    '&.Mui-focused fieldset': { borderColor: '#3d678a', borderWidth: '1px' },
-    '& .MuiSelect-icon': { color: 'rgba(61,103,138,0.6)' }
+    bgcolor: 'rgba(46,158,191,0.03)',
+    '& fieldset': { borderColor: 'rgba(46,158,191,0.15)', borderWidth: '1px' },
+    '&:hover fieldset': { borderColor: 'rgba(46,158,191,0.4)' },
+    '&.Mui-focused fieldset': { borderColor: '#2E9EBF', borderWidth: '1px' },
+    '& .MuiSelect-icon': { color: 'rgba(46,158,191,0.6)' }
   },
 };
 
@@ -326,7 +326,7 @@ export default function Jobs() {
   };
 
   return (
-    <Box sx={{ display: 'flex', height: '100vh', overflow: 'hidden', bgcolor: 'background.default', backgroundImage: 'radial-gradient(circle at top left, rgba(61,103,138,0.04) 0%, transparent 50%)' }}>
+    <Box sx={{ display: 'flex', height: '100vh', overflow: 'hidden', bgcolor: 'background.default', backgroundImage: 'radial-gradient(circle at top left, rgba(46,158,191,0.04) 0%, transparent 50%)' }}>
       <Sidebar activeSection="jobs" />
 
       <Box sx={{ flex: 1, display: 'flex', flexDirection: 'column', minWidth: 0, overflow: 'hidden' }}>
@@ -344,10 +344,11 @@ export default function Jobs() {
                     flexDirection: { xs: 'column', md: 'row' },
                     alignItems: 'center',
                     justifyContent: 'space-between',
-                    bgcolor: 'rgba(255,255,255,0.03)', 
+                    bgcolor: 'background.paper', 
                     borderRadius: '32px',
                     overflow: 'hidden',
-                    border: '1px solid rgba(255,255,255,0.05)',
+                    border: '1px solid',
+                    borderColor: 'divider',
                     position: 'relative'
                   }}
                 >
@@ -385,16 +386,16 @@ export default function Jobs() {
                       onClick={() => navigate('/jobs/create')}
                       startIcon={<AddIcon />}
                       sx={{
-                        bgcolor: '#3d678a',
-                        color: '#111111',
-                        fontWeight: 800,
+                        bgcolor: '#2E9EBF',
+                        color: '#ffffff',
+                        fontWeight: 700,
                         py: 1.5,
                         px: 4,
                         borderRadius: '16px',
                         fontSize: '1rem',
                         textTransform: 'none',
                         '&:hover': {
-                          bgcolor: '#2e5270',
+                          bgcolor: '#1a7a9a',
                         }
                       }}
                     >
@@ -414,7 +415,7 @@ export default function Jobs() {
                       overflow: 'hidden'
                     }}
                   >
-                     <Box sx={{ position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)', width: '80%', height: '80%', bgcolor: 'rgba(61,103,138,0.05)', filter: 'blur(60px)', zIndex: 0, borderRadius: '50%' }} />
+                     <Box sx={{ position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)', width: '80%', height: '80%', bgcolor: 'rgba(46,158,191,0.05)', filter: 'blur(60px)', zIndex: 0, borderRadius: '50%' }} />
                      <Box 
                        component="img" 
                        src="/job_service.png" 
@@ -437,19 +438,19 @@ export default function Jobs() {
                 <Box sx={{ mb: 8 }}>
                   <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 4 }}>
                         <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
-                          <WorkIcon sx={{ color: '#3d678a', fontSize: 28 }} />
+                          <WorkIcon sx={{ color: '#2E9EBF', fontSize: 28 }} />
                           <Box>
                             <Typography variant="h5" sx={{ fontWeight: 800, color: 'text.primary', letterSpacing: '-0.01em' }}>
                               New Job Postings
                             </Typography>
-                            <Typography variant="caption" sx={{ color: 'rgba(255,255,255,0.4)' }}>Recently added opportunities for you</Typography>
+                            <Typography variant="caption" sx={{ color: 'text.secondary' }}>Recently added opportunities for you</Typography>
                           </Box>
                         </Box>
                         <Box sx={{ display: { xs: 'none', md: 'flex' }, gap: 1.5 }}>
-                          <IconButton onClick={() => scrollNewJobs('left')} sx={{ bgcolor: 'rgba(255,255,255,0.03)', color: 'text.primary', border: '1px solid', '&:hover': { bgcolor: 'rgba(61,103,138,0.15)', borderColor: '#3d678a' } }}>
+                          <IconButton onClick={() => scrollNewJobs('left')} sx={{ bgcolor: 'rgba(255,255,255,0.03)', color: 'text.primary', border: '1px solid', '&:hover': { bgcolor: 'rgba(46,158,191,0.15)', borderColor: '#2E9EBF' } }}>
                             <ChevronLeftIcon />
                           </IconButton>
-                          <IconButton onClick={() => scrollNewJobs('right')} sx={{ bgcolor: 'rgba(255,255,255,0.03)', color: 'text.primary', border: '1px solid', '&:hover': { bgcolor: 'rgba(61,103,138,0.15)', borderColor: '#3d678a' } }}>
+                          <IconButton onClick={() => scrollNewJobs('right')} sx={{ bgcolor: 'rgba(255,255,255,0.03)', color: 'text.primary', border: '1px solid', '&:hover': { bgcolor: 'rgba(46,158,191,0.15)', borderColor: '#2E9EBF' } }}>
                             <ChevronRightIcon />
                           </IconButton>
                         </Box>
@@ -493,7 +494,7 @@ export default function Jobs() {
                              Opportunities
                           </Typography>
                           {isFetching && !loading && (
-                            <CircularProgress size={16} sx={{ color: 'rgba(61,103,138,0.7)' }} />
+                            <CircularProgress size={16} sx={{ color: 'rgba(46,158,191,0.7)' }} />
                           )}
                         </Box>
                         <Typography variant="caption" sx={{ color: 'rgba(255,255,255,0.4)' }}>
@@ -602,17 +603,17 @@ export default function Jobs() {
                               fontWeight: 600,
                               transition: 'all 0.2s ease',
                               '&:hover': {
-                                bgcolor: 'rgba(61,103,138,0.12)',
-                                borderColor: 'rgba(61,103,138,0.4)',
-                                color: '#3d678a',
+                                bgcolor: 'rgba(46,158,191,0.12)',
+                                borderColor: 'rgba(46,158,191,0.4)',
+                                color: '#2E9EBF',
                               },
                               '&.Mui-selected': {
-                                bgcolor: '#3d678a',
+                                bgcolor: '#2E9EBF',
                                 color: '#111111',
                                 fontWeight: 800,
-                                borderColor: '#3d678a',
+                                borderColor: '#2E9EBF',
                                 '&:hover': {
-                                  bgcolor: '#2e5270',
+                                  bgcolor: '#1a7a9a',
                                 },
                               },
                             },
@@ -631,10 +632,10 @@ export default function Jobs() {
                 )}
               </Box>
 
-              <Box sx={{ mt: 10, p: 4, borderRadius: '32px', bgcolor: 'rgba(61, 103, 138, 0.03)', border: '1px dashed rgba(61, 103, 138, 0.2)', textAlign: 'center' }}>
+              <Box sx={{ mt: 10, p: 4, borderRadius: '32px', bgcolor: 'rgba(46, 158, 191, 0.03)', border: '1px dashed rgba(46, 158, 191, 0.2)', textAlign: 'center' }}>
                  <Typography variant="h6" sx={{ color: 'text.primary', fontWeight: 700, mb: 1 }}>Don't see what you're looking for?</Typography>
                  <Typography variant="body2" sx={{ color: 'text.secondary', mb: 3 }}>We update our job board daily. Check back tomorrow for more roles!</Typography>
-                 <Button variant="outlined" sx={{ color: '#3d678a', borderColor: 'rgba(61, 103, 138, 0.4)', borderRadius: '12px', px: 4, py: 1.2, fontWeight: 700, textTransform: 'none', '&:hover': { borderColor: '#3d678a', bgcolor: 'rgba(61, 103, 138, 0.08)' } }}>
+                 <Button variant="outlined" sx={{ color: '#2E9EBF', borderColor: 'rgba(46, 158, 191, 0.4)', borderRadius: '12px', px: 4, py: 1.2, fontWeight: 700, textTransform: 'none', '&:hover': { borderColor: '#2E9EBF', bgcolor: 'rgba(46, 158, 191, 0.08)' } }}>
                     Set Job Alerts
                  </Button>
               </Box>
@@ -654,7 +655,7 @@ export default function Jobs() {
           sx: {
             bgcolor: 'background.paper',
             borderRadius: { xs: 0, md: '32px' },
-            border: '1px solid rgba(61, 103, 138, 0.12)',
+            border: '1px solid rgba(46, 158, 191, 0.12)',
             backgroundImage: 'none',
             boxShadow: '0 25px 50px -12px rgba(0,0,0,0.8)',
             m: { xs: 0, md: 2 }
@@ -664,8 +665,8 @@ export default function Jobs() {
         {selectedJob && (
           <Box sx={{ position: 'relative' }}>
             {/* Header / Background cover */}
-            <Box sx={{ height: { xs: 150, md: 200 }, bgcolor: 'rgba(61, 103, 138, 0.05)', position: 'relative', overflow: 'hidden' }}>
-                <Box sx={{ position: 'absolute', top: 0, left: 0, right: 0, bottom: 0, opacity: 0.12, backgroundImage: `radial-gradient(circle at 20% 50%, #3d678a 0%, transparent 50%), radial-gradient(circle at 80% 50%, #3d678a 0%, transparent 50%)` }} />
+            <Box sx={{ height: { xs: 150, md: 200 }, bgcolor: 'rgba(46, 158, 191, 0.05)', position: 'relative', overflow: 'hidden' }}>
+                <Box sx={{ position: 'absolute', top: 0, left: 0, right: 0, bottom: 0, opacity: 0.12, backgroundImage: `radial-gradient(circle at 20% 50%, #2E9EBF 0%, transparent 50%), radial-gradient(circle at 80% 50%, #2E9EBF 0%, transparent 50%)` }} />
                 <IconButton 
                     onClick={handleCloseDetails} 
                     sx={{ 
@@ -701,7 +702,7 @@ export default function Jobs() {
                         <Typography variant="h4" sx={{ color: 'text.primary', fontWeight: 800, letterSpacing: '-0.02em', mb: 0.5 }}>
                             {selectedJob.title}
                         </Typography>
-                        <Typography variant="h6" sx={{ color: '#3d678a', fontWeight: 600, display: 'flex', alignItems: 'center', gap: 1 }}>
+                        <Typography variant="h6" sx={{ color: '#2E9EBF', fontWeight: 600, display: 'flex', alignItems: 'center', gap: 1 }}>
                             {selectedJob.company} <VerifiedIcon sx={{ fontSize: 20 }} />
                         </Typography>
                     </Box>
@@ -732,7 +733,7 @@ export default function Jobs() {
                               <Stack spacing={2}>
                                   {selectedJob.requirements.map((req, i) => (
                                       <Box key={i} sx={{ display: 'flex', gap: 2, alignItems: 'flex-start' }}>
-                                          <Box sx={{ mt: 1, width: 6, height: 6, borderRadius: '50%', bgcolor: '#3d678a', flexShrink: 0 }} />
+                                          <Box sx={{ mt: 1, width: 6, height: 6, borderRadius: '50%', bgcolor: '#2E9EBF', flexShrink: 0 }} />
                                           <Typography variant="body1" sx={{ color: 'text.secondary' }}>{req}</Typography>
                                       </Box>
                                   ))}
@@ -746,7 +747,7 @@ export default function Jobs() {
                               <Typography variant="h6" sx={{ color: 'text.primary', fontWeight: 700, mb: 2 }}>Tags</Typography>
                               <Box sx={{ display: 'flex', gap: 1, flexWrap: 'wrap' }}>
                                   {selectedJob.tags.map((tag, i) => (
-                                      <Chip key={i} label={tag} variant="outlined" sx={{ color: '#3d678a', borderColor: 'rgba(61, 103, 138, 0.3)', bgcolor: 'rgba(61, 103, 138, 0.05)' }} />
+                                      <Chip key={i} label={tag} variant="outlined" sx={{ color: '#2E9EBF', borderColor: 'rgba(46, 158, 191, 0.3)', bgcolor: 'rgba(46, 158, 191, 0.05)' }} />
                                   ))}
                               </Box>
                           </Box>
@@ -776,7 +777,7 @@ export default function Jobs() {
                                 </Box>
                                 
                                 <Box sx={{ display: 'flex', gap: 2 }}>
-                                    <LabelIcon sx={{ color: '#3d678a' }} />
+                                    <LabelIcon sx={{ color: '#2E9EBF' }} />
                                     <Box>
                                         <Typography variant="caption" sx={{ color: 'rgba(255,255,255,0.4)', display: 'block' }}>Job Type</Typography>
                                         <Typography variant="body2" sx={{ color: 'text.primary', fontWeight: 600 }}>{selectedJob.jobType}</Typography>
@@ -797,7 +798,7 @@ export default function Jobs() {
                             {/* Poster Info */}
                             <Typography variant="subtitle2" sx={{ color: 'rgba(255,255,255,0.4)', mb: 2, fontSize: '0.75rem', fontWeight: 700, letterSpacing: '0.05em' }}>POSTED BY</Typography>
                             <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, mb: 3 }}>
-                                <Avatar src={selectedJob.postedBy.avatar || undefined} sx={{ width: 44, height: 44, border: '1px solid #3d678a' }} />
+                                <Avatar src={selectedJob.postedBy.avatar || undefined} sx={{ width: 44, height: 44, border: '1px solid #2E9EBF' }} />
                                 <Box>
                                     <Typography variant="body2" sx={{ color: 'text.primary', fontWeight: 700 }}>{selectedJob.postedBy.name}</Typography>
                                     <Typography variant="caption" sx={{ color: 'rgba(255,255,255,0.4)' }}>{selectedJob.postedBy.email}</Typography>
@@ -844,13 +845,13 @@ export default function Jobs() {
                                         variant="contained" 
                                         startIcon={<EmailIcon />}
                                         sx={{ 
-                                            bgcolor: '#3d678a', 
+                                            bgcolor: '#2E9EBF', 
                                             color: '#111111', 
                                             fontWeight: 700, 
                                             borderRadius: '12px', 
                                             py: 1.2,
                                             textTransform: 'none',
-                                            '&:hover': { bgcolor: '#2e5270' }
+                                            '&:hover': { bgcolor: '#1a7a9a' }
                                         }}
                                         href={`mailto:${selectedJob.postedBy.email}`}
                                     >
@@ -862,8 +863,8 @@ export default function Jobs() {
                                            variant="outlined" 
                                            startIcon={<PhoneIcon />}
                                            sx={{ 
-                                               color: '#3d678a', 
-                                               borderColor: 'rgba(61, 103, 138, 0.4)',
+                                               color: '#2E9EBF', 
+                                               borderColor: 'rgba(46, 158, 191, 0.4)',
                                                fontWeight: 700, 
                                                borderRadius: '12px', 
                                                py: 1.2,

@@ -173,7 +173,7 @@ function ServiceCard({ service, index }: { service: typeof services[0], index: n
   const [hovered, setHovered] = useState(false);
   const theme = useTheme();
   const accent = theme.palette.primary.main;
-  const accentAlpha = (a: number) => `rgba(61, 103, 138, ${a})`;
+  const accentAlpha = (a: number) => `rgba(46, 158, 191, ${a})`;
 
   return (
     <Grow in timeout={400 + index * 100}>
@@ -257,7 +257,7 @@ function DealCard({ deal, index }: { deal: typeof hotDeals[0], index: number }) 
   const [hovered, setHovered] = useState(false);
   const theme = useTheme();
   const accent = theme.palette.primary.main;
-  const accentAlpha = (a: number) => `rgba(61, 103, 138, ${a})`;
+  const accentAlpha = (a: number) => `rgba(46, 158, 191, ${a})`;
 
   return (
     <Grow in timeout={600 + index * 100}>
@@ -315,7 +315,7 @@ function DealCard({ deal, index }: { deal: typeof hotDeals[0], index: number }) 
 function TestimonialCard({ t, index }: { t: typeof testimonials[0], index: number }) {
   const theme = useTheme();
   const accent = theme.palette.primary.main;
-  const accentAlpha = (a: number) => `rgba(61, 103, 138, ${a})`;
+  const accentAlpha = (a: number) => `rgba(46, 158, 191, ${a})`;
 
   return (
     <Grow in timeout={800 + index * 100}>
@@ -361,7 +361,7 @@ export default function Home() {
   const [showAllServices, setShowAllServices] = useState(false);
 
   const accent = theme.palette.primary.main;
-  const accentAlpha = (a: number) => `rgba(61, 103, 138, ${a})`;
+  const accentAlpha = (a: number) => `rgba(46, 158, 191, ${a})`;
 
   const { scrollRef: servicesRef, scroll: scrollServices } = useHorizontalScroll();
   const { scrollRef: dealsRef, scroll: scrollDeals } = useHorizontalScroll();

@@ -143,7 +143,7 @@ export default function FoodPage(){
 
   const theme = useTheme();
   const accent = theme.palette.primary.main;
-  const accentAlpha = (a: number) => `rgba(61, 103, 138, ${a})`;
+  const accentAlpha = (a: number) => `rgba(46, 158, 191, ${a})`;
 
   return (
     <Box
@@ -160,9 +160,8 @@ export default function FoodPage(){
       <Box sx={{ flexGrow: 1, display:'flex', flexDirection:'column', minWidth: 0 , overflow:'hidden'}}>
         <Navbar />
 
-        <PageLayout>
-          <Box sx={{ flex: 1, overflowY: 'auto', overflowX: 'hidden' }}>
-            <Box sx={{px: { xs: 2, md: 4 }, py: { xs: 4, md: 5 }, pb:8, maxWidth:1400, mx:'auto' }}>
+        <Box sx={{ flex: 1, overflowY: 'auto', overflowX: 'hidden' }}>
+          <Box sx={{px: { xs: 2, md: 4 }, py: { xs: 4, md: 5 }, pb:8, maxWidth:1400, mx:'auto' }}>
 
               {/* hero section  */}
               <Box
@@ -493,9 +492,8 @@ export default function FoodPage(){
                 </Box>
               )}
 
-            </Box>
           </Box>
-        </PageLayout>
+        </Box>
       </Box>
 
       <UpdateShopDialog

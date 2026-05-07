@@ -42,7 +42,7 @@ export default function Profile() {
   const { isDark, toggleTheme } = useNearUTheme();
   const theme = useTheme();
   const accent = theme.palette.primary.main;
-  const accentAlpha = (a: number) => `rgba(61, 103, 138, ${a})`;
+  const accentAlpha = (a: number) => `rgba(46, 158, 191, ${a})`;
 
   const handleLogout = async () => {
     try {

@@ -110,13 +110,13 @@ export default function Login() {
             to="/register"
             variant="outlined"
             sx={{
-              color: '#3d678a',
-              borderColor: 'rgba(61, 103, 138, 0.2)',
+              color: '#2E9EBF',
+              borderColor: 'rgba(46, 158, 191, 0.2)',
               borderRadius: '0.75rem',
               px: 3,
               '&:hover': {
-                borderColor: '#3d678a',
-                bgcolor: 'rgba(61, 103, 138, 0.1)',
+                borderColor: '#2E9EBF',
+                bgcolor: 'rgba(46, 158, 191, 0.1)',
                 transform: 'scale(1.05)',
               },
               transition: 'all 0.3s',
@@ -147,16 +147,16 @@ export default function Login() {
 
                   {/* Orbiting icons */}
                   <div className="absolute top-8 left-1/2 -translate-x-1/2 w-12 h-12 bg-blue-400/20 rounded-full flex items-center justify-center border border-blue-400/40 animate-float">
-                    <StoreIcon sx={{ fontSize: 24, color: '#3d678a' }} />
+                    <StoreIcon sx={{ fontSize: 24, color: '#2E9EBF' }} />
                   </div>
                   <div className="absolute bottom-8 left-1/2 -translate-x-1/2 w-12 h-12 bg-blue-400/20 rounded-full flex items-center justify-center border border-blue-400/40 animate-float" style={{ animationDelay: '1s' }}>
-                    <BikeIcon sx={{ fontSize: 24, color: '#3d678a' }} />
+                    <BikeIcon sx={{ fontSize: 24, color: '#2E9EBF' }} />
                   </div>
                   <div className="absolute left-8 top-1/2 -translate-y-1/2 w-12 h-12 bg-blue-400/20 rounded-full flex items-center justify-center border border-blue-400/40 animate-float" style={{ animationDelay: '2s' }}>
-                    <MailIcon sx={{ fontSize: 24, color: '#3d678a' }} />
+                    <MailIcon sx={{ fontSize: 24, color: '#2E9EBF' }} />
                   </div>
                   <div className="absolute right-8 top-1/2 -translate-y-1/2 w-12 h-12 bg-blue-400/20 rounded-full flex items-center justify-center border border-blue-400/40 animate-float" style={{ animationDelay: '3s' }}>
-                    <LockIcon sx={{ fontSize: 24, color: '#3d678a' }} />
+                    <LockIcon sx={{ fontSize: 24, color: '#2E9EBF' }} />
                   </div>
                 </div>
               </div>
@@ -212,9 +212,9 @@ export default function Login() {
                     sx={{
                       '& .MuiOutlinedInput-root': {
                         bgcolor: 'rgba(0,0,0,0.4)',
-                        '& fieldset': { borderColor: 'rgba(61, 103, 138, 0.2)' },
-                        '&:hover fieldset': { borderColor: 'rgba(61, 103, 138, 0.6)' },
-                        '&.Mui-focused fieldset': { borderColor: 'rgba(61, 103, 138, 0.6)' },
+                        '& fieldset': { borderColor: 'rgba(46, 158, 191, 0.2)' },
+                        '&:hover fieldset': { borderColor: 'rgba(46, 158, 191, 0.6)' },
+                        '&.Mui-focused fieldset': { borderColor: 'rgba(46, 158, 191, 0.6)' },
                       },
                       input: { color: 'white' },
                     }}
@@ -249,7 +249,7 @@ export default function Login() {
                             <IconButton
                               onClick={() => setShowPassword(!showPassword)}
                               edge="end"
-                              sx={{ color: 'gray', '&:hover': { color: '#3d678a' } }}
+                              sx={{ color: 'gray', '&:hover': { color: '#2E9EBF' } }}
                             >
                               {showPassword ? <EyeOffIcon /> : <EyeIcon />}
                             </IconButton>
@@ -260,9 +260,9 @@ export default function Login() {
                     sx={{
                       '& .MuiOutlinedInput-root': {
                         bgcolor: 'rgba(0,0,0,0.4)',
-                        '& fieldset': { borderColor: 'rgba(61, 103, 138, 0.2)' },
-                        '&:hover fieldset': { borderColor: 'rgba(61, 103, 138, 0.6)' },
-                        '&.Mui-focused fieldset': { borderColor: 'rgba(61, 103, 138, 0.6)' },
+                        '& fieldset': { borderColor: 'rgba(46, 158, 191, 0.2)' },
+                        '&:hover fieldset': { borderColor: 'rgba(46, 158, 191, 0.6)' },
+                        '&.Mui-focused fieldset': { borderColor: 'rgba(46, 158, 191, 0.6)' },
                       },
                       input: { color: 'white' },
                     }}
@@ -282,11 +282,11 @@ export default function Login() {
                   disabled={isLoading}
                   sx={{
                     py: 1.5,
-                    bgcolor: '#3d678a',
+                    bgcolor: '#2E9EBF',
                     color: 'white',
-                    '&:hover': { bgcolor: '#2e5270', transform: 'scale(1.05)' },
+                    '&:hover': { bgcolor: '#1a7a9a', transform: 'scale(1.05)' },
                     transition: 'all 0.3s',
-                    boxShadow: '0 10px 15px -3px rgba(61, 103, 138, 0.4)',
+                    boxShadow: '0 10px 15px -3px rgba(46, 158, 191, 0.4)',
                     fontSize: '1.125rem',
                   }}
                   startIcon={isLoading ? <CircularProgress size={20} color="inherit" /> : null}
@@ -296,7 +296,7 @@ export default function Login() {
 
                 {/* Divider */}
                 <Box sx={{ position: 'relative', my: 3 }}>
-                  <Divider sx={{ borderColor: 'rgba(61, 103, 138, 0.2)' }} />
+                  <Divider sx={{ borderColor: 'rgba(46, 158, 191, 0.2)' }} />
                   <Typography 
                     variant="caption" 
                     sx={{ 
@@ -322,8 +322,8 @@ export default function Login() {
                     onClick={() => toast.info('Google login coming soon!')}
                     sx={{
                       color: 'white',
-                      borderColor: 'rgba(61, 103, 138, 0.2)',
-                      '&:hover': { borderColor: 'rgba(61, 103, 138, 0.4)', bgcolor: 'rgba(61, 103, 138, 0.05)' },
+                      borderColor: 'rgba(46, 158, 191, 0.2)',
+                      '&:hover': { borderColor: 'rgba(46, 158, 191, 0.4)', bgcolor: 'rgba(46, 158, 191, 0.05)' },
                     }}
                   >
                     Google
@@ -345,8 +345,8 @@ export default function Login() {
                     }}
                     sx={{
                       color: 'white',
-                      borderColor: 'rgba(61, 103, 138, 0.2)',
-                      '&:hover': { borderColor: 'rgba(61, 103, 138, 0.4)', bgcolor: 'rgba(61, 103, 138, 0.05)' },
+                      borderColor: 'rgba(46, 158, 191, 0.2)',
+                      '&:hover': { borderColor: 'rgba(46, 158, 191, 0.4)', bgcolor: 'rgba(46, 158, 191, 0.05)' },
                     }}
                   >
                     Guest

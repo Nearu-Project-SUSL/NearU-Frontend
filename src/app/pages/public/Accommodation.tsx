@@ -127,7 +127,7 @@ function AccommodationCard({
     const [hovered, setHovered] = useState(false);
     const theme = useTheme();
     const accent = theme.palette.primary.main;
-    const accentAlpha = (a: number) => `rgba(61, 103, 138, ${a})`;
+    const accentAlpha = (a: number) => `rgba(46, 158, 191, ${a})`;
 
     return (
         <Grow in timeout={400 + index * 100}>
@@ -271,7 +271,7 @@ export default function Accommodation() {
     const [openAddDialog, setOpenAddDialog] = useState(false);
     const theme = useTheme();
     const accent = theme.palette.primary.main;
-    const accentAlpha = (a: number) => `rgba(61, 103, 138, ${a})`;
+    const accentAlpha = (a: number) => `rgba(46, 158, 191, ${a})`;
 
     const queryClient = useQueryClient();
     const { data: accommodations = [], isLoading: loading, error } = useAccommodations();
@@ -369,7 +369,7 @@ export default function Accommodation() {
                                         fontWeight: 800,
                                         borderRadius: 2,
                                         textTransform: "none",
-                                        "&:hover": { backgroundColor: '#2e5270' },
+                                        "&:hover": { backgroundColor: '#1a7a9a' },
                                     }}
                                 >
                                     Add Place

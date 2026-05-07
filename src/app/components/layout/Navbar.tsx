@@ -33,8 +33,8 @@ export default function Navbar() {
   const { isDark, toggleTheme } = useNearUTheme();
   const theme = useTheme();
 
-  const accent = theme.palette.primary.main;          // #3d678a
-  const accentAlpha = (a: number) => `rgba(61, 103, 138, ${a})`;
+  const accent = theme.palette.primary.main;          // #2E9EBF
+  const accentAlpha = (a: number) => `rgba(46, 158, 191, ${a})`;
 
   return (
     <AppBar
