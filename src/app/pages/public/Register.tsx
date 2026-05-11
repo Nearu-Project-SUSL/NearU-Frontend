@@ -215,16 +215,16 @@ export default function Register() {
   return (
     <div className="min-h-screen w-full relative overflow-hidden bg-gradient-to-br from-gray-900 via-black to-gray-900">
       {/* Animated background */}
-      <div className="absolute inset-0 bg-gradient-to-br from-yellow-400/10 via-transparent to-yellow-600/10 animate-gradient"></div>
+      <div className="absolute inset-0 bg-gradient-to-br from-blue-400/10 via-transparent to-blue-600/10 animate-gradient"></div>
       
       {/* Floating orbs */}
-      <div className="absolute top-1/4 right-1/4 w-96 h-96 bg-yellow-400/10 rounded-full blur-3xl animate-float"></div>
-      <div className="absolute bottom-1/4 left-1/4 w-80 h-80 bg-yellow-600/10 rounded-full blur-3xl animate-float" style={{ animationDelay: '2s' }}></div>
+      <div className="absolute top-1/4 right-1/4 w-96 h-96 bg-blue-400/10 rounded-full blur-3xl animate-float"></div>
+      <div className="absolute bottom-1/4 left-1/4 w-80 h-80 bg-blue-600/10 rounded-full blur-3xl animate-float" style={{ animationDelay: '2s' }}></div>
 
       {/* Top Navigation */}
-      <nav className="relative z-20 flex items-center justify-between px-8 lg:px-12 py-6 bg-black/30 backdrop-blur-sm border-b border-yellow-400/20">
+      <nav className="relative z-20 flex items-center justify-between px-8 lg:px-12 py-6 bg-black/30 backdrop-blur-sm border-b border-blue-400/20">
         <Link to="/" className="flex items-center gap-3 group">
-          <div className="w-12 h-12 bg-gradient-to-br from-yellow-400 to-yellow-600 rounded-xl flex items-center justify-center shadow-lg shadow-yellow-400/30 group-hover:scale-110 transition-transform duration-300">
+          <div className="w-12 h-12 bg-gradient-to-br from-blue-400 to-blue-600 rounded-xl flex items-center justify-center shadow-lg shadow-blue-400/30 group-hover:scale-110 transition-transform duration-300">
             <span className="text-black text-2xl">🎓</span>
           </div>
           <span className="text-white text-2xl">NearU</span>
@@ -236,13 +236,13 @@ export default function Register() {
             to="/login"
             variant="outlined"
             sx={{
-              color: '#facc15',
-              borderColor: 'rgba(250, 204, 21, 0.2)',
+              color: '#2E9EBF',
+              borderColor: 'rgba(46, 158, 191, 0.2)',
               borderRadius: '0.75rem',
               px: 3,
               '&:hover': {
-                borderColor: '#facc15',
-                bgcolor: 'rgba(250, 204, 21, 0.1)',
+                borderColor: '#2E9EBF',
+                bgcolor: 'rgba(46, 158, 191, 0.1)',
                 transform: 'scale(1.05)',
               },
               transition: 'all 0.3s',
@@ -261,28 +261,28 @@ export default function Register() {
             {/* Illustration */}
             <div className="relative w-full max-w-md">
               {/* Decorative circles */}
-              <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-80 h-80 bg-gradient-to-br from-yellow-400/20 to-yellow-600/20 rounded-full blur-3xl animate-pulse"></div>
+              <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-80 h-80 bg-gradient-to-br from-blue-400/20 to-blue-600/20 rounded-full blur-3xl animate-pulse"></div>
               
               {/* Central hub */}
               <div className="relative z-10 flex items-center justify-center">
-                <div className="relative w-64 h-64 bg-gradient-to-br from-gray-800 to-black rounded-3xl border-2 border-yellow-400/30 shadow-2xl shadow-yellow-400/20 p-8">
+                <div className="relative w-64 h-64 bg-gradient-to-br from-gray-800 to-black rounded-3xl border-2 border-blue-400/30 shadow-2xl shadow-blue-400/20 p-8">
                   {/* Center circle */}
-                  <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-20 h-20 bg-gradient-to-br from-yellow-400 to-yellow-600 rounded-full flex items-center justify-center shadow-lg animate-pulse">
+                  <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-20 h-20 bg-gradient-to-br from-blue-400 to-blue-600 rounded-full flex items-center justify-center shadow-lg animate-pulse">
                     <GraduationCapIcon sx={{ fontSize: 40, color: 'black' }} />
                   </div>
 
                   {/* Orbiting icons */}
-                  <div className="absolute top-8 left-1/2 -translate-x-1/2 w-12 h-12 bg-yellow-400/20 rounded-full flex items-center justify-center border border-yellow-400/40 animate-float">
-                    <UserIcon sx={{ fontSize: 24, color: '#facc15' }} />
+                  <div className="absolute top-8 left-1/2 -translate-x-1/2 w-12 h-12 bg-blue-400/20 rounded-full flex items-center justify-center border border-blue-400/40 animate-float">
+                    <UserIcon sx={{ fontSize: 24, color: '#2E9EBF' }} />
                   </div>
-                  <div className="absolute bottom-8 left-1/2 -translate-x-1/2 w-12 h-12 bg-yellow-400/20 rounded-full flex items-center justify-center border border-yellow-400/40 animate-float" style={{ animationDelay: '1s' }}>
-                    <BikeIcon sx={{ fontSize: 24, color: '#facc15' }} />
+                  <div className="absolute bottom-8 left-1/2 -translate-x-1/2 w-12 h-12 bg-blue-400/20 rounded-full flex items-center justify-center border border-blue-400/40 animate-float" style={{ animationDelay: '1s' }}>
+                    <BikeIcon sx={{ fontSize: 24, color: '#2E9EBF' }} />
                   </div>
-                  <div className="absolute left-8 top-1/2 -translate-y-1/2 w-12 h-12 bg-yellow-400/20 rounded-full flex items-center justify-center border border-yellow-400/40 animate-float" style={{ animationDelay: '2s' }}>
-                    <StoreIcon sx={{ fontSize: 24, color: '#facc15' }} />
+                  <div className="absolute left-8 top-1/2 -translate-y-1/2 w-12 h-12 bg-blue-400/20 rounded-full flex items-center justify-center border border-blue-400/40 animate-float" style={{ animationDelay: '2s' }}>
+                    <StoreIcon sx={{ fontSize: 24, color: '#2E9EBF' }} />
                   </div>
-                  <div className="absolute right-8 top-1/2 -translate-y-1/2 w-12 h-12 bg-yellow-400/20 rounded-full flex items-center justify-center border border-yellow-400/40 animate-float" style={{ animationDelay: '3s' }}>
-                    <BuildingIcon sx={{ fontSize: 24, color: '#facc15' }} />
+                  <div className="absolute right-8 top-1/2 -translate-y-1/2 w-12 h-12 bg-blue-400/20 rounded-full flex items-center justify-center border border-blue-400/40 animate-float" style={{ animationDelay: '3s' }}>
+                    <BuildingIcon sx={{ fontSize: 24, color: '#2E9EBF' }} />
                   </div>
                 </div>
               </div>
@@ -292,7 +292,7 @@ export default function Register() {
             <div className="text-center space-y-4 max-w-md">
               <Typography variant="h3" sx={{ color: 'white', fontWeight: 'bold' }}>
                 Join the NearU<br />
-                <span className="text-yellow-400">Community Today.</span>
+                <span className="text-blue-400">Community Today.</span>
               </Typography>
               <Typography variant="body1" sx={{ color: 'gray', fontSize: '1.125rem' }}>
                 Connect with campus services, discover local businesses, and find part-time opportunities at Sabaragamuwa University.
@@ -302,7 +302,7 @@ export default function Register() {
 
           {/* Right Side - Registration Form */}
           <div className="w-full max-w-md mx-auto animate-slideUp">
-            <div className="bg-gradient-to-br from-yellow-400/5 to-black/50 backdrop-blur-xl rounded-3xl border-2 border-yellow-400/20 p-8 lg:p-10 shadow-2xl shadow-yellow-400/10 hover:border-yellow-400/30 transition-all duration-500">
+            <div className="bg-gradient-to-br from-blue-400/5 to-black/50 backdrop-blur-xl rounded-3xl border-2 border-blue-400/20 p-8 lg:p-10 shadow-2xl shadow-blue-400/10 hover:border-blue-400/30 transition-all duration-500">
               {/* Header */}
               <div className="text-center mb-6">
                 <Typography variant="h4" sx={{ color: 'white', mb: 1 }}>Create Account</Typography>
@@ -325,17 +325,17 @@ export default function Register() {
                         py: 2,
                         borderRadius: '0.75rem',
                         border: '2px solid',
-                        borderColor: userType === item.type ? '#facc15' : 'rgba(250, 204, 21, 0.2)',
-                        bgcolor: userType === item.type ? 'rgba(250, 204, 21, 0.1)' : 'rgba(0,0,0,0.4)',
+                        borderColor: userType === item.type ? '#2E9EBF' : 'rgba(46, 158, 191, 0.2)',
+                        bgcolor: userType === item.type ? 'rgba(46, 158, 191, 0.1)' : 'rgba(0,0,0,0.4)',
                         color: 'white',
                         '&:hover': {
-                          borderColor: userType === item.type ? '#facc15' : 'rgba(250, 204, 21, 0.4)',
-                          bgcolor: userType === item.type ? 'rgba(250, 204, 21, 0.15)' : 'rgba(0,0,0,0.6)',
+                          borderColor: userType === item.type ? '#2E9EBF' : 'rgba(46, 158, 191, 0.4)',
+                          bgcolor: userType === item.type ? 'rgba(46, 158, 191, 0.15)' : 'rgba(0,0,0,0.6)',
                         },
                       }}
                     >
                       <Box sx={{ 
-                        bgcolor: userType === item.type ? '#facc15' : 'rgba(156, 163, 175, 0.2)',
+                        bgcolor: userType === item.type ? '#2E9EBF' : 'rgba(156, 163, 175, 0.2)',
                         p: 1, 
                         borderRadius: '0.5rem',
                         mb: 1,
@@ -353,7 +353,7 @@ export default function Register() {
               {/* Form Content */}
               {userType === 'student' && (
                 <Box className="animate-fadeIn">
-                  <Stepper activeStep={activeStep} alternativeLabel sx={{ mb: 4, '& .MuiStepIcon-root.Mui-active': { color: '#facc15' }, '& .MuiStepIcon-root.Mui-completed': { color: '#facc15' } }}>
+                  <Stepper activeStep={activeStep} alternativeLabel sx={{ mb: 4, '& .MuiStepIcon-root.Mui-active': { color: '#2E9EBF' }, '& .MuiStepIcon-root.Mui-completed': { color: '#2E9EBF' } }}>
                     {steps.map((label) => (
                       <Step key={label}>
                         <StepLabel sx={{ '& .MuiStepLabel-label': { color: 'gray' }, '& .MuiStepLabel-label.Mui-active': { color: 'white' } }}>{label}</StepLabel>
@@ -453,7 +453,7 @@ export default function Register() {
                           fullWidth
                           variant="contained"
                           onClick={handleNext}
-                          sx={{ mt: 2, bgcolor: '#facc15', color: 'black', '&:hover': { bgcolor: '#eab308' } }}
+                          sx={{ mt: 2, bgcolor: '#2E9EBF', color: 'black', '&:hover': { bgcolor: '#1a7a9a' } }}
                           endIcon={<ChevronRightIcon />}
                         >
                           Next Step
@@ -522,7 +522,7 @@ export default function Register() {
                             variant="outlined"
                             onClick={handleBack}
                             startIcon={<ChevronLeftIcon />}
-                            sx={{ color: 'white', borderColor: 'rgba(250, 204, 21, 0.2)' }}
+                            sx={{ color: 'white', borderColor: 'rgba(46, 158, 191, 0.2)' }}
                           >
                             Back
                           </Button>
@@ -531,7 +531,7 @@ export default function Register() {
                             variant="contained"
                             onClick={handleNext}
                             endIcon={<ChevronRightIcon />}
-                            sx={{ bgcolor: '#facc15', color: 'black', '&:hover': { bgcolor: '#eab308' } }}
+                            sx={{ bgcolor: '#2E9EBF', color: 'black', '&:hover': { bgcolor: '#1a7a9a' } }}
                           >
                             Next Step
                           </Button>
@@ -587,7 +587,7 @@ export default function Register() {
                             variant="outlined"
                             onClick={handleBack}
                             startIcon={<ChevronLeftIcon />}
-                            sx={{ color: 'white', borderColor: 'rgba(250, 204, 21, 0.2)' }}
+                            sx={{ color: 'white', borderColor: 'rgba(46, 158, 191, 0.2)' }}
                           >
                             Back
                           </Button>
@@ -654,12 +654,12 @@ export default function Register() {
                         <TextField fullWidth label="Tax ID" value={businessForm.taxId} onChange={(e) => setBusinessForm({...businessForm, taxId: e.target.value})} />
                       </Grid>
                     </Grid>
-                    <Paper sx={{ p: 2, bgcolor: 'rgba(250, 204, 21, 0.05)', border: '1px solid rgba(250, 204, 21, 0.2)' }}>
-                      <Typography variant="caption" sx={{ color: '#facc15' }}>
+                    <Paper sx={{ p: 2, bgcolor: 'rgba(46, 158, 191, 0.05)', border: '1px solid rgba(46, 158, 191, 0.2)' }}>
+                      <Typography variant="caption" sx={{ color: '#2E9EBF' }}>
                         Note: Your application will be reviewed by our admin team.
                       </Typography>
                     </Paper>
-                    <Button fullWidth variant="contained" type="submit" disabled={isLoading} endIcon={isLoading ? undefined : <ArrowRightIcon />} startIcon={isLoading ? <CircularProgress size={20} color="inherit" /> : null} sx={{ mt: 2, bgcolor: '#facc15', color: 'black', '&:hover': { bgcolor: '#eab308' } }}>
+                    <Button fullWidth variant="contained" type="submit" disabled={isLoading} endIcon={isLoading ? undefined : <ArrowRightIcon />} startIcon={isLoading ? <CircularProgress size={20} color="inherit" /> : null} sx={{ mt: 2, bgcolor: '#2E9EBF', color: 'black', '&:hover': { bgcolor: '#1a7a9a' } }}>
                       {isLoading ? 'Processing...' : 'Submit for Review'}
                     </Button>
                   </form>
@@ -704,12 +704,12 @@ export default function Register() {
                     </Grid>
                     <TextField fullWidth label="License No." required value={riderForm.licenseNumber} onChange={(e) => setRiderForm({...riderForm, licenseNumber: e.target.value})} />
                     <TextField fullWidth label="Address" multiline rows={2} required value={riderForm.address} onChange={(e) => setRiderForm({...riderForm, address: e.target.value})} />
-                    <Paper sx={{ p: 2, bgcolor: 'rgba(250, 204, 21, 0.05)', border: '1px solid rgba(250, 204, 21, 0.2)' }}>
-                      <Typography variant="caption" sx={{ color: '#facc15' }}>
+                    <Paper sx={{ p: 2, bgcolor: 'rgba(46, 158, 191, 0.05)', border: '1px solid rgba(46, 158, 191, 0.2)' }}>
+                      <Typography variant="caption" sx={{ color: '#2E9EBF' }}>
                         Note: Your application will be reviewed by our admin team.
                       </Typography>
                     </Paper>
-                    <Button fullWidth variant="contained" type="submit" disabled={isLoading} endIcon={isLoading ? undefined : <ArrowRightIcon />} startIcon={isLoading ? <CircularProgress size={20} color="inherit" /> : null} sx={{ mt: 2, bgcolor: '#facc15', color: 'black', '&:hover': { bgcolor: '#eab308' } }}>
+                    <Button fullWidth variant="contained" type="submit" disabled={isLoading} endIcon={isLoading ? undefined : <ArrowRightIcon />} startIcon={isLoading ? <CircularProgress size={20} color="inherit" /> : null} sx={{ mt: 2, bgcolor: '#2E9EBF', color: 'black', '&:hover': { bgcolor: '#1a7a9a' } }}>
                       {isLoading ? 'Processing...' : 'Submit for Review'}
                     </Button>
                   </form>

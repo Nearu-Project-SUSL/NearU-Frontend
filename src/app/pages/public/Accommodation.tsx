@@ -31,9 +31,8 @@ import Navbar from "../../components/layout/Navbar";
 import { useAccommodations } from "../../hooks/useAccommodation";
 import { createAccommodation } from "../../../api/accommodationService";
 import AddAccommodationDialog, { AddAccommodationFormData } from "../../components/accommodation/AddAccommodationDialog";
+import { useTheme } from "@mui/material";
 
-const accentYellow = "#facc15";
-const deepBlack = "#050505";
 
 const accommodationTypes = ["All", "Boarding", "Annex", "Apartment"] as const;
 
@@ -43,7 +42,7 @@ function LazyImage({ src, alt, height }: { src: string; alt: string; height: num
     const [error, setError] = useState(false);
 
     return (
-        <Box sx={{ position: "relative", height, overflow: "hidden", bgcolor: "#111", borderRadius: "16px 16px 0 0" }}>
+        <Box sx={{ position: "relative", height, overflow: "hidden", bgcolor: "action.hover", borderRadius: "16px 16px 0 0" }}>
             {!loaded && !error && (
                 <Skeleton
                     variant="rectangular"
@@ -82,13 +81,14 @@ function LazyImage({ src, alt, height }: { src: string; alt: string; height: num
 
 // ─── Accommodation Card Skeleton ──────────────────────────────────────────────
 function AccommodationSkeleton() {
+    const theme = useTheme();
     return (
         <Card
             sx={{
                 borderRadius: "20px",
                 height: "100%",
-                backgroundColor: "#111111",
-                border: "1px solid rgba(255,255,255,0.05)",
+                backgroundColor: theme.palette.background.paper,
+                border: `1px solid ${theme.palette.divider}`,
                 display: "flex",
                 flexDirection: "column",
                 overflow: "hidden",
@@ -125,6 +125,9 @@ function AccommodationCard({
 }) {
     const navigate = useNavigate();
     const [hovered, setHovered] = useState(false);
+    const theme = useTheme();
+    const accent = theme.palette.primary.main;
+    const accentAlpha = (a: number) => `rgba(46, 158, 191, ${a})`;
 
     return (
         <Grow in timeout={400 + index * 100}>
@@ -135,17 +138,17 @@ function AccommodationCard({
                 sx={{
                     borderRadius: "20px",
                     height: "100%",
-                    backgroundColor: "#111111",
-                    border: "1px solid rgba(255,255,255,0.05)",
+                    backgroundColor: theme.palette.background.paper,
+                    border: `1px solid ${theme.palette.divider}`,
                     display: "flex",
                     flexDirection: "column",
                     overflow: "hidden",
                     transition: "all 0.35s cubic-bezier(0.175, 0.885, 0.32, 1.275)",
                     transform: hovered ? "translateY(-6px)" : "translateY(0)",
-                    boxShadow: hovered ? "0 24px 48px rgba(0,0,0,0.5)" : "none",
+                    boxShadow: hovered ? "0 24px 48px rgba(0,0,0,0.3)" : "none",
                     "&:hover": {
-                        borderColor: "rgba(250, 204, 21, 0.3)",
-                        backgroundColor: "rgba(250,204,21,0.02)",
+                        borderColor: accentAlpha(0.35),
+                        backgroundColor: accentAlpha(0.02),
                     },
                 }}
             >
@@ -163,17 +166,17 @@ function AccommodationCard({
                                 {item.title}
                             </Typography>
                             <Chip
-                                icon={<HotelIcon sx={{ color: `${deepBlack} !important`, fontSize: "14px !important" }} />}
+                                icon={<HotelIcon sx={{ color: `#fff !important`, fontSize: "14px !important" }} />}
                                 label={item.type}
                                 size="small"
-                                sx={{ backgroundColor: accentYellow, color: deepBlack, fontWeight: 700, fontSize: "0.72rem" }}
+                                sx={{ backgroundColor: accent, color: '#fff', fontWeight: 700, fontSize: "0.72rem" }}
                             />
                         </Stack>
 
                         {/* Location & Distance */}
-                        <Stack direction={{ xs: "column", sm: "row" }} spacing={{ xs: 0.5, sm: 1.5 }} color="rgba(255,255,255,0.6)">
+                        <Stack direction={{ xs: "column", sm: "row" }} spacing={{ xs: 0.5, sm: 1.5 }} color={theme.palette.text.secondary}>
                             <Stack direction="row" spacing={0.5} alignItems="center">
-                                <PlaceIcon fontSize="small" sx={{ color: accentYellow, fontSize: 15 }} />
+                                <PlaceIcon fontSize="small" sx={{ color: accent, fontSize: 15 }} />
                                 <Typography variant="caption" sx={{ fontWeight: 500 }}>{item.location}</Typography>
                             </Stack>
                             <Typography variant="caption">{item.distanceKm} km to campus</Typography>
@@ -181,11 +184,11 @@ function AccommodationCard({
 
                         {/* Rating */}
                         <Stack direction="row" spacing={0.5} alignItems="center">
-                            <StarIcon sx={{ color: accentYellow, fontSize: 17 }} />
-                            <Typography variant="caption" sx={{ color: "#f5f5f5", fontWeight: 600 }}>
+                            <StarIcon sx={{ color: accent, fontSize: 17 }} />
+                            <Typography variant="caption" sx={{ color: theme.palette.text.primary, fontWeight: 600 }}>
                                 {item.rating}
                             </Typography>
-                            <Typography variant="caption" sx={{ color: "rgba(255,255,255,0.4)" }}>
+                            <Typography variant="caption" sx={{ color: theme.palette.text.secondary }}>
                                 ({item.reviews} reviews)
                             </Typography>
                         </Stack>
@@ -194,7 +197,7 @@ function AccommodationCard({
                         <Typography
                             variant="body2"
                             sx={{
-                                color: "rgba(255,255,255,0.6)",
+                                color: theme.palette.text.secondary,
                                 fontSize: "0.82rem",
                                 lineHeight: 1.6,
                                 display: "-webkit-box",
@@ -214,13 +217,13 @@ function AccommodationCard({
                                     label={amenity}
                                     size="small"
                                     variant="outlined"
-                                    sx={{ borderColor: "rgba(250, 204, 21, 0.3)", color: "rgba(255,255,255,0.7)", fontSize: "0.68rem" }}
+                                    sx={{ borderColor: accentAlpha(0.3), color: theme.palette.text.secondary, fontSize: "0.68rem" }}
                                 />
                             ))}
                         </Stack>
 
                         {/* Price */}
-                        <Typography variant="h6" sx={{ fontWeight: 800, color: accentYellow, fontSize: "1.05rem" }}>
+                        <Typography variant="h6" sx={{ fontWeight: 800, color: accent, fontSize: "1.05rem" }}>
                             LKR {item.monthlyRent?.toLocaleString() || 0} / month
                         </Typography>
 
@@ -240,16 +243,16 @@ function AccommodationCard({
                         variant="contained"
                         onClick={() => navigate(`/accommodation/${item.id}`)}
                         sx={{
-                            backgroundColor: hovered ? accentYellow : "rgba(250,204,21,0.1)",
-                            color: hovered ? deepBlack : accentYellow,
+                            backgroundColor: hovered ? accent : accentAlpha(0.1),
+                            color: '#fff',
                             fontWeight: 800,
                             borderRadius: "12px",
                             py: 1.2,
                             textTransform: "none",
                             fontSize: "0.9rem",
-                            border: `1px solid rgba(250,204,21,0.3)`,
+                            border: `1px solid ${accentAlpha(0.35)}`,
                             transition: "all 0.3s ease",
-                            "&:hover": { backgroundColor: accentYellow, color: deepBlack, boxShadow: "0 0 20px rgba(250,204,21,0.3)" },
+                            "&:hover": { backgroundColor: accent, color: '#fff', boxShadow: `0 0 20px ${accentAlpha(0.3)}` },
                         }}
                     >
                         View Details
@@ -266,6 +269,9 @@ export default function Accommodation() {
     const [selectedType, setSelectedType] = useState<(typeof accommodationTypes)[number]>("All");
     const [visible, setVisible] = useState(false);
     const [openAddDialog, setOpenAddDialog] = useState(false);
+    const theme = useTheme();
+    const accent = theme.palette.primary.main;
+    const accentAlpha = (a: number) => `rgba(46, 158, 191, ${a})`;
 
     const queryClient = useQueryClient();
     const { data: accommodations = [], isLoading: loading, error } = useAccommodations();
@@ -315,8 +321,8 @@ export default function Accommodation() {
                 display: "flex",
                 height: "100vh",
                 overflow: "hidden",
-                bgcolor: deepBlack,
-                backgroundImage: "radial-gradient(circle at top right, rgba(250, 204, 21, 0.04), transparent 45%)",
+                bgcolor: "background.default",
+                backgroundImage: `radial-gradient(circle at top right, ${accentAlpha(0.05)}, transparent 45%)`,
             }}
         >
             <Sidebar activeSection="accommodation" />
@@ -333,23 +339,23 @@ export default function Accommodation() {
                             <Box sx={{ mb: 6, display: "flex", justifyContent: "space-between", alignItems: "flex-start", flexWrap: "wrap", gap: 2 }}>
                                 <Box>
                                     <Stack direction="row" alignItems="center" spacing={1.5} sx={{ mb: 1 }}>
-                                        <AutoAwesomeIcon sx={{ color: accentYellow, fontSize: 22 }} />
+                                        <AutoAwesomeIcon sx={{ color: accent, fontSize: 22 }} />
                                         <Typography
                                             variant="h4"
                                             sx={{
                                                 fontWeight: 800,
-                                                color: "#ffffff",
+                                                color: theme.palette.text.primary,
                                                 fontSize: { xs: "1.8rem", sm: "2.2rem", md: "2.6rem" },
                                                 letterSpacing: "-0.02em",
                                             }}
                                         >
                                             Student{" "}
-                                            <Box component="span" sx={{ color: accentYellow }}>
+                                            <Box component="span" sx={{ color: accent }}>
                                                 Accommodation
                                             </Box>
                                         </Typography>
                                     </Stack>
-                                    <Typography variant="body1" sx={{ color: "rgba(255,255,255,0.55)", maxWidth: 680, fontSize: "1rem", lineHeight: 1.6 }}>
+                                    <Typography variant="body1" sx={{ color: theme.palette.text.secondary, maxWidth: 680, fontSize: "1rem", lineHeight: 1.6 }}>
                                         Verified, student-friendly places near your campus. Browse by type, budget, and amenities.
                                     </Typography>
                                 </Box>
@@ -358,12 +364,12 @@ export default function Accommodation() {
                                     startIcon={<AddIcon />}
                                     onClick={() => setOpenAddDialog(true)}
                                     sx={{
-                                        backgroundColor: accentYellow,
-                                        color: deepBlack,
+                                        backgroundColor: accent,
+                                        color: '#fff',
                                         fontWeight: 800,
                                         borderRadius: 2,
                                         textTransform: "none",
-                                        "&:hover": { backgroundColor: "#eab308" },
+                                        "&:hover": { backgroundColor: '#1a7a9a' },
                                     }}
                                 >
                                     Add Place
@@ -378,8 +384,8 @@ export default function Accommodation() {
                                     mb: 6,
                                     p: { xs: 2, md: 3 },
                                     borderRadius: "20px",
-                                    bgcolor: "rgba(255,255,255,0.02)",
-                                    border: "1px solid rgba(250, 204, 21, 0.15)",
+                                    bgcolor: theme.palette.background.paper,
+                                    border: `1px solid ${accentAlpha(0.2)}`,
                                     backdropFilter: "blur(10px)",
                                 }}
                             >
@@ -391,24 +397,24 @@ export default function Accommodation() {
                                         placeholder="Search by place, area, or amenity..."
                                         sx={{
                                             "& .MuiOutlinedInput-root": {
-                                                color: "#fff",
+                                                color: theme.palette.text.primary,
                                                 borderRadius: "12px",
-                                                bgcolor: "rgba(255,255,255,0.03)",
-                                                "& fieldset": { borderColor: "rgba(255,255,255,0.1)" },
-                                                "&:hover fieldset": { borderColor: "rgba(250, 204, 21, 0.4)" },
-                                                "&.Mui-focused fieldset": { borderColor: accentYellow, borderWidth: "1px" },
+                                                bgcolor: accentAlpha(0.04),
+                                                "& fieldset": { borderColor: theme.palette.divider },
+                                                "&:hover fieldset": { borderColor: accentAlpha(0.5) },
+                                                "&.Mui-focused fieldset": { borderColor: accent, borderWidth: "1px" },
                                             },
-                                            "& .MuiInputBase-input::placeholder": { color: "rgba(255,255,255,0.3)" },
+                                            "& .MuiInputBase-input::placeholder": { color: theme.palette.text.secondary },
                                         }}
                                         InputProps={{
                                             startAdornment: (
                                                 <InputAdornment position="start">
-                                                    <SearchIcon sx={{ color: "rgba(255,255,255,0.4)", fontSize: 20 }} />
+                                                    <SearchIcon sx={{ color: theme.palette.text.secondary, fontSize: 20 }} />
                                                 </InputAdornment>
                                             ),
                                             endAdornment: query ? (
                                                 <InputAdornment position="end">
-                                                    <IconButton size="small" onClick={() => setQuery("")} sx={{ color: "rgba(255,255,255,0.3)", p: 0.3 }}>
+                                                    <IconButton size="small" onClick={() => setQuery("")} sx={{ color: theme.palette.text.secondary, p: 0.3 }}>
                                                         <CloseIcon sx={{ fontSize: 16 }} />
                                                     </IconButton>
                                                 </InputAdornment>
@@ -429,14 +435,14 @@ export default function Accommodation() {
                                                     fontSize: "0.82rem",
                                                     borderRadius: "10px",
                                                     border: "1px solid",
-                                                    borderColor: selectedType === type ? accentYellow : "rgba(255,255,255,0.12)",
-                                                    backgroundColor: selectedType === type ? accentYellow : "rgba(255,255,255,0.04)",
-                                                    color: selectedType === type ? deepBlack : "rgba(255,255,255,0.6)",
+                                                    borderColor: selectedType === type ? accent : theme.palette.divider,
+                                                    backgroundColor: selectedType === type ? accent : accentAlpha(0.05),
+                                                    color: selectedType === type ? '#fff' : theme.palette.text.secondary,
                                                     transition: "all 0.2s ease",
                                                     "&:hover": {
-                                                        backgroundColor: selectedType === type ? accentYellow : "rgba(250,204,21,0.1)",
-                                                        borderColor: accentYellow,
-                                                        color: selectedType === type ? deepBlack : accentYellow,
+                                                        backgroundColor: selectedType === type ? accent : accentAlpha(0.1),
+                                                        borderColor: accent,
+                                                        color: selectedType === type ? '#fff' : accent,
                                                     },
                                                 }}
                                             />
@@ -445,7 +451,7 @@ export default function Accommodation() {
                                         {/* Result count */}
                                         {!loading && (
                                             <Box sx={{ ml: "auto", display: "flex", alignItems: "center" }}>
-                                                <Typography variant="caption" sx={{ color: "rgba(255,255,255,0.4)" }}>
+                                                <Typography variant="caption" sx={{ color: theme.palette.text.secondary }}>
                                                     {filteredAccommodations.length} place{filteredAccommodations.length !== 1 ? "s" : ""} found
                                                 </Typography>
                                             </Box>

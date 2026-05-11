@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router';
 import { Sidebar } from '../../components/layout/Sidebar';
 import Navbar from '../../components/layout/Navbar';
 import useAuth from '../../hooks/useAuth';
+import { useNearUTheme } from '../../context/ThemeContext';
 
 import {
   Box,
@@ -140,7 +141,7 @@ const testimonials = [
     name: 'Uvindu',
     time: '1 week ago',
     image: 'https://i.pravatar.cc/150?img=12',
-    text: 'Love the ride-sharing feature! It\'s so convenient for getting to campus and back. The drivers are friendly and the app is really easy to use. Great service overall!',
+    text: "Love the ride-sharing feature! It's so convenient for getting to campus and back. The drivers are friendly and the app is really easy to use. Great service overall!",
   },
   {
     id: 't3',
@@ -154,7 +155,7 @@ const testimonials = [
 // ─── Custom Carousel Hook ─────────────────────────────────────────────────────
 function useHorizontalScroll() {
   const scrollRef = useRef<HTMLDivElement>(null);
-  
+
   const scroll = (direction: 'left' | 'right') => {
     if (scrollRef.current) {
       const { scrollLeft, clientWidth } = scrollRef.current;
@@ -170,6 +171,9 @@ function useHorizontalScroll() {
 function ServiceCard({ service, index }: { service: typeof services[0], index: number }) {
   const navigate = useNavigate();
   const [hovered, setHovered] = useState(false);
+  const theme = useTheme();
+  const accent = theme.palette.primary.main;
+  const accentAlpha = (a: number) => `rgba(46, 158, 191, ${a})`;
 
   return (
     <Grow in timeout={400 + index * 100}>
@@ -178,19 +182,19 @@ function ServiceCard({ service, index }: { service: typeof services[0], index: n
         sx={{
           minWidth: { xs: 260, md: 300 },
           height: 280,
-          bgcolor: 'rgba(255,255,255,0.02)',
+          bgcolor: theme.palette.background.paper,
           borderRadius: '24px',
           position: 'relative',
           overflow: 'hidden',
           transition: 'all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275)',
           transform: hovered ? 'translateY(-8px) scale(1.02)' : 'translateY(0) scale(1)',
-          boxShadow: hovered ? '0 30px 60px rgba(0,0,0,0.5)' : 'none',
+          boxShadow: hovered ? '0 30px 60px rgba(0,0,0,0.3)' : 'none',
           '&::before': {
             content: '""',
             position: 'absolute',
             top: 0, left: 0, right: 0, bottom: 0,
-            background: hovered 
-              ? 'linear-gradient(to bottom, rgba(250, 204, 21, 0.08) 0%, transparent 100%)'
+            background: hovered
+              ? `linear-gradient(to bottom, ${accentAlpha(0.08)} 0%, transparent 100%)`
               : 'transparent',
             zIndex: 0,
             transition: 'background 0.4s ease',
@@ -200,8 +204,8 @@ function ServiceCard({ service, index }: { service: typeof services[0], index: n
              position: 'absolute',
              inset: 0,
              borderRadius: '24px',
-             padding: '2px', // border width
-             background: hovered ? 'linear-gradient(135deg, rgba(250, 204, 21, 0.4), rgba(250, 204, 21, 0.05))' : 'rgba(255, 255, 255, 0.05)',
+             padding: '2px',
+             background: hovered ? `linear-gradient(135deg, ${accentAlpha(0.4)}, ${accentAlpha(0.05)})` : accentAlpha(0.06),
              WebkitMask: 'linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0)',
              WebkitMaskComposite: 'xor',
              maskComposite: 'exclude',
@@ -220,26 +224,26 @@ function ServiceCard({ service, index }: { service: typeof services[0], index: n
              {service.iconImage ? (
                 <Box sx={{ width: '100%', height: '100%', backgroundImage: `url(${service.iconImage})`, backgroundSize: 'cover', backgroundPosition: 'center', filter: hovered ? 'brightness(1.1) contrast(1.1)' : 'grayscale(100%) contrast(1.2)', transition: 'all 0.4s ease' }} />
              ) : (
-                <Box sx={{ width: '100%', height: '100%', bgcolor: 'rgba(255,255,255,0.03)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                   <service.icon sx={{ fontSize: 48, color: hovered ? '#facc15' : 'rgba(255,255,255,0.2)', transition: 'color 0.4s ease' }} />
+                <Box sx={{ width: '100%', height: '100%', bgcolor: accentAlpha(0.04), display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                   <service.icon sx={{ fontSize: 48, color: hovered ? accent : theme.palette.text.disabled, transition: 'color 0.4s ease' }} />
                 </Box>
              )}
-             
+
              {/* Gradient Overlay bottom to top */}
-             <Box sx={{ position: 'absolute', bottom: 0, left: 0, right: 0, height: '60%', background: 'linear-gradient(to top, rgba(0,0,0,0.8), transparent)' }} />
-             
+             <Box sx={{ position: 'absolute', bottom: 0, left: 0, right: 0, height: '60%', background: `linear-gradient(to top, ${theme.palette.background.paper}, transparent)` }} />
+
              {/* Badge */}
              {service.badge && (
-                <Box sx={{ position: 'absolute', top: 12, right: 12, bgcolor: '#facc15', color: '#000', px: 1.2, py: 0.3, borderRadius: '12px', fontWeight: 800, fontSize: '0.7rem', boxShadow: '0 4px 10px rgba(0,0,0,0.5)' }}>
+                <Box sx={{ position: 'absolute', top: 12, right: 12, bgcolor: accent, color: '#111', px: 1.2, py: 0.3, borderRadius: '12px', fontWeight: 800, fontSize: '0.7rem', boxShadow: '0 4px 10px rgba(0,0,0,0.3)' }}>
                   {service.badge}
                 </Box>
              )}
           </Box>
 
-          <Typography variant="h6" sx={{ color: '#fff', fontWeight: 700, mb: 1, fontSize: '1.2rem', fontFamily: '"Outfit", "Inter", sans-serif' }}>
+          <Typography variant="h6" sx={{ color: theme.palette.text.primary, fontWeight: 700, mb: 1, fontSize: '1.2rem', fontFamily: '"Outfit", "Inter", sans-serif' }}>
             {service.label}
           </Typography>
-          <Typography variant="body2" sx={{ color: 'rgba(255,255,255,0.5)', fontSize: '0.85rem', lineHeight: 1.5, display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>
+          <Typography variant="body2" sx={{ color: theme.palette.text.secondary, fontSize: '0.85rem', lineHeight: 1.5, display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>
             {service.description}
           </Typography>
         </CardActionArea>
@@ -251,50 +255,52 @@ function ServiceCard({ service, index }: { service: typeof services[0], index: n
 // ─── Deal Card Component ──────────────────────────────────────────────────────
 function DealCard({ deal, index }: { deal: typeof hotDeals[0], index: number }) {
   const [hovered, setHovered] = useState(false);
+  const theme = useTheme();
+  const accent = theme.palette.primary.main;
+  const accentAlpha = (a: number) => `rgba(46, 158, 191, ${a})`;
+
   return (
     <Grow in timeout={600 + index * 100}>
       <Card
         elevation={0}
         sx={{
           minWidth: { xs: 280, md: 340 },
-          bgcolor: '#0a0a0a',
+          bgcolor: theme.palette.background.paper,
           borderRadius: '24px',
           overflow: 'hidden',
-          border: '1px solid rgba(250, 204, 21, 0.2)',
+          border: `1px solid ${accentAlpha(0.2)}`,
           transition: 'all 0.3s ease',
           transform: hovered ? 'translateY(-5px)' : 'none',
-          boxShadow: hovered ? '0 15px 35px rgba(250, 204, 21, 0.1)' : 'none',
+          boxShadow: hovered ? `0 15px 35px ${accentAlpha(0.12)}` : 'none',
         }}
         onMouseEnter={() => setHovered(true)}
         onMouseLeave={() => setHovered(false)}
       >
         <Box sx={{ height: 180, position: 'relative', overflow: 'hidden' }}>
           <Box sx={{ width: '100%', height: '100%', backgroundImage: `url(${deal.image})`, backgroundSize: 'cover', backgroundPosition: 'center', transition: 'transform 0.5s ease', transform: hovered ? 'scale(1.05)' : 'scale(1)' }} />
-          <Box sx={{ position: 'absolute', top: 16, right: 16, bgcolor: deal.badgeColor, color: '#fff', px: 1.5, py: 0.5, borderRadius: '8px', fontWeight: 800, fontSize: '0.8rem', zIndex: 2 }}>
+          <Box sx={{ position: 'absolute', top: 16, right: 16, bgcolor: deal.badgeColor, color: 'text.primary', px: 1.5, py: 0.5, borderRadius: '8px', fontWeight: 800, fontSize: '0.8rem', zIndex: 2 }}>
             {deal.badge}
           </Box>
-          <Box sx={{ position: 'absolute', inset: 0, background: 'linear-gradient(to top, #0a0a0a, transparent)', zIndex: 1 }} />
+          <Box sx={{ position: 'absolute', inset: 0, background: `linear-gradient(to top, ${theme.palette.background.paper}, transparent)`, zIndex: 1 }} />
         </Box>
         <Box sx={{ p: 3, pt: 1 }}>
-          <Typography variant="h6" sx={{ color: '#facc15', fontWeight: 700, mb: 1, fontSize: '1.1rem' }}>
+          <Typography variant="h6" sx={{ color: accent, fontWeight: 700, mb: 1, fontSize: '1.1rem' }}>
             {deal.title}
           </Typography>
-          <Typography variant="body2" sx={{ color: 'rgba(255,255,255,0.6)', mb: 3, fontSize: '0.85rem', lineHeight: 1.6, minHeight: 40 }}>
+          <Typography variant="body2" sx={{ color: theme.palette.text.secondary, mb: 3, fontSize: '0.85rem', lineHeight: 1.6, minHeight: 40 }}>
             {deal.description}
           </Typography>
-          <Button 
-            fullWidth 
-            variant="contained" 
-            sx={{ 
-              bgcolor: '#facc15', 
-              color: '#000', 
-              fontWeight: 700, 
-              borderRadius: '12px', 
+          <Button
+            fullWidth
+            variant="contained"
+            color="primary"
+            sx={{
+              fontWeight: 700,
+              borderRadius: '12px',
               py: 1.2,
-              backgroundImage: 'linear-gradient(135deg, #facc15, #ca8a04)',
               textTransform: 'none',
               fontSize: '0.95rem',
-              '&:hover': { bgcolor: '#eab308' }
+              color: '#111111',
             }}
           >
             Get Deal
@@ -307,33 +313,37 @@ function DealCard({ deal, index }: { deal: typeof hotDeals[0], index: number }) 
 
 // ─── Testimonial Card ─────────────────────────────────────────────────────────
 function TestimonialCard({ t, index }: { t: typeof testimonials[0], index: number }) {
+  const theme = useTheme();
+  const accent = theme.palette.primary.main;
+  const accentAlpha = (a: number) => `rgba(46, 158, 191, ${a})`;
+
   return (
     <Grow in timeout={800 + index * 100}>
       <Card
         elevation={0}
         sx={{
           minWidth: { xs: 240, md: 320 },
-          bgcolor: 'rgba(255,255,255,0.02)',
+          bgcolor: theme.palette.background.paper,
           borderRadius: '20px',
           p: 3,
-          border: '1px solid rgba(255,255,255,0.05)',
+          border: `1px solid ${theme.palette.divider}`,
           transition: 'border 0.3s ease',
-          '&:hover': { border: '1px solid rgba(250, 204, 21, 0.3)' }
+          '&:hover': { border: `1px solid ${accentAlpha(0.35)}` }
         }}
       >
         <Box sx={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', mb: 2 }}>
            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
-              <Avatar src={t.image} sx={{ width: 48, height: 48, border: '2px solid #facc15' }} />
+              <Avatar src={t.image} sx={{ width: 48, height: 48, border: `2px solid ${accent}` }} />
               <Box>
-                <Typography variant="subtitle1" sx={{ color: '#fff', fontWeight: 700, lineHeight: 1.2 }}>{t.name}</Typography>
-                <Box sx={{ display: 'flex', color: '#facc15', fontSize: '0.8rem', mt: 0.5 }}>
+                <Typography variant="subtitle1" sx={{ color: theme.palette.text.primary, fontWeight: 700, lineHeight: 1.2 }}>{t.name}</Typography>
+                <Box sx={{ display: 'flex', color: accent, fontSize: '0.8rem', mt: 0.5 }}>
                   {[1,2,3,4,5].map(i => <StarIcon key={i} fontSize="inherit" />)}
                 </Box>
               </Box>
            </Box>
-           <Typography variant="caption" sx={{ color: 'rgba(255,255,255,0.4)' }}>{t.time}</Typography>
+           <Typography variant="caption" sx={{ color: theme.palette.text.secondary }}>{t.time}</Typography>
         </Box>
-        <Typography variant="body2" sx={{ color: 'rgba(255,255,255,0.6)', lineHeight: 1.6, fontStyle: 'italic' }}>
+        <Typography variant="body2" sx={{ color: theme.palette.text.secondary, lineHeight: 1.6, fontStyle: 'italic' }}>
           "{t.text}"
         </Typography>
       </Card>
@@ -346,8 +356,12 @@ export default function Home() {
   const { auth } = useAuth();
   const [visible, setVisible] = useState(false);
   const theme = useTheme();
+  const { isDark } = useNearUTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('md'));
   const [showAllServices, setShowAllServices] = useState(false);
+
+  const accent = theme.palette.primary.main;
+  const accentAlpha = (a: number) => `rgba(46, 158, 191, ${a})`;
 
   const { scrollRef: servicesRef, scroll: scrollServices } = useHorizontalScroll();
   const { scrollRef: dealsRef, scroll: scrollDeals } = useHorizontalScroll();
@@ -361,7 +375,7 @@ export default function Home() {
   const userName = auth?.user?.username || auth?.user?.email?.split('@')[0] || 'Student';
 
   return (
-    <Box sx={{ display: 'flex', height: '100vh', overflow: 'hidden', bgcolor: '#050505', backgroundImage: 'radial-gradient(circle at top right, rgba(250,204,21,0.03) 0%, transparent 40%)' }}>
+    <Box sx={{ display: 'flex', height: '100vh', overflow: 'hidden', bgcolor: 'background.default', backgroundImage: `radial-gradient(circle at top right, ${accentAlpha(0.04)} 0%, transparent 40%)` }}>
       <Sidebar activeSection="home" />
 
       <Box sx={{ flex: 1, display: 'flex', flexDirection: 'column', minWidth: 0, overflow: 'hidden' }}>
@@ -370,25 +384,25 @@ export default function Home() {
         {/* Main Scroller wrapper */}
         <Box sx={{ flex: 1, overflowY: 'auto', overflowX: 'hidden' }}>
           <Box sx={{ px: { xs: 2.5, md: 5 }, py: { xs: 4, md: 5 }, pb: 8, maxWidth: 1400, mx: 'auto', width: '100%' }}>
-              
+
               {/* ── Hero ─────────────────────────────────────────── */}
               <Fade in={visible} timeout={600}>
                 <Box sx={{ mb: 6, position: 'relative' }}>
-                  <Typography variant="h2" sx={{ fontWeight: 800, color: '#fff', fontSize: { xs: '2.5rem', md: '3.5rem' }, letterSpacing: '-0.03em', mb: 1 }}>
-                    Hello <Box component="span" sx={{ color: '#facc15' }}>{userName}</Box> <Box component="span" sx={{ display: 'inline-block', animation: 'wave 2.5s infinite', transformOrigin: '70% 70%' }}>👋</Box>
+                  <Typography variant="h2" sx={{ fontWeight: 800, color: 'text.primary', fontSize: { xs: '2.5rem', md: '3.5rem' }, letterSpacing: '-0.03em', mb: 1 }}>
+                    Hello <Box component="span" sx={{ color: accent }}>{userName}</Box>
                   </Typography>
-                  <Typography variant="h5" sx={{ color: 'rgba(255,255,255,0.5)', fontWeight: 500 }}>
+                  <Typography variant="h5" sx={{ color: 'text.secondary', fontWeight: 500 }}>
                     What would you like to do today?
                   </Typography>
                   <style>{`
                     @keyframes wave {
                       0% { transform: rotate( 0.0deg) }
-                      10% { transform: rotate(14.0deg) }  
+                      10% { transform: rotate(14.0deg) }
                       20% { transform: rotate(-8.0deg) }
                       30% { transform: rotate(14.0deg) }
                       40% { transform: rotate(-4.0deg) }
                       50% { transform: rotate(10.0deg) }
-                      60% { transform: rotate( 0.0deg) }  
+                      60% { transform: rotate( 0.0deg) }
                       100% { transform: rotate( 0.0deg) }
                     }
                   `}</style>
@@ -399,32 +413,32 @@ export default function Home() {
               <Box sx={{ mb: 8 }}>
                 <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 3 }}>
                   <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
-                    <SparkleIcon sx={{ color: '#facc15', fontSize: 24 }} />
-                    <Typography variant="h5" sx={{ fontWeight: 800, color: '#fff', letterSpacing: '-0.01em' }}>
+                    <SparkleIcon sx={{ color: accent, fontSize: 24 }} />
+                    <Typography variant="h5" sx={{ fontWeight: 800, color: 'text.primary', letterSpacing: '-0.01em' }}>
                       Explore Services
                     </Typography>
                   </Box>
                   <Box sx={{ display: { xs: 'none', md: 'flex' }, gap: 1 }}>
-                    <IconButton onClick={() => scrollServices('left')} sx={{ bgcolor: 'rgba(255,255,255,0.05)', color: '#fff', '&:hover': { bgcolor: 'rgba(250,204,21,0.2)' } }}>
+                    <IconButton onClick={() => scrollServices('left')} sx={{ bgcolor: accentAlpha(0.06), color: 'text.primary', '&:hover': { bgcolor: accentAlpha(0.15) } }}>
                       <ChevronLeftIcon />
                     </IconButton>
-                    <IconButton onClick={() => scrollServices('right')} sx={{ bgcolor: 'rgba(255,255,255,0.05)', color: '#fff', '&:hover': { bgcolor: 'rgba(250,204,21,0.2)' } }}>
+                    <IconButton onClick={() => scrollServices('right')} sx={{ bgcolor: accentAlpha(0.06), color: 'text.primary', '&:hover': { bgcolor: accentAlpha(0.15) } }}>
                       <ChevronRightIcon />
                     </IconButton>
                   </Box>
                 </Box>
-                
-                <Box 
+
+                <Box
                   ref={servicesRef}
-                  sx={{ 
-                    display: 'flex', 
+                  sx={{
+                    display: 'flex',
                     flexDirection: { xs: 'column', md: 'row' },
-                    gap: 3, 
-                    overflowX: { xs: 'visible', md: 'auto' }, 
-                    pb: { xs: 2, md: 4 }, 
-                    px: 1, 
+                    gap: 3,
+                    overflowX: { xs: 'visible', md: 'auto' },
+                    pb: { xs: 2, md: 4 },
+                    px: 1,
                     mx: -1,
-                    scrollbarWidth: 'none', 
+                    scrollbarWidth: 'none',
                     '&::-webkit-scrollbar': { display: 'none' },
                     scrollBehavior: 'smooth',
                     scrollSnapType: { xs: 'none', md: 'x mandatory' },
@@ -437,21 +451,21 @@ export default function Home() {
                     </Box>
                   ))}
                 </Box>
-                
+
                 {isMobile && services.length > 3 && (
                   <Box sx={{ display: 'flex', justifyContent: 'center', mt: 1 }}>
-                    <Button 
-                      variant="outlined" 
+                    <Button
+                      variant="outlined"
                       onClick={() => setShowAllServices(!showAllServices)}
-                      sx={{ 
-                        color: '#facc15', 
-                        borderColor: 'rgba(250, 204, 21, 0.4)', 
-                        borderRadius: '12px', 
-                        px: 4, 
-                        py: 1.2, 
-                        fontWeight: 700, 
+                      sx={{
+                        color: accent,
+                        borderColor: accentAlpha(0.4),
+                        borderRadius: '12px',
+                        px: 4,
+                        py: 1.2,
+                        fontWeight: 700,
                         textTransform: 'none',
-                        '&:hover': { borderColor: '#facc15', bgcolor: 'rgba(250, 204, 21, 0.1)' } 
+                        '&:hover': { borderColor: accent, bgcolor: accentAlpha(0.08) }
                       }}
                     >
                       {showAllServices ? 'Show Less' : `View All Services (${services.length})`}
@@ -464,37 +478,37 @@ export default function Home() {
               <Box sx={{ mb: 8 }}>
                 <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 3 }}>
                   <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
-                    <OffersIcon sx={{ color: '#facc15', fontSize: 24 }} />
+                    <OffersIcon sx={{ color: accent, fontSize: 24 }} />
                     <Box>
-                      <Typography variant="h5" sx={{ fontWeight: 800, color: '#facc15', letterSpacing: '-0.01em', lineHeight: 1.2 }}>
+                      <Typography variant="h5" sx={{ fontWeight: 800, color: accent, letterSpacing: '-0.01em', lineHeight: 1.2 }}>
                         Hot Deals & Offers
                       </Typography>
-                      <Typography variant="body2" sx={{ color: 'rgba(255,255,255,0.5)' }}>
+                      <Typography variant="body2" sx={{ color: 'text.secondary' }}>
                         Limited time exclusive offers just for you
                       </Typography>
                     </Box>
                   </Box>
                   <Box sx={{ display: { xs: 'none', md: 'flex' }, gap: 1 }}>
-                    <IconButton onClick={() => scrollDeals('left')} sx={{ bgcolor: 'rgba(255,255,255,0.05)', color: '#fff', '&:hover': { bgcolor: 'rgba(250,204,21,0.2)' } }}>
+                    <IconButton onClick={() => scrollDeals('left')} sx={{ bgcolor: accentAlpha(0.06), color: 'text.primary', '&:hover': { bgcolor: accentAlpha(0.15) } }}>
                       <ChevronLeftIcon />
                     </IconButton>
-                    <IconButton onClick={() => scrollDeals('right')} sx={{ bgcolor: 'rgba(255,255,255,0.05)', color: '#fff', '&:hover': { bgcolor: 'rgba(250,204,21,0.2)' } }}>
+                    <IconButton onClick={() => scrollDeals('right')} sx={{ bgcolor: accentAlpha(0.06), color: 'text.primary', '&:hover': { bgcolor: accentAlpha(0.15) } }}>
                       <ChevronRightIcon />
                     </IconButton>
                   </Box>
                 </Box>
 
-                <Box 
+                <Box
                   ref={dealsRef}
-                  sx={{ 
-                    display: 'flex', 
+                  sx={{
+                    display: 'flex',
                     flexDirection: { xs: 'column', md: 'row' },
-                    gap: 3, 
-                    overflowX: { xs: 'visible', md: 'auto' }, 
-                    pb: 4, 
-                    px: 1, 
+                    gap: 3,
+                    overflowX: { xs: 'visible', md: 'auto' },
+                    pb: 4,
+                    px: 1,
                     mx: -1,
-                    scrollbarWidth: 'none', 
+                    scrollbarWidth: 'none',
                     '&::-webkit-scrollbar': { display: 'none' },
                     scrollBehavior: 'smooth',
                     scrollSnapType: { xs: 'none', md: 'x mandatory' },
@@ -513,37 +527,37 @@ export default function Home() {
               <Box sx={{ mb: 6 }}>
                 <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 3 }}>
                   <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
-                    <UserIcon sx={{ color: '#facc15', fontSize: 24 }} />
+                    <UserIcon sx={{ color: accent, fontSize: 24 }} />
                     <Box>
-                      <Typography variant="h5" sx={{ fontWeight: 800, color: '#facc15', letterSpacing: '-0.01em', lineHeight: 1.2 }}>
+                      <Typography variant="h5" sx={{ fontWeight: 800, color: accent, letterSpacing: '-0.01em', lineHeight: 1.2 }}>
                         What Students Say
                       </Typography>
-                      <Typography variant="body2" sx={{ color: 'rgba(255,255,255,0.5)' }}>
+                      <Typography variant="body2" sx={{ color: 'text.secondary' }}>
                         Real experiences from our community members
                       </Typography>
                     </Box>
                   </Box>
                    <Box sx={{ display: { xs: 'none', md: 'flex' }, gap: 1 }}>
-                    <IconButton onClick={() => scrollTest('left')} sx={{ bgcolor: 'rgba(255,255,255,0.05)', color: '#fff', '&:hover': { bgcolor: 'rgba(250,204,21,0.2)' } }}>
+                    <IconButton onClick={() => scrollTest('left')} sx={{ bgcolor: accentAlpha(0.06), color: 'text.primary', '&:hover': { bgcolor: accentAlpha(0.15) } }}>
                       <ChevronLeftIcon />
                     </IconButton>
-                    <IconButton onClick={() => scrollTest('right')} sx={{ bgcolor: 'rgba(255,255,255,0.05)', color: '#fff', '&:hover': { bgcolor: 'rgba(250,204,21,0.2)' } }}>
+                    <IconButton onClick={() => scrollTest('right')} sx={{ bgcolor: accentAlpha(0.06), color: 'text.primary', '&:hover': { bgcolor: accentAlpha(0.15) } }}>
                       <ChevronRightIcon />
                     </IconButton>
                   </Box>
                 </Box>
 
-                <Box 
+                <Box
                   ref={testRef}
-                  sx={{ 
-                    display: 'flex', 
+                  sx={{
+                    display: 'flex',
                     flexDirection: { xs: 'column', md: 'row' },
-                    gap: 3, 
-                    overflowX: { xs: 'visible', md: 'auto' }, 
-                    pb: 2, 
-                    px: 1, 
+                    gap: 3,
+                    overflowX: { xs: 'visible', md: 'auto' },
+                    pb: 2,
+                    px: 1,
                     mx: -1,
-                    scrollbarWidth: 'none', 
+                    scrollbarWidth: 'none',
                     '&::-webkit-scrollbar': { display: 'none' },
                     scrollBehavior: 'smooth',
                     scrollSnapType: { xs: 'none', md: 'x mandatory' },
@@ -556,9 +570,9 @@ export default function Home() {
                     </Box>
                   ))}
                 </Box>
-                
+
                 <Box sx={{ display: 'flex', justifyContent: 'center', mt: 4 }}>
-                   <Button variant="outlined" sx={{ color: '#facc15', borderColor: 'rgba(250, 204, 21, 0.4)', borderRadius: '12px', px: 4, py: 1.2, fontWeight: 700, '&:hover': { borderColor: '#facc15', bgcolor: 'rgba(250, 204, 21, 0.1)' } }}>
+                   <Button variant="outlined" sx={{ color: accent, borderColor: accentAlpha(0.4), borderRadius: '12px', px: 4, py: 1.2, fontWeight: 700, '&:hover': { borderColor: accent, bgcolor: accentAlpha(0.08) } }}>
                      + Share Your Experience
                    </Button>
                 </Box>
