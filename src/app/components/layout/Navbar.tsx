@@ -1,114 +1,140 @@
+
 import { Link } from 'react-router';
 import useAuth from '../../hooks/useAuth';
 import { useSidebar } from '../../context/SidebarContext';
+import { useNearUTheme } from '../../context/ThemeContext';
 
 // MUI Components
 import {
   AppBar,
   Toolbar,
   IconButton,
-  Typography,
   Badge,
   Box,
   Avatar,
   Tooltip,
+  Typography,
+  useTheme,
 } from '@mui/material';
 
 // MUI Icons
 import {
   Notifications as BellIcon,
-  School as GraduationCapIcon,
-  LocationOn as LocationIcon,
-  AutoAwesome as SparkleIcon,
   Person as UserIcon,
+  Work as WorkIcon,
+  Menu as MenuIcon,
+  WbSunny as SunIcon,
+  NightlightRound as MoonIcon,
 } from '@mui/icons-material';
-
-function getTimeGreeting(): string {
-  const hour = new Date().getHours();
-  if (hour < 12) return 'Good Morning';
-  if (hour < 17) return 'Good Afternoon';
-  return 'Good Evening';
-}
 
 export default function Navbar() {
   const { auth } = useAuth();
-  const { isExpanded } = useSidebar();
+  const { isExpanded, toggleMobileSidebar } = useSidebar();
+  const { isDark, toggleTheme } = useNearUTheme();
+  const theme = useTheme();
 
-  const userName = auth?.user?.username || auth?.user?.email?.split('@')[0] || 'Student';
-  const greeting = getTimeGreeting();
+  const accent = theme.palette.primary.main;          // #2E9EBF
+  const accentAlpha = (a: number) => `rgba(46, 158, 191, ${a})`;
 
   return (
     <AppBar
       position="sticky"
       sx={{
         width: '100%',
-        bgcolor: 'rgba(14, 14, 14, 0.85)',
+        bgcolor: isDark ? 'rgba(17, 17, 17, 0.75)' : 'rgba(245, 245, 242, 0.85)',
         backdropFilter: 'blur(20px)',
-        borderBottom: '1px solid rgba(250, 204, 21, 0.12)',
-        boxShadow: 'none',
+        WebkitBackdropFilter: 'blur(20px)',
+        borderBottom: `1px solid ${accentAlpha(0.15)}`,
+        boxShadow: isDark ? '0 8px 32px rgba(0, 0, 0, 0.4)' : '0 4px 20px rgba(0,0,0,0.08)',
         zIndex: 10,
+        transition: 'background-color 0.25s ease, box-shadow 0.25s ease',
       }}
     >
-      <Toolbar sx={{ px: { xs: 2, sm: 3 }, minHeight: '68px !important', gap: 2 }}>
-        {/* Left: Avatar + Greeting */}
-        <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, flex: 1 }}>
-          {/* Logo icon */}
+      <Toolbar sx={{ px: { xs: 2, sm: 3 }, minHeight: '64px !important', gap: 2 }}>
+
+        {/* Left: Logo wordmark */}
+        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5, flexShrink: 0 }}>
+          {/* Hamburger Menu (Mobile Only) */}
+          <IconButton
+            onClick={toggleMobileSidebar}
+            edge="start"
+            sx={{
+              display: { xs: 'flex', md: 'none' },
+              color: theme.palette.text.secondary,
+              mr: 1,
+            }}
+          >
+            <MenuIcon />
+          </IconButton>
+
           <Box
             sx={{
-              width: 48,
-              height: 48,
-              bgcolor: '#facc15',
-              backgroundImage: 'linear-gradient(135deg, #fde68a 0%, #facc15 50%, #ca8a04 100%)',
-              borderRadius: '14px',
+              width: 34,
+              height: 34,
+              bgcolor: accent,
+              backgroundImage: `linear-gradient(135deg, ${accentAlpha(0.8)} 0%, ${accent} 60%, #008e76 100%)`,
+              borderRadius: '10px',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
-              boxShadow: '0 0 20px rgba(250, 204, 21, 0.35)',
+              boxShadow: `0 0 14px ${accentAlpha(0.35)}`,
               flexShrink: 0,
             }}
           >
-            <GraduationCapIcon sx={{ color: '#1a0a00', fontSize: 26 }} />
+            <WorkIcon sx={{ color: '#111111', fontSize: 18 }} />
           </Box>
-
-          {/* Greeting text */}
-          <Box>
-            <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.75 }}>
-              <Typography
-                variant="h6"
-                sx={{ color: '#fff', fontWeight: 600, fontSize: '1.05rem', lineHeight: 1.2 }}
-              >
-                {greeting},{' '}
-                <Box component="span" sx={{ color: '#facc15', fontWeight: 700 }}>
-                  {userName}
-                </Box>
-              </Typography>
-              <SparkleIcon sx={{ color: '#facc15', fontSize: 18 }} />
-            </Box>
-            <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.4 }}>
-              <LocationIcon sx={{ color: 'rgba(255,255,255,0.35)', fontSize: 13 }} />
-              <Typography variant="caption" sx={{ color: 'rgba(255,255,255,0.4)', fontSize: '0.75rem' }}>
-                Sabaragamuwa University
-              </Typography>
-            </Box>
-          </Box>
+          <Typography
+            sx={{
+              color: accent,
+              fontWeight: 800,
+              fontStyle: 'italic',
+              fontSize: '1.15rem',
+              letterSpacing: '-0.02em',
+              lineHeight: 1,
+              display: { xs: 'none', sm: 'block' },
+            }}
+          >
+            NearU
+          </Typography>
         </Box>
 
+        <Box sx={{ flex: 1 }} />
+
         {/* Right: Actions */}
-        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+        <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5, flexShrink: 0 }}>
+
+          {/* Theme Toggle */}
+          <Tooltip title={isDark ? 'Switch to Light Mode' : 'Switch to Dark Mode'}>
+            <IconButton
+              onClick={toggleTheme}
+              id="theme-toggle-btn"
+              aria-label="Toggle theme"
+              sx={{
+                color: theme.palette.text.secondary,
+                borderRadius: '10px',
+                transition: 'color 0.2s ease',
+                '&:hover': { color: accent, bgcolor: accentAlpha(0.08) },
+              }}
+            >
+              {isDark ? <SunIcon sx={{ fontSize: 20 }} /> : <MoonIcon sx={{ fontSize: 20 }} />}
+            </IconButton>
+          </Tooltip>
+
+          {/* Notifications */}
           <Tooltip title="Notifications">
             <IconButton
               sx={{
-                color: 'rgba(255,255,255,0.55)',
+                color: theme.palette.text.secondary,
                 borderRadius: '10px',
-                '&:hover': { color: '#facc15', bgcolor: 'rgba(250, 204, 21, 0.08)' },
+                '&:hover': { color: accent, bgcolor: accentAlpha(0.08) },
               }}
             >
               <Badge
                 badgeContent={3}
                 sx={{
                   '& .MuiBadge-badge': {
-                    bgcolor: '#facc15',
-                    color: '#000',
+                    bgcolor: accent,
+                    color: '#111111',
                     fontSize: '0.6rem',
                     fontWeight: 800,
                     minWidth: 17,
@@ -116,31 +142,30 @@ export default function Navbar() {
                   },
                 }}
               >
-                <BellIcon sx={{ fontSize: 22 }} />
+                <BellIcon sx={{ fontSize: 21 }} />
               </Badge>
             </IconButton>
           </Tooltip>
 
+          {/* Profile */}
           <Tooltip title="Profile">
             <IconButton
               component={Link}
               to="/profile"
-              sx={{
-                p: 0.5,
-                '&:hover': { opacity: 0.85 },
-              }}
+              sx={{ p: 0.5, ml: 0.5, '&:hover': { opacity: 0.85 } }}
             >
               <Avatar
                 sx={{
-                  width: 36,
-                  height: 36,
-                  bgcolor: '#facc15',
-                  color: '#000',
+                  width: 34,
+                  height: 34,
+                  bgcolor: accentAlpha(0.15),
+                  border: `1.5px solid ${accentAlpha(0.4)}`,
+                  color: accent,
                   fontWeight: 700,
-                  fontSize: '0.9rem',
+                  fontSize: '0.85rem',
                 }}
               >
-                <UserIcon fontSize="small" />
+                <UserIcon sx={{ fontSize: 18 }} />
               </Avatar>
             </IconButton>
           </Tooltip>
