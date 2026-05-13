@@ -30,6 +30,7 @@ const FoodPage = Loadable(lazy(() => import("./pages/protected/Food")));
 const ShopDetailPage = Loadable(lazy(() => import("./pages/protected/ShopDetail")));
 const Accommodation = Loadable(lazy(() => import("./pages/public/Accommodation")));
 const AccommodationDetail = Loadable(lazy(() => import("./pages/public/AccommodationDetail")));
+const Gifts = Loadable(lazy(() => import("./pages/protected/Gifts")));
 
 // ── Role-specific Pages (lazy) ────────────────────────────────────────────────
 const AdminHome = Loadable(lazy(() => import("./pages/protected/AdminHome")));
@@ -107,6 +108,10 @@ export const router = createBrowserRouter([
       {
         path: "/accommodation/:id",
         Component: AccommodationDetail,
+      },
+      {
+        path: "/gifts",
+        Component: Gifts,
       },
     ]
   },
