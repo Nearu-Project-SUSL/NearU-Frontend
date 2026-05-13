@@ -1,5 +1,5 @@
 import { Link, useNavigate } from 'react-router';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { toast } from 'sonner';
 import authService from '../../../api/authService';
 import useAuth from '../../hooks/useAuth';
@@ -32,12 +32,20 @@ import {
 
 export default function Login() {
   const navigate = useNavigate();
-  const { setAuth } = useAuth();
+  const { auth, setAuth } = useAuth();
   const [showPassword, setShowPassword] = useState(false);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [errors, setErrors] = useState({ email: '', password: '' });
+  const [redirectTo, setRedirectTo] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (redirectTo && auth.user) {
+      navigate(redirectTo, { replace: true });
+      setRedirectTo(null);
+    }
+  }, [auth.user, navigate, redirectTo]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -66,13 +74,13 @@ export default function Login() {
       
       const userRole = response.user.roles[0];
       if (userRole === 'Admin') {
-        navigate('/admin-home');
+        setRedirectTo('/admin-home');
       } else if (userRole === 'BusinessOwner') {
-        navigate('/business-owner-home');
+        setRedirectTo('/business-owner-home');
       } else if (userRole === 'Rider') {
-        navigate('/rider-home');
+        setRedirectTo('/rider-home');
       } else {
-        navigate('/home');
+        setRedirectTo('/home');
       }
     } catch (error: any) {
       const errorMessage = error.response?.data?.message || 'Login failed. Please check your credentials.';
