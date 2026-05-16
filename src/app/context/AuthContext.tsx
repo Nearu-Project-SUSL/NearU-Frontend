@@ -13,7 +13,7 @@ interface AuthState {
   refreshToken: string | null;
 }
 
-interface AuthContextType {
+export interface AuthContextType {
   auth: AuthState;
   setAuth: React.Dispatch<React.SetStateAction<AuthState>>;
 }

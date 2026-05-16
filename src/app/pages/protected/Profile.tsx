@@ -69,7 +69,7 @@ export default function Profile() {
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   // Safely extract the user ID
-  const userId = auth?.user?.userId || auth?.user?.id;
+  const userId = (auth?.user as any)?.userId || auth?.user?.id;
   const isGuest = userId === 'guest';
 
   useEffect(() => {
@@ -89,7 +89,9 @@ export default function Profile() {
           address: 'N/A',
           city: 'N/A',
           dateOfBirth: 'N/A',
-          mobileNumber: 'N/A'
+          mobileNumber: 'N/A',
+          isActive: 1,
+          createdDate: new Date().toISOString()
         });
         setLoading(false);
         return;
@@ -382,7 +384,7 @@ export default function Profile() {
 
                 <Grid container spacing={4}>
                   {/* Left Column: Settings */}
-                  <Grid item xs={12} md={4}>
+                  <Grid size={{ xs: 12, md: 4 }}>
                     {/* Settings List */}
                     <Paper sx={{ ...glassStyles, overflow: 'hidden' }}>
                       <List disablePadding>
@@ -441,13 +443,13 @@ export default function Profile() {
                   </Grid>
 
                   {/* Right Column: Profile Details Form */}
-                  <Grid item xs={12} md={8}>
+                  <Grid size={{ xs: 12, md: 8 }}>
                     <Paper sx={{ ...glassStyles, p: 4 }}>
                       <Typography variant="h6" sx={{ mb: 3, fontWeight: 800, display: 'flex', alignItems: 'center', gap: 1 }}>
                         <UserIcon sx={{ color: accent }} /> Personal Information
                       </Typography>
                       <Grid container spacing={3}>
-                        <Grid item xs={12} sm={6}>
+                        <Grid size={{ xs: 12, sm: 6 }}>
                           <TextField
                             fullWidth
                             label="Username / Name"
@@ -459,7 +461,7 @@ export default function Profile() {
                             InputProps={{ sx: { borderRadius: '0.75rem', transition: 'all 0.2s' } }}
                           />
                         </Grid>
-                        <Grid item xs={12} sm={6}>
+                        <Grid size={{ xs: 12, sm: 6 }}>
                           <TextField
                             fullWidth
                             label="Email Address"
@@ -470,7 +472,7 @@ export default function Profile() {
                             helperText={!isGuest ? "Email cannot be changed" : ""}
                           />
                         </Grid>
-                        <Grid item xs={12} sm={6}>
+                        <Grid size={{ xs: 12, sm: 6 }}>
                           <TextField
                             fullWidth
                             label="Mobile Number"
@@ -482,7 +484,7 @@ export default function Profile() {
                             InputProps={{ sx: { borderRadius: '0.75rem' } }}
                           />
                         </Grid>
-                        <Grid item xs={12} sm={6}>
+                        <Grid size={{ xs: 12, sm: 6 }}>
                           <TextField
                             fullWidth
                             label="Date of Birth"
@@ -497,14 +499,14 @@ export default function Profile() {
                           />
                         </Grid>
                         
-                        <Grid item xs={12}>
+                        <Grid size={{ xs: 12 }}>
                           <Divider sx={{ my: 3, borderColor: accentAlpha(0.1) }} />
                           <Typography variant="h6" sx={{ mb: 3, fontWeight: 800, display: 'flex', alignItems: 'center', gap: 1 }}>
                             <WorkIcon sx={{ color: accent }} /> Academic Details
                           </Typography>
                         </Grid>
 
-                        <Grid item xs={12} sm={6}>
+                        <Grid size={{ xs: 12, sm: 6 }}>
                           <TextField
                             fullWidth
                             label="Student ID"
@@ -515,7 +517,7 @@ export default function Profile() {
                             helperText={!isGuest ? "Student ID cannot be changed" : ""}
                           />
                         </Grid>
-                        <Grid item xs={12} sm={6}>
+                        <Grid size={{ xs: 12, sm: 6 }}>
                           <TextField
                             fullWidth
                             label="Faculty"
@@ -527,7 +529,7 @@ export default function Profile() {
                             InputProps={{ sx: { borderRadius: '0.75rem' } }}
                           />
                         </Grid>
-                        <Grid item xs={12} sm={6}>
+                        <Grid size={{ xs: 12, sm: 6 }}>
                           <TextField
                             fullWidth
                             label="Year"
@@ -540,14 +542,14 @@ export default function Profile() {
                           />
                         </Grid>
 
-                        <Grid item xs={12}>
+                        <Grid size={{ xs: 12 }}>
                           <Divider sx={{ my: 3, borderColor: accentAlpha(0.1) }} />
                           <Typography variant="h6" sx={{ mb: 3, fontWeight: 800, display: 'flex', alignItems: 'center', gap: 1 }}>
                             <MailIcon sx={{ color: accent }} /> Location
                           </Typography>
                         </Grid>
 
-                        <Grid item xs={12} sm={6}>
+                        <Grid size={{ xs: 12, sm: 6 }}>
                           <TextField
                             fullWidth
                             label="City"
@@ -559,7 +561,7 @@ export default function Profile() {
                             InputProps={{ sx: { borderRadius: '0.75rem' } }}
                           />
                         </Grid>
-                        <Grid item xs={12} sm={6}>
+                        <Grid size={{ xs: 12, sm: 6 }}>
                           <TextField
                             fullWidth
                             label="Address"

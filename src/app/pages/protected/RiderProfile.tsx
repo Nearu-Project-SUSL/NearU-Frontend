@@ -61,7 +61,7 @@ export default function RiderProfile() {
             
             <Grid container spacing={4}>
               {/* Profile Card */}
-              <Grid xs={12} md={4}>
+              <Grid size={{ xs: 12, md: 4 }}>
                 <Paper sx={{ p: 4, textAlign: 'center', bgcolor: 'rgba(255, 255, 255, 0.03)', borderRadius: '1.5rem', border: '1px solid rgba(255, 255, 255, 0.1)' }}>
                   <Avatar 
                     sx={{ 
@@ -95,7 +95,7 @@ export default function RiderProfile() {
               </Grid>
 
               {/* Settings List */}
-              <Grid xs={12} md={8}>
+              <Grid size={{ xs: 12, md: 8 }}>
                 <Paper sx={{ bgcolor: 'rgba(255, 255, 255, 0.03)', borderRadius: '1.5rem', border: '1px solid rgba(255, 255, 255, 0.1)', overflow: 'hidden' }}>
                   <List disablePadding>
                     <ListItem sx={{ py: 2, px: 3 }}>
