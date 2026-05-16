@@ -103,6 +103,25 @@ const authService = {
     };
   },
 
+  loginWithGoogle: async (credential: string): Promise<AuthResponse> => {
+    const response = await axios.post<ApiResponse<any>>('/auth/google-login', {
+      token: credential
+    });
+    
+    const apiData = response.data.data;
+    
+    return {
+      accessToken: apiData.accessToken,
+      refreshToken: apiData.refreshToken,
+      user: {
+        id: apiData.userId,
+        username: apiData.username,
+        email: apiData.email,
+        roles: apiData.role ? [apiData.role] : []
+      }
+    };
+  },
+
   registerStudent: async (data: RegisterStudentData): Promise<{ message: string, userId: string, username: string }> => {
     const response = await axios.post<ApiResponse<any>>('/auth/register', {
         username: data.fullName,
