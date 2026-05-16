@@ -66,7 +66,7 @@ export function Sidebar({ activeSection }: SidebarProps) {
     { icon: BikeIcon,          label: 'Rides',            id: 'rides',         path: '/rides' },
     { icon: JobsIcon,          label: 'Jobs',             id: 'jobs',          path: '/jobs' },
     { icon: AccommodationIcon, label: 'Accommodation',    id: 'accommodation', path: '/accommodation' },
-    { icon: GiftIcon,          label: 'Custom Gifts',     id: 'gifts',         path: '/gifts' },
+    { icon: GiftIcon,          label: 'Gifts',     id: 'gifts',         path: '/gifts' },
     { icon: OffersIcon,        label: 'Deals and Offers', id: 'offers',        path: '/deals' },
   ];
 

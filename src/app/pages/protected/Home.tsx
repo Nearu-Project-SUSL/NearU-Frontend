@@ -84,7 +84,7 @@ const services = [
   {
     id: 'gifts',
     icon: GiftIcon,
-    label: 'Custom Gifts',
+    label: 'Gifts',
     description: 'Send personalised gifts to friends and loved ones.',
     badge: '15+',
     path: '/gifts',
