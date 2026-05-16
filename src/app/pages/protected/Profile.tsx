@@ -99,7 +99,7 @@ export default function Profile() {
         const data = await userService.getUserProfile(userId);
         setProfile(data);
         setEditForm({
-          username: data.username || '',
+          username: data.username || (data as any).Username || auth?.user?.username || '',
           mobileNumber: data.mobileNumber || '',
           faculty: data.faculty || '',
           year: data.year || '',
@@ -253,26 +253,30 @@ export default function Profile() {
                     borderRadius: '1.5rem', 
                     background: `linear-gradient(135deg, ${accentAlpha(0.6)} 0%, ${accentAlpha(0.1)} 100%)`,
                     position: 'relative',
-                    mb: 8,
-                    overflow: 'visible',
                     boxShadow: `0 8px 32px ${accentAlpha(0.15)}`
                   }}
+                />
+
+                {/* Profile Header Info */}
+                <Box 
+                  sx={{ 
+                    display: 'flex',
+                    flexDirection: { xs: 'column', sm: 'row' },
+                    alignItems: { xs: 'center', sm: 'flex-end' },
+                    px: { xs: 2, sm: 6 },
+                    mt: { xs: -10, sm: -8 },
+                    mb: 5,
+                    gap: { xs: 2, sm: 4 },
+                    position: 'relative',
+                    zIndex: 10
+                  }}
                 >
-                  <Box 
-                    sx={{ 
-                      position: 'absolute', 
-                      bottom: { xs: -50, sm: -60 }, 
-                      left: { xs: '50%', sm: 40 },
-                      transform: { xs: 'translateX(-50%)', sm: 'none' },
-                      display: 'inline-block',
-                      zIndex: 10
-                    }}
-                  >
+                  <Box sx={{ position: 'relative' }}>
                     <Avatar
                       src={profile?.profilePictureUrl}
                       sx={{
-                        width: { xs: 120, sm: 140 },
-                        height: { xs: 120, sm: 140 },
+                        width: { xs: 120, sm: 150 },
+                        height: { xs: 120, sm: 150 },
                         bgcolor: accent,
                         color: '#fff',
                         fontSize: '3.5rem',
@@ -285,7 +289,7 @@ export default function Profile() {
                         }
                       }}
                     >
-                      {!profile?.profilePictureUrl && (profile?.username?.charAt(0).toUpperCase() || <UserIcon fontSize="large" />)}
+                      {!profile?.profilePictureUrl && ((profile?.username || (profile as any)?.Username || auth?.user?.username || 'U').charAt(0).toUpperCase() || <UserIcon fontSize="large" />)}
                     </Avatar>
                     
                     {!isGuest && (
@@ -305,7 +309,7 @@ export default function Profile() {
                           sx={{ 
                             position: 'absolute', 
                             bottom: 8, 
-                            right: 0, 
+                            right: 8, 
                             bgcolor: 'background.paper',
                             boxShadow: '0 4px 12px rgba(0,0,0,0.15)',
                             transition: 'all 0.2s',
@@ -317,69 +321,68 @@ export default function Profile() {
                       </>
                     )}
                   </Box>
+
+                  <Box sx={{ pb: { sm: 2 }, textAlign: { xs: 'center', sm: 'left' }, flexGrow: 1 }}>
+                    <Typography variant="h4" sx={{ fontWeight: 800, color: 'text.primary', mb: 0.5 }}>
+                      {profile?.username || (profile as any)?.Username || auth?.user?.username || 'User'}
+                    </Typography>
+                    <Typography variant="subtitle1" sx={{ color: accent, fontWeight: 700, textTransform: 'uppercase', letterSpacing: 1 }}>
+                      {profile?.role || auth?.user?.roles?.[0] || 'Student'}
+                    </Typography>
+                  </Box>
+
+                  <Box sx={{ pb: { sm: 2 } }}>
+                    {!isGuest && (
+                      !isEditing ? (
+                        <Button
+                          variant="outlined"
+                          onClick={() => setIsEditing(true)}
+                          startIcon={<EditIcon />}
+                          sx={{ color: accent, borderColor: accentAlpha(0.35), borderRadius: '2rem', py: 1, px: 3, fontWeight: 'bold', '&:hover': { bgcolor: accentAlpha(0.08) }, minWidth: 160 }}
+                        >
+                          Edit Profile
+                        </Button>
+                      ) : (
+                        <Box sx={{ display: 'flex', gap: 2 }}>
+                          <Button
+                            variant="contained"
+                            disabled={saving}
+                            onClick={handleSaveProfile}
+                            startIcon={saving ? <CircularProgress size={20} color="inherit" /> : <SaveIcon />}
+                            sx={{ borderRadius: '2rem', py: 1, px: 3, fontWeight: 'bold', bgcolor: accent, '&:hover': { bgcolor: accentAlpha(0.8) } }}
+                          >
+                            Save
+                          </Button>
+                          <Button
+                            variant="outlined"
+                            disabled={saving}
+                            onClick={() => {
+                              setIsEditing(false);
+                              setEditForm({
+                                username: profile?.username || (profile as any)?.Username || auth?.user?.username || '',
+                                mobileNumber: profile?.mobileNumber || '',
+                                faculty: profile?.faculty || '',
+                                year: profile?.year || '',
+                                address: profile?.address || '',
+                                city: profile?.city || '',
+                                dateOfBirth: profile?.dateOfBirth || ''
+                              });
+                            }}
+                            startIcon={<CancelIcon />}
+                            color="error"
+                            sx={{ borderRadius: '2rem', py: 1, px: 3, fontWeight: 'bold' }}
+                          >
+                            Cancel
+                          </Button>
+                        </Box>
+                      )
+                    )}
+                  </Box>
                 </Box>
 
                 <Grid container spacing={4}>
-                  {/* Left Column: Quick Info & Settings */}
+                  {/* Left Column: Settings */}
                   <Grid item xs={12} md={4}>
-                    <Paper sx={{ ...glassStyles, p: 4, textAlign: 'center', mb: 4 }}>
-                      <Typography variant="h5" sx={{ color: 'text.primary', mb: 1, fontWeight: 800 }}>
-                        {profile?.username || 'User'}
-                      </Typography>
-                      <Typography variant="subtitle1" sx={{ color: accent, fontWeight: 600, mb: 3 }}>
-                        {profile?.role || 'Student'}
-                      </Typography>
-                      
-                      {!isGuest && (
-                        !isEditing ? (
-                          <Button
-                            variant="outlined"
-                            fullWidth
-                            onClick={() => setIsEditing(true)}
-                            startIcon={<EditIcon />}
-                            sx={{ color: accent, borderColor: accentAlpha(0.35), borderRadius: '0.75rem', py: 1.5, fontWeight: 'bold', '&:hover': { bgcolor: accentAlpha(0.08) } }}
-                          >
-                            Edit Profile
-                          </Button>
-                        ) : (
-                          <Box sx={{ display: 'flex', gap: 2 }}>
-                            <Button
-                              variant="contained"
-                              fullWidth
-                              disabled={saving}
-                              onClick={handleSaveProfile}
-                              startIcon={saving ? <CircularProgress size={20} color="inherit" /> : <SaveIcon />}
-                              sx={{ borderRadius: '0.75rem', py: 1.5, fontWeight: 'bold', bgcolor: accent, '&:hover': { bgcolor: accentAlpha(0.8) } }}
-                            >
-                              Save
-                            </Button>
-                            <Button
-                              variant="outlined"
-                              fullWidth
-                              disabled={saving}
-                              onClick={() => {
-                                setIsEditing(false);
-                                setEditForm({
-                                  username: profile?.username || '',
-                                  mobileNumber: profile?.mobileNumber || '',
-                                  faculty: profile?.faculty || '',
-                                  year: profile?.year || '',
-                                  address: profile?.address || '',
-                                  city: profile?.city || '',
-                                  dateOfBirth: profile?.dateOfBirth || ''
-                                });
-                              }}
-                              startIcon={<CancelIcon />}
-                              color="error"
-                              sx={{ borderRadius: '0.75rem', py: 1.5, fontWeight: 'bold' }}
-                            >
-                              Cancel
-                            </Button>
-                          </Box>
-                        )
-                      )}
-                    </Paper>
-
                     {/* Settings List */}
                     <Paper sx={{ ...glassStyles, overflow: 'hidden' }}>
                       <List disablePadding>
@@ -449,7 +452,7 @@ export default function Profile() {
                             fullWidth
                             label="Username / Name"
                             name="username"
-                            value={isEditing ? editForm.username : profile?.username || ''}
+                            value={isEditing ? editForm.username : profile?.username || (profile as any)?.Username || auth?.user?.username || ''}
                             onChange={handleEditChange}
                             disabled={!isEditing || isGuest}
                             variant={isEditing ? "outlined" : "filled"}
