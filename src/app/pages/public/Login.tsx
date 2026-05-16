@@ -4,6 +4,7 @@ import { toast } from 'sonner';
 import authService from '../../../api/authService';
 import useAuth from '../../hooks/useAuth';
 import { validateEmail, validateRequired } from '../../utils/validation';
+import { useGoogleLogin } from '@react-oauth/google';
 
 // MUI Components
 import { 
@@ -38,6 +39,41 @@ export default function Login() {
   const [password, setPassword] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [errors, setErrors] = useState({ email: '', password: '' });
+
+  const handleGoogleLogin = useGoogleLogin({
+    onSuccess: async (tokenResponse) => {
+      try {
+        setIsLoading(true);
+        const response = await authService.loginWithGoogle(tokenResponse.access_token);
+        
+        setAuth({
+          user: response.user,
+          accessToken: response.accessToken,
+          refreshToken: response.refreshToken,
+        });
+        
+        toast.success('Login successful!');
+        
+        const userRole = response.user.roles[0];
+        if (userRole === 'Admin') {
+          navigate('/admin-home');
+        } else if (userRole === 'BusinessOwner') {
+          navigate('/business-owner-home');
+        } else if (userRole === 'Rider') {
+          navigate('/rider-home');
+        } else {
+          navigate('/home');
+        }
+      } catch (error: any) {
+        toast.error(error.response?.data?.message || 'Google login failed');
+      } finally {
+        setIsLoading(false);
+      }
+    },
+    onError: () => {
+      toast.error('Google login failed');
+    }
+  });
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -319,7 +355,7 @@ export default function Login() {
                     fullWidth
                     variant="outlined"
                     startIcon={<GoogleIcon />}
-                    onClick={() => toast.info('Google login coming soon!')}
+                    onClick={() => handleGoogleLogin()}
                     sx={{
                       color: 'white',
                       borderColor: 'rgba(46, 158, 191, 0.2)',
