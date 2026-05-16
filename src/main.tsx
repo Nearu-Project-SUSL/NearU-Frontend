@@ -18,8 +18,10 @@
     },
   }); 
 
+  const GOOGLE_CLIENT_ID = import.meta.env.VITE_GOOGLE_CLIENT_ID || "";
+
   createRoot(document.getElementById("root")!).render(
-    <GoogleOAuthProvider clientId="390715786042-a2klspd5hhvbi9vp3f2kjl60lmu49r59.apps.googleusercontent.com">
+    <GoogleOAuthProvider clientId={GOOGLE_CLIENT_ID}>
       <QueryClientProvider client={queryClient}>
         <App />
       </QueryClientProvider>
