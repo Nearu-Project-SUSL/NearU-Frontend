@@ -1,5 +1,5 @@
-import { useState, useEffect, useRef } from 'react';
-import { useNavigate } from 'react-router';
+import { useState, useEffect, useRef, useCallback } from 'react';
+import { Navigate, useNavigate } from 'react-router';
 import { Sidebar } from '../../components/layout/Sidebar';
 import Navbar from '../../components/layout/Navbar';
 import useAuth from '../../hooks/useAuth';
@@ -45,6 +45,7 @@ import {
   Close as CloseIcon,
   Send as SendIcon,
 } from '@mui/icons-material';
+import { set } from 'date-fns';
 
 
 interface Testimonial{
@@ -585,14 +586,72 @@ export default function Home() {
   const accent = theme.palette.primary.main;
   const accentAlpha = (a: number) => `rgba(46, 158, 191, ${a})`;
 
+  //testimonial state
+  const [testimonials, setTestimonials] = useState<Testimonial[]>([]);
+  const [testimonialsLoading, setTestimonialsLoading] = useState(true);
+  const [currentPage, setCurrentPage] = useState(0);
+  const [modalOpen, setModalOpen] = useState(false);
+  const [snackbar, setSnackbar] = useState<{ open: boolean; message: string; severity: 'success' | 'error' }>({ open: false, message: '', severity: 'success' });
+  const autoRotateRef = useRef<ReturnType<typeof setInterval> | null>(null);
+
   const { scrollRef: servicesRef, scroll: scrollServices } = useHorizontalScroll();
   const { scrollRef: dealsRef, scroll: scrollDeals } = useHorizontalScroll();
   const { scrollRef: testRef, scroll: scrollTest } = useHorizontalScroll();
 
+  const CARDS_PER_PAGE = 3;
+  const totalPages = Math.ceil(testimonials.length / CARDS_PER_PAGE);
+  const visibleTestimonials = testimonials.slice(currentPage * CARDS_PER_PAGE, currentPage * CARDS_PER_PAGE + CARDS_PER_PAGE);
+  
   useEffect(() => {
     const t = setTimeout(() => setVisible(true), 100);
     return () => clearTimeout(t);
   }, []);
+
+  //fetch testimonial from API
+  const fetchTestimonials = useCallback(async ()=> {
+    try{
+      const res = await axios.get('/api/testimonials');
+      setTestimonials(res.data);
+    } catch{
+      //silently fail - page still works
+    } finally{
+      setTestimonialsLoading(false);
+    }
+  }, []);
+
+  useEffect(() => { fetchTestimonials(); }, [fetchTestimonials]);
+
+  //Auto rotate every 15 sec
+  useEffect(() => {
+    if (testimonials.length <= CARDS_PER_PAGE) return;
+    autoRotateRef.current = setInterval(() => {
+      setCurrentPage((prev) => (prev + 1) % totalPages);
+    }, 15000);
+    return () => {if (autoRotateRef.current) clearInterval(autoRotateRef.current);};
+  }, [testimonials.length, totalPages]);
+
+  const goToPage = (page: number) =>{
+    //reset time when manual navigation
+    if (autoRotateRef.current) clearInterval(autoRotateRef.current);
+    setCurrentPage(page);
+    autoRotateRef.current = setInterval(() => {
+      setCurrentPage((prev) => (prev + 1) % totalPages);
+    }, 15000);
+  };
+
+  const handleShareClick = () => {
+    if(!auth?.accessToken){
+      navigate('/api/login');
+      return;
+    }
+    setModalOpen(true);
+  }
+
+  const handleSubmitted = () => {
+    setSnackbar({open: true, message: 'Thank you! your experience has been shared.', severity: 'success'});
+    fetchTestimonials(); //refresh list
+    setCurrentPage(0);
+  }
 
   const userName = auth?.user?.username || auth?.user?.email?.split('@')[0] || 'Student';
 
@@ -759,6 +818,8 @@ export default function Home() {
                       </Typography>
                     </Box>
                   </Box>
+                   
+                   
                    <Box sx={{ display: { xs: 'none', md: 'flex' }, gap: 1 }}>
                     <IconButton onClick={() => scrollTest('left')} sx={{ bgcolor: accentAlpha(0.06), color: 'text.primary', '&:hover': { bgcolor: accentAlpha(0.15) } }}>
                       <ChevronLeftIcon />
