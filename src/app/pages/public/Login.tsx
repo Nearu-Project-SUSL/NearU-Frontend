@@ -1,5 +1,5 @@
 import { Link, useNavigate } from 'react-router';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { toast } from 'sonner';
 import authService from '../../../api/authService';
 import useAuth from '../../hooks/useAuth';
@@ -33,12 +33,27 @@ import {
 
 export default function Login() {
   const navigate = useNavigate();
-  const { setAuth } = useAuth();
+  const { auth, setAuth } = useAuth();
   const [showPassword, setShowPassword] = useState(false);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [errors, setErrors] = useState({ email: '', password: '' });
+
+  useEffect(() => {
+    if (auth?.user) {
+      const userRole = auth.user.roles[0];
+      if (userRole === 'Admin') {
+        navigate('/admin-home', { replace: true });
+      } else if (userRole === 'BusinessOwner') {
+        navigate('/business-owner-home', { replace: true });
+      } else if (userRole === 'Rider') {
+        navigate('/rider-home', { replace: true });
+      } else {
+        navigate('/home', { replace: true });
+      }
+    }
+  }, [auth, navigate]);
 
   const handleGoogleLogin = useGoogleLogin({
     onSuccess: async (tokenResponse) => {
