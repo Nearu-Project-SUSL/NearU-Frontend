@@ -1,5 +1,8 @@
 import { useState } from 'react';
 import { useNavigate, Link } from 'react-router';
+import { toast } from 'sonner';
+import authService from '../../../api/authService';
+import { validatePassword, validatePasswordMatch } from '../../utils/validation';
 
 // MUI Components
 import {
@@ -29,6 +32,7 @@ export default function ResetPassword() {
   const [showNewPassword, setShowNewPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [isSuccess, setIsSuccess] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
   
   const [formData, setFormData] = useState({
     currentPassword: '',
@@ -42,16 +46,6 @@ export default function ResetPassword() {
     confirmPassword: '',
   });
 
-  const validatePassword = (password: string) => {
-    if (password.length < 8) {
-      return 'Password must be at least 8 characters';
-    }
-    if (!/(?=.*[a-z])(?=.*[A-Z])(?=.*\d)/.test(password)) {
-      return 'Password must contain uppercase, lowercase, and number';
-    }
-    return '';
-  };
-
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
     setFormData(prev => ({ ...prev, [name]: value }));
@@ -62,16 +56,14 @@ export default function ResetPassword() {
     }
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
-    // Validate all fields
+    // Validate all fields using imported validation functions
     const newErrors = {
       currentPassword: !formData.currentPassword ? 'Current password is required' : '',
       newPassword: validatePassword(formData.newPassword),
-      confirmPassword: formData.newPassword !== formData.confirmPassword 
-        ? 'Passwords do not match' 
-        : '',
+      confirmPassword: validatePasswordMatch(formData.newPassword, formData.confirmPassword),
     };
 
     setErrors(newErrors);
@@ -81,13 +73,28 @@ export default function ResetPassword() {
       return;
     }
 
-    // Simulate API call
-    setTimeout(() => {
+    setIsLoading(true);
+    try {
+      const res = await authService.changePassword({
+        currentPassword: formData.currentPassword,
+        newPassword: formData.newPassword
+      });
+      toast.success(res.message || 'Password changed successfully!');
       setIsSuccess(true);
       setTimeout(() => {
         navigate('/profile');
       }, 2000);
-    }, 1000);
+    } catch (error: any) {
+      const errorMsg = error.response?.data?.message || 'Failed to change password. Please check your current password.';
+      toast.error(errorMsg);
+      setErrors(prev => ({
+        ...prev,
+        currentPassword: error.response?.data?.message?.toLowerCase().includes('current') ? errorMsg : '',
+        newPassword: !error.response?.data?.message?.toLowerCase().includes('current') ? errorMsg : ''
+      }));
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   if (isSuccess) {
@@ -185,6 +192,7 @@ export default function ResetPassword() {
                 onChange={handleChange}
                 error={!!errors.currentPassword}
                 helperText={errors.currentPassword}
+                disabled={isLoading}
                 slotProps={{
                   input: {
                     startAdornment: (
@@ -224,6 +232,7 @@ export default function ResetPassword() {
                 onChange={handleChange}
                 error={!!errors.newPassword}
                 helperText={errors.newPassword}
+                disabled={isLoading}
                 slotProps={{
                   input: {
                     startAdornment: (
@@ -263,6 +272,7 @@ export default function ResetPassword() {
                 onChange={handleChange}
                 error={!!errors.confirmPassword}
                 helperText={errors.confirmPassword}
+                disabled={isLoading}
                 slotProps={{
                   input: {
                     startAdornment: (
@@ -315,6 +325,7 @@ export default function ResetPassword() {
                 fullWidth
                 variant="contained"
                 type="submit"
+                disabled={isLoading}
                 sx={{ 
                   py: 1.5, 
                   bgcolor: '#2E9EBF', 
@@ -324,7 +335,7 @@ export default function ResetPassword() {
                   boxShadow: '0 10px 15px -3px rgba(46, 158, 191, 0.4)'
                 }}
               >
-                Reset Password
+                {isLoading ? 'Resetting Password...' : 'Reset Password'}
               </Button>
             </Box>
           </form>
