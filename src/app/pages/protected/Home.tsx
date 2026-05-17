@@ -353,39 +353,46 @@ function DealCard({ deal, index }: { deal: typeof hotDeals[0], index: number }) 
 }
 
 // ─── Testimonial Card ─────────────────────────────────────────────────────────
-function TestimonialCard({ t, index }: { t: typeof testimonials[0], index: number }) {
-  const theme = useTheme();
-  const accent = theme.palette.primary.main;
-  const accentAlpha = (a: number) => `rgba(46, 158, 191, ${a})`;
+function TestimonialCard({ t, index }: { t:  Testimonial, index: number }) {
+  const color = getAvatarColor(t.userInitial)
 
   return (
     <Grow in timeout={800 + index * 100}>
       <Card
         elevation={0}
         sx={{
+          width: { xs: '100%', md: 320 },
           minWidth: { xs: 240, md: 320 },
-          bgcolor: theme.palette.background.paper,
+          bgcolor: 'rgba(255,255,255,0.02)',
           borderRadius: '20px',
           p: 3,
-          border: `1px solid ${theme.palette.divider}`,
+          border: '1px solid rgba(255,255,255,0.05)',
           transition: 'border 0.3s ease',
-          '&:hover': { border: `1px solid ${accentAlpha(0.35)}` }
+          '&:hover': { border: '1px solid rgba(250, 204, 21, 0.3)' },
         }}
       >
         <Box sx={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', mb: 2 }}>
-           <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
-              <Avatar src={t.image} sx={{ width: 48, height: 48, border: `2px solid ${accent}` }} />
-              <Box>
-                <Typography variant="subtitle1" sx={{ color: theme.palette.text.primary, fontWeight: 700, lineHeight: 1.2 }}>{t.name}</Typography>
-                <Box sx={{ display: 'flex', color: accent, fontSize: '0.8rem', mt: 0.5 }}>
-                  {[1,2,3,4,5].map(i => <StarIcon key={i} fontSize="inherit" />)}
-                </Box>
+          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
+            <Avatar sx={{ width: 48, height: 48, border: `2px solid ${color}`, bgcolor: color, color: '#000', fontWeight: 800, fontSize: '1.1rem' }}>
+              {t.userInitial}
+            </Avatar>
+            <Box>
+              <Typography variant="subtitle1" sx={{ color: '#fff', fontWeight: 700, lineHeight: 1.2 }}>{t.userName}</Typography>
+              <Box sx={{ display: 'flex', mt: 0.5 }}>
+                {[1, 2, 3, 4, 5].map((i) =>
+                  i <= t.rating
+                    ? <StarIcon key={i} sx={{ fontSize: '0.85rem', color: '#facc15' }} />
+                    : <StarBorderIcon key={i} sx={{ fontSize: '0.85rem', color: 'rgba(255,255,255,0.3)' }} />
+                )}
               </Box>
-           </Box>
-           <Typography variant="caption" sx={{ color: theme.palette.text.secondary }}>{t.time}</Typography>
+            </Box>
+          </Box>
+          <Typography variant="caption" sx={{ color: 'rgba(255,255,255,0.4)', whiteSpace: 'nowrap' }}>
+            {timeAgo(t.createdAt)}
+          </Typography>
         </Box>
-        <Typography variant="body2" sx={{ color: theme.palette.text.secondary, lineHeight: 1.6, fontStyle: 'italic' }}>
-          "{t.text}"
+        <Typography variant="body2" sx={{ color: 'rgba(255,255,255,0.6)', lineHeight: 1.6, fontStyle: 'italic' }}>
+          "{t.message}"
         </Typography>
       </Card>
     </Grow>
