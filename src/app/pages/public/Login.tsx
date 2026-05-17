@@ -134,7 +134,7 @@ export default function Login() {
       {/* Top Navigation */}
       <nav className="relative z-20 flex items-center justify-between px-8 lg:px-12 py-6 bg-black/30 backdrop-blur-sm border-b border-blue-400/20">
         <Link to="/" className="flex items-center gap-3 group">
-          <div className="w-12 h-12 bg-gradient-to-br from-yellow-400 to-yellow-600 rounded-xl flex items-center justify-center shadow-lg shadow-blue-400/30 group-hover:scale-110 transition-transform duration-300">
+          <div className="w-12 h-12 bg-gradient-to-br from-blue-400 to-blue-600 rounded-xl flex items-center justify-center shadow-lg shadow-blue-400/30 group-hover:scale-110 transition-transform duration-300">
             <span className="text-black text-2xl">🎓</span>
           </div>
           <span className="text-white text-2xl">NearU</span>
@@ -171,13 +171,13 @@ export default function Login() {
             {/* Illustration */}
             <div className="relative w-full max-w-md">
               {/* Decorative circles */}
-              <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-80 h-80 bg-gradient-to-br from-yellow-400/20 to-yellow-600/20 rounded-full blur-3xl animate-pulse"></div>
+              <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-80 h-80 bg-gradient-to-br from-blue-400/20 to-blue-600/20 rounded-full blur-3xl animate-pulse"></div>
               
               {/* Central hub */}
               <div className="relative z-10 flex items-center justify-center">
-                <div className="relative w-64 h-64 bg-gradient-to-br from-gray-800 to-black rounded-3xl border-2 border-yellow-400/30 shadow-2xl shadow-blue-400/20 p-8">
+                <div className="relative w-64 h-64 bg-gradient-to-br from-gray-800 to-black rounded-3xl border-2 border-blue-400/30 shadow-2xl shadow-blue-400/20 p-8">
                   {/* Center circle */}
-                  <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-20 h-20 bg-gradient-to-br from-yellow-400 to-yellow-600 rounded-full flex items-center justify-center shadow-lg animate-pulse">
+                  <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-20 h-20 bg-gradient-to-br from-blue-400 to-blue-600 rounded-full flex items-center justify-center shadow-lg animate-pulse">
                     <GraduationCapIcon sx={{ fontSize: 40, color: 'black' }} />
                   </div>
 
