@@ -197,18 +197,28 @@ export function Sidebar({ activeSection }: SidebarProps) {
             to="/profile"
             onClick={() => { if (isMobileOpen) toggleMobileSidebar(); }}
             sx={{
-              p: 1.25,
+              py: 1.25,
+              px: expanded ? 2 : 1.25,
               borderRadius: '11px',
               border: `1px solid ${accentAlpha(0.15)}`,
               bgcolor: accentAlpha(0.04),
               justifyContent: expanded ? 'flex-start' : 'center',
+              alignItems: 'center',
               '&:hover': { bgcolor: accentAlpha(0.1), borderColor: accentAlpha(0.3) },
-              transition: 'all 0.18s ease',
+              transition: 'all 0.28s cubic-bezier(0.4, 0, 0.2, 1)',
             }}
           >
             <Avatar
               src={auth?.user?.profilePictureUrl}
-              sx={{ width: 32, height: 32, bgcolor: accent, color: '#111', mr: expanded ? 1.25 : 0, transition: 'margin 0.28s ease', flexShrink: 0 }}
+              sx={{ 
+                width: 32, 
+                height: 32, 
+                bgcolor: accent, 
+                color: '#111', 
+                mr: expanded ? 1.5 : 0, 
+                transition: 'margin 0.28s cubic-bezier(0.4, 0, 0.2, 1)', 
+                flexShrink: 0 
+              }}
             >
               {!auth?.user?.profilePictureUrl && <UserIcon sx={{ fontSize: 17 }} />}
             </Avatar>
@@ -216,15 +226,40 @@ export function Sidebar({ activeSection }: SidebarProps) {
               sx={{
                 opacity: expanded ? 1 : 0,
                 width: expanded ? 'auto' : 0,
+                minWidth: 0,
+                flex: expanded ? 1 : 0,
                 overflow: 'hidden',
-                whiteSpace: 'nowrap',
-                transition: 'opacity 0.2s ease, width 0.28s ease',
+                display: 'flex',
+                flexDirection: 'column',
+                justifyContent: 'center',
+                transition: 'opacity 0.28s ease, width 0.28s ease, flex 0.28s ease',
               }}
             >
-              <Typography variant="body2" sx={{ fontWeight: 700, color: textPrimary, fontSize: '0.82rem' }}>
+              <Typography 
+                variant="body2" 
+                sx={{ 
+                  fontWeight: 700, 
+                  color: textPrimary, 
+                  fontSize: '0.82rem',
+                  lineHeight: 1.2,
+                  whiteSpace: 'nowrap',
+                  overflow: 'hidden',
+                  textOverflow: 'ellipsis',
+                }}
+              >
                 {userName}
               </Typography>
-              <Typography variant="caption" sx={{ color: accentAlpha(0.6), fontSize: '0.68rem' }}>
+              <Typography 
+                variant="caption" 
+                sx={{ 
+                  color: accentAlpha(0.6), 
+                  fontSize: '0.68rem',
+                  lineHeight: 1.2,
+                  whiteSpace: 'nowrap',
+                  overflow: 'hidden',
+                  textOverflow: 'ellipsis',
+                }}
+              >
                 View Profile
               </Typography>
             </Box>
