@@ -428,24 +428,24 @@ function ShareModal({
   const handleSubmit = async () => {
     if(rating == 0) {setError('Please select a rating'); return;}
     if(message.trim() === '') {setError('Please enter your experience'); return;}
-  }
+  
+    setLoading(true);
+    setError('');
 
-  setLoading(true);
-  setError('');
+    try{
+      await axiosPrivate.post(
+        '/api/testimonials',
+        {message: message.trim(), rating},
+        {headers: {'Authorization': `Bearer ${token}`}}
+      );
 
-  try{
-    await axiosPrivate.post(
-      '/api/testimonials',
-      {message: message.trim(), rating},
-      {headers: {'Authorization': `Bearer ${token}`}}
-    );
-
-    handleClose();
-    onSubmitted();
-  } catch (err: any){
-    setError(err?.response?.data?.message || 'Something went wrong. Please try again.');
-  } finally {
-    setLoading(false);
+      handleClose();
+      onSubmitted();
+    } catch (err: any){
+      setError(err?.response?.data?.message || 'Something went wrong. Please try again.');
+    } finally {
+      setLoading(false);
+    }
   }
 
   return (
@@ -582,6 +582,7 @@ export default function Home() {
   const { isDark } = useNearUTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('md'));
   const [showAllServices, setShowAllServices] = useState(false);
+  const navigate = useNavigate();
 
   const accent = theme.palette.primary.main;
   const accentAlpha = (a: number) => `rgba(46, 158, 191, ${a})`;
@@ -818,53 +819,104 @@ export default function Home() {
                       </Typography>
                     </Box>
                   </Box>
-                   
-                   
-                   <Box sx={{ display: { xs: 'none', md: 'flex' }, gap: 1 }}>
-                    <IconButton onClick={() => scrollTest('left')} sx={{ bgcolor: accentAlpha(0.06), color: 'text.primary', '&:hover': { bgcolor: accentAlpha(0.15) } }}>
-                      <ChevronLeftIcon />
-                    </IconButton>
-                    <IconButton onClick={() => scrollTest('right')} sx={{ bgcolor: accentAlpha(0.06), color: 'text.primary', '&:hover': { bgcolor: accentAlpha(0.15) } }}>
+                
+                {/*page navigation arrows only if more than 3 testimonials */}
+                {testimonials.length > CARDS_PER_PAGE && (
+                  <Box sx={{ display: 'flex', gap: 1 }}>
+                        <IconButton
+                          onClick={() => goToPage((currentPage - 1 + totalPages) % totalPages)}
+                          sx={{ bgcolor: 'rgba(255,255,255,0.05)', color: '#fff', '&:hover': { bgcolor: 'rgba(250,204,21,0.2)' } }}
+                        >
+                          <ChevronLeftIcon />
+                        </IconButton>
+                        <IconButton
+                          onClick={() => goToPage((currentPage + 1) % totalPages)}
+                          sx={{ bgcolor: 'rgba(255,255,255,0.05)', color: '#fff', '&:hover': { bgcolor: 'rgba(250,204,21,0.2)' } }}
+                        >
                       <ChevronRightIcon />
                     </IconButton>
                   </Box>
-                </Box>
-
-                <Box
-                  ref={testRef}
-                  sx={{
-                    display: 'flex',
-                    flexDirection: { xs: 'column', md: 'row' },
-                    gap: 3,
-                    overflowX: { xs: 'visible', md: 'auto' },
-                    pb: 2,
-                    px: 1,
-                    mx: -1,
-                    scrollbarWidth: 'none',
-                    '&::-webkit-scrollbar': { display: 'none' },
-                    scrollBehavior: 'smooth',
-                    scrollSnapType: { xs: 'none', md: 'x mandatory' },
-                    '& > *': { scrollSnapAlign: { xs: 'none', md: 'start' } }
-                  }}
-                >
-                  {testimonials.map((t, i) => (
-                    <Box key={t.id} sx={{ width: { xs: '100%', md: 'auto' } }}>
-                      <TestimonialCard t={t} index={i} />
-                    </Box>
-                  ))}
-                </Box>
-
-                <Box sx={{ display: 'flex', justifyContent: 'center', mt: 4 }}>
-                   <Button variant="outlined" sx={{ color: accent, borderColor: accentAlpha(0.4), borderRadius: '12px', px: 4, py: 1.2, fontWeight: 700, '&:hover': { borderColor: accent, bgcolor: accentAlpha(0.08) } }}>
-                     + Share Your Experience
-                   </Button>
-                </Box>
-
+                )}
               </Box>
 
+              {/*testimonial cards*/}
+              {testimonialsLoading ? (
+                <Box sx={{ display: 'flex', justifyContent: 'center', py: 6 }}>
+                  <CircularProgress sx={{ color: '#facc15' }} />
+                </Box>
+              ) : testimonials.length === 0 ? (
+                <Box sx={{ textAlign: 'center', py: 6, color: 'rgba(255,255,255,0.3)' }}>
+                  <Typography variant="body1">No testimonials yet. Be the first to share!</Typography>
+                </Box>
+              ) : (
+                <Fade in key={currentPage} timeout={500}>
+                  <Box sx={{ display: 'flex', flexDirection: { xs: 'column', md: 'row' }, gap: 3 }}>
+                    {visibleTestimonials.map((t, i) => (
+                      <TestimonialCard key={t.id} t={t} index={i} />
+                    ))}
+                  </Box>
+                </Fade>
+              )}
+
+              {/*page dots*/}
+              {totalPages > 1 && (
+                <Box sx={{ display: 'flex', justifyContent: 'center', gap: 1, mt: 3 }}>
+                  {Array.from({ length: totalPages }).map((_, i) => (
+                    <Box
+                      key={i}
+                      onClick={() => goToPage(i)}
+                      sx={{
+                        width: i === currentPage ? 24 : 8,
+                        height: 8,
+                        borderRadius: '4px',
+                        bgcolor: i === currentPage ? '#facc15' : 'rgba(255,255,255,0.15)',
+                        cursor: 'pointer',
+                        transition: 'all 0.3s ease',
+                        '&:hover': { bgcolor: i === currentPage ? '#facc15' : 'rgba(255,255,255,0.3)' },
+                      }}
+                    />
+                  ))}
+                </Box>
+              )}
+
+               <Box sx={{ display: 'flex', justifyContent: 'center', mt: 4 }}>
+                <Button
+                  variant="outlined"
+                  onClick={handleShareClick}
+                  sx={{ color: '#facc15', borderColor: 'rgba(250, 204, 21, 0.4)', borderRadius: '12px', px: 4, py: 1.2, fontWeight: 700, textTransform: 'none', '&:hover': { borderColor: '#facc15', bgcolor: 'rgba(250, 204, 21, 0.1)' } }}
+                >
+                  + Share Your Experience
+                </Button>
+              </Box>
+            </Box>
           </Box>
         </Box>
       </Box>
+
+      {/*share model*/}
+      <ShareModal 
+        open={modalOpen}
+        onClose={() => setModalOpen(false)}
+        onSubmitted={handleSubmitted}
+        token={auth?.accessToken || ''}  
+      />
+
+
+      {/*Success Snackbar*/}
+      <Snackbar
+        open={snackbar.open}
+        autoHideDuration={4000}
+        onClose={() => setSnackbar((s) => ({ ...s, open: false }))}
+        anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
+      >
+        <Alert
+          severity={snackbar.severity}
+          onClose={() => setSnackbar((s) => ({ ...s, open: false }))}
+          sx={{ borderRadius: '12px', fontWeight: 600 }}
+        >
+          {snackbar.message}
+        </Alert>
+      </Snackbar>
     </Box>
   );
 }
