@@ -146,7 +146,7 @@ export default function GiftDetailsDialog({
                   {shop.name}
                 </Typography>
                 <Stack direction="row" spacing={1} alignItems="center" sx={{ mt: 1 }}>
-                  <LocationOnIcon sx={{ color: "#facc15", fontSize: 18 }} />
+                  <LocationOnIcon sx={{ color: "#2E9EBF", fontSize: 18 }} />
                   <Typography sx={{ color: "rgba(255,255,255,0.75)" }}>
                     {shop.locationName}
                   </Typography>
@@ -272,7 +272,7 @@ export default function GiftDetailsDialog({
                             <Typography sx={{ color: "#fff", fontWeight: 700, mb: 0.6 }}>
                               {product.name}
                             </Typography>
-                            <Typography sx={{ color: "#facc15", fontWeight: 800, mb: 1.5 }}>
+                            <Typography sx={{ color: "#2E9EBF", fontWeight: 800, mb: 1.5 }}>
                               Rs. {Number(product.price).toLocaleString()}
                             </Typography>
 
@@ -367,12 +367,12 @@ export default function GiftDetailsDialog({
 }
 
 const primaryBtnSx = {
-  bgcolor: "#facc15",
-  color: "#000",
+  bgcolor: "#2E9EBF",
+  color: "#fff",
   fontWeight: 800,
   textTransform: "none",
   borderRadius: "12px",
-  "&:hover": { bgcolor: "#eab308" },
+  "&:hover": { bgcolor: "#1a7a9a" },
 };
 
 const secondaryBtnSx = {
@@ -381,8 +381,8 @@ const secondaryBtnSx = {
   textTransform: "none",
   borderRadius: "12px",
   "&:hover": {
-    borderColor: "#facc15",
-    bgcolor: "rgba(250,204,21,0.05)",
+    borderColor: "#2E9EBF",
+    bgcolor: "rgba(46,158,191,0.05)",
   },
 };
 
@@ -405,7 +405,7 @@ const contactBtnSx = {
   textTransform: "none",
   borderRadius: "12px",
   "&:hover": {
-    bgcolor: "rgba(250,204,21,0.06)",
-    borderColor: "rgba(250,204,21,0.35)",
+    bgcolor: "rgba(46,158,191,0.06)",
+    borderColor: "rgba(46, 158, 191, 0.35)",
   },
 };
