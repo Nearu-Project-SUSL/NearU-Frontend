@@ -4,6 +4,8 @@ import { Sidebar } from '../../components/layout/Sidebar';
 import Navbar from '../../components/layout/Navbar';
 import useAuth from '../../hooks/useAuth';
 import { useNearUTheme } from '../../context/ThemeContext';
+import axios from '../../../api/axios'; 
+import { axiosPrivate } from '../../../api/axios'; 
 
 import {
   Box,
@@ -15,6 +17,13 @@ import {
   Grow,
   IconButton,
   Button,
+  Dialog,
+  DialogContent,
+  DialogTitle,
+  TextField,
+  CircularProgress,
+  Snackbar,
+  Alert,
   useTheme,
   useMediaQuery,
 } from '@mui/material';
@@ -31,8 +40,21 @@ import {
   ChevronLeft as ChevronLeftIcon,
   ChevronRight as ChevronRightIcon,
   Star as StarIcon,
+  StarBorder as StarBorderIcon,
   Person as UserIcon,
+  Close as CloseIcon,
+  Send as SendIcon,
 } from '@mui/icons-material';
+
+
+interface Testimonial{
+  id: number;
+  message: string;
+  rating: number;
+  createdAt: string;
+  userName: string;
+  userInitial: string;
+}
 
 // ─── Service Card Data ───────────────────────────────────────────────────────
 const services = [
@@ -151,6 +173,25 @@ const testimonials = [
     text: 'Found my perfect accommodation through NearU Bodims. The verified listings gave me peace of mind and the booking process was seamless. Thank you NearU!',
   },
 ];
+
+function timeAgo(dateStr: string): string{
+  const diff = Date.now() - new Date(dateStr).getTime();
+  const minutes = Math.floor(diff / 60000);
+  if (minutes < 60) return `${minutes}m ago`;
+  const hours = Math.floor(minutes / 60);
+  if (hours < 24) return `${hours}h ago`;
+  const days = Math.floor(hours / 24);
+  if (days < 7) return `${days} day${days > 1 ? 's' : ''} ago`;
+  const weeks = Math.floor(days / 7);
+  if (weeks < 5) return `${weeks} week${weeks > 1 ? 's' : ''} ago`;
+  const months = Math.floor(days / 30);
+  return `${months} month${months > 1 ? 's' : ''} ago`;
+}
+
+function getAvatarColor(initial: string){
+  const colors = ['#facc15', '#f97316', '#22d3ee', '#a78bfa', '#34d399', '#fb7185'];
+  return colors[initial.charCodeAt(0) % colors.length];
+}
 
 // ─── Custom Carousel Hook ─────────────────────────────────────────────────────
 function useHorizontalScroll() {
