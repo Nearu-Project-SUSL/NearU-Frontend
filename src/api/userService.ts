@@ -30,21 +30,29 @@ export interface UpdateProfileRequest {
 
 const userService = {
     getUserProfile: async (userId: string): Promise<UserProfileResponse> => {
-        const response = await axios.get(`/User/${userId}`);
+        const token = localStorage.getItem('auth_accessToken');
+        const response = await axios.get(`/User/${userId}`, {
+            headers: token ? { Authorization: `Bearer ${token}` } : {}
+        });
         return response.data.data;
     },
 
     updateUserProfile: async (userId: string, request: UpdateProfileRequest): Promise<UserProfileResponse> => {
-        const response = await axios.put(`/User/${userId}/profile`, request);
+        const token = localStorage.getItem('auth_accessToken');
+        const response = await axios.put(`/User/${userId}/profile`, request, {
+            headers: token ? { Authorization: `Bearer ${token}` } : {}
+        });
         return response.data.data;
     },
 
     uploadProfilePicture: async (userId: string, file: File): Promise<{ profilePictureUrl: string }> => {
         const formData = new FormData();
         formData.append('file', file);
+        const token = localStorage.getItem('auth_accessToken');
         const response = await axios.post(`/User/${userId}/profile-picture`, formData, {
             headers: {
                 'Content-Type': 'multipart/form-data',
+                ...(token ? { Authorization: `Bearer ${token}` } : {})
             },
         });
         return response.data.data;
