@@ -5,6 +5,7 @@ interface User {
   username: string;
   email: string;
   roles: string[]; // Maps from backend "role"
+  profilePictureUrl?: string;
 }
 
 interface AuthState {

@@ -109,6 +109,27 @@ export default function Profile() {
           city: data.city || '',
           dateOfBirth: data.dateOfBirth || ''
         });
+
+        // Sync to global auth context if different (prevents infinite loop by returning exact reference)
+        const latestUsername = data.username || (data as any).Username || auth?.user?.username || '';
+        if (data.profilePictureUrl || latestUsername) {
+          setAuth((prev) => {
+            if (!prev.user) return prev;
+            const hasPictureChanged = !!(data.profilePictureUrl && prev.user.profilePictureUrl !== data.profilePictureUrl);
+            const hasUsernameChanged = !!(latestUsername && prev.user.username !== latestUsername);
+
+            if (!hasPictureChanged && !hasUsernameChanged) return prev;
+
+            return {
+              ...prev,
+              user: {
+                ...prev.user,
+                ...(hasPictureChanged ? { profilePictureUrl: data.profilePictureUrl } : {}),
+                ...(hasUsernameChanged ? { username: latestUsername } : {})
+              }
+            };
+          });
+        }
       } catch (error) {
         toast.error('Failed to load profile');
       } finally {
@@ -143,6 +164,22 @@ export default function Profile() {
     try {
       const updatedProfile = await userService.updateUserProfile(userId, editForm);
       setProfile(updatedProfile);
+
+      // Update global auth state to keep username and profile picture in sync
+      if (updatedProfile.username) {
+        setAuth((prev) => {
+          if (!prev.user) return prev;
+          return {
+            ...prev,
+            user: {
+              ...prev.user,
+              username: updatedProfile.username,
+              profilePictureUrl: updatedProfile.profilePictureUrl ?? prev.user.profilePictureUrl
+            }
+          };
+        });
+      }
+
       setIsEditing(false);
       toast.success('Profile updated successfully');
     } catch (error: any) {
@@ -178,6 +215,21 @@ export default function Profile() {
       const toastId = toast.loading('Uploading profile picture...');
       const response = await userService.uploadProfilePicture(userId, file);
       setProfile((prev) => prev ? { ...prev, profilePictureUrl: response.profilePictureUrl } : null);
+
+      // Update global auth state to propagate changes to Navbar/Sidebar immediately
+      if (response.profilePictureUrl) {
+        setAuth((prev) => {
+          if (!prev.user) return prev;
+          return {
+            ...prev,
+            user: {
+              ...prev.user,
+              profilePictureUrl: response.profilePictureUrl
+            }
+          };
+        });
+      }
+
       toast.success('Profile picture updated', { id: toastId });
     } catch (error: any) {
       toast.error(error.response?.data?.message || 'Failed to upload profile picture');

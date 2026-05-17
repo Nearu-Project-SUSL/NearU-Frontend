@@ -206,8 +206,11 @@ export function Sidebar({ activeSection }: SidebarProps) {
               transition: 'all 0.18s ease',
             }}
           >
-            <Avatar sx={{ width: 32, height: 32, bgcolor: accent, color: '#111', mr: expanded ? 1.25 : 0, transition: 'margin 0.28s ease', flexShrink: 0 }}>
-              <UserIcon sx={{ fontSize: 17 }} />
+            <Avatar
+              src={auth?.user?.profilePictureUrl}
+              sx={{ width: 32, height: 32, bgcolor: accent, color: '#111', mr: expanded ? 1.25 : 0, transition: 'margin 0.28s ease', flexShrink: 0 }}
+            >
+              {!auth?.user?.profilePictureUrl && <UserIcon sx={{ fontSize: 17 }} />}
             </Avatar>
             <Box
               sx={{
