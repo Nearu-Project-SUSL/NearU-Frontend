@@ -112,10 +112,11 @@ export default function Profile() {
 
         // Sync to global auth context if different (prevents infinite loop by returning exact reference)
         const latestUsername = data.username || (data as any).Username || auth?.user?.username || '';
-        if (data.profilePictureUrl || latestUsername) {
+        const latestProfilePictureUrl = data.profilePictureUrl || (data as any).ProfilePictureUrl || (data as any).profilePicture || (data as any).ProfilePicture;
+        if (latestProfilePictureUrl || latestUsername) {
           setAuth((prev) => {
             if (!prev.user) return prev;
-            const hasPictureChanged = !!(data.profilePictureUrl && prev.user.profilePictureUrl !== data.profilePictureUrl);
+            const hasPictureChanged = !!(latestProfilePictureUrl && prev.user.profilePictureUrl !== latestProfilePictureUrl);
             const hasUsernameChanged = !!(latestUsername && prev.user.username !== latestUsername);
 
             if (!hasPictureChanged && !hasUsernameChanged) return prev;
@@ -124,7 +125,7 @@ export default function Profile() {
               ...prev,
               user: {
                 ...prev.user,
-                ...(hasPictureChanged ? { profilePictureUrl: data.profilePictureUrl } : {}),
+                ...(hasPictureChanged ? { profilePictureUrl: latestProfilePictureUrl } : {}),
                 ...(hasUsernameChanged ? { username: latestUsername } : {})
               }
             };
@@ -214,17 +215,18 @@ export default function Profile() {
     try {
       const toastId = toast.loading('Uploading profile picture...');
       const response = await userService.uploadProfilePicture(userId, file);
-      setProfile((prev) => prev ? { ...prev, profilePictureUrl: response.profilePictureUrl } : null);
+      const latestPicUrl = response.profilePictureUrl || (response as any).ProfilePictureUrl || (response as any).profilePicture || (response as any).ProfilePicture;
+      setProfile((prev) => prev ? { ...prev, profilePictureUrl: latestPicUrl } : null);
 
       // Update global auth state to propagate changes to Navbar/Sidebar immediately
-      if (response.profilePictureUrl) {
+      if (latestPicUrl) {
         setAuth((prev) => {
           if (!prev.user) return prev;
           return {
             ...prev,
             user: {
               ...prev.user,
-              profilePictureUrl: response.profilePictureUrl
+              profilePictureUrl: latestPicUrl
             }
           };
         });
@@ -327,7 +329,7 @@ export default function Profile() {
                 >
                   <Box sx={{ position: 'relative' }}>
                     <Avatar
-                      src={profile?.profilePictureUrl}
+                      src={profile?.profilePictureUrl || (profile as any)?.ProfilePictureUrl || (profile as any)?.profilePicture || (profile as any)?.ProfilePicture}
                       sx={{
                         width: { xs: 120, sm: 150 },
                         height: { xs: 120, sm: 150 },
@@ -343,7 +345,7 @@ export default function Profile() {
                         }
                       }}
                     >
-                      {!profile?.profilePictureUrl && ((profile?.username || (profile as any)?.Username || auth?.user?.username || 'U').charAt(0).toUpperCase() || <UserIcon fontSize="large" />)}
+                      {!(profile?.profilePictureUrl || (profile as any)?.ProfilePictureUrl || (profile as any)?.profilePicture || (profile as any)?.ProfilePicture) && ((profile?.username || (profile as any)?.Username || auth?.user?.username || 'U').charAt(0).toUpperCase() || <UserIcon fontSize="large" />)}
                     </Avatar>
                     
                     {!isGuest && (
