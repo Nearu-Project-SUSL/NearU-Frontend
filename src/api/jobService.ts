@@ -115,46 +115,27 @@ const jobService = {
   },
 
   uploadLogo: async (file: File): Promise<string> => {
-    const token = localStorage.getItem('auth_accessToken');
     const formData = new FormData();
     formData.append('file', file);
 
-    const response = await axiosPrivate.post<ApiResponse<{ url: string }>>('/job/upload-logo', formData, {
-      headers: {
-        Authorization: `Bearer ${token}`,
-      }
-    });
+    const response = await axiosPrivate.post<ApiResponse<{ url: string }>>('/job/upload-logo', formData);
     return response.data.data.url;
   },
 
   createJob: async (data: CreateJobData): Promise<JobResponse> => {
-    const token = localStorage.getItem('auth_accessToken');
-    const response = await axiosPrivate.post<ApiResponse<JobResponse>>('/job', data, {
-      headers: {
-        Authorization: `Bearer ${token}`
-      }
-    });
+    const response = await axiosPrivate.post<ApiResponse<JobResponse>>('/job', data);
     return response.data.data;
   },
 
   updateJob: async (id: string, data: UpdateJobData): Promise<JobResponse> => {
-    const token = localStorage.getItem('auth_accessToken');
-    const response = await axiosPrivate.put<ApiResponse<JobResponse>>(`/job/${id}`, data, {
-      headers: {
-        Authorization: `Bearer ${token}`
-      }
-    });
+    const response = await axiosPrivate.put<ApiResponse<JobResponse>>(`/job/${id}`, data);
     return response.data.data;
   },
 
   deleteJob: async (id: string): Promise<void> => {
-    const token = localStorage.getItem('auth_accessToken');
-    await axiosPrivate.delete(`/job/${id}`, {
-      headers: {
-        Authorization: `Bearer ${token}`
-      }
-    });
+    await axiosPrivate.delete(`/job/${id}`);
   },
+
 };
 
 export default jobService;
