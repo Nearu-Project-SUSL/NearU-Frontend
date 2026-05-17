@@ -185,7 +185,7 @@ export default function GiftDetailsDialog({
             </Box>
 
             <Grid container spacing={4}>
-              <Grid item xs={12} md={4}>
+              <Grid size={{ xs: 12, md: 4 }}>
                 <Box
                   sx={{
                     p: 3,
@@ -224,7 +224,7 @@ export default function GiftDetailsDialog({
                 </Box>
               </Grid>
 
-              <Grid item xs={12} md={8}>
+              <Grid size={{ xs: 12, md: 8 }}>
                 <Box
                   sx={{
                     display: "flex",
@@ -251,7 +251,7 @@ export default function GiftDetailsDialog({
                 <Grid container spacing={2}>
                   {products.length > 0 ? (
                     products.map((product) => (
-                      <Grid item xs={12} sm={6} key={product.id}>
+                      <Grid size={{ xs: 12, sm: 6 }} key={product.id}>
                         <Box
                           sx={{
                             borderRadius: "18px",
@@ -304,7 +304,7 @@ export default function GiftDetailsDialog({
                       </Grid>
                     ))
                   ) : (
-                    <Grid item xs={12}>
+                    <Grid size={{ xs: 12 }}>
                       <Box
                         sx={{
                           p: 4,

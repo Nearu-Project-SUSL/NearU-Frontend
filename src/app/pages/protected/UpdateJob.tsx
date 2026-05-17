@@ -203,7 +203,7 @@ export default function UpdateJob() {
                     <Box sx={{ p: 4, bgcolor: 'rgba(255,255,255,0.02)', borderRadius: '24px', border: '1px solid rgba(255,255,255,0.05)' }}>
                       <Typography variant="h6" sx={{ color: '#fff', mb: 3, fontWeight: 700 }}>Basic Information</Typography>
                       <Grid container spacing={3}>
-                        <Grid item xs={12} sm={6}>
+                        <Grid size={{ xs: 12, sm: 6 }}>
                           <TextField
                             fullWidth
                             required
@@ -217,7 +217,7 @@ export default function UpdateJob() {
                             sx={textFieldStyles}
                           />
                         </Grid>
-                        <Grid item xs={12} sm={6}>
+                        <Grid size={{ xs: 12, sm: 6 }}>
                           <TextField
                             fullWidth
                             required
@@ -231,7 +231,7 @@ export default function UpdateJob() {
                             sx={textFieldStyles}
                           />
                         </Grid>
-                        <Grid item xs={12} sm={6}>
+                        <Grid size={{ xs: 12, sm: 6 }}>
                           <TextField
                             fullWidth
                             required
@@ -245,7 +245,7 @@ export default function UpdateJob() {
                             sx={textFieldStyles}
                           />
                         </Grid>
-                        <Grid item xs={12} sm={6}>
+                        <Grid size={{ xs: 12, sm: 6 }}>
                           <TextField
                             fullWidth
                             required
@@ -260,7 +260,7 @@ export default function UpdateJob() {
                             sx={textFieldStyles}
                           />
                         </Grid>
-                        <Grid item xs={12} sm={12}>
+                        <Grid size={{ xs: 12, sm: 12 }}>
                           <Box sx={{ 
                             border: '1px dashed rgba(255,255,255,0.2)', 
                             borderRadius: '12px', 
@@ -354,7 +354,7 @@ export default function UpdateJob() {
                             )}
                           </Box>
                         </Grid>
-                        <Grid item xs={12} sm={6}>
+                        <Grid size={{ xs: 12, sm: 6 }}>
                           <TextField
                             select
                             fullWidth
@@ -373,7 +373,7 @@ export default function UpdateJob() {
                             ))}
                           </TextField>
                         </Grid>
-                        <Grid item xs={12} sm={6}>
+                        <Grid size={{ xs: 12, sm: 6 }}>
                           <TextField
                             select
                             fullWidth
@@ -398,7 +398,7 @@ export default function UpdateJob() {
                     <Box sx={{ p: 4, bgcolor: 'rgba(255,255,255,0.02)', borderRadius: '24px', border: '1px solid rgba(255,255,255,0.05)' }}>
                       <Typography variant="h6" sx={{ color: '#fff', mb: 3, fontWeight: 700 }}>Job Details</Typography>
                       <Grid container spacing={3}>
-                        <Grid item xs={12}>
+                        <Grid size={{ xs: 12 }}>
                           <TextField
                             fullWidth
                             required
@@ -412,7 +412,7 @@ export default function UpdateJob() {
                             sx={textFieldStyles}
                           />
                         </Grid>
-                        <Grid item xs={12}>
+                        <Grid size={{ xs: 12 }}>
                           <TextField
                             fullWidth
                             required
@@ -429,7 +429,7 @@ export default function UpdateJob() {
                             sx={textFieldStyles}
                           />
                         </Grid>
-                        <Grid item xs={12}>
+                        <Grid size={{ xs: 12 }}>
                           <TextField
                             fullWidth
                             label="Tags (comma separated)"
@@ -443,7 +443,7 @@ export default function UpdateJob() {
                             sx={textFieldStyles}
                           />
                         </Grid>
-                        <Grid item xs={12}>
+                        <Grid size={{ xs: 12 }}>
                           <TextField
                             fullWidth
                             multiline
