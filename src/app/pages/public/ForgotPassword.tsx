@@ -1,5 +1,8 @@
 import { useState } from 'react';
 import { useNavigate, Link } from 'react-router';
+import { toast } from 'sonner';
+import authService from '../../../api/authService';
+import { validateEmail, validatePassword, validatePasswordMatch } from '../../utils/validation';
 
 // MUI Components
 import {
@@ -52,35 +55,27 @@ export default function ForgotPassword() {
     confirmPassword: '',
   });
 
-  const validatePassword = (password: string) => {
-    if (password.length < 8) {
-      return 'Password must be at least 8 characters';
-    }
-    if (!/(?=.*[a-z])(?=.*[A-Z])(?=.*\d)/.test(password)) {
-      return 'Password must contain uppercase, lowercase, and number';
-    }
-    return '';
-  };
-
-  const handleEmailSubmit = (e: React.FormEvent) => {
+  const handleEmailSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
-    if (!email) {
-      setErrors({ ...errors, email: 'Email is required' });
-      return;
-    }
-    
-    if (!/\S+@\S+\.\S+/.test(email)) {
-      setErrors({ ...errors, email: 'Please enter a valid email' });
+    const emailError = validateEmail(email);
+    if (emailError) {
+      setErrors({ ...errors, email: emailError });
       return;
     }
 
     setIsLoading(true);
-    // Simulate sending email
-    setTimeout(() => {
-      setIsLoading(false);
+    try {
+      const res = await authService.forgotPassword({ email });
+      toast.success(res.message || 'Verification code sent to your email.');
       setStep('verify');
-    }, 1000);
+    } catch (error: any) {
+      const errorMsg = error.response?.data?.message || 'Failed to send reset code. Please try again.';
+      toast.error(errorMsg);
+      setErrors({ ...errors, email: errorMsg });
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   const handleVerificationChange = (index: number, value: string) => {
@@ -97,7 +92,7 @@ export default function ForgotPassword() {
     }
   };
 
-  const handleVerificationSubmit = (e: React.FormEvent) => {
+  const handleVerificationSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
     const code = verificationCode.join('');
@@ -107,23 +102,45 @@ export default function ForgotPassword() {
     }
 
     setIsLoading(true);
-    // Simulate verification
-    setTimeout(() => {
-      setIsLoading(false);
+    try {
+      const res = await authService.verifyResetCode({ email, code });
+      toast.success(res.message || 'Code verified successfully.');
       setStep('reset');
-    }, 1000);
+    } catch (error: any) {
+      const errorMsg = error.response?.data?.message || 'Invalid or expired code.';
+      toast.error(errorMsg);
+      setErrors({ ...errors, verificationCode: errorMsg });
+    } finally {
+      setIsLoading(false);
+    }
   };
 
-  const handleResetSubmit = (e: React.FormEvent) => {
+  const handleResendCode = async () => {
+    setIsLoading(true);
+    try {
+      const res = await authService.forgotPassword({ email });
+      toast.success(res.message || 'Verification code resent to your email.');
+      setVerificationCode(['', '', '', '', '', '']);
+      setErrors({ ...errors, verificationCode: '' });
+      setTimeout(() => {
+        document.getElementById('code-0')?.focus();
+      }, 100);
+    } catch (error: any) {
+      const errorMsg = error.response?.data?.message || 'Failed to resend reset code. Please try again.';
+      toast.error(errorMsg);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleResetSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
     const newErrors = {
       email: '',
       verificationCode: '',
       newPassword: validatePassword(formData.newPassword),
-      confirmPassword: formData.newPassword !== formData.confirmPassword 
-        ? 'Passwords do not match' 
-        : '',
+      confirmPassword: validatePasswordMatch(formData.newPassword, formData.confirmPassword),
     };
 
     setErrors(newErrors);
@@ -133,14 +150,25 @@ export default function ForgotPassword() {
     }
 
     setIsLoading(true);
-    // Simulate API call
-    setTimeout(() => {
-      setIsLoading(false);
+    try {
+      const code = verificationCode.join('');
+      const res = await authService.resetPassword({
+        email,
+        code,
+        newPassword: formData.newPassword
+      });
+      toast.success(res.message || 'Password reset successfully.');
       setStep('success');
       setTimeout(() => {
         navigate('/login');
       }, 2500);
-    }, 1000);
+    } catch (error: any) {
+      const errorMsg = error.response?.data?.message || 'Failed to reset password.';
+      toast.error(errorMsg);
+      setErrors({ ...errors, newPassword: errorMsg });
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
@@ -375,7 +403,7 @@ export default function ForgotPassword() {
                         {isLoading ? 'Verifying...' : 'Verify Code'}
                       </Button>
                       <Button
-                        onClick={() => setStep('email')}
+                        onClick={handleResendCode}
                         disabled={isLoading}
                         sx={{ color: 'gray', textTransform: 'none', '&:hover': { color: '#2E9EBF' } }}
                       >

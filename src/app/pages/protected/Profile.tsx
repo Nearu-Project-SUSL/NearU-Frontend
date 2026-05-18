@@ -480,6 +480,17 @@ export default function Profile() {
                               />
                             </ListItem>
                             <Divider sx={{ borderColor: accentAlpha(0.1) }} />
+
+                            <ListItem
+                              onClick={() => navigate('/reset-password')}
+                              sx={{ py: 2.5, px: 3, cursor: 'pointer', transition: 'all 0.2s', '&:hover': { bgcolor: accentAlpha(0.04), paddingLeft: 4 } }}
+                            >
+                              <ListItemIcon><LockIcon sx={{ color: accent }} /></ListItemIcon>
+                              <ListItemText
+                                primary={<Typography sx={{ color: 'text.primary', fontWeight: 600 }}>Change Password</Typography>}
+                              />
+                            </ListItem>
+                            <Divider sx={{ borderColor: accentAlpha(0.1) }} />
                           </>
                         )}
 
