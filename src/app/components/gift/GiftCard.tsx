@@ -1,3 +1,4 @@
+import { useNavigate } from "react-router";
 import {
   Box,
   Card,
@@ -12,10 +13,10 @@ import type { GiftShopResponseDto } from "../../../api/services/giftShopApi";
 
 interface GiftCardProps {
   shop: GiftShopResponseDto;
-  onClick: () => void;
 }
 
-export default function GiftCard({ shop, onClick }: GiftCardProps) {
+export default function GiftCard({ shop }: GiftCardProps) {
+  const navigate = useNavigate();
   const firstProducts = shop.products?.slice(0, 3) ?? [];
 
   return (
@@ -35,7 +36,7 @@ export default function GiftCard({ shop, onClick }: GiftCardProps) {
         },
       }}
     >
-      <CardActionArea onClick={onClick}>
+      <CardActionArea onClick={() => navigate(`/gifts/${shop.id}`)}>
         <Box
           sx={{
             height: 220,
