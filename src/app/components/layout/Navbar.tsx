@@ -155,6 +155,7 @@ export default function Navbar() {
               sx={{ p: 0.5, ml: 0.5, '&:hover': { opacity: 0.85 } }}
             >
               <Avatar
+                src={auth?.user?.profilePictureUrl}
                 sx={{
                   width: 34,
                   height: 34,
@@ -165,7 +166,7 @@ export default function Navbar() {
                   fontSize: '0.85rem',
                 }}
               >
-                <UserIcon sx={{ fontSize: 18 }} />
+                {!auth?.user?.profilePictureUrl && <UserIcon sx={{ fontSize: 18 }} />}
               </Avatar>
             </IconButton>
           </Tooltip>

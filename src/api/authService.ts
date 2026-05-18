@@ -57,6 +57,7 @@ export interface AuthResponse {
     username: string;
     email: string;
     roles: string[];
+    profilePictureUrl?: string;
   };
 }
 
@@ -98,7 +99,28 @@ const authService = {
         id: apiData.userId,
         username: apiData.username,
         email: apiData.email,
-        roles: apiData.role ? [apiData.role] : []
+        roles: apiData.role ? [apiData.role] : [],
+        profilePictureUrl: apiData.profilePictureUrl || apiData.profilePicture || undefined
+      }
+    };
+  },
+
+  loginWithGoogle: async (credential: string): Promise<AuthResponse> => {
+    const response = await axios.post<ApiResponse<any>>('/auth/google-login', {
+      token: credential
+    });
+    
+    const apiData = response.data.data;
+    
+    return {
+      accessToken: apiData.accessToken,
+      refreshToken: apiData.refreshToken,
+      user: {
+        id: apiData.userId,
+        username: apiData.username,
+        email: apiData.email,
+        roles: apiData.role ? [apiData.role] : [],
+        profilePictureUrl: apiData.profilePictureUrl || apiData.profilePicture || undefined
       }
     };
   },

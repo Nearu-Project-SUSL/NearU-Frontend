@@ -1,9 +1,10 @@
 import { Link, useNavigate } from 'react-router';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { toast } from 'sonner';
 import authService from '../../../api/authService';
 import useAuth from '../../hooks/useAuth';
 import { validateEmail, validateRequired } from '../../utils/validation';
+import { useGoogleLogin } from '@react-oauth/google';
 
 // MUI Components
 import { 
@@ -32,12 +33,62 @@ import {
 
 export default function Login() {
   const navigate = useNavigate();
-  const { setAuth } = useAuth();
+  const { auth, setAuth } = useAuth();
   const [showPassword, setShowPassword] = useState(false);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [errors, setErrors] = useState({ email: '', password: '' });
+
+  useEffect(() => {
+    if (auth?.user) {
+      const userRole = auth.user.roles[0];
+      if (userRole === 'Admin') {
+        navigate('/admin-home', { replace: true });
+      } else if (userRole === 'BusinessOwner') {
+        navigate('/business-owner-home', { replace: true });
+      } else if (userRole === 'Rider') {
+        navigate('/rider-home', { replace: true });
+      } else {
+        navigate('/home', { replace: true });
+      }
+    }
+  }, [auth, navigate]);
+
+  const handleGoogleLogin = useGoogleLogin({
+    onSuccess: async (tokenResponse) => {
+      try {
+        setIsLoading(true);
+        const response = await authService.loginWithGoogle(tokenResponse.access_token);
+        
+        setAuth({
+          user: response.user,
+          accessToken: response.accessToken,
+          refreshToken: response.refreshToken,
+        });
+        
+        toast.success('Login successful!');
+        
+        const userRole = response.user.roles[0];
+        if (userRole === 'Admin') {
+          navigate('/admin-home');
+        } else if (userRole === 'BusinessOwner') {
+          navigate('/business-owner-home');
+        } else if (userRole === 'Rider') {
+          navigate('/rider-home');
+        } else {
+          navigate('/home');
+        }
+      } catch (error: any) {
+        toast.error(error.response?.data?.message || 'Google login failed');
+      } finally {
+        setIsLoading(false);
+      }
+    },
+    onError: () => {
+      toast.error('Google login failed');
+    }
+  });
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -98,7 +149,7 @@ export default function Login() {
       {/* Top Navigation */}
       <nav className="relative z-20 flex items-center justify-between px-8 lg:px-12 py-6 bg-black/30 backdrop-blur-sm border-b border-blue-400/20">
         <Link to="/" className="flex items-center gap-3 group">
-          <div className="w-12 h-12 bg-gradient-to-br from-yellow-400 to-yellow-600 rounded-xl flex items-center justify-center shadow-lg shadow-blue-400/30 group-hover:scale-110 transition-transform duration-300">
+          <div className="w-12 h-12 bg-gradient-to-br from-blue-400 to-blue-600 rounded-xl flex items-center justify-center shadow-lg shadow-blue-400/30 group-hover:scale-110 transition-transform duration-300">
             <span className="text-black text-2xl">🎓</span>
           </div>
           <span className="text-white text-2xl">NearU</span>
@@ -135,13 +186,13 @@ export default function Login() {
             {/* Illustration */}
             <div className="relative w-full max-w-md">
               {/* Decorative circles */}
-              <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-80 h-80 bg-gradient-to-br from-yellow-400/20 to-yellow-600/20 rounded-full blur-3xl animate-pulse"></div>
+              <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-80 h-80 bg-gradient-to-br from-blue-400/20 to-blue-600/20 rounded-full blur-3xl animate-pulse"></div>
               
               {/* Central hub */}
               <div className="relative z-10 flex items-center justify-center">
-                <div className="relative w-64 h-64 bg-gradient-to-br from-gray-800 to-black rounded-3xl border-2 border-yellow-400/30 shadow-2xl shadow-blue-400/20 p-8">
+                <div className="relative w-64 h-64 bg-gradient-to-br from-gray-800 to-black rounded-3xl border-2 border-blue-400/30 shadow-2xl shadow-blue-400/20 p-8">
                   {/* Center circle */}
-                  <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-20 h-20 bg-gradient-to-br from-yellow-400 to-yellow-600 rounded-full flex items-center justify-center shadow-lg animate-pulse">
+                  <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-20 h-20 bg-gradient-to-br from-blue-400 to-blue-600 rounded-full flex items-center justify-center shadow-lg animate-pulse">
                     <GraduationCapIcon sx={{ fontSize: 40, color: 'black' }} />
                   </div>
 
@@ -319,7 +370,7 @@ export default function Login() {
                     fullWidth
                     variant="outlined"
                     startIcon={<GoogleIcon />}
-                    onClick={() => toast.info('Google login coming soon!')}
+                    onClick={() => handleGoogleLogin()}
                     sx={{
                       color: 'white',
                       borderColor: 'rgba(46, 158, 191, 0.2)',

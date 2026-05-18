@@ -95,7 +95,8 @@ export default function MyJobs() {
   
   const { auth } = useAuth();
   const userId = auth?.user?.id;
-  const myJobs = allJobs.filter(job => job.postedBy.userId === userId);
+  const jobsArray: JobResponse[] = Array.isArray(allJobs) ? allJobs : (allJobs as any).items || [];
+  const myJobs = jobsArray.filter((job: JobResponse) => job.postedBy.userId === userId);
 
   useEffect(() => {
     if (isError) {
@@ -152,7 +153,7 @@ export default function MyJobs() {
                     </Grid>
                   ) : myJobs.length > 0 ? (
                     <Grid container spacing={3}>
-                      {myJobs.map((job, index) => (
+                      {myJobs.map((job: JobResponse, index: number) => (
                         <Grid size={{ xs: 12 }} key={job.id}>
                           <Grow in timeout={400 + index * 100}>
                               <Card
