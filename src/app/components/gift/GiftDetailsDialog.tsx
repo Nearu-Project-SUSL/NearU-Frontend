@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import {
   Box,
   Button,
@@ -41,10 +41,15 @@ interface GiftDetailsDialogProps {
 
 export default function GiftDetailsDialog({
   open,
-  shop,
+  shop: shopProp,
   onClose,
   onRefresh,
 }: GiftDetailsDialogProps) {
+  const [shop, setShop] = useState<GiftShopResponseDto | null>(shopProp);
+
+  useEffect(() => {
+    if (shopProp) setShop(shopProp);
+  }, [shopProp]);
   const [loading, setLoading] = useState(false);
   const [shopFormOpen, setShopFormOpen] = useState(false);
   const [productFormOpen, setProductFormOpen] = useState(false);
@@ -56,7 +61,8 @@ export default function GiftDetailsDialog({
   if (!shop) return null;
 
   const refreshCurrentAndParent = async () => {
-    await getGiftShopById(shop.id);
+    const updated = await getGiftShopById(shop.id);
+    setShop(updated);
     await onRefresh();
   };
 
@@ -162,7 +168,6 @@ export default function GiftDetailsDialog({
                   />
                 </Stack>
               </Box>
-{false && (
               <Stack direction="row" spacing={1.5} flexWrap="wrap">
                 <Button
                   startIcon={<EditIcon />}
@@ -181,7 +186,7 @@ export default function GiftDetailsDialog({
                 >
                   Delete Shop
                 </Button>
-              </Stack>)}
+              </Stack>
             </Box>
 
             <Grid container spacing={4}>
@@ -237,7 +242,7 @@ export default function GiftDetailsDialog({
                 >
                   <Typography sx={{ color: "#fff", fontWeight: 800, fontSize: "1.2rem" }}>
                     Products
-                  </Typography>{false && (
+                  </Typography>
                   <Button
                     startIcon={<AddIcon />}
                     variant="contained"
@@ -245,7 +250,7 @@ export default function GiftDetailsDialog({
                     onClick={() => setProductFormOpen(true)}
                   >
                     Add Product
-                  </Button>)}
+                  </Button>
                 </Box>
 
                 <Grid container spacing={2}>

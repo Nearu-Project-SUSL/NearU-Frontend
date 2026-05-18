@@ -18,7 +18,6 @@ import AddIcon from "@mui/icons-material/Add";
 import { Sidebar } from "../../components/layout/Sidebar";
 import Navbar from "../../components/layout/Navbar";
 import GiftCard from "../../components/gift/GiftCard";
-import GiftDetailsDialog from "../../components/gift/GiftDetailsDialog";
 import GiftShopFormDialog from "../../components/gift/GiftShopFormDialog";
 import {
   createGiftShop,
@@ -41,7 +40,6 @@ function useHorizontalScroll() {
 
 export default function Gifts() {
   const [shops, setShops] = useState<GiftShopResponseDto[]>([]);
-  const [selectedShop, setSelectedShop] = useState<GiftShopResponseDto | null>(null);
   const [keyword, setKeyword] = useState("");
   const [location, setLocation] = useState("");
   const [visible, setVisible] = useState(false);
@@ -212,7 +210,7 @@ export default function Gifts() {
                   <Box key={shop.id} sx={{ minWidth: { xs: "100%", sm: 360 } }}>
                     <Grow in timeout={400 + index * 80}>
                       <Box>
-                        <GiftCard shop={shop} onClick={() => setSelectedShop(shop)} />
+                        <GiftCard shop={shop} />
                       </Box>
                     </Grow>
                   </Box>
@@ -228,7 +226,7 @@ export default function Gifts() {
               <Grid container spacing={3}>
                 {shops.map((shop) => (
                   <Grid size={{ xs: 12, sm: 6, lg: 4 }} key={shop.id}>
-                    <GiftCard shop={shop} onClick={() => setSelectedShop(shop)} />
+                    <GiftCard shop={shop} />
                   </Grid>
                 ))}
               </Grid>
@@ -236,13 +234,6 @@ export default function Gifts() {
           </Box>
         </Box>
       </Box>
-
-      <GiftDetailsDialog
-        open={!!selectedShop}
-        shop={selectedShop}
-        onClose={() => setSelectedShop(null)}
-        onRefresh={fetchGiftShops}
-      />
 
       <GiftShopFormDialog
         open={createOpen}
