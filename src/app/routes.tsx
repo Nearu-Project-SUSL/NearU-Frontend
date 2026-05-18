@@ -18,6 +18,7 @@ const Register = Loadable(lazy(() => import("./pages/public/Register")));
 const ForgotPassword = Loadable(lazy(() => import("./pages/public/ForgotPassword")));
 const ResetPassword = Loadable(lazy(() => import("./pages/public/ResetPassword")));
 const Unauthorized = Loadable(lazy(() => import("./pages/public/Unauthorized")));
+const LandingPage = Loadable(lazy(() => import("./pages/public/LandingPage")));
 
 // ── Protected Pages (lazy) ────────────────────────────────────────────────────
 const Home = Loadable(lazy(() => import("./pages/protected/Home")));
@@ -43,7 +44,7 @@ export const router = createBrowserRouter([
   // Public Routes - Accessible to anyone
   {
     path: "/",
-    element: <LoadingScreen isSplashScreen={true} />,
+    Component: LandingPage,
   },
   {
     path: "/register",
