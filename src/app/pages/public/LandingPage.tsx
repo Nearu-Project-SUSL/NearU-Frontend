@@ -837,6 +837,79 @@ const testimonials = [
   }
 ];
 
+// Glowing background orb with concentric ripple rings and orbital track
+function HeroGlowingOrb() {
+  return (
+    <div className="absolute left-1/2 top-[35%] -translate-x-1/2 -translate-y-1/2 -z-10 pointer-events-none flex items-center justify-center h-[700px] w-[700px] overflow-hidden">
+      {/* Dynamic pulsing central glowing core */}
+      <motion.div
+        animate={{
+          scale: [0.85, 1.15, 0.85],
+          opacity: [0.55, 0.8, 0.55],
+        }}
+        transition={{
+          duration: 6,
+          repeat: Infinity,
+          ease: "easeInOut",
+        }}
+        className="absolute h-[280px] w-[280px] rounded-full bg-[radial-gradient(circle,rgba(46,158,191,0.5)_0%,rgba(14,165,233,0.18)_50%,transparent_70%)] blur-[45px]"
+      />
+
+      {/* Primary Cyan accent glow backup */}
+      <div className="absolute h-[500px] w-[500px] rounded-full bg-[radial-gradient(circle,rgba(46,158,191,0.15)_0%,transparent_70%)] blur-[80px]" />
+
+      {/* Expanding, fading ripple rings replicating the lead automation style */}
+      {[0, 1, 2].map((i) => (
+        <motion.div
+          key={i}
+          initial={{ scale: 0.4, opacity: 0 }}
+          animate={{
+            scale: [0.4, 1.75],
+            opacity: [0, 0.6, 0.25, 0],
+          }}
+          transition={{
+            duration: 7,
+            repeat: Infinity,
+            delay: i * 2.3,
+            ease: "linear",
+          }}
+          className="absolute h-[340px] w-[340px] rounded-full border border-[#2E9EBF]/25 bg-gradient-to-b from-[#2E9EBF]/5 to-transparent"
+          style={{
+            boxShadow: "inset 0 0 30px rgba(46,158,191,0.06)",
+          }}
+        />
+      ))}
+
+      {/* Dotted orbital ring tracking grid */}
+      <motion.div
+        animate={{ rotate: 360 }}
+        transition={{
+          duration: 40,
+          repeat: Infinity,
+          ease: "linear",
+        }}
+        className="absolute h-[420px] w-[420px] rounded-full border border-dashed border-[#2E9EBF]/20 opacity-35"
+      />
+
+      {/* Outer faint solid ring contour */}
+      <div className="absolute h-[520px] w-[520px] rounded-full border border-[#2E9EBF]/10 opacity-25" />
+
+      {/* Satellite beacon node orbiting dynamically */}
+      <motion.div
+        animate={{ rotate: -360 }}
+        transition={{
+          duration: 25,
+          repeat: Infinity,
+          ease: "linear",
+        }}
+        className="absolute h-[420px] w-[420px]"
+      >
+        <div className="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-1/2 h-3 w-3 rounded-full bg-[#2E9EBF] shadow-[0_0_15px_rgba(46,158,191,0.9)]" />
+      </motion.div>
+    </div>
+  );
+}
+
 export default function LandingPage() {
   const { scrollYProgress } = useScroll();
   const smoothProgress = useSpring(scrollYProgress, { stiffness: 120, damping: 24 });
@@ -921,9 +994,11 @@ export default function LandingPage() {
         {/* HERO SECTION */}
         <motion.section
           id="home"
-          className="mx-auto flex min-h-[90vh] max-w-7xl flex-col items-center justify-center px-6 pt-24 pb-16 text-center md:px-10"
+          className="relative mx-auto flex min-h-[90vh] max-w-7xl flex-col items-center justify-center px-6 pt-24 pb-16 text-center md:px-10"
           style={{ y: heroY }}
         >
+          {/* Glowing Orb Animation behind the hero text */}
+          <HeroGlowingOrb />
           {/* Animated Header Badge */}
           <motion.div
             initial={{ opacity: 0, y: 20 }}
