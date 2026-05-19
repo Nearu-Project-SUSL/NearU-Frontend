@@ -190,7 +190,7 @@ function timeAgo(dateStr: string): string{
 }
 
 function getAvatarColor(initial: string  | undefined): string{
-  const colors = ['#facc15', '#f97316', '#22d3ee', '#a78bfa', '#34d399', '#fb7185'];
+  const colors = ['#2E9EBF', '#f97316', '#22d3ee', '#a78bfa', '#34d399', '#fb7185'];
   if(!initial) return colors[0];
 
   return colors[initial?.charCodeAt(0) % colors.length || 0];
@@ -385,7 +385,7 @@ function TestimonialCard({ t, index }: { t:  Testimonial, index: number }) {
               <Box sx={{ display: 'flex', mt: 0.5 }}>
                 {[1, 2, 3, 4, 5].map((i) =>
                   i <= t.rating
-                    ? <StarIcon key={i} sx={{ fontSize: '0.85rem', color: '#facc15' }} />
+                    ? <StarIcon key={i} sx={{ fontSize: '0.85rem', color: '#2E9EBF' }} />
                     : <StarBorderIcon key={i} sx={{ fontSize: '0.85rem', color: 'rgba(255,255,255,0.3)' }} />
                 )}
               </Box>
@@ -470,7 +470,7 @@ function ShareModal({
         <DialogTitle sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', pb: 1 }}>
           <Box>
             
-            <Typography variant="h6" sx={{ fontWeight: 800, color: '#facc15' }}>
+            <Typography variant="h6" sx={{ fontWeight: 800, color: '#2E9EBF' }}>
               Share Your Experience
             </Typography>
             
@@ -501,7 +501,7 @@ function ShareModal({
                   sx={{ p: 0.5, transition: 'transform 0.15s ease', transform: (hoverRating || rating) >= star ? 'scale(1.2)' : 'scale(1)' }}
                 >
                   {(hoverRating || rating) >= star
-                    ? <StarIcon sx={{ fontSize: 36, color: '#facc15' }} />
+                    ? <StarIcon sx={{ fontSize: 36, color: '#2E9EBF' }} />
                     : <StarBorderIcon sx={{ fontSize: 36, color: 'rgba(255,255,255,0.2)' }} />
                   }
                 </IconButton>
@@ -533,8 +533,8 @@ function ShareModal({
                   borderRadius: '14px',
                   bgcolor: 'rgba(255,255,255,0.03)',
                   '& fieldset': { borderColor: 'rgba(255,255,255,0.1)' },
-                  '&:hover fieldset': { borderColor: 'rgba(250,204,21,0.3)' },
-                  '&.Mui-focused fieldset': { borderColor: '#facc15' },
+                  '&:hover fieldset': { borderColor: 'rgba(46, 158, 191, 0.3)' },
+                  '&.Mui-focused fieldset': { borderColor: '#2E9EBF' },
                 },
                 '& .MuiInputBase-input::placeholder': { color: 'rgba(255,255,255,0.25)' },
               }}
@@ -557,16 +557,16 @@ function ShareModal({
             disabled={loading}
             endIcon={loading ? <CircularProgress size={18} sx={{ color: '#000' }} /> : <SendIcon />}
             sx={{
-              bgcolor: '#facc15',
+              bgcolor: '#2E9EBF',
               color: '#000',
               fontWeight: 800,
               borderRadius: '14px',
               py: 1.5,
               fontSize: '1rem',
               textTransform: 'none',
-              backgroundImage: 'linear-gradient(135deg, #facc15, #ca8a04)',
-              '&:hover': { backgroundImage: 'linear-gradient(135deg, #fde047, #facc15)' },
-              '&:disabled': { bgcolor: 'rgba(250,204,21,0.3)', color: 'rgba(0,0,0,0.4)' },
+              backgroundImage: 'linear-gradient(135deg, #2E9EBF, #1e608a)',
+              '&:hover': { backgroundImage: 'linear-gradient(135deg, #3da5d9, #2E9EBF)' },
+              '&:disabled': { bgcolor: 'rgba(46, 158, 191, 0.3)', color: 'rgba(0,0,0,0.4)' },
             }}
           >
             {loading ? 'Submitting...' : 'Submit Review'}
@@ -828,13 +828,13 @@ export default function Home() {
                   <Box sx={{ display: 'flex', gap: 1 }}>
                         <IconButton
                           onClick={() => goToPage((currentPage - 1 + totalPages) % totalPages)}
-                          sx={{ bgcolor: 'rgba(255,255,255,0.05)', color: '#fff', '&:hover': { bgcolor: 'rgba(250,204,21,0.2)' } }}
+                          sx={{ bgcolor: 'rgba(255,255,255,0.05)', color: '#fff', '&:hover': { bgcolor: 'rgba(46,158,191,0.2)' } }}
                         >
                           <ChevronLeftIcon />
                         </IconButton>
                         <IconButton
                           onClick={() => goToPage((currentPage + 1) % totalPages)}
-                          sx={{ bgcolor: 'rgba(255,255,255,0.05)', color: '#fff', '&:hover': { bgcolor: 'rgba(250,204,21,0.2)' } }}
+                          sx={{ bgcolor: 'rgba(255,255,255,0.05)', color: '#fff', '&:hover': { bgcolor: 'rgba(46,158,191,0.2)' } }}
                         >
                       <ChevronRightIcon />
                     </IconButton>
@@ -845,7 +845,7 @@ export default function Home() {
               {/*testimonial cards*/}
               {testimonialsLoading ? (
                 <Box sx={{ display: 'flex', justifyContent: 'center', py: 6 }}>
-                  <CircularProgress sx={{ color: '#facc15' }} />
+                  <CircularProgress sx={{ color: '#2E9EBF' }} />
                 </Box>
               ) : testimonials.length === 0 ? (
                 <Box sx={{ textAlign: 'center', py: 6, color: 'rgba(255,255,255,0.3)' }}>
@@ -872,10 +872,10 @@ export default function Home() {
                         width: i === currentPage ? 24 : 8,
                         height: 8,
                         borderRadius: '4px',
-                        bgcolor: i === currentPage ? '#facc15' : 'rgba(255,255,255,0.15)',
+                        bgcolor: i === currentPage ? '#2E9EBF' : 'rgba(255,255,255,0.15)',
                         cursor: 'pointer',
                         transition: 'all 0.3s ease',
-                        '&:hover': { bgcolor: i === currentPage ? '#facc15' : 'rgba(255,255,255,0.3)' },
+                        '&:hover': { bgcolor: i === currentPage ? '#2E9EBF' : 'rgba(255,255,255,0.3)' },
                       }}
                     />
                   ))}
@@ -886,7 +886,7 @@ export default function Home() {
                 <Button
                   variant="outlined"
                   onClick={handleShareClick}
-                  sx={{ color: '#facc15', borderColor: 'rgba(250, 204, 21, 0.4)', borderRadius: '12px', px: 4, py: 1.2, fontWeight: 700, textTransform: 'none', '&:hover': { borderColor: '#facc15', bgcolor: 'rgba(250, 204, 21, 0.1)' } }}
+                  sx={{ color: '#2E9EBF', borderColor: 'rgba(46, 158, 191, 0.1)', borderRadius: '12px', px: 4, py: 1.2, fontWeight: 700, textTransform: 'none', '&:hover': { borderColor: '#2E9EBF', bgcolor: 'rgba(46, 158, 191, 0.1)' } }}
                 >
                   + Share Your Experience
                 </Button>
