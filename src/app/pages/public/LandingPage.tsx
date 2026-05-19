@@ -840,75 +840,137 @@ const testimonials = [
 // Glowing background orb with concentric ripple rings and orbital track
 function HeroGlowingOrb() {
   return (
-    <div className="absolute left-1/2 top-[35%] -translate-x-1/2 -translate-y-1/2 -z-10 pointer-events-none flex items-center justify-center h-[700px] w-[700px] overflow-hidden">
-      {/* Dynamic pulsing central glowing core */}
+    <div className="absolute left-1/2 top-[35%] -translate-x-1/2 -translate-y-1/2 -z-10 pointer-events-none flex items-center justify-center h-[1000px] w-[1000px]">
+      {/* 1. Dynamic pulsing central glowing core - High Intensity */}
       <motion.div
         animate={{
-          scale: [0.85, 1.15, 0.85],
-          opacity: [0.55, 0.8, 0.55],
+          scale: [0.88, 1.12, 0.88],
+          opacity: [0.65, 0.9, 0.65],
         }}
         transition={{
-          duration: 6,
+          duration: 7,
           repeat: Infinity,
           ease: "easeInOut",
         }}
-        className="absolute h-[280px] w-[280px] rounded-full bg-[radial-gradient(circle,rgba(46,158,191,0.5)_0%,rgba(14,165,233,0.18)_50%,transparent_70%)] blur-[45px]"
+        className="absolute h-[380px] w-[380px] rounded-full bg-[radial-gradient(circle,rgba(46,158,191,0.65)_0%,rgba(14,165,233,0.25)_45%,rgba(56,189,248,0.1)_65%,transparent_80%)] blur-[55px]"
       />
 
-      {/* Primary Cyan accent glow backup */}
-      <div className="absolute h-[500px] w-[500px] rounded-full bg-[radial-gradient(circle,rgba(46,158,191,0.15)_0%,transparent_70%)] blur-[80px]" />
+      {/* 2. Shimmering secondary deep blue/purple glow backup for visual depth & chromatic rich aura */}
+      <motion.div
+        animate={{
+          rotate: [0, 360],
+          scale: [0.95, 1.15, 0.95],
+        }}
+        transition={{
+          duration: 16,
+          repeat: Infinity,
+          ease: "linear",
+        }}
+        className="absolute h-[550px] w-[550px] rounded-full bg-[radial-gradient(circle,rgba(14,165,233,0.25)_0%,rgba(46,158,191,0.08)_50%,transparent_75%)] blur-[80px]"
+      />
 
-      {/* Expanding, fading ripple rings replicating the lead automation style */}
-      {[0, 1, 2].map((i) => (
+      {/* 3. Primary wide Cyan ambient bloom floor */}
+      <div className="absolute h-[750px] w-[750px] rounded-full bg-[radial-gradient(circle,rgba(46,158,191,0.18)_0%,transparent_70%)] blur-[100px]" />
+
+      {/* 4. Expanding, fading ripple rings with subtle neon glow drop shadows */}
+      {[0, 1, 2, 3].map((i) => (
         <motion.div
           key={i}
-          initial={{ scale: 0.4, opacity: 0 }}
+          initial={{ scale: 0.35, opacity: 0 }}
           animate={{
-            scale: [0.4, 1.75],
-            opacity: [0, 0.6, 0.25, 0],
+            scale: [0.35, 2.2],
+            opacity: [0, 0.65, 0.28, 0],
           }}
           transition={{
-            duration: 7,
+            duration: 8.5,
             repeat: Infinity,
-            delay: i * 2.3,
+            delay: i * 2.1,
             ease: "linear",
           }}
-          className="absolute h-[340px] w-[340px] rounded-full border border-[#2E9EBF]/25 bg-gradient-to-b from-[#2E9EBF]/5 to-transparent"
+          className="absolute h-[380px] w-[380px] rounded-full border border-[#2E9EBF]/30 bg-gradient-to-b from-[#2E9EBF]/8 to-transparent"
           style={{
-            boxShadow: "inset 0 0 30px rgba(46,158,191,0.06)",
+            boxShadow: "inset 0 0 40px rgba(46,158,191,0.08), 0 0 20px rgba(46,158,191,0.04)",
           }}
         />
       ))}
 
-      {/* Dotted orbital ring tracking grid */}
+      {/* 5. Rotating inner dashed orbital track */}
       <motion.div
         animate={{ rotate: 360 }}
         transition={{
-          duration: 40,
+          duration: 35,
           repeat: Infinity,
           ease: "linear",
         }}
-        className="absolute h-[420px] w-[420px] rounded-full border border-dashed border-[#2E9EBF]/20 opacity-35"
+        className="absolute h-[480px] w-[480px] rounded-full border border-dashed border-[#2E9EBF]/25 opacity-40"
       />
 
-      {/* Outer faint solid ring contour */}
-      <div className="absolute h-[520px] w-[520px] rounded-full border border-[#2E9EBF]/10 opacity-25" />
-
-      {/* Satellite beacon node orbiting dynamically */}
+      {/* 6. Counter-rotating outer dashed orbital track */}
       <motion.div
         animate={{ rotate: -360 }}
         transition={{
-          duration: 25,
+          duration: 50,
           repeat: Infinity,
           ease: "linear",
         }}
-        className="absolute h-[420px] w-[420px]"
+        className="absolute h-[640px] w-[640px] rounded-full border border-dashed border-[#2E9EBF]/15 opacity-25"
+      />
+
+      {/* 7. Faint outermost boundary ring */}
+      <div className="absolute h-[780px] w-[780px] rounded-full border border-[#2E9EBF]/10 opacity-20" />
+
+      {/* 8. Satellite Beacon A (Clockwise Inner Orbit) */}
+      <motion.div
+        animate={{ rotate: 360 }}
+        transition={{
+          duration: 22,
+          repeat: Infinity,
+          ease: "linear",
+        }}
+        className="absolute h-[480px] w-[480px]"
       >
-        <div className="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-1/2 h-3 w-3 rounded-full bg-[#2E9EBF] shadow-[0_0_15px_rgba(46,158,191,0.9)]" />
+        <div className="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-1/2 h-3.5 w-3.5 rounded-full bg-cyan-400 shadow-[0_0_20px_rgba(46,158,191,0.95)] border border-white/40" />
+      </motion.div>
+
+      {/* 9. Satellite Beacon B (Counter-Clockwise Outer Orbit) */}
+      <motion.div
+        animate={{ rotate: -360 }}
+        transition={{
+          duration: 32,
+          repeat: Infinity,
+          ease: "linear",
+        }}
+        className="absolute h-[640px] w-[640px]"
+      >
+        <div className="absolute bottom-0 left-1/2 -translate-x-1/2 translate-y-1/2 h-2.5 w-2.5 rounded-full bg-sky-300 shadow-[0_0_15px_rgba(56,189,248,0.85)] border border-white/20" />
       </motion.div>
     </div>
   );
 }
+
+const heroTitleContainerVariants = {
+  hidden: { opacity: 0 },
+  visible: {
+    opacity: 1,
+    transition: {
+      staggerChildren: 0.07,
+      delayChildren: 0.2,
+    },
+  },
+};
+
+const heroTitleWordVariants = {
+  hidden: { y: "115%", rotateZ: 3.5, opacity: 0 },
+  visible: {
+    y: 0,
+    rotateZ: 0,
+    opacity: 1,
+    transition: {
+      duration: 0.85,
+      ease: [0.16, 1, 0.3, 1], // Custom ultra-smooth easeOutExpo
+    },
+  },
+};
 
 export default function LandingPage() {
   const { scrollYProgress } = useScroll();
@@ -1001,9 +1063,9 @@ export default function LandingPage() {
           <HeroGlowingOrb />
           {/* Animated Header Badge */}
           <motion.div
-            initial={{ opacity: 0, y: 20 }}
+            initial={{ opacity: 0, y: 15 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6 }}
+            transition={{ duration: 0.7, ease: [0.16, 1, 0.3, 1], delay: 0.05 }}
             className="mb-8 inline-flex items-center gap-2 rounded-full border border-[#2E9EBF]/20 bg-[#2E9EBF]/5 px-4 py-2 text-xs font-semibold text-sky-200"
           >
             <Sparkles className="h-4 w-4 text-[#2E9EBF] animate-spin-slow" />
@@ -1011,30 +1073,55 @@ export default function LandingPage() {
             <span className="font-mono min-w-[170px] text-left">{badgeText}</span>
           </motion.div>
 
-          {/* Glowing character text header */}
+          {/* Glowing character text header - Custom word-by-word reveal mask */}
           <motion.h1
-            initial={{ opacity: 0, y: 30 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8, delay: 0.15 }}
-            className="max-w-5xl text-4xl font-extrabold leading-[1.1] tracking-tight sm:text-6xl md:text-8xl text-white"
+            variants={heroTitleContainerVariants}
+            initial="hidden"
+            animate="visible"
+            className="max-w-5xl text-4xl font-black leading-[1.15] tracking-tight sm:text-6xl md:text-8xl text-white drop-shadow-[0_4px_24px_rgba(0,0,0,0.85)] flex flex-wrap justify-center"
           >
-            Intelligent Campus Companion for
-            <span className="block mt-2 bg-gradient-to-r from-white via-sky-200 to-[#2E9EBF] bg-clip-text text-transparent drop-shadow-[0_0_30px_rgba(46,158,191,0.25)]"> Modern Students.</span>
+            {"Intelligent Campus Companion for".split(" ").map((word, idx) => (
+              <span key={idx} className="inline-block overflow-hidden py-1 mr-2.5 md:mr-3.5">
+                <motion.span variants={heroTitleWordVariants} className="inline-block origin-bottom-left">
+                  {word}
+                </motion.span>
+              </span>
+            ))}
+            <span className="block w-full overflow-hidden py-2 mt-1 md:mt-2">
+              <motion.span
+                variants={{
+                  hidden: { y: "110%", opacity: 0, scale: 0.95 },
+                  visible: {
+                    y: 0,
+                    opacity: 1,
+                    scale: 1,
+                    transition: {
+                      duration: 1.0,
+                      ease: [0.16, 1, 0.3, 1],
+                      delay: 0.55,
+                    },
+                  },
+                }}
+                className="block bg-gradient-to-r from-white via-sky-100 to-sky-400 bg-clip-text text-transparent drop-shadow-[0_4px_20px_rgba(46,158,191,0.35)] origin-center"
+              >
+                Modern Students.
+              </motion.span>
+            </span>
           </motion.h1>
 
           <motion.p
-            initial={{ opacity: 0, y: 20 }}
+            initial={{ opacity: 0, y: 15 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8, delay: 0.25 }}
-            className="mt-8 max-w-2xl text-base text-slate-400 md:text-xl leading-relaxed"
+            transition={{ duration: 0.85, ease: [0.16, 1, 0.3, 1], delay: 0.7 }}
+            className="mt-8 max-w-2xl text-base text-slate-200 md:text-xl leading-relaxed drop-shadow-[0_2px_10px_rgba(0,0,0,0.9)]"
           >
             NearU unites jobs, food delivery, rides, accommodation, and gift delivery into a single premium network tailored for university life.
           </motion.p>
 
           <motion.div
-            initial={{ opacity: 0, y: 15 }}
+            initial={{ opacity: 0, y: 12 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.7, delay: 0.4 }}
+            transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1], delay: 0.85 }}
             className="mt-10 flex flex-wrap items-center justify-center gap-4"
           >
             <Link
