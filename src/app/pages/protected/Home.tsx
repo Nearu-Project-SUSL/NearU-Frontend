@@ -189,9 +189,11 @@ function timeAgo(dateStr: string): string{
   return `${months} month${months > 1 ? 's' : ''} ago`;
 }
 
-function getAvatarColor(initial: string){
+function getAvatarColor(initial: string  | undefined): string{
   const colors = ['#facc15', '#f97316', '#22d3ee', '#a78bfa', '#34d399', '#fb7185'];
-  return colors[initial.charCodeAt(0) % colors.length];
+  if(!initial) return colors[0];
+
+  return colors[initial?.charCodeAt(0) % colors.length || 0];
 }
 
 // ─── Custom Carousel Hook ─────────────────────────────────────────────────────
@@ -355,7 +357,8 @@ function DealCard({ deal, index }: { deal: typeof hotDeals[0], index: number }) 
 
 // ─── Testimonial Card ─────────────────────────────────────────────────────────
 function TestimonialCard({ t, index }: { t:  Testimonial, index: number }) {
-  const color = getAvatarColor(t.userInitial)
+  const initial = t.userInitial || t.userName?.charAt(0)?.toUpperCase() || '?'
+  const color = getAvatarColor(initial)
 
   return (
     <Grow in timeout={800 + index * 100}>
@@ -375,7 +378,7 @@ function TestimonialCard({ t, index }: { t:  Testimonial, index: number }) {
         <Box sx={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', mb: 2 }}>
           <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
             <Avatar sx={{ width: 48, height: 48, border: `2px solid ${color}`, bgcolor: color, color: '#000', fontWeight: 800, fontSize: '1.1rem' }}>
-              {t.userInitial}
+              {initial}
             </Avatar>
             <Box>
               <Typography variant="subtitle1" sx={{ color: '#fff', fontWeight: 700, lineHeight: 1.2 }}>{t.userName}</Typography>
@@ -434,7 +437,7 @@ function ShareModal({
 
     try{
       await axiosPrivate.post(
-        '/api/testimonials',
+        '/testimonials',
         {message: message.trim(), rating},
         {headers: {'Authorization': `Bearer ${token}`}}
       );
@@ -611,7 +614,7 @@ export default function Home() {
   //fetch testimonial from API
   const fetchTestimonials = useCallback(async ()=> {
     try{
-      const res = await axios.get('/api/testimonials');
+      const res = await axios.get('/testimonials');
       setTestimonials(res.data);
     } catch{
       //silently fail - page still works
@@ -642,7 +645,7 @@ export default function Home() {
 
   const handleShareClick = () => {
     if(!auth?.accessToken){
-      navigate('/api/login');
+      navigate('/login');
       return;
     }
     setModalOpen(true);
