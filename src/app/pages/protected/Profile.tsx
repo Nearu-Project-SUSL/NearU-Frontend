@@ -68,21 +68,31 @@ export default function Profile() {
 
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-  // Safely extract the user ID
+  // Safely extract the user ID — derive stable primitives to avoid re-render loops
   const userId = (auth?.user as any)?.userId || auth?.user?.id;
   const isGuest = userId === 'guest';
 
+  // Capture auth snapshot for guest profile construction (avoids putting `auth` in deps)
+  const authUserRef = useRef(auth?.user);
+  useEffect(() => {
+    authUserRef.current = auth?.user;
+  });
+
   useEffect(() => {
     const fetchProfile = async () => {
-      if (!userId) return;
+      if (!userId) {
+        setLoading(false);
+        return;
+      }
 
       if (isGuest) {
-        // Mock profile for guest
+        // Build guest mock profile from the ref snapshot (not from `auth` dep)
+        const u = authUserRef.current;
         setProfile({
           userId: 'guest',
-          username: auth?.user?.username || 'Guest',
-          email: auth?.user?.email || 'guest@nearu.com',
-          role: auth?.user?.roles?.[0] || 'Guest',
+          username: u?.username || 'Guest',
+          email: u?.email || 'guest@nearu.com',
+          role: u?.roles?.[0] || 'Guest',
           studentId: 'N/A',
           faculty: 'N/A',
           year: 'N/A',
@@ -100,8 +110,11 @@ export default function Profile() {
       try {
         const data = await userService.getUserProfile(userId);
         setProfile(data);
+
+        // Snapshot current auth user for fallback — safe because we read from ref
+        const u = authUserRef.current;
         setEditForm({
-          username: data.username || (data as any).Username || auth?.user?.username || '',
+          username: data.username || (data as any).Username || u?.username || '',
           mobileNumber: data.mobileNumber || '',
           faculty: data.faculty || '',
           year: data.year || '',
@@ -110,9 +123,14 @@ export default function Profile() {
           dateOfBirth: data.dateOfBirth || ''
         });
 
-        // Sync to global auth context if different (prevents infinite loop by returning exact reference)
-        const latestUsername = data.username || (data as any).Username || auth?.user?.username || '';
-        const latestProfilePictureUrl = data.profilePictureUrl || (data as any).ProfilePictureUrl || (data as any).profilePicture || (data as any).ProfilePicture;
+        // Sync to global auth context only if values actually changed
+        const latestUsername = data.username || (data as any).Username || u?.username || '';
+        const latestProfilePictureUrl =
+          data.profilePictureUrl ||
+          (data as any).ProfilePictureUrl ||
+          (data as any).profilePicture ||
+          (data as any).ProfilePicture;
+
         if (latestProfilePictureUrl || latestUsername) {
           setAuth((prev) => {
             if (!prev.user) return prev;
@@ -131,14 +149,24 @@ export default function Profile() {
             };
           });
         }
-      } catch (error) {
-        toast.error('Failed to load profile');
+      } catch (error: any) {
+        // Only show toast for non-auth errors; the axios interceptor handles 401/403 centrally
+        const status = error?.response?.status;
+        if (status === 404) {
+          toast.error('Profile not found. Please contact support.');
+        } else if (status !== 401 && status !== 403) {
+          toast.error('Failed to load profile. Please try again.');
+        }
       } finally {
         setLoading(false);
       }
     };
+
     fetchProfile();
-  }, [auth, userId, isGuest]);
+    // IMPORTANT: Do NOT add `auth` to this dep array — it causes an infinite loop
+    // because setAuth() is called inside this effect.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [userId, isGuest]);
 
   const handleLogout = async () => {
     try {
@@ -215,7 +243,11 @@ export default function Profile() {
     try {
       const toastId = toast.loading('Uploading profile picture...');
       const response = await userService.uploadProfilePicture(userId, file);
-      const latestPicUrl = response.profilePictureUrl || (response as any).ProfilePictureUrl || (response as any).profilePicture || (response as any).ProfilePicture;
+      const latestPicUrl =
+        response.profilePictureUrl ||
+        (response as any).ProfilePictureUrl ||
+        (response as any).profilePicture ||
+        (response as any).ProfilePicture;
       setProfile((prev) => prev ? { ...prev, profilePictureUrl: latestPicUrl } : null);
 
       // Update global auth state to propagate changes to Navbar/Sidebar immediately

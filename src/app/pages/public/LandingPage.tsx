@@ -8,6 +8,8 @@ import {
   Gift,
   Hotel,
   MapPin,
+  Menu,
+  X,
   ShoppingBag,
   Sparkles,
   Star,
@@ -17,7 +19,6 @@ import {
   Search,
   MessageSquare,
   Share2,
-  DollarSign,
   Award,
 } from "lucide-react";
 
@@ -42,7 +43,8 @@ function InteractiveStarfield() {
 
     window.addEventListener("resize", handleResize);
 
-    const starsCount = 160;
+    const isMobile = window.innerWidth < 768;
+    const starsCount = isMobile ? 35 : 160;
     const stars: Array<{
       x: number;
       y: number;
@@ -76,14 +78,18 @@ function InteractiveStarfield() {
 
     let mouse = { x: -1000, y: -1000 };
     const handleMouseMove = (e: MouseEvent) => {
+      if (isMobile) return;
       mouse.x = e.clientX;
       mouse.y = e.clientY;
     };
 
-    window.addEventListener("mousemove", handleMouseMove);
+    if (!isMobile) {
+      window.addEventListener("mousemove", handleMouseMove);
+    }
 
     let scrollY = window.scrollY;
     const handleScroll = () => {
+      if (isMobile) return;
       const currentScroll = window.scrollY;
       const diff = currentScroll - scrollY;
       scrollY = currentScroll;
@@ -119,7 +125,7 @@ function InteractiveStarfield() {
         const dist = Math.sqrt(dx * dx + dy * dy);
         let glowSize = star.size;
 
-        if (dist < 200) {
+        if (!isMobile && dist < 200) {
           const force = (200 - dist) / 200;
           star.x += (dx / dist) * force * 0.5;
           star.y += (dy / dist) * force * 0.5;
@@ -131,7 +137,7 @@ function InteractiveStarfield() {
         ctx.arc(star.x, star.y, glowSize, 0, Math.PI * 2);
         ctx.fill();
 
-        if (star.size > 1.5 && dist < 180) {
+        if (!isMobile && star.size > 1.5 && dist < 180) {
           ctx.fillStyle = `rgba(46, 158, 191, ${star.alpha * 0.25})`;
           ctx.beginPath();
           ctx.arc(star.x, star.y, glowSize * 4, 0, Math.PI * 2);
@@ -146,7 +152,9 @@ function InteractiveStarfield() {
 
     return () => {
       window.removeEventListener("resize", handleResize);
-      window.removeEventListener("mousemove", handleMouseMove);
+      if (!isMobile) {
+        window.removeEventListener("mousemove", handleMouseMove);
+      }
       window.removeEventListener("scroll", handleScroll);
       cancelAnimationFrame(animationFrameId);
     };
@@ -159,8 +167,15 @@ function InteractiveStarfield() {
 function CursorSpotlight() {
   const [mousePos, setMousePos] = useState({ x: -400, y: -400 });
   const [isVisible, setIsVisible] = useState(false);
+  const [isMobile, setIsMobile] = useState(false);
 
   useEffect(() => {
+    const checkMobile = () => {
+      setIsMobile(window.innerWidth < 768);
+    };
+    checkMobile();
+    if (window.innerWidth < 768) return;
+
     const handleMouseMove = (e: MouseEvent) => {
       setMousePos({ x: e.clientX, y: e.clientY });
       setIsVisible(true);
@@ -178,7 +193,7 @@ function CursorSpotlight() {
     };
   }, []);
 
-  if (!isVisible) return null;
+  if (isMobile || !isVisible) return null;
 
   return (
     <div
@@ -839,6 +854,56 @@ const testimonials = [
 
 // Glowing background orb with concentric ripple rings and orbital track
 function HeroGlowingOrb() {
+  const [isMobile, setIsMobile] = useState(false);
+
+  useEffect(() => {
+    const checkMobile = () => {
+      setIsMobile(window.innerWidth < 768);
+    };
+    checkMobile();
+    window.addEventListener("resize", checkMobile);
+    return () => window.removeEventListener("resize", checkMobile);
+  }, []);
+
+  if (isMobile) {
+    return (
+      <div className="absolute left-1/2 top-[35%] -translate-x-1/2 -translate-y-1/2 -z-10 pointer-events-none flex items-center justify-center h-[500px] w-[500px]">
+        {/* Simple single pulsing central glowing core for buttery smooth mobile rendering */}
+        <motion.div
+          animate={{
+            scale: [0.9, 1.1, 0.9],
+            opacity: [0.6, 0.8, 0.6],
+          }}
+          transition={{
+            duration: 8,
+            repeat: Infinity,
+            ease: "easeInOut",
+          }}
+          className="absolute h-[250px] w-[250px] rounded-full bg-[radial-gradient(circle,rgba(46,158,191,0.5)_0%,rgba(14,165,233,0.18)_50%,transparent_80%)] blur-[40px]"
+        />
+
+        {/* Dynamic ripple rings - limited to 2 rings, with no expensive drop shadows/inner shadows */}
+        {[0, 1].map((i) => (
+          <motion.div
+            key={i}
+            initial={{ scale: 0.4, opacity: 0 }}
+            animate={{
+              scale: [0.4, 1.8],
+              opacity: [0, 0.5, 0.2, 0],
+            }}
+            transition={{
+              duration: 7,
+              repeat: Infinity,
+              delay: i * 3.5,
+              ease: "linear",
+            }}
+            className="absolute h-[250px] w-[250px] rounded-full border border-[#2E9EBF]/15 bg-gradient-to-b from-[#2E9EBF]/4 to-transparent"
+          />
+        ))}
+      </div>
+    );
+  }
+
   return (
     <div className="absolute left-1/2 top-[35%] -translate-x-1/2 -translate-y-1/2 -z-10 pointer-events-none flex items-center justify-center h-[1000px] w-[1000px]">
       {/* 1. Dynamic pulsing central glowing core - High Intensity */}
@@ -972,7 +1037,116 @@ const heroTitleWordVariants = {
   },
 };
 
+// Mobile nav shared state (module-level so MobileMenuButton and MobileNav share state via context)
+// We use a simple custom event approach to avoid prop drilling
+const MOBILE_NAV_EVENT = "nearu_mobile_nav_toggle";
+
+function MobileMenuButton() {
+  const [isOpen, setIsOpen] = useState(false);
+
+  useEffect(() => {
+    const handler = (e: Event) => {
+      const ce = e as CustomEvent<boolean>;
+      setIsOpen(ce.detail);
+    };
+    window.addEventListener(MOBILE_NAV_EVENT, handler);
+    return () => window.removeEventListener(MOBILE_NAV_EVENT, handler);
+  }, []);
+
+  const toggle = () => {
+    const next = !isOpen;
+    setIsOpen(next);
+    window.dispatchEvent(new CustomEvent(MOBILE_NAV_EVENT, { detail: next }));
+  };
+
+  return (
+    <button
+      onClick={toggle}
+      className="flex h-9 w-9 items-center justify-center rounded-lg border border-white/10 bg-white/5 text-white md:hidden"
+      aria-label="Toggle navigation menu"
+    >
+      {isOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
+    </button>
+  );
+}
+
+function MobileNav() {
+  const [isOpen, setIsOpen] = useState(false);
+
+  useEffect(() => {
+    const handler = (e: Event) => {
+      const ce = e as CustomEvent<boolean>;
+      setIsOpen(ce.detail);
+    };
+    window.addEventListener(MOBILE_NAV_EVENT, handler);
+    return () => window.removeEventListener(MOBILE_NAV_EVENT, handler);
+  }, []);
+
+  const close = () => {
+    setIsOpen(false);
+    window.dispatchEvent(new CustomEvent(MOBILE_NAV_EVENT, { detail: false }));
+  };
+
+  return (
+    <AnimatePresence>
+      {isOpen && (
+        <motion.div
+          initial={{ opacity: 0, y: -12 }}
+          animate={{ opacity: 1, y: 0 }}
+          exit={{ opacity: 0, y: -12 }}
+          transition={{ duration: 0.25, ease: "easeOut" }}
+          className="fixed inset-x-0 top-[73px] z-50 border-b border-white/10 bg-black/90 backdrop-blur-2xl md:hidden"
+        >
+          <nav className="flex flex-col gap-1 px-6 py-6">
+            {[
+              { label: "Home", href: "#home" },
+              { label: "Services", href: "#services" },
+              { label: "How it works", href: "#process" },
+              { label: "FAQs", href: "#faqs" },
+            ].map((item) => (
+              <a
+                key={item.href}
+                href={item.href}
+                onClick={close}
+                className="rounded-xl px-4 py-3 text-base font-semibold text-slate-200 hover:bg-white/5 hover:text-white transition-colors"
+              >
+                {item.label}
+              </a>
+            ))}
+            <div className="mt-4 flex flex-col gap-3 border-t border-white/10 pt-4">
+              <Link
+                to="/register"
+                onClick={close}
+                className="w-full rounded-xl bg-gradient-to-r from-[#2E9EBF] to-sky-600 px-6 py-3 text-center text-sm font-bold text-white shadow-[0_0_20px_rgba(46,158,191,0.3)]"
+              >
+                Get started for free
+              </Link>
+              <Link
+                to="/login"
+                onClick={close}
+                className="w-full rounded-xl border border-white/10 bg-white/5 px-6 py-3 text-center text-sm font-semibold text-white"
+              >
+                Login to my account
+              </Link>
+            </div>
+          </nav>
+        </motion.div>
+      )}
+    </AnimatePresence>
+  );
+}
+
 export default function LandingPage() {
+  const [isMobile, setIsMobile] = useState(false);
+  useEffect(() => {
+    const checkMobile = () => {
+      setIsMobile(window.innerWidth < 768);
+    };
+    checkMobile();
+    window.addEventListener("resize", checkMobile);
+    return () => window.removeEventListener("resize", checkMobile);
+  }, []);
+
   const { scrollYProgress } = useScroll();
   const smoothProgress = useSpring(scrollYProgress, { stiffness: 120, damping: 24 });
   const orbY = useTransform(scrollYProgress, [0, 1], [0, 320]);
@@ -994,6 +1168,19 @@ export default function LandingPage() {
     }, 3800);
     return () => clearInterval(timer);
   }, []);
+
+  const titleWordVariants = {
+    hidden: { y: "115%", rotateZ: isMobile ? 0 : 3.5, opacity: 0 },
+    visible: {
+      y: 0,
+      rotateZ: 0,
+      opacity: 1,
+      transition: {
+        duration: isMobile ? 0.65 : 0.85,
+        ease: [0.16, 1, 0.3, 1],
+      },
+    },
+  };
 
   return (
     <div className="relative min-h-screen overflow-x-hidden bg-[#030307] text-white">
@@ -1017,13 +1204,15 @@ export default function LandingPage() {
         {/* Blob 2 with scroll parallax */}
         <motion.div
           className="absolute left-[15%] top-1/4 h-[600px] w-[600px] rounded-full bg-[#2E9EBF]/10 blur-[130px]"
-          style={{ y: orbY }}
+          style={isMobile ? {} : { y: orbY }}
         />
         {/* Blob 3 */}
         <div className="absolute right-[5%] bottom-1/4 h-[500px] w-[500px] rounded-full bg-sky-500/5 blur-[120px]" />
         {/* Blob 4 */}
         <div className="absolute left-[35%] bottom-1/10 h-[450px] w-[450px] rounded-full bg-emerald-500/5 blur-[130px]" />
       </div>
+
+      <MobileNav />
 
       <header className="sticky top-0 z-40 border-b border-white/5 bg-black/40 backdrop-blur-2xl">
         <nav className="mx-auto flex max-w-7xl items-center justify-between px-6 py-5 md:px-10">
@@ -1043,12 +1232,15 @@ export default function LandingPage() {
             <a href="#faqs" className="hover:text-white transition-colors">FAQs</a>
           </div>
 
-          <Link
-            to="/register"
-            className="rounded-xl bg-gradient-to-r from-[#2E9EBF] to-sky-600 px-5 py-2.5 text-xs font-bold text-white tracking-wide shadow-[0_0_20px_rgba(46,158,191,0.3)] hover:shadow-[0_0_25px_rgba(46,158,191,0.5)] transition hover:scale-[1.03]"
-          >
-            Get Started
-          </Link>
+          <div className="flex items-center gap-3">
+            <Link
+              to="/register"
+              className="rounded-xl bg-gradient-to-r from-[#2E9EBF] to-sky-600 px-5 py-2.5 text-xs font-bold text-white tracking-wide shadow-[0_0_20px_rgba(46,158,191,0.3)] hover:shadow-[0_0_25px_rgba(46,158,191,0.5)] transition hover:scale-[1.03]"
+            >
+              Get Started
+            </Link>
+            <MobileMenuButton />
+          </div>
         </nav>
       </header>
 
@@ -1057,7 +1249,7 @@ export default function LandingPage() {
         <motion.section
           id="home"
           className="relative mx-auto flex min-h-[90vh] max-w-7xl flex-col items-center justify-center px-6 pt-24 pb-16 text-center md:px-10"
-          style={{ y: heroY }}
+          style={isMobile ? {} : { y: heroY }}
         >
           {/* Glowing Orb Animation behind the hero text */}
           <HeroGlowingOrb />
@@ -1066,11 +1258,11 @@ export default function LandingPage() {
             initial={{ opacity: 0, y: 15 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.7, ease: [0.16, 1, 0.3, 1], delay: 0.05 }}
-            className="mb-8 inline-flex items-center gap-2 rounded-full border border-[#2E9EBF]/20 bg-[#2E9EBF]/5 px-4 py-2 text-xs font-semibold text-sky-200"
+            className="mb-8 inline-flex items-center gap-2 rounded-full border border-[#2E9EBF]/20 bg-[#2E9EBF]/5 px-4 py-2 text-xs font-semibold text-sky-200 max-w-[calc(100vw-3rem)]"
           >
-            <Sparkles className="h-4 w-4 text-[#2E9EBF] animate-spin-slow" />
-            <span className="rounded-full bg-[#2E9EBF]/25 px-2.5 py-0.5 text-[10px] text-sky-300 border border-[#2E9EBF]/30 uppercase tracking-widest font-mono font-bold">New</span>
-            <span className="font-mono min-w-[170px] text-left">{badgeText}</span>
+            <Sparkles className="h-4 w-4 shrink-0 text-[#2E9EBF] animate-spin-slow" />
+            <span className="shrink-0 rounded-full bg-[#2E9EBF]/25 px-2.5 py-0.5 text-[10px] text-sky-300 border border-[#2E9EBF]/30 uppercase tracking-widest font-mono font-bold">New</span>
+            <span className="font-mono truncate text-left">{badgeText}</span>
           </motion.div>
 
           {/* Glowing character text header - Custom word-by-word reveal mask */}
@@ -1082,7 +1274,7 @@ export default function LandingPage() {
           >
             {"Intelligent Campus Companion for".split(" ").map((word, idx) => (
               <span key={idx} className="inline-block overflow-hidden py-1 mr-2.5 md:mr-3.5">
-                <motion.span variants={heroTitleWordVariants} className="inline-block origin-bottom-left">
+                <motion.span variants={titleWordVariants} className="inline-block origin-bottom-left">
                   {word}
                 </motion.span>
               </span>
@@ -1141,7 +1333,10 @@ export default function LandingPage() {
 
           {/* 3D Tilting dashboard display */}
           <motion.div
-            style={{
+            style={isMobile ? {
+              transformStyle: "preserve-3d",
+              perspective: 1200
+            } : {
               y: dashboardY,
               scale: dashboardScale,
               rotateX: dashboardRotation,
