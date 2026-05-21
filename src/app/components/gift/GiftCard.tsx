@@ -1,3 +1,4 @@
+import { useNavigate } from "react-router";
 import {
   Box,
   Card,
@@ -12,10 +13,10 @@ import type { GiftShopResponseDto } from "../../../api/services/giftShopApi";
 
 interface GiftCardProps {
   shop: GiftShopResponseDto;
-  onClick: () => void;
 }
 
-export default function GiftCard({ shop, onClick }: GiftCardProps) {
+export default function GiftCard({ shop }: GiftCardProps) {
+  const navigate = useNavigate();
   const firstProducts = shop.products?.slice(0, 3) ?? [];
 
   return (
@@ -29,13 +30,13 @@ export default function GiftCard({ shop, onClick }: GiftCardProps) {
         transition: "all 0.3s ease",
         "&:hover": {
           transform: "translateY(-6px)",
-          borderColor: "rgba(250, 204, 21, 0.35)",
+          borderColor: "rgba(46, 158, 191, 0.35)",
           boxShadow: "0 20px 40px rgba(0,0,0,0.35)",
-          bgcolor: "rgba(250,204,21,0.03)",
+          bgcolor: "rgba(46,158,191,0.03)",
         },
       }}
     >
-      <CardActionArea onClick={onClick}>
+      <CardActionArea onClick={() => navigate(`/gifts/${shop.id}`)}>
         <Box
           sx={{
             height: 220,
@@ -76,7 +77,7 @@ export default function GiftCard({ shop, onClick }: GiftCardProps) {
             </Typography>
 
             <Box sx={{ display: "flex", alignItems: "center", gap: 0.6 }}>
-              <LocationOnIcon sx={{ fontSize: 16, color: "#facc15" }} />
+              <LocationOnIcon sx={{ fontSize: 16, color: "#2E9EBF" }} />
               <Typography sx={{ color: "rgba(255,255,255,0.75)", fontSize: "0.85rem" }}>
                 {shop.locationName}
               </Typography>

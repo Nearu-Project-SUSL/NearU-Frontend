@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import {
   Box,
   Button,
@@ -41,10 +41,15 @@ interface GiftDetailsDialogProps {
 
 export default function GiftDetailsDialog({
   open,
-  shop,
+  shop: shopProp,
   onClose,
   onRefresh,
 }: GiftDetailsDialogProps) {
+  const [shop, setShop] = useState<GiftShopResponseDto | null>(shopProp);
+
+  useEffect(() => {
+    if (shopProp) setShop(shopProp);
+  }, [shopProp]);
   const [loading, setLoading] = useState(false);
   const [shopFormOpen, setShopFormOpen] = useState(false);
   const [productFormOpen, setProductFormOpen] = useState(false);
@@ -56,7 +61,8 @@ export default function GiftDetailsDialog({
   if (!shop) return null;
 
   const refreshCurrentAndParent = async () => {
-    await getGiftShopById(shop.id);
+    const updated = await getGiftShopById(shop.id);
+    setShop(updated);
     await onRefresh();
   };
 
@@ -146,7 +152,7 @@ export default function GiftDetailsDialog({
                   {shop.name}
                 </Typography>
                 <Stack direction="row" spacing={1} alignItems="center" sx={{ mt: 1 }}>
-                  <LocationOnIcon sx={{ color: "#facc15", fontSize: 18 }} />
+                  <LocationOnIcon sx={{ color: "#2E9EBF", fontSize: 18 }} />
                   <Typography sx={{ color: "rgba(255,255,255,0.75)" }}>
                     {shop.locationName}
                   </Typography>
@@ -162,7 +168,6 @@ export default function GiftDetailsDialog({
                   />
                 </Stack>
               </Box>
-{false && (
               <Stack direction="row" spacing={1.5} flexWrap="wrap">
                 <Button
                   startIcon={<EditIcon />}
@@ -181,11 +186,11 @@ export default function GiftDetailsDialog({
                 >
                   Delete Shop
                 </Button>
-              </Stack>)}
+              </Stack>
             </Box>
 
             <Grid container spacing={4}>
-              <Grid item xs={12} md={4}>
+              <Grid size={{ xs: 12, md: 4 }}>
                 <Box
                   sx={{
                     p: 3,
@@ -224,7 +229,7 @@ export default function GiftDetailsDialog({
                 </Box>
               </Grid>
 
-              <Grid item xs={12} md={8}>
+              <Grid size={{ xs: 12, md: 8 }}>
                 <Box
                   sx={{
                     display: "flex",
@@ -237,7 +242,7 @@ export default function GiftDetailsDialog({
                 >
                   <Typography sx={{ color: "#fff", fontWeight: 800, fontSize: "1.2rem" }}>
                     Products
-                  </Typography>{false && (
+                  </Typography>
                   <Button
                     startIcon={<AddIcon />}
                     variant="contained"
@@ -245,13 +250,13 @@ export default function GiftDetailsDialog({
                     onClick={() => setProductFormOpen(true)}
                   >
                     Add Product
-                  </Button>)}
+                  </Button>
                 </Box>
 
                 <Grid container spacing={2}>
                   {products.length > 0 ? (
                     products.map((product) => (
-                      <Grid item xs={12} sm={6} key={product.id}>
+                      <Grid size={{ xs: 12, sm: 6 }} key={product.id}>
                         <Box
                           sx={{
                             borderRadius: "18px",
@@ -272,7 +277,7 @@ export default function GiftDetailsDialog({
                             <Typography sx={{ color: "#fff", fontWeight: 700, mb: 0.6 }}>
                               {product.name}
                             </Typography>
-                            <Typography sx={{ color: "#facc15", fontWeight: 800, mb: 1.5 }}>
+                            <Typography sx={{ color: "#2E9EBF", fontWeight: 800, mb: 1.5 }}>
                               Rs. {Number(product.price).toLocaleString()}
                             </Typography>
 
@@ -304,7 +309,7 @@ export default function GiftDetailsDialog({
                       </Grid>
                     ))
                   ) : (
-                    <Grid item xs={12}>
+                    <Grid size={{ xs: 12 }}>
                       <Box
                         sx={{
                           p: 4,
@@ -367,12 +372,12 @@ export default function GiftDetailsDialog({
 }
 
 const primaryBtnSx = {
-  bgcolor: "#facc15",
-  color: "#000",
+  bgcolor: "#2E9EBF",
+  color: "#fff",
   fontWeight: 800,
   textTransform: "none",
   borderRadius: "12px",
-  "&:hover": { bgcolor: "#eab308" },
+  "&:hover": { bgcolor: "#1a7a9a" },
 };
 
 const secondaryBtnSx = {
@@ -381,8 +386,8 @@ const secondaryBtnSx = {
   textTransform: "none",
   borderRadius: "12px",
   "&:hover": {
-    borderColor: "#facc15",
-    bgcolor: "rgba(250,204,21,0.05)",
+    borderColor: "#2E9EBF",
+    bgcolor: "rgba(46,158,191,0.05)",
   },
 };
 
@@ -405,7 +410,7 @@ const contactBtnSx = {
   textTransform: "none",
   borderRadius: "12px",
   "&:hover": {
-    bgcolor: "rgba(250,204,21,0.06)",
-    borderColor: "rgba(250,204,21,0.35)",
+    bgcolor: "rgba(46,158,191,0.06)",
+    borderColor: "rgba(46, 158, 191, 0.35)",
   },
 };

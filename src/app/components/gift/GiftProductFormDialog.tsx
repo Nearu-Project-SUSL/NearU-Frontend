@@ -151,18 +151,18 @@ const darkTextFieldSx = {
     color: "#fff",
     borderRadius: "14px",
     "& fieldset": { borderColor: "rgba(255,255,255,0.12)" },
-    "&:hover fieldset": { borderColor: "rgba(250,204,21,0.35)" },
-    "&.Mui-focused fieldset": { borderColor: "#facc15" },
+    "&:hover fieldset": { borderColor: "rgba(46,158,191,0.35)" },
+    "&.Mui-focused fieldset": { borderColor: "#2E9EBF" },
   },
 };
 
 const primaryBtnSx = {
-  bgcolor: "#facc15",
-  color: "#000",
+  bgcolor: "#2E9EBF",
+  color: "#fff",
   fontWeight: 800,
   textTransform: "none",
   borderRadius: "12px",
-  "&:hover": { bgcolor: "#eab308" },
+  "&:hover": { bgcolor: "#1a7a9a" },
 };
 
 const secondaryBtnSx = {
@@ -171,7 +171,7 @@ const secondaryBtnSx = {
   textTransform: "none",
   borderRadius: "12px",
   "&:hover": {
-    borderColor: "#facc15",
-    bgcolor: "rgba(250,204,21,0.05)",
+    borderColor: "#2E9EBF",
+    bgcolor: "rgba(46,158,191,0.05)",
   },
 };

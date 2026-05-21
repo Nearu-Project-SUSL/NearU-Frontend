@@ -5,6 +5,7 @@ interface User {
   username: string;
   email: string;
   roles: string[]; // Maps from backend "role"
+  profilePictureUrl?: string;
 }
 
 interface AuthState {
@@ -13,7 +14,7 @@ interface AuthState {
   refreshToken: string | null;
 }
 
-interface AuthContextType {
+export interface AuthContextType {
   auth: AuthState;
   setAuth: React.Dispatch<React.SetStateAction<AuthState>>;
 }
@@ -62,6 +63,34 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       localStorage.removeItem('auth_refreshToken');
     }
   }, [auth]);
+
+  // Synchronize static interceptor updates (tokens refreshed/logout) with React state
+  useEffect(() => {
+    const handleRefreshed = (e: Event) => {
+      const customEvent = e as CustomEvent<string>;
+      const newAccessToken = customEvent.detail;
+      setAuth(prev => {
+        if (!prev.user) return prev;
+        return {
+          ...prev,
+          accessToken: newAccessToken
+        };
+      });
+    };
+
+    const handleLogoutEvent = () => {
+      setAuth({ user: null, accessToken: null, refreshToken: null });
+    };
+
+    window.addEventListener('auth_token_refreshed', handleRefreshed);
+    window.addEventListener('auth_logout', handleLogoutEvent);
+
+    return () => {
+      window.removeEventListener('auth_token_refreshed', handleRefreshed);
+      window.removeEventListener('auth_logout', handleLogoutEvent);
+    };
+  }, []);
+
 
   return (
     <AuthContext.Provider value={{ auth, setAuth }}>

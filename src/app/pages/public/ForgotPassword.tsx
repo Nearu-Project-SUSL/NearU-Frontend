@@ -1,5 +1,8 @@
 import { useState } from 'react';
 import { useNavigate, Link } from 'react-router';
+import { toast } from 'sonner';
+import authService from '../../../api/authService';
+import { validateEmail, validatePassword, validatePasswordMatch } from '../../utils/validation';
 
 // MUI Components
 import {
@@ -52,35 +55,27 @@ export default function ForgotPassword() {
     confirmPassword: '',
   });
 
-  const validatePassword = (password: string) => {
-    if (password.length < 8) {
-      return 'Password must be at least 8 characters';
-    }
-    if (!/(?=.*[a-z])(?=.*[A-Z])(?=.*\d)/.test(password)) {
-      return 'Password must contain uppercase, lowercase, and number';
-    }
-    return '';
-  };
-
-  const handleEmailSubmit = (e: React.FormEvent) => {
+  const handleEmailSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
-    if (!email) {
-      setErrors({ ...errors, email: 'Email is required' });
-      return;
-    }
-    
-    if (!/\S+@\S+\.\S+/.test(email)) {
-      setErrors({ ...errors, email: 'Please enter a valid email' });
+    const emailError = validateEmail(email);
+    if (emailError) {
+      setErrors({ ...errors, email: emailError });
       return;
     }
 
     setIsLoading(true);
-    // Simulate sending email
-    setTimeout(() => {
-      setIsLoading(false);
+    try {
+      const res = await authService.forgotPassword({ email });
+      toast.success(res.message || 'Verification code sent to your email.');
       setStep('verify');
-    }, 1000);
+    } catch (error: any) {
+      const errorMsg = error.response?.data?.message || 'Failed to send reset code. Please try again.';
+      toast.error(errorMsg);
+      setErrors({ ...errors, email: errorMsg });
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   const handleVerificationChange = (index: number, value: string) => {
@@ -97,7 +92,7 @@ export default function ForgotPassword() {
     }
   };
 
-  const handleVerificationSubmit = (e: React.FormEvent) => {
+  const handleVerificationSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
     const code = verificationCode.join('');
@@ -107,23 +102,45 @@ export default function ForgotPassword() {
     }
 
     setIsLoading(true);
-    // Simulate verification
-    setTimeout(() => {
-      setIsLoading(false);
+    try {
+      const res = await authService.verifyResetCode({ email, code });
+      toast.success(res.message || 'Code verified successfully.');
       setStep('reset');
-    }, 1000);
+    } catch (error: any) {
+      const errorMsg = error.response?.data?.message || 'Invalid or expired code.';
+      toast.error(errorMsg);
+      setErrors({ ...errors, verificationCode: errorMsg });
+    } finally {
+      setIsLoading(false);
+    }
   };
 
-  const handleResetSubmit = (e: React.FormEvent) => {
+  const handleResendCode = async () => {
+    setIsLoading(true);
+    try {
+      const res = await authService.forgotPassword({ email });
+      toast.success(res.message || 'Verification code resent to your email.');
+      setVerificationCode(['', '', '', '', '', '']);
+      setErrors({ ...errors, verificationCode: '' });
+      setTimeout(() => {
+        document.getElementById('code-0')?.focus();
+      }, 100);
+    } catch (error: any) {
+      const errorMsg = error.response?.data?.message || 'Failed to resend reset code. Please try again.';
+      toast.error(errorMsg);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleResetSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
     const newErrors = {
       email: '',
       verificationCode: '',
       newPassword: validatePassword(formData.newPassword),
-      confirmPassword: formData.newPassword !== formData.confirmPassword 
-        ? 'Passwords do not match' 
-        : '',
+      confirmPassword: validatePasswordMatch(formData.newPassword, formData.confirmPassword),
     };
 
     setErrors(newErrors);
@@ -133,29 +150,40 @@ export default function ForgotPassword() {
     }
 
     setIsLoading(true);
-    // Simulate API call
-    setTimeout(() => {
-      setIsLoading(false);
+    try {
+      const code = verificationCode.join('');
+      const res = await authService.resetPassword({
+        email,
+        code,
+        newPassword: formData.newPassword
+      });
+      toast.success(res.message || 'Password reset successfully.');
       setStep('success');
       setTimeout(() => {
         navigate('/login');
       }, 2500);
-    }, 1000);
+    } catch (error: any) {
+      const errorMsg = error.response?.data?.message || 'Failed to reset password.';
+      toast.error(errorMsg);
+      setErrors({ ...errors, newPassword: errorMsg });
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
     <div className="min-h-screen w-full relative overflow-hidden bg-gradient-to-br from-gray-900 via-black to-gray-900">
       {/* Animated background */}
-      <div className="absolute inset-0 bg-gradient-to-br from-yellow-400/10 via-transparent to-yellow-600/10 animate-gradient"></div>
+      <div className="absolute inset-0 bg-gradient-to-br from-blue-400/10 via-transparent to-blue-600/10 animate-gradient"></div>
       
       {/* Floating orbs */}
-      <div className="absolute top-1/4 right-1/4 w-96 h-96 bg-yellow-400/10 rounded-full blur-3xl animate-float"></div>
-      <div className="absolute bottom-1/4 left-1/4 w-80 h-80 bg-yellow-600/10 rounded-full blur-3xl animate-float" style={{ animationDelay: '2s' }}></div>
+      <div className="absolute top-1/4 right-1/4 w-96 h-96 bg-blue-400/10 rounded-full blur-3xl animate-float"></div>
+      <div className="absolute bottom-1/4 left-1/4 w-80 h-80 bg-blue-600/10 rounded-full blur-3xl animate-float" style={{ animationDelay: '2s' }}></div>
 
       {/* Top Navigation */}
-      <nav className="relative z-20 flex items-center justify-between px-8 lg:px-12 py-6 bg-black/30 backdrop-blur-sm border-b border-yellow-400/20">
+      <nav className="relative z-20 flex items-center justify-between px-8 lg:px-12 py-6 bg-black/30 backdrop-blur-sm border-b border-blue-400/20">
         <Link to="/" className="flex items-center gap-3 group">
-          <div className="w-12 h-12 bg-gradient-to-br from-yellow-400 to-yellow-600 rounded-xl flex items-center justify-center shadow-lg shadow-yellow-400/30 group-hover:scale-110 transition-transform duration-300">
+          <div className="w-12 h-12 bg-gradient-to-br from-blue-400 to-blue-600 rounded-xl flex items-center justify-center shadow-lg shadow-blue-400/30 group-hover:scale-110 transition-transform duration-300">
             <span className="text-black text-2xl">🎓</span>
           </div>
           <span className="text-white text-2xl">NearU</span>
@@ -167,13 +195,13 @@ export default function ForgotPassword() {
             to="/login"
             variant="outlined"
             sx={{
-              color: '#facc15',
-              borderColor: 'rgba(250, 204, 21, 0.2)',
+              color: '#2E9EBF',
+              borderColor: 'rgba(46, 158, 191, 0.2)',
               borderRadius: '0.75rem',
               px: 3,
               '&:hover': {
-                borderColor: '#facc15',
-                bgcolor: 'rgba(250, 204, 21, 0.1)',
+                borderColor: '#2E9EBF',
+                bgcolor: 'rgba(46, 158, 191, 0.1)',
                 transform: 'scale(1.05)',
               },
               transition: 'all 0.3s',
@@ -192,28 +220,28 @@ export default function ForgotPassword() {
             {/* Illustration */}
             <div className="relative w-full max-w-md">
               {/* Decorative circles */}
-              <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-80 h-80 bg-gradient-to-br from-yellow-400/20 to-yellow-600/20 rounded-full blur-3xl animate-pulse"></div>
+              <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-80 h-80 bg-gradient-to-br from-blue-400/20 to-blue-600/20 rounded-full blur-3xl animate-pulse"></div>
               
               {/* Central hub */}
               <div className="relative z-10 flex items-center justify-center">
-                <div className="relative w-64 h-64 bg-gradient-to-br from-gray-800 to-black rounded-3xl border-2 border-yellow-400/30 shadow-2xl shadow-yellow-400/20 p-8">
+                <div className="relative w-64 h-64 bg-gradient-to-br from-gray-800 to-black rounded-3xl border-2 border-blue-400/30 shadow-2xl shadow-blue-400/20 p-8">
                   {/* Center circle */}
-                  <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-20 h-20 bg-gradient-to-br from-yellow-400 to-yellow-600 rounded-full flex items-center justify-center shadow-lg animate-pulse">
+                  <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-20 h-20 bg-gradient-to-br from-blue-400 to-blue-600 rounded-full flex items-center justify-center shadow-lg animate-pulse">
                     <VpnKeyIcon sx={{ fontSize: 40, color: 'black' }} />
                   </div>
 
                   {/* Orbiting icons */}
-                  <div className="absolute top-8 left-1/2 -translate-x-1/2 w-12 h-12 bg-yellow-400/20 rounded-full flex items-center justify-center border border-yellow-400/40 animate-float">
-                    <SecurityIcon sx={{ fontSize: 24, color: '#facc15' }} />
+                  <div className="absolute top-8 left-1/2 -translate-x-1/2 w-12 h-12 bg-blue-400/20 rounded-full flex items-center justify-center border border-blue-400/40 animate-float">
+                    <SecurityIcon sx={{ fontSize: 24, color: '#2E9EBF' }} />
                   </div>
-                  <div className="absolute bottom-8 left-1/2 -translate-x-1/2 w-12 h-12 bg-yellow-400/20 rounded-full flex items-center justify-center border border-yellow-400/40 animate-float" style={{ animationDelay: '1s' }}>
-                    <LockIcon sx={{ fontSize: 24, color: '#facc15' }} />
+                  <div className="absolute bottom-8 left-1/2 -translate-x-1/2 w-12 h-12 bg-blue-400/20 rounded-full flex items-center justify-center border border-blue-400/40 animate-float" style={{ animationDelay: '1s' }}>
+                    <LockIcon sx={{ fontSize: 24, color: '#2E9EBF' }} />
                   </div>
-                  <div className="absolute left-8 top-1/2 -translate-y-1/2 w-12 h-12 bg-yellow-400/20 rounded-full flex items-center justify-center border border-yellow-400/40 animate-float" style={{ animationDelay: '2s' }}>
-                    <MailIcon sx={{ fontSize: 24, color: '#facc15' }} />
+                  <div className="absolute left-8 top-1/2 -translate-y-1/2 w-12 h-12 bg-blue-400/20 rounded-full flex items-center justify-center border border-blue-400/40 animate-float" style={{ animationDelay: '2s' }}>
+                    <MailIcon sx={{ fontSize: 24, color: '#2E9EBF' }} />
                   </div>
-                  <div className="absolute right-8 top-1/2 -translate-y-1/2 w-12 h-12 bg-yellow-400/20 rounded-full flex items-center justify-center border border-yellow-400/40 animate-float" style={{ animationDelay: '3s' }}>
-                    <RestoreIcon sx={{ fontSize: 24, color: '#facc15' }} />
+                  <div className="absolute right-8 top-1/2 -translate-y-1/2 w-12 h-12 bg-blue-400/20 rounded-full flex items-center justify-center border border-blue-400/40 animate-float" style={{ animationDelay: '3s' }}>
+                    <RestoreIcon sx={{ fontSize: 24, color: '#2E9EBF' }} />
                   </div>
                 </div>
               </div>
@@ -223,7 +251,7 @@ export default function ForgotPassword() {
             <div className="text-center space-y-4 max-w-md">
               <Typography variant="h3" sx={{ color: 'white', fontWeight: 'bold' }}>
                 Secure Access<br />
-                <span className="text-yellow-400">Restored Easily.</span>
+                <span className="text-blue-400">Restored Easily.</span>
               </Typography>
               <Typography variant="body1" sx={{ color: 'gray', fontSize: '1.125rem' }}>
                 Regain access to your NearU account quickly and securely. We prioritize your privacy and smooth experience.
@@ -233,7 +261,7 @@ export default function ForgotPassword() {
 
           {/* Right Side - Recovery Form */}
           <div className="w-full max-w-md mx-auto animate-slideUp">
-            <div className="bg-gradient-to-br from-yellow-400/5 to-black/50 backdrop-blur-xl rounded-3xl border-2 border-yellow-400/20 p-8 lg:p-10 shadow-2xl shadow-yellow-400/10 hover:border-yellow-400/30 transition-all duration-500">
+            <div className="bg-gradient-to-br from-blue-400/5 to-black/50 backdrop-blur-xl rounded-3xl border-2 border-blue-400/20 p-8 lg:p-10 shadow-2xl shadow-blue-400/10 hover:border-blue-400/30 transition-all duration-500">
               
               {/* Back Button */}
               {step !== 'success' && (
@@ -241,7 +269,7 @@ export default function ForgotPassword() {
                   component={Link}
                   to="/login"
                   startIcon={<ArrowLeftIcon />}
-                  sx={{ color: '#facc15', mb: 3, ml: -1, '&:hover': { bgcolor: 'transparent', transform: 'translateX(-4px)' }, transition: 'all 0.3s' }}
+                  sx={{ color: '#2E9EBF', mb: 3, ml: -1, '&:hover': { bgcolor: 'transparent', transform: 'translateX(-4px)' }, transition: 'all 0.3s' }}
                 >
                   Back to Login
                 </Button>
@@ -250,9 +278,9 @@ export default function ForgotPassword() {
               {/* Progress Indicator */}
               {step !== 'success' && (
                 <Box sx={{ display: 'flex', justifyContent: 'center', gap: 1, mb: 4 }}>
-                  <Box sx={{ height: 4, width: step === 'email' ? 32 : 12, borderRadius: 2, bgcolor: step === 'email' ? '#facc15' : 'rgba(250, 204, 21, 0.2)', transition: 'all 0.3s' }} />
-                  <Box sx={{ height: 4, width: step === 'verify' ? 32 : 12, borderRadius: 2, bgcolor: step === 'verify' ? '#facc15' : 'rgba(250, 204, 21, 0.2)', transition: 'all 0.3s' }} />
-                  <Box sx={{ height: 4, width: step === 'reset' ? 32 : 12, borderRadius: 2, bgcolor: step === 'reset' ? '#facc15' : 'rgba(250, 204, 21, 0.2)', transition: 'all 0.3s' }} />
+                  <Box sx={{ height: 4, width: step === 'email' ? 32 : 12, borderRadius: 2, bgcolor: step === 'email' ? '#2E9EBF' : 'rgba(46, 158, 191, 0.2)', transition: 'all 0.3s' }} />
+                  <Box sx={{ height: 4, width: step === 'verify' ? 32 : 12, borderRadius: 2, bgcolor: step === 'verify' ? '#2E9EBF' : 'rgba(46, 158, 191, 0.2)', transition: 'all 0.3s' }} />
+                  <Box sx={{ height: 4, width: step === 'reset' ? 32 : 12, borderRadius: 2, bgcolor: step === 'reset' ? '#2E9EBF' : 'rgba(46, 158, 191, 0.2)', transition: 'all 0.3s' }} />
                 </Box>
               )}
 
@@ -260,8 +288,8 @@ export default function ForgotPassword() {
               {step === 'email' && (
                 <Box className="animate-fadeIn">
                   <Box sx={{ textAlign: 'center', mb: 4 }}>
-                    <Box sx={{ width: 64, height: 64, bgcolor: 'rgba(250, 204, 21, 0.1)', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', mx: 'auto', mb: 2, border: '1px solid rgba(250, 204, 21, 0.3)' }}>
-                      <MailIcon sx={{ fontSize: 32, color: '#facc15' }} />
+                    <Box sx={{ width: 64, height: 64, bgcolor: 'rgba(46, 158, 191, 0.1)', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', mx: 'auto', mb: 2, border: '1px solid rgba(46, 158, 191, 0.3)' }}>
+                      <MailIcon sx={{ fontSize: 32, color: '#2E9EBF' }} />
                     </Box>
                     <Typography variant="h5" sx={{ color: 'white', fontWeight: 'bold', mb: 1 }}>Forgot Password?</Typography>
                     <Typography variant="body2" sx={{ color: 'gray' }}>Enter your email and we'll send you a reset code</Typography>
@@ -292,9 +320,9 @@ export default function ForgotPassword() {
                           sx={{
                             '& .MuiOutlinedInput-root': {
                               bgcolor: 'rgba(0,0,0,0.4)',
-                              '& fieldset': { borderColor: 'rgba(250, 204, 21, 0.2)' },
-                              '&:hover fieldset': { borderColor: 'rgba(250, 204, 21, 0.6)' },
-                              '&.Mui-focused fieldset': { borderColor: 'rgba(250, 204, 21, 0.6)' },
+                              '& fieldset': { borderColor: 'rgba(46, 158, 191, 0.2)' },
+                              '&:hover fieldset': { borderColor: 'rgba(46, 158, 191, 0.6)' },
+                              '&.Mui-focused fieldset': { borderColor: 'rgba(46, 158, 191, 0.6)' },
                             },
                             input: { color: 'white' },
                           }}
@@ -306,7 +334,7 @@ export default function ForgotPassword() {
                         type="submit"
                         disabled={isLoading}
                         startIcon={!isLoading && <SendIcon />}
-                        sx={{ py: 1.5, bgcolor: '#facc15', color: 'black', '&:hover': { bgcolor: '#eab308', transform: 'scale(1.05)' }, transition: 'all 0.3s', boxShadow: '0 10px 15px -3px rgba(250, 204, 21, 0.3)' }}
+                        sx={{ py: 1.5, bgcolor: '#2E9EBF', color: 'white', '&:hover': { bgcolor: '#1a7a9a', transform: 'scale(1.05)' }, transition: 'all 0.3s', boxShadow: '0 10px 15px -3px rgba(46, 158, 191, 0.4)' }}
                       >
                         {isLoading ? 'Sending...' : 'Send Reset Code'}
                       </Button>
@@ -319,12 +347,12 @@ export default function ForgotPassword() {
               {step === 'verify' && (
                 <Box className="animate-fadeIn">
                   <Box sx={{ textAlign: 'center', mb: 4 }}>
-                    <Box sx={{ width: 64, height: 64, bgcolor: 'rgba(250, 204, 21, 0.1)', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', mx: 'auto', mb: 2, border: '1px solid rgba(250, 204, 21, 0.3)' }}>
-                      <ShieldCheckIcon sx={{ fontSize: 32, color: '#facc15' }} />
+                    <Box sx={{ width: 64, height: 64, bgcolor: 'rgba(46, 158, 191, 0.1)', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', mx: 'auto', mb: 2, border: '1px solid rgba(46, 158, 191, 0.3)' }}>
+                      <ShieldCheckIcon sx={{ fontSize: 32, color: '#2E9EBF' }} />
                     </Box>
                     <Typography variant="h5" sx={{ color: 'white', fontWeight: 'bold', mb: 1 }}>Check Your Email</Typography>
                     <Typography variant="body2" sx={{ color: 'gray' }}>We've sent a 6-digit code to</Typography>
-                    <Typography variant="body2" sx={{ color: '#facc15', fontWeight: 'bold' }}>{email}</Typography>
+                    <Typography variant="body2" sx={{ color: '#2E9EBF', fontWeight: 'bold' }}>{email}</Typography>
                   </Box>
 
                   <form onSubmit={handleVerificationSubmit}>
@@ -354,9 +382,9 @@ export default function ForgotPassword() {
                             }}
                             sx={{
                               '& .MuiOutlinedInput-root': {
-                                '& fieldset': { borderColor: 'rgba(250, 204, 21, 0.2)' },
-                                '&:hover fieldset': { borderColor: 'rgba(250, 204, 21, 0.6)' },
-                                '&.Mui-focused fieldset': { borderColor: 'rgba(250, 204, 21, 0.6)' },
+                                '& fieldset': { borderColor: 'rgba(46, 158, 191, 0.2)' },
+                                '&:hover fieldset': { borderColor: 'rgba(46, 158, 191, 0.6)' },
+                                '&.Mui-focused fieldset': { borderColor: 'rgba(46, 158, 191, 0.6)' },
                               }
                             }}
                           />
@@ -370,16 +398,16 @@ export default function ForgotPassword() {
                         variant="contained"
                         type="submit"
                         disabled={isLoading}
-                        sx={{ py: 1.5, bgcolor: '#facc15', color: 'black', '&:hover': { bgcolor: '#eab308', transform: 'scale(1.05)' }, transition: 'all 0.3s', boxShadow: '0 10px 15px -3px rgba(250, 204, 21, 0.3)' }}
+                        sx={{ py: 1.5, bgcolor: '#2E9EBF', color: 'white', '&:hover': { bgcolor: '#1a7a9a', transform: 'scale(1.05)' }, transition: 'all 0.3s', boxShadow: '0 10px 15px -3px rgba(46, 158, 191, 0.4)' }}
                       >
                         {isLoading ? 'Verifying...' : 'Verify Code'}
                       </Button>
                       <Button
-                        onClick={() => setStep('email')}
+                        onClick={handleResendCode}
                         disabled={isLoading}
-                        sx={{ color: 'gray', textTransform: 'none', '&:hover': { color: '#facc15' } }}
+                        sx={{ color: 'gray', textTransform: 'none', '&:hover': { color: '#2E9EBF' } }}
                       >
-                        Didn't receive the code? <Typography component="span" sx={{ color: '#facc15', fontWeight: 'bold', ml: 1 }}>Resend</Typography>
+                        Didn't receive the code? <Typography component="span" sx={{ color: '#2E9EBF', fontWeight: 'bold', ml: 1 }}>Resend</Typography>
                       </Button>
                     </Box>
                   </form>
@@ -390,8 +418,8 @@ export default function ForgotPassword() {
               {step === 'reset' && (
                 <Box className="animate-fadeIn">
                   <Box sx={{ textAlign: 'center', mb: 4 }}>
-                    <Box sx={{ width: 64, height: 64, bgcolor: 'rgba(250, 204, 21, 0.1)', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', mx: 'auto', mb: 2, border: '1px solid rgba(250, 204, 21, 0.3)' }}>
-                      <KeyRoundIcon sx={{ fontSize: 32, color: '#facc15' }} />
+                    <Box sx={{ width: 64, height: 64, bgcolor: 'rgba(46, 158, 191, 0.1)', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', mx: 'auto', mb: 2, border: '1px solid rgba(46, 158, 191, 0.3)' }}>
+                      <KeyRoundIcon sx={{ fontSize: 32, color: '#2E9EBF' }} />
                     </Box>
                     <Typography variant="h5" sx={{ color: 'white', fontWeight: 'bold', mb: 1 }}>Create New Password</Typography>
                     <Typography variant="body2" sx={{ color: 'gray' }}>Your new password must be different</Typography>
@@ -419,7 +447,7 @@ export default function ForgotPassword() {
                               ),
                               endAdornment: (
                                 <InputAdornment position="end">
-                                  <IconButton onClick={() => setShowNewPassword(!showNewPassword)} edge="end" sx={{ color: 'gray', '&:hover': { color: '#facc15' } }}>
+                                  <IconButton onClick={() => setShowNewPassword(!showNewPassword)} edge="end" sx={{ color: 'gray', '&:hover': { color: '#2E9EBF' } }}>
                                     {showNewPassword ? <EyeOffIcon /> : <EyeIcon />}
                                   </IconButton>
                                 </InputAdornment>
@@ -429,9 +457,9 @@ export default function ForgotPassword() {
                           sx={{
                             '& .MuiOutlinedInput-root': {
                               bgcolor: 'rgba(0,0,0,0.4)',
-                              '& fieldset': { borderColor: 'rgba(250, 204, 21, 0.2)' },
-                              '&:hover fieldset': { borderColor: 'rgba(250, 204, 21, 0.6)' },
-                              '&.Mui-focused fieldset': { borderColor: 'rgba(250, 204, 21, 0.6)' },
+                              '& fieldset': { borderColor: 'rgba(46, 158, 191, 0.2)' },
+                              '&:hover fieldset': { borderColor: 'rgba(46, 158, 191, 0.6)' },
+                              '&.Mui-focused fieldset': { borderColor: 'rgba(46, 158, 191, 0.6)' },
                             },
                             input: { color: 'white' },
                           }}
@@ -457,7 +485,7 @@ export default function ForgotPassword() {
                               ),
                               endAdornment: (
                                 <InputAdornment position="end">
-                                  <IconButton onClick={() => setShowConfirmPassword(!showConfirmPassword)} edge="end" sx={{ color: 'gray', '&:hover': { color: '#facc15' } }}>
+                                  <IconButton onClick={() => setShowConfirmPassword(!showConfirmPassword)} edge="end" sx={{ color: 'gray', '&:hover': { color: '#2E9EBF' } }}>
                                     {showConfirmPassword ? <EyeOffIcon /> : <EyeIcon />}
                                   </IconButton>
                                 </InputAdornment>
@@ -467,17 +495,17 @@ export default function ForgotPassword() {
                           sx={{
                             '& .MuiOutlinedInput-root': {
                               bgcolor: 'rgba(0,0,0,0.4)',
-                              '& fieldset': { borderColor: 'rgba(250, 204, 21, 0.2)' },
-                              '&:hover fieldset': { borderColor: 'rgba(250, 204, 21, 0.6)' },
-                              '&.Mui-focused fieldset': { borderColor: 'rgba(250, 204, 21, 0.6)' },
+                              '& fieldset': { borderColor: 'rgba(46, 158, 191, 0.2)' },
+                              '&:hover fieldset': { borderColor: 'rgba(46, 158, 191, 0.6)' },
+                              '&.Mui-focused fieldset': { borderColor: 'rgba(46, 158, 191, 0.6)' },
                             },
                             input: { color: 'white' },
                           }}
                         />
                       </Box>
                       
-                      <Paper sx={{ p: 2, bgcolor: 'rgba(250, 204, 21, 0.05)', border: '1px solid rgba(250, 204, 21, 0.2)', borderRadius: '0.75rem' }}>
-                        <Typography variant="subtitle2" sx={{ color: '#facc15', mb: 1 }}>Requirements:</Typography>
+                      <Paper sx={{ p: 2, bgcolor: 'rgba(46, 158, 191, 0.05)', border: '1px solid rgba(46, 158, 191, 0.2)', borderRadius: '0.75rem' }}>
+                        <Typography variant="subtitle2" sx={{ color: '#2E9EBF', mb: 1 }}>Requirements:</Typography>
                         <Box sx={{ display: 'flex', flexDirection: 'column', gap: 0.5 }}>
                           {[
                             { label: '8+ characters', met: formData.newPassword.length >= 8 },
@@ -497,7 +525,7 @@ export default function ForgotPassword() {
                         variant="contained"
                         type="submit"
                         disabled={isLoading}
-                        sx={{ py: 1.5, bgcolor: '#facc15', color: 'black', '&:hover': { bgcolor: '#eab308', transform: 'scale(1.05)' }, transition: 'all 0.3s', boxShadow: '0 10px 15px -3px rgba(250, 204, 21, 0.3)' }}
+                        sx={{ py: 1.5, bgcolor: '#2E9EBF', color: 'white', '&:hover': { bgcolor: '#1a7a9a', transform: 'scale(1.05)' }, transition: 'all 0.3s', boxShadow: '0 10px 15px -3px rgba(46, 158, 191, 0.4)' }}
                       >
                         {isLoading ? 'Resetting...' : 'Reset Password'}
                       </Button>
@@ -513,18 +541,18 @@ export default function ForgotPassword() {
                     sx={{ 
                       width: 80, 
                       height: 80, 
-                      bgcolor: 'rgba(250, 204, 21, 0.1)', 
+                      bgcolor: 'rgba(46, 158, 191, 0.1)', 
                       borderRadius: '50%', 
                       display: 'flex', 
                       alignItems: 'center', 
                       justifyContent: 'center', 
                       mx: 'auto', 
                       mb: 3,
-                      border: '2px solid #facc15',
+                      border: '2px solid #2E9EBF',
                       animation: 'bounce 2s infinite'
                     }}
                   >
-                    <CheckCircle2Icon sx={{ fontSize: 48, color: '#facc15' }} />
+                    <CheckCircle2Icon sx={{ fontSize: 48, color: '#2E9EBF' }} />
                   </Box>
                   <Typography variant="h4" sx={{ color: 'white', fontWeight: 'bold', mb: 1 }}>Password Reset!</Typography>
                   <Typography sx={{ color: 'gray', fontSize: '1.125rem', mb: 1 }}>
@@ -534,9 +562,9 @@ export default function ForgotPassword() {
                     Redirecting you to login...
                   </Typography>
                   <Box sx={{ mt: 3, display: 'flex', gap: 1, justifyContent: 'center' }}>
-                    <Box sx={{ width: 8, height: 8, bgcolor: '#facc15', borderRadius: '50%', animation: 'pulse 1.5s infinite' }}></Box>
-                    <Box sx={{ width: 8, height: 8, bgcolor: '#facc15', borderRadius: '50%', animation: 'pulse 1.5s infinite', animationDelay: '0.2s' }}></Box>
-                    <Box sx={{ width: 8, height: 8, bgcolor: '#facc15', borderRadius: '50%', animation: 'pulse 1.5s infinite', animationDelay: '0.4s' }}></Box>
+                    <Box sx={{ width: 8, height: 8, bgcolor: '#2E9EBF', borderRadius: '50%', animation: 'pulse 1.5s infinite' }}></Box>
+                    <Box sx={{ width: 8, height: 8, bgcolor: '#2E9EBF', borderRadius: '50%', animation: 'pulse 1.5s infinite', animationDelay: '0.2s' }}></Box>
+                    <Box sx={{ width: 8, height: 8, bgcolor: '#2E9EBF', borderRadius: '50%', animation: 'pulse 1.5s infinite', animationDelay: '0.4s' }}></Box>
                   </Box>
                 </Box>
               )}

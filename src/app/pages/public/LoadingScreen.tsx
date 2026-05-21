@@ -1,9 +1,11 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router';
+import useAuth from '../../hooks/useAuth';
 
 export default function LoadingScreen({ isSplashScreen = false }: { isSplashScreen?: boolean }) {
   const navigate = useNavigate();
   const [progress, setProgress] = useState(0);
+  const { auth } = useAuth();
 
   useEffect(() => {
     if (!isSplashScreen) return;
@@ -12,7 +14,22 @@ export default function LoadingScreen({ isSplashScreen = false }: { isSplashScre
       setProgress((prev) => {
         if (prev >= 100) {
           clearInterval(interval);
-          setTimeout(() => navigate('/login'), 500);
+          setTimeout(() => {
+            if (auth?.user) {
+              const userRole = auth.user.roles[0];
+              if (userRole === 'Admin') {
+                navigate('/admin-home');
+              } else if (userRole === 'BusinessOwner') {
+                navigate('/business-owner-home');
+              } else if (userRole === 'Rider') {
+                navigate('/rider-home');
+              } else {
+                navigate('/home');
+              }
+            } else {
+              navigate('/login');
+            }
+          }, 500);
           return 100;
         }
         return prev + 2;
@@ -20,7 +37,7 @@ export default function LoadingScreen({ isSplashScreen = false }: { isSplashScre
     }, 30);
 
     return () => clearInterval(interval);
-  }, [navigate, isSplashScreen]);
+  }, [navigate, isSplashScreen, auth]);
 
   return (
     <div className="min-h-screen w-full relative overflow-hidden flex items-center justify-center"

@@ -18,7 +18,6 @@ import AddIcon from "@mui/icons-material/Add";
 import { Sidebar } from "../../components/layout/Sidebar";
 import Navbar from "../../components/layout/Navbar";
 import GiftCard from "../../components/gift/GiftCard";
-import GiftDetailsDialog from "../../components/gift/GiftDetailsDialog";
 import GiftShopFormDialog from "../../components/gift/GiftShopFormDialog";
 import {
   createGiftShop,
@@ -41,7 +40,6 @@ function useHorizontalScroll() {
 
 export default function Gifts() {
   const [shops, setShops] = useState<GiftShopResponseDto[]>([]);
-  const [selectedShop, setSelectedShop] = useState<GiftShopResponseDto | null>(null);
   const [keyword, setKeyword] = useState("");
   const [location, setLocation] = useState("");
   const [visible, setVisible] = useState(false);
@@ -71,7 +69,7 @@ export default function Gifts() {
         minHeight: "100vh",
         bgcolor: "#050505",
         backgroundImage:
-          "radial-gradient(circle at top left, rgba(250,204,21,0.03) 0%, transparent 50%)",
+          "radial-gradient(circle at top left, rgba(46,158,191,0.03) 0%, transparent 50%)",
       }}
     >
       <Sidebar activeSection="gifts" />
@@ -88,13 +86,13 @@ export default function Gifts() {
                     display: "inline-flex",
                     alignItems: "center",
                     gap: 1,
-                    bgcolor: "rgba(250, 204, 21, 0.1)",
-                    color: "#facc15",
+                    bgcolor: "rgba(46, 158, 191, 0.1)",
+                    color: "#2E9EBF",
                     px: 2,
                     py: 0.8,
                     borderRadius: "20px",
                     mb: 3,
-                    border: "1px solid rgba(250, 204, 21, 0.2)",
+                    border: "1px solid rgba(46, 158, 191, 0.2)",
                   }}
                 >
                   <AutoAwesomeIcon sx={{ fontSize: 18 }} />
@@ -113,7 +111,7 @@ export default function Gifts() {
                     mb: 2,
                   }}
                 >
-                   <Box component="span" sx={{ color: "#facc15" }}>Gifts</Box>
+                   <Box component="span" sx={{ color: "#2E9EBF" }}>Gifts</Box>
                 </Typography>
 
                 <Typography
@@ -176,7 +174,7 @@ export default function Gifts() {
             <Box sx={{ mb: 8 }}>
               <Box sx={{ display: "flex", alignItems: "center", justifyContent: "space-between", mb: 3 }}>
                 <Box sx={{ display: "flex", alignItems: "center", gap: 1.5 }}>
-                  <CardGiftcardIcon sx={{ color: "#facc15", fontSize: 28 }} />
+                  <CardGiftcardIcon sx={{ color: "#2E9EBF", fontSize: 28 }} />
                   <Box>
                     <Typography variant="h5" sx={{ fontWeight: 800, color: "#fff" }}>
                       Featured Gift Shops
@@ -212,7 +210,7 @@ export default function Gifts() {
                   <Box key={shop.id} sx={{ minWidth: { xs: "100%", sm: 360 } }}>
                     <Grow in timeout={400 + index * 80}>
                       <Box>
-                        <GiftCard shop={shop} onClick={() => setSelectedShop(shop)} />
+                        <GiftCard shop={shop} />
                       </Box>
                     </Grow>
                   </Box>
@@ -227,8 +225,8 @@ export default function Gifts() {
 
               <Grid container spacing={3}>
                 {shops.map((shop) => (
-                  <Grid item xs={12} sm={6} lg={4} key={shop.id}>
-                    <GiftCard shop={shop} onClick={() => setSelectedShop(shop)} />
+                  <Grid size={{ xs: 12, sm: 6, lg: 4 }} key={shop.id}>
+                    <GiftCard shop={shop} />
                   </Grid>
                 ))}
               </Grid>
@@ -236,13 +234,6 @@ export default function Gifts() {
           </Box>
         </Box>
       </Box>
-
-      <GiftDetailsDialog
-        open={!!selectedShop}
-        shop={selectedShop}
-        onClose={() => setSelectedShop(null)}
-        onRefresh={fetchGiftShops}
-      />
 
       <GiftShopFormDialog
         open={createOpen}
@@ -262,19 +253,19 @@ const darkTextFieldSx = {
     color: "#fff",
     borderRadius: "14px",
     "& fieldset": { borderColor: "rgba(255,255,255,0.12)" },
-    "&:hover fieldset": { borderColor: "rgba(250,204,21,0.35)" },
-    "&.Mui-focused fieldset": { borderColor: "#facc15" },
+    "&:hover fieldset": { borderColor: "rgba(46,158,191,0.35)" },
+    "&.Mui-focused fieldset": { borderColor: "#2E9EBF" },
   },
 };
 
 const primaryBtnSx = {
-  bgcolor: "#facc15",
-  color: "#000",
+  bgcolor: "#2E9EBF",
+  color: "#fff",
   fontWeight: 800,
   textTransform: "none",
   borderRadius: "12px",
   px: 3,
-  "&:hover": { bgcolor: "#eab308" },
+  "&:hover": { bgcolor: "#1a7a9a" },
 };
 
 const secondaryBtnSx = {
@@ -284,8 +275,8 @@ const secondaryBtnSx = {
   borderRadius: "12px",
   px: 3,
   "&:hover": {
-    borderColor: "#facc15",
-    bgcolor: "rgba(250,204,21,0.05)",
+    borderColor: "#2E9EBF",
+    bgcolor: "rgba(46,158,191,0.05)",
   },
 };
 
@@ -294,7 +285,7 @@ const iconBtnSx = {
   color: "#fff",
   border: "1px solid rgba(255,255,255,0.08)",
   "&:hover": {
-    bgcolor: "rgba(250,204,21,0.15)",
-    borderColor: "#facc15",
+    bgcolor: "rgba(46,158,191,0.15)",
+    borderColor: "#2E9EBF",
   },
 };
