@@ -114,7 +114,7 @@ export default function MenuItemCard({ item, onClick, onDelete, onEdit }: MenuIt
 
             <Typography
               variant="body2"
-              sx={{ color: '#facc15', fontWeight: 800, fontSize: '1rem' }}
+              sx={{ color: '#2E9EBF', fontWeight: 800, fontSize: '1rem' }}
             >
               Rs. {item.price.toLocaleString()}
             </Typography>
