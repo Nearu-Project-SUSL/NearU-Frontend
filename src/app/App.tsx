@@ -117,7 +117,7 @@ export default function App() {
           </MuiThemeWrapper>
         </ThemeProvider>
       </AuthProvider>
-      <ReactQueryDevtools initialIsOpen={false} />
+      {import.meta.env.DEV && <ReactQueryDevtools initialIsOpen={false} />}
       <Analytics />
     </QueryClientProvider>
   );
