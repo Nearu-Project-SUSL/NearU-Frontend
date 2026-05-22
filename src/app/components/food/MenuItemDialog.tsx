@@ -23,9 +23,9 @@ export default function MenuItemDialog({ item, onClose }: MenuItemDialogProps) {
       fullWidth
       PaperProps={{
         sx:{
-          bgcolor:'#0a0a0a',
+          bgcolor:'var(--bg-surface)',
           borderRadius:'28px',
-          border:'1px solid rgba(255,255,255,0.08)',
+          border:'1px solid var(--nearu-border)',
           backgroundImage:'none',
           overflow:'hidden',
           m:2

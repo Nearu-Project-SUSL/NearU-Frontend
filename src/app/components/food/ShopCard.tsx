@@ -22,9 +22,9 @@ interface ShopCardProps {
 export default function ShopCard({ shop, onEdit, onDelete }: ShopCardProps) {
   const [hovered, setHovered] = useState(false);
   const navigate = useNavigate();
-  const theme = useTheme();
-  const accent = theme.palette.primary.main;           // #2E9EBF
-  const accentAlpha = (a: number) => `rgba(46, 158, 191, ${a})`;
+  
+  const accent = 'var(--nearu-accent)';
+  const accentSubtle = 'var(--nearu-accent-subtle)';
 
   return (
     <Box
@@ -36,12 +36,12 @@ export default function ShopCard({ shop, onEdit, onDelete }: ShopCardProps) {
         elevation={hovered ? 4 : 1}
         sx={{
           width: '100%',
-          bgcolor: 'background.paper',
+          bgcolor: 'var(--bg-surface)',
           overflow: 'hidden',
           borderRadius: '24px',
           border: hovered
             ? `1px solid ${accent}`
-            : `1px solid ${theme.palette.divider}`,
+            : `1px solid var(--nearu-border)`,
           transition: 'all 0.25s ease',
           '&:hover': { transform: 'translateY(-4px)' },
         }}
@@ -71,17 +71,17 @@ export default function ShopCard({ shop, onEdit, onDelete }: ShopCardProps) {
           <Box sx={{ p: 2.5 }}>
             <Typography
               variant="h6"
-              sx={{ color: 'text.primary', fontWeight: 700, mb: 0.5, fontSize: '1.1rem' }}
+              sx={{ color: 'var(--text-primary)', fontWeight: 700, mb: 0.5, fontSize: '1.1rem' }}
             >
               {shop.name}
             </Typography>
 
             <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-              <LocationIcon sx={{ fontSize: 14, color: 'text.secondary' }} />
+              <LocationIcon sx={{ fontSize: 14, color: 'var(--text-secondary)' }} />
               <Typography
                 variant="caption"
                 sx={{
-                  color: 'text.secondary',
+                  color: 'var(--text-secondary)',
                   fontSize: '0.78rem',
                   overflow: 'hidden',
                   textOverflow: 'ellipsis',
@@ -95,7 +95,7 @@ export default function ShopCard({ shop, onEdit, onDelete }: ShopCardProps) {
             <Box
               sx={{
                 mt: 2, pt: 2,
-                borderTop: `1px solid ${theme.palette.divider}`,
+                borderTop: `1px solid var(--nearu-border)`,
                 display: 'flex',
                 justifyContent: 'space-between',
                 alignItems: 'center',
@@ -106,16 +106,16 @@ export default function ShopCard({ shop, onEdit, onDelete }: ShopCardProps) {
                 sx={{
                   px: 1.5, py: 0.4,
                   borderRadius: '8px',
-                  bgcolor: accentAlpha(0.12),
-                  border: `1px solid ${accentAlpha(0.35)}`,
+                  bgcolor: 'var(--nearu-accent-subtle)',
+                  border: `1px solid var(--nearu-accent)`,
                 }}
               >
-                <Typography variant="caption" sx={{ color: accent, fontWeight: 700, fontSize: '0.7rem' }}>
+                <Typography variant="caption" sx={{ color: 'var(--nearu-accent)', fontWeight: 700, fontSize: '0.7rem' }}>
                   {shop.category}
                 </Typography>
               </Box>
 
-              <Typography variant="caption" sx={{ color: accent, fontWeight: 700, fontSize: '0.78rem' }}>
+              <Typography variant="caption" sx={{ color: 'var(--nearu-accent)', fontWeight: 700, fontSize: '0.78rem' }}>
                 Tap to View Menu →
               </Typography>
             </Box>
@@ -143,11 +143,11 @@ export default function ShopCard({ shop, onEdit, onDelete }: ShopCardProps) {
               onClick={(e) => { e.stopPropagation(); onEdit(shop); }}
               sx={{
                 width: 30, height: 30,
-                bgcolor: accentAlpha(0.2),
-                border: `1px solid ${accentAlpha(0.4)}`,
-                color: accent,
+                bgcolor: 'var(--nearu-accent-subtle)',
+                border: `1px solid var(--nearu-accent)`,
+                color: 'var(--nearu-accent)',
                 backdropFilter: 'blur(8px)',
-                '&:hover': { bgcolor: accentAlpha(0.4) },
+                '&:hover': { bgcolor: 'var(--nearu-accent)' },
               }}
             >
               <EditIcon sx={{ fontSize: 14 }} />

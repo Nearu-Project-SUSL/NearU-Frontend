@@ -90,9 +90,10 @@ export default function AddMenuItem({
     PaperProps={{
       sx:{
         borderRadius:'24px',
-        bgcolor:"#111",
-        color:'#fff',
-        backgroundImage:'none'
+        bgcolor:"var(--bg-surface)",
+        color:'var(--text-primary)',
+        backgroundImage:'none',
+        border: '1px solid var(--nearu-border)'
       },
     }}
     >

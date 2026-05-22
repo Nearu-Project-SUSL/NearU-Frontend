@@ -37,9 +37,9 @@ export default function MenuItemCard({ item, onClick, onDelete, onEdit }: MenuIt
       <Card
         elevation={0}
         sx={{
-          bgcolor: 'rgba(255,255,255,0.02)',
+          bgcolor: 'var(--bg-surface)',
           borderRadius: '20px',
-          border: '1px solid rgba(255,255,255,0.05)',
+          border: '1px solid var(--nearu-border)',
           overflow: 'hidden',
           transition: 'all 0.3s ease',
           transform: hovered ? 'translateY(-4px)' : 'translateY(0)',
@@ -92,14 +92,14 @@ export default function MenuItemCard({ item, onClick, onDelete, onEdit }: MenuIt
             <Box>
               <Typography
                 variant="body1"
-                sx={{ color: '#fff', fontWeight: 700, mb: 0.5, fontSize: '1rem' }}
+                sx={{ color: 'var(--text-primary)', fontWeight: 700, mb: 0.5, fontSize: '1rem' }}
               >
                 {item.name}
               </Typography>
               <Typography
                 variant="caption"
                 sx={{
-                  color: 'rgba(255,255,255,0.4)',
+                  color: 'var(--text-secondary)',
                   fontSize: '0.78rem',
                   lineHeight: 1.5,
                   display: '-webkit-box',
@@ -114,7 +114,7 @@ export default function MenuItemCard({ item, onClick, onDelete, onEdit }: MenuIt
 
             <Typography
               variant="body2"
-              sx={{ color: '#2E9EBF', fontWeight: 800, fontSize: '1rem' }}
+              sx={{ color: 'var(--nearu-accent)', fontWeight: 800, fontSize: '1rem' }}
             >
               Rs. {item.price.toLocaleString()}
             </Typography>
@@ -143,11 +143,12 @@ export default function MenuItemCard({ item, onClick, onDelete, onEdit }: MenuIt
             sx={{
               width: 28,
               height: 28,
-              bgcolor: 'rgba(59,130,246,0.15)',
-              border: '1px solid rgba(59,130,246,0.3)',
-              color: '#60a5fa',
+              bgcolor: 'var(--nearu-accent-subtle)',
+              border: '1px solid var(--nearu-accent)',
+              color: 'var(--nearu-accent)',
               '&:hover': {
-                bgcolor: 'rgba(59,130,246,0.3)',
+                bgcolor: 'var(--nearu-accent)',
+                color: '#fff'
               },
             }}
             >
@@ -164,11 +165,12 @@ export default function MenuItemCard({ item, onClick, onDelete, onEdit }: MenuIt
               sx={{
                 width: 28,
                 height: 28,
-                bgcolor: 'rgba(239,68,68,0.15)',
-                border: '1px solid rgba(239,68,68,0.3)',
-                color: '#f87171',
+                bgcolor: 'rgba(212, 24, 61, 0.15)',
+                border: '1px solid rgba(212, 24, 61, 0.3)',
+                color: 'var(--destructive)',
                 '&:hover': {
-                  bgcolor: 'rgba(239,68,68,0.3)',
+                  bgcolor: 'var(--destructive)',
+                  color: '#fff'
                 },
               }}
               > 

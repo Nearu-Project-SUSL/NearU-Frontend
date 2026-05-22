@@ -128,7 +128,7 @@ export default function ShopDetailPage() {
       sx={{
         display:'flex',
         minHeight:'100vh',
-        bgcolor:'#050505'
+        bgcolor:'var(--bg-base)'
       }}>
         <Sidebar activeSection='food' />
 
@@ -165,7 +165,7 @@ export default function ShopDetailPage() {
                           left:'0',
                           right:'0',
                           height:'70%',
-                          background:'linear-gradient(to top, #050505, transparent)',
+                          background:'linear-gradient(to top, var(--bg-base), transparent)',
                         }} />
 
                         <IconButton
@@ -174,9 +174,9 @@ export default function ShopDetailPage() {
                             position:'absolute',
                             top:{xs:70, md:80},
                             left:24,
-                            bgcolor:'rgba(255, 255, 255, 0.5)',
-                            color:'#fff',
-                            border:'1px solid rgba(255, 255, 255, 0.1)',
+                            bgcolor:'rgba(255, 255, 255, 0.2)',
+                            color:'var(--text-primary)',
+                            border:'1px solid var(--nearu-border)',
                             '&:hover': { bgcolor: 'rgba(0,0,0,0.8)' }
                           }}>
                             <BackIcon />
@@ -216,7 +216,7 @@ export default function ShopDetailPage() {
                     <Typography 
                       variant='h6'
                       sx={{
-                        color:'#fff',
+                        color:'var(--text-primary)',
                         fontWeight:700,
                         mb:2
                       }}>
@@ -229,7 +229,7 @@ export default function ShopDetailPage() {
 
                       <Typography
                         variant='body1'
-                        sx={{ color:'rgba(255,255,255,0.6)', lineHeight:1.8}}>
+                        sx={{ color:'var(--text-secondary)', lineHeight:1.8}}>
                           {shop.description || 'No description available.'}
 
                         </Typography>
@@ -252,8 +252,8 @@ export default function ShopDetailPage() {
                           }}
                         >
                           <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
-                            <MenuIcon sx={{ color: '#2E9EBF', fontSize: 24 }} />
-                            <Typography variant="h6" sx={{ color: '#fff', fontWeight: 700 }}>
+                            <MenuIcon sx={{ color: 'var(--nearu-accent)', fontSize: 24 }} />
+                            <Typography variant="h6" sx={{ color: 'var(--text-primary)', fontWeight: 700 }}>
                               Menu
                             </Typography>
                           </Box>
@@ -262,7 +262,7 @@ export default function ShopDetailPage() {
                             component="button"
                             onClick={() => setOpenAddItem(true)}
                             style={{
-                              background: '#2E9EBF',
+                              background: 'var(--nearu-accent)',
                               color: '#fff',
                               border: 'none',
                               borderRadius: '999px',
@@ -306,15 +306,15 @@ export default function ShopDetailPage() {
                         sx={{
                           position: 'sticky',
                           top: 80,
-                          bgcolor: 'rgba(255,255,255,0.02)',
+                          bgcolor: 'var(--bg-surface)',
                           borderRadius: '24px',
                           p: 3.5,
-                          border: '1px solid rgba(255,255,255,0.06)',
+                          border: '1px solid var(--nearu-border)',
                         }}
                       >
                         <Typography
                           variant="subtitle1"
-                          sx={{ color: '#fff', fontWeight: 700, mb: 3 }}
+                          sx={{ color: 'var(--text-primary)', fontWeight: 700, mb: 3 }}
                         >
                           Shop Info
                         </Typography>
@@ -326,7 +326,7 @@ export default function ShopDetailPage() {
                               <Typography
                                 variant="caption"
                                 sx={{
-                                  color: 'rgba(255,255,255,0.4)',
+                                  color: 'var(--text-secondary)',
                                   display: 'block',
                                   mb: 0.3,
                                 }}
@@ -335,7 +335,7 @@ export default function ShopDetailPage() {
                               </Typography>
                               <Typography
                                 variant="body2"
-                                sx={{ color: '#fff', fontWeight: 600, lineHeight: 1.5 }}
+                                sx={{ color: 'var(--text-primary)', fontWeight: 600, lineHeight: 1.5 }}
                               >
                                 {shop.address || 'No address available'}
                               </Typography>
@@ -351,7 +351,7 @@ export default function ShopDetailPage() {
                               <Typography
                                 variant="caption"
                                 sx={{
-                                  color: 'rgba(255,255,255,0.4)',
+                                  color: 'var(--text-secondary)',
                                   display: 'block',
                                   mb: 0.3,
                                 }}
@@ -361,7 +361,7 @@ export default function ShopDetailPage() {
                               <Typography
                                 variant="body2"
                                 sx={{
-                                  color: '#fff',
+                                  color: 'var(--text-primary)',
                                   fontWeight: 600,
                                 }}
                               >

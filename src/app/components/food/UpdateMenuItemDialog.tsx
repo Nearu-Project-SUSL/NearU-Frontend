@@ -24,15 +24,15 @@ interface UpdateMenuItemDialogProps {
 
 const inputStyles = {
   '& .MuiOutlinedInput-root': {
-    color: '#fff',
+    color: 'var(--text-primary)',
     borderRadius: '12px',
     bgcolor: 'rgba(255,255,255,0.03)',
-    '& fieldset': { borderColor: 'rgba(255,255,255,0.1)' },
+    '& fieldset': { borderColor: 'var(--nearu-border)' },
     '&:hover fieldset': { borderColor: 'rgba(46,158,191,0.4)' },
-    '&.Mui-focused fieldset': { borderColor: '#2E9EBF' },
+    '&.Mui-focused fieldset': { borderColor: 'var(--nearu-accent)' },
   },
-  '& .MuiInputLabel-root': { color: 'rgba(255,255,255,0.4)' },
-  '& .MuiInputLabel-root.Mui-focused': { color: '#2E9EBF' },
+  '& .MuiInputLabel-root': { color: 'var(--text-secondary)' },
+  '& .MuiInputLabel-root.Mui-focused': { color: 'var(--nearu-accent)' },
 };
 
 export default function UpdateMenuItemDialog({ item, onClose, onSubmit }: UpdateMenuItemDialogProps) {
@@ -105,9 +105,9 @@ export default function UpdateMenuItemDialog({ item, onClose, onSubmit }: Update
       fullWidth
       PaperProps={{
         sx: {
-          bgcolor: '#0a0a0a',
+          bgcolor: 'var(--bg-surface)',
           borderRadius: '24px',
-          border: '1px solid rgba(255,255,255,0.08)',
+          border: '1px solid var(--nearu-border)',
           backgroundImage: 'none',
           m: 2,
         },

@@ -32,16 +32,16 @@ interface UpdateShopDialogProps {
 
 const inputStyles = {
   '& .MuiOutlinedInput-root': {
-    color: '#fff',
+    color: 'var(--text-primary)',
     borderRadius: '12px',
     bgcolor: 'rgba(255,255,255,0.03)',
-    '& fieldset': { borderColor: 'rgba(255,255,255,0.1)' },
-    '&:hover fieldset': { borderColor: 'rgba(250,204,21,0.4)' },
-    '&.Mui-focused fieldset': { borderColor: '#facc15' },
+    '& fieldset': { borderColor: 'var(--nearu-border)' },
+    '&:hover fieldset': { borderColor: 'rgba(46,158,191,0.4)' },
+    '&.Mui-focused fieldset': { borderColor: 'var(--nearu-accent)' },
   },
-  '& .MuiInputLabel-root': { color: 'rgba(255,255,255,0.4)' },
-  '& .MuiInputLabel-root.Mui-focused': { color: '#facc15' },
-  '& .MuiSelect-icon': { color: 'rgba(255,255,255,0.4)' },
+  '& .MuiInputLabel-root': { color: 'var(--text-secondary)' },
+  '& .MuiInputLabel-root.Mui-focused': { color: 'var(--nearu-accent)' },
+  '& .MuiSelect-icon': { color: 'var(--text-secondary)' },
 };
 
 export default function UpdateShopDialog({ shop, onClose, onSubmit }: UpdateShopDialogProps) {
@@ -111,9 +111,9 @@ export default function UpdateShopDialog({ shop, onClose, onSubmit }: UpdateShop
       fullWidth
       PaperProps={{
         sx: {
-          bgcolor: '#0a0a0a',
+          bgcolor: 'var(--bg-surface)',
           borderRadius: '24px',
-          border: '1px solid rgba(255,255,255,0.08)',
+          border: '1px solid var(--nearu-border)',
           backgroundImage: 'none',
           m: 2,
         },

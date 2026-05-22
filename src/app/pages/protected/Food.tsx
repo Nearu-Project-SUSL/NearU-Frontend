@@ -141,9 +141,8 @@ export default function FoodPage(){
     setShopToDelete(null);
   }
 
-  const theme = useTheme();
-  const accent = theme.palette.primary.main;
-  const accentAlpha = (a: number) => `rgba(46, 158, 191, ${a})`;
+  const accent = 'var(--nearu-accent)';
+  const accentSubtle = 'var(--nearu-accent-subtle)';
 
   return (
     <Box
@@ -151,8 +150,8 @@ export default function FoodPage(){
         display:'flex',
         height:'100vh',           
         overflow:'hidden',        
-        bgcolor:'background.default',
-        backgroundImage:`radial-gradient(circle at top right, ${accentAlpha(0.04)} 0%, transparent 50%)`,
+        bgcolor:'var(--bg-base)',
+        backgroundImage:`radial-gradient(circle at top right, ${accentSubtle} 0%, transparent 50%)`,
       }}>
 
       <Sidebar activeSection="food" />
@@ -173,8 +172,8 @@ export default function FoodPage(){
                   flexDirection: { xs: "column", md: "row" },
                   alignItems: "center",
                   justifyContent: "space-between",
-                  background: "rgba(255,255,255,0.03)",
-                  border: "1px solid rgba(255,255,255,0.1)",
+                  background: "var(--bg-surface)",
+                  border: "1px solid var(--nearu-border)",
                   borderRadius: "20px",
                   overflow: "hidden",
                   gap: 4,
@@ -185,7 +184,7 @@ export default function FoodPage(){
                     variant="h2"
                     sx={{
                       fontWeight: 900,
-                      color: theme.palette.text.primary,
+                      color: 'var(--text-primary)',
                       fontSize: { xs: "2.3rem", md: "3.6rem" },
                       letterSpacing: "-0.03em",
                       mb: 2,
@@ -200,7 +199,7 @@ export default function FoodPage(){
                   <Typography
                     variant="body1"
                     sx={{
-                      color: theme.palette.text.secondary,
+                      color: 'var(--text-secondary)',
                       maxWidth: 600,
                       lineHeight: 1.8,
                       fontSize: { xs: "1rem", md: "1.08rem" },
@@ -239,10 +238,10 @@ export default function FoodPage(){
                   }}>
 
                   <Box>
-                    <Typography variant="h5" sx={{color: theme.palette.text.primary, fontWeight:'800'}}>
+                    <Typography variant="h5" sx={{color: 'var(--text-primary)', fontWeight:'800'}}>
                       Food Shops
                     </Typography>
-                    <Typography variant="body2" sx={{ color: theme.palette.text.secondary}}>
+                    <Typography variant="body2" sx={{ color: 'var(--text-secondary)'}}>
                       {totalCount} shop{totalCount !== 1 ? 's' : ''} found
                       {totalPages > 1 && `. page ${currentPage} of ${totalPages}`}
                     </Typography>
@@ -257,14 +256,14 @@ export default function FoodPage(){
                       minWidth: { xs: "100%", md: 280 },
                       "& .MuiOutlinedInput-root": {
                         borderRadius: "14px",
-                        bgcolor: accentAlpha(0.04),
-                        color: theme.palette.text.primary,
-                        "& fieldset": { borderColor: theme.palette.divider },
+                        bgcolor: accentSubtle,
+                        color: 'var(--text-primary)',
+                        "& fieldset": { borderColor: 'var(--nearu-border)' },
                         "&:hover fieldset": { borderColor: accent },
                         "&.Mui-focused fieldset": { borderColor: accent },
                       },
                       "& input::placeholder": {
-                        color: theme.palette.text.secondary,
+                        color: 'var(--text-secondary)',
                         opacity: 1,
                       }
                     }}
@@ -319,19 +318,19 @@ export default function FoodPage(){
 
                           
                           bgcolor: isActive
-                            ? accentAlpha(0.15)
-                            : accentAlpha(0.03),
+                            ? 'var(--nearu-accent-subtle)'
+                            : 'var(--bg-surface)',
                           border: isActive
                             ? `1px solid ${accent}`
-                            : `1px solid ${theme.palette.divider}`,
+                            : `1px solid var(--nearu-border)`,
                           color: isActive
                             ? accent
-                            : theme.palette.text.secondary,
+                            : 'var(--text-secondary)',
 
                           '&:hover': {
                             bgcolor: isActive
-                              ? accentAlpha(0.2)
-                              : accentAlpha(0.06),
+                              ? 'var(--nearu-accent-subtle)'
+                              : 'rgba(46,158,191,0.1)',
                             borderColor: accent,
                             color: accent,
                           },
@@ -371,15 +370,15 @@ export default function FoodPage(){
                   sx={{
                     textAlign: 'center',
                     py: 10,
-                    bgcolor: 'rgba(255,255,255,0.02)',
+                    bgcolor: 'var(--bg-surface)',
                     borderRadius: '24px',
-                    border: '1px dashed rgba(255,255,255,0.08)',
+                    border: '1px dashed var(--nearu-border)',
                     mx: {xs:0, md:5},
                   }}>
-                  <Typography variant="h6" sx={{ color: 'rgba(255,255,255,0.4)', mb: 1 }}>
+                  <Typography variant="h6" sx={{ color: 'var(--text-secondary)', mb: 1 }}>
                     No shops found
                   </Typography>
-                  <Typography variant="body2" sx={{ color: 'rgba(255,255,255,0.3)' }}>
+                  <Typography variant="body2" sx={{ color: 'var(--text-secondary)', opacity: 0.8 }}>
                     {activeCategory !== 'All'
                       ? `No ${activeCategory} shops available right now`
                       : 'Try a different search term'}
@@ -403,15 +402,16 @@ export default function FoodPage(){
                     onClick={() => setCurrentPage(p => p -1)}
                     disabled={currentPage === 1}
                     sx={{
-                      color: currentPage === 1 ? 'rgba(255,255,255,0.2)' : '#fff',
-                      bgcolor: 'rgba(255,255,255,0.03)',
-                      border: '1px solid rgba(255,255,255,0.08)',
+                      color: currentPage === 1 ? 'var(--text-secondary)' : 'var(--text-primary)',
+                      bgcolor: 'var(--bg-surface)',
+                      border: '1px solid var(--nearu-border)',
                       borderRadius: '50px',
                       '&:hover': {
-                        bgcolor: currentPage === 1 ? 'transparent' : 'rgba(255,255,255,0.08)',
+                        bgcolor: currentPage === 1 ? 'transparent' : 'var(--nearu-accent-subtle)',
                       },
                       '&.Mui-disabled': {
-                        color: 'rgba(255,255,255,0.2)',
+                        color: 'var(--text-secondary)',
+                        opacity: 0.5
                       }
                     }}>
                       <ChevronLeftIcon />
@@ -448,18 +448,18 @@ export default function FoodPage(){
 
                             bgcolor: isCurrentPage
                               ? accent
-                              : accentAlpha(0.03),
+                              : 'var(--bg-surface)',
                             color: isCurrentPage
                               ? '#fff'
-                              : theme.palette.text.secondary,
+                              : 'var(--text-secondary)',
                             border: isCurrentPage
                               ? 'none'
-                              : `1px solid ${theme.palette.divider}`,
+                              : `1px solid var(--nearu-border)`,
 
                             '&:hover': {
                               bgcolor: isCurrentPage
                                 ? accent
-                                : accentAlpha(0.08),
+                                : 'var(--nearu-accent-subtle)',
                               color: '#fff',
                             },
                           }}>
@@ -475,15 +475,16 @@ export default function FoodPage(){
                       onClick={() => setCurrentPage(p => p + 1)}
                       disabled={currentPage === totalPages}
                       sx={{
-                        color: currentPage === totalPages ? 'rgba(255,255,255,0.2)' : '#fff',
-                        bgcolor: 'rgba(255,255,255,0.03)',
-                        border: '1px solid rgba(255,255,255,0.08)',
+                        color: currentPage === totalPages ? 'var(--text-secondary)' : 'var(--text-primary)',
+                        bgcolor: 'var(--bg-surface)',
+                        border: '1px solid var(--nearu-border)',
                         borderRadius: '50px',
                         '&:hover': {
-                          bgcolor: currentPage === totalPages ? 'transparent' : 'rgba(255,255,255,0.08)',
+                          bgcolor: currentPage === totalPages ? 'transparent' : 'var(--nearu-accent-subtle)',
                         },
                         '&.Mui-disabled': {
-                          color: 'rgba(255,255,255,0.2)',
+                          color: 'var(--text-secondary)',
+                          opacity: 0.5
                         }
                       }}>
                       <ChevronRightIcon />

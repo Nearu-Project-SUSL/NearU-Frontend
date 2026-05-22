@@ -36,9 +36,9 @@ export default function DeleteMenuItemDialog({ item, onClose, onConfirm }: Delet
       fullWidth
       PaperProps={{
         sx: {
-          bgcolor: '#0a0a0a',
+          bgcolor: 'var(--bg-surface)',
           borderRadius: '24px',
-          border: '1px solid rgba(239,68,68,0.2)',
+          border: '1px solid rgba(212, 24, 61, 0.2)',
           backgroundImage: 'none',
           m: 2,
         },
