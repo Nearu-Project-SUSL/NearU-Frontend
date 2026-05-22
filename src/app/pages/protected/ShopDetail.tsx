@@ -68,7 +68,7 @@ export default function ShopDetailPage() {
             <Typography variant="h5" sx={{ color: '#fff', mb: 2 }}>
               Shop not found
             </Typography>
-            <IconButton onClick={() => navigate('/food')} sx={{ color: '#facc15' }}>
+            <IconButton onClick={() => navigate('/food')} sx={{ color: '#2E9EBF' }}>
               <BackIcon />
             </IconButton>
           </Box>
@@ -252,7 +252,7 @@ export default function ShopDetailPage() {
                           }}
                         >
                           <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
-                            <MenuIcon sx={{ color: '#facc15', fontSize: 24 }} />
+                            <MenuIcon sx={{ color: '#2E9EBF', fontSize: 24 }} />
                             <Typography variant="h6" sx={{ color: '#fff', fontWeight: 700 }}>
                               Menu
                             </Typography>
@@ -262,8 +262,8 @@ export default function ShopDetailPage() {
                             component="button"
                             onClick={() => setOpenAddItem(true)}
                             style={{
-                              background: '#facc15',
-                              color: '#111',
+                              background: '#2E9EBF',
+                              color: '#fff',
                               border: 'none',
                               borderRadius: '999px',
                               padding: '10px 18px',
