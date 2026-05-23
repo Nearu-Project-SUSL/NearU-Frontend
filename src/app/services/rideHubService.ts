@@ -5,14 +5,11 @@
  * Hub URL: wss://{domain}/hubs/rides?access_token={JWT}
  *
  * ─── Server → Client Events (what the server pushes to us) ──────────────────
- *   "ReceiveRideRequest"  → (RideRequest) A new nearby ride request (broadcast to OnlineRiders)
- *   "RideAccepted"        → (ActiveRide)  Ride was accepted (confirmation to student)
- *   "RiderArrived"        → ()            Rider arrived at pickup
- *   "RideStarted"         → ()            OTP verified, ride is underway
- *   "RideCompleted"       → ()            Rider marked complete, pending student confirm
- *   "RideConfirmed"       → ()            Student confirmed — ride fully done
- *   "LocationUpdate"      → (LocationCoords) Live rider position update (to students)
- *   "RideCancelled"       → (reason: string) Ride was cancelled
+ *   "RideStateChanged" → ({ rideId, status, updatedAtUtc }) State machine update for both parties
+ *                         status values: Pending, Accepted, RiderEnRoute, RiderArrived,
+ *                                        InProgress, PendingConfirmation, Completed, Cancelled
+ *   "LocationUpdated"  → ({ rideId, latitude, longitude, timestamp }) Live rider GPS (to students)
+ *   "ReceiveRideRequest" → (RideRequest) Nearby request broadcast to OnlineRiders group
  *
  * ─── Client → Server Methods (what we invoke) ────────────────────────────────
  *   GoOnline()                → Add this rider to OnlineRiders group
@@ -31,26 +28,32 @@ import type { RideRequest, ActiveRide, LocationCoords } from '../../api/riderSer
 
 // ─── Hub Event Names ──────────────────────────────────────────────────────────
 export const HUB_EVENTS = {
+  // Broadcast to all OnlineRiders when a new student request is created
   RECEIVE_RIDE_REQUEST: 'ReceiveRideRequest',
-  RIDE_ACCEPTED: 'RideAccepted',
-  RIDER_ARRIVED: 'RiderArrived',
-  RIDE_STARTED: 'RideStarted',
-  RIDE_COMPLETED: 'RideCompleted',
-  RIDE_CONFIRMED: 'RideConfirmed',
-  LOCATION_UPDATE: 'LocationUpdate',
-  RIDE_CANCELLED: 'RideCancelled',
+  // State change pushed to ride:{rideId} group for both student and rider
+  RIDE_STATE_CHANGED: 'RideStateChanged',
+  // Live GPS coordinates pushed to ride:{rideId} group (students receive this)
+  LOCATION_UPDATED: 'LocationUpdated',
 } as const;
 
 // ─── Event Callback Types ─────────────────────────────────────────────────────
+export type RideStatePayload = {
+  rideId: string;
+  status: string;  // 'Pending'|'Accepted'|'RiderEnRoute'|'RiderArrived'|'InProgress'|'PendingConfirmation'|'Completed'|'Cancelled'
+  updatedAtUtc: string;
+};
+
+export type LocationPayload = {
+  rideId: string;
+  latitude: number;
+  longitude: number;
+  timestamp: string;
+};
+
 export type HubEventCallbacks = {
   onRideRequest?: (request: RideRequest) => void;
-  onRideAccepted?: (ride: ActiveRide) => void;
-  onRiderArrived?: () => void;
-  onRideStarted?: () => void;
-  onRideCompleted?: () => void;
-  onRideConfirmed?: () => void;
-  onLocationUpdate?: (coords: LocationCoords) => void;
-  onRideCancelled?: (reason: string) => void;
+  onRideStateChanged?: (payload: RideStatePayload) => void;
+  onLocationUpdated?: (payload: LocationPayload) => void;
   onReconnecting?: () => void;
   onReconnected?: () => void;
   onDisconnected?: (error?: Error) => void;
@@ -115,36 +118,19 @@ class RideHubService {
   private registerHandlers(): void {
     if (!this.connection) return;
 
+    // New ride request broadcast to OnlineRiders group
     this.connection.on(HUB_EVENTS.RECEIVE_RIDE_REQUEST, (request: RideRequest) => {
       this.callbacks.onRideRequest?.(request);
     });
 
-    this.connection.on(HUB_EVENTS.RIDE_ACCEPTED, (ride: ActiveRide) => {
-      this.callbacks.onRideAccepted?.(ride);
+    // Unified state change event — both student & rider receive this on the ride channel
+    this.connection.on(HUB_EVENTS.RIDE_STATE_CHANGED, (payload: RideStatePayload) => {
+      this.callbacks.onRideStateChanged?.(payload);
     });
 
-    this.connection.on(HUB_EVENTS.RIDER_ARRIVED, () => {
-      this.callbacks.onRiderArrived?.();
-    });
-
-    this.connection.on(HUB_EVENTS.RIDE_STARTED, () => {
-      this.callbacks.onRideStarted?.();
-    });
-
-    this.connection.on(HUB_EVENTS.RIDE_COMPLETED, () => {
-      this.callbacks.onRideCompleted?.();
-    });
-
-    this.connection.on(HUB_EVENTS.RIDE_CONFIRMED, () => {
-      this.callbacks.onRideConfirmed?.();
-    });
-
-    this.connection.on(HUB_EVENTS.LOCATION_UPDATE, (coords: LocationCoords) => {
-      this.callbacks.onLocationUpdate?.(coords);
-    });
-
-    this.connection.on(HUB_EVENTS.RIDE_CANCELLED, (reason: string) => {
-      this.callbacks.onRideCancelled?.(reason);
+    // Live GPS location update — students receive this on the ride channel
+    this.connection.on(HUB_EVENTS.LOCATION_UPDATED, (payload: LocationPayload) => {
+      this.callbacks.onLocationUpdated?.(payload);
     });
 
     this.connection.onreconnecting(() => {
