@@ -1,11 +1,30 @@
+import { useState } from 'react';
+import { useNavigate } from 'react-router';
+import { toast } from 'sonner';
 import { PageLayout } from '../../components/layout/PageLayout';
 import { Sidebar } from '../../components/layout/Sidebar';
-import { Container, Typography, Box, Paper, Grid } from '@mui/material';
+import { Container, Typography, Box, Paper, Grid, Button } from '@mui/material';
 import useAuth from '../../hooks/useAuth';
 import Navbar from '../../components/layout/Navbar';
+import DealFormDialog from '../../components/deal/DealFormDialog';
+import { useCreateDeal } from '../../hooks/useDeals';
 
 export default function BusinessOwnerHome() {
   const { auth } = useAuth();
+  const navigate = useNavigate();
+  const [formOpen, setFormOpen] = useState(false);
+  const createDealMutation = useCreateDeal();
+
+  const handleSubmitDeal = async (formData: FormData) => {
+    try {
+      await createDealMutation.mutateAsync(formData);
+      toast.success('Deal submitted! Admin will review it shortly.');
+    } catch (err: unknown) {
+      const message = (err as { response?: { data?: { message?: string } } })?.response?.data?.message;
+      toast.error(message || 'Failed to submit deal');
+      throw err;
+    }
+  };
 
   return (
     <Box sx={{ display: 'flex', minHeight: '100vh', bgcolor: 'background.default' }}>
@@ -28,9 +47,26 @@ export default function BusinessOwnerHome() {
               <Typography variant="h3" sx={{ color: '#3b82f6', fontWeight: 'bold', mb: 2 }}>
                 Welcome, {auth?.user?.email || 'Owner'}!
               </Typography>
-              <Typography variant="h6" sx={{ color: '#9ca3af', mb: 4 }}>
+              <Typography variant="h6" sx={{ color: '#9ca3af', mb: 3 }}>
                 You are logged in as a Business Owner.
               </Typography>
+
+              <Box sx={{ display: 'flex', gap: 2, mb: 4, flexWrap: 'wrap' }}>
+                <Button
+                  variant="contained"
+                  onClick={() => setFormOpen(true)}
+                  sx={{ fontWeight: 700, borderRadius: '12px', bgcolor: '#3b82f6', color: '#fff' }}
+                >
+                  Submit Deal / Offer
+                </Button>
+                <Button
+                  variant="outlined"
+                  onClick={() => navigate('/deals')}
+                  sx={{ fontWeight: 700, borderRadius: '12px', borderColor: '#3b82f6', color: '#3b82f6' }}
+                >
+                  View My Deals
+                </Button>
+              </Box>
               
               <Grid container spacing={3}>
                 {[
@@ -60,6 +96,8 @@ export default function BusinessOwnerHome() {
           </Container>
         </PageLayout>
       </Box>
+
+      <DealFormDialog open={formOpen} onClose={() => setFormOpen(false)} onSubmit={handleSubmitDeal} />
     </Box>
   );
 }

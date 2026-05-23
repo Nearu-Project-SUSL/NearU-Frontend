@@ -1,11 +1,13 @@
+import { useNavigate } from 'react-router';
 import { PageLayout } from '../../components/layout/PageLayout';
 import { Sidebar } from '../../components/layout/Sidebar';
-import { Container, Typography, Box, Paper, Grid } from '@mui/material';
+import { Container, Typography, Box, Paper, Grid, Button } from '@mui/material';
 import useAuth from '../../hooks/useAuth';
 import Navbar from '../../components/layout/Navbar';
 
 export default function AdminHome() {
   const { auth } = useAuth();
+  const navigate = useNavigate();
 
   return (
     <Box sx={{ display: 'flex', minHeight: '100vh', bgcolor: 'background.default' }}>
@@ -28,14 +30,22 @@ export default function AdminHome() {
               <Typography variant="h3" sx={{ color: '#ef4444', fontWeight: 'bold', mb: 2 }}>
                 Welcome Admin, {auth?.user?.email || 'User'}!
               </Typography>
-              <Typography variant="h6" sx={{ color: '#9ca3af', mb: 4 }}>
+              <Typography variant="h6" sx={{ color: '#9ca3af', mb: 3 }}>
                 You have full system access.
               </Typography>
+
+              <Button
+                variant="contained"
+                onClick={() => navigate('/admin/deals')}
+                sx={{ mb: 4, fontWeight: 700, borderRadius: '12px', bgcolor: '#ef4444', color: '#fff' }}
+              >
+                Review Deals & Offers
+              </Button>
               
               <Grid container spacing={3}>
                 {[
                   { title: 'Users', count: '1,240', color: '#ef4444' },
-                  { title: 'Business Apps', count: '12 Pending', color: '#2E9EBF' },
+                  { title: 'Deals Pending', count: 'Review Queue', color: '#2E9EBF' },
                   { title: 'System Health', count: '99.9%', color: '#34d399' }
                 ].map((stat, i) => (
                   <Grid size={{ xs: 12, sm: 4 }} key={i}>
