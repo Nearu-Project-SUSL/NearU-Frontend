@@ -16,7 +16,7 @@ export type RideStatus =
 
 export interface FareEstimate {
   distanceKm : number;
-  estimateFare : number;
+  estimatedFare : number;
   baseFare: number;
   ratePerKm: number;
 }
