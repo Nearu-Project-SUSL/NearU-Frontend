@@ -476,7 +476,7 @@ export default function RiderHome() {
         </Box>
 
         {/* ── Map fills remaining height ── */}
-        <Box sx={{ flex: 1, position: 'relative', mt: '64px' }}>
+        <Box sx={{ flex: 1, position: 'relative' }}>
           <MapView
             riderCoords={riderCoords}
             pickupCoords={
