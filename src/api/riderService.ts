@@ -86,18 +86,18 @@ export interface RiderStatsResponse {
 
 /**
  * Toggle rider online/offline status.
- * PUT /api/rider/status
+ * PUT /rider/status  (baseURL already includes /api)
  * NOTE: Also call SignalR GoOnline()/GoOffline() alongside this for real-time group membership.
  */
 const setStatus = async (isOnline: boolean): Promise<void> => {
-  await axiosPrivate.put('/api/rider/status', { isOnline });
+  await axiosPrivate.put('/rider/status', { isOnline });
 };
 
 // ─── Nearby Requests ──────────────────────────────────────────────────────────
 
 /**
  * Fetch nearby ride requests.
- * GET /api/requests/nearby?latitude=X&longitude=Y&radiusMeters=Z
+ * GET /requests/nearby?latitude=X&longitude=Y&radiusMeters=Z  (baseURL already includes /api)
  * Used as a fallback; primary delivery is via SignalR broadcast to OnlineRiders group.
  */
 const getNearbyRequests = async (
@@ -105,7 +105,7 @@ const getNearbyRequests = async (
   longitude: number,
   radiusMeters?: number
 ): Promise<RideRequest[]> => {
-  const response = await axiosPrivate.get<RideRequest[]>('/api/requests/nearby', {
+  const response = await axiosPrivate.get<RideRequest[]>('/requests/nearby', {
     params: { latitude, longitude, ...(radiusMeters ? { radiusMeters } : {}) },
   });
   return response.data;
@@ -115,44 +115,44 @@ const getNearbyRequests = async (
 
 /**
  * Accept a pending ride request.
- * POST /api/accept
+ * POST /accept  (baseURL already includes /api)
  */
 const acceptRide = async (rideId: string): Promise<ActiveRide> => {
-  const response = await axiosPrivate.post<ActiveRide>('/api/accept', { rideId });
+  const response = await axiosPrivate.post<ActiveRide>('/accept', { rideId });
   return response.data;
 };
 
 /**
  * Mark that the rider has arrived at the pickup location.
- * POST /api/arrive
+ * POST /arrive  (baseURL already includes /api)
  */
 const markArrived = async (rideId: string): Promise<void> => {
-  await axiosPrivate.post('/api/arrive', { rideId });
+  await axiosPrivate.post('/arrive', { rideId });
 };
 
 /**
  * Verify the student's OTP to officially start the ride.
- * POST /api/verify
+ * POST /verify  (baseURL already includes /api)
  */
 const verifyOtp = async (rideId: string, otp: string): Promise<void> => {
-  await axiosPrivate.post('/api/verify', { rideId, otp });
+  await axiosPrivate.post('/verify', { rideId, otp });
 };
 
 /**
  * Mark the ride as completed from the rider's side.
  * Puts ride in pending-confirmation state (student must confirm).
- * POST /api/rider-complete
+ * POST /rider-complete  (baseURL already includes /api)
  */
 const completeRide = async (rideId: string): Promise<void> => {
-  await axiosPrivate.post('/api/rider-complete', { rideId });
+  await axiosPrivate.post('/rider-complete', { rideId });
 };
 
 /**
  * Send GPS heartbeat while a ride is active.
- * POST /api/location/heartbeat
+ * POST /location/heartbeat  (baseURL already includes /api)
  */
 const sendHeartbeat = async (rideId: string, coords: LocationCoords): Promise<void> => {
-  await axiosPrivate.post('/api/location/heartbeat', {
+  await axiosPrivate.post('/location/heartbeat', {
     rideId,
     latitude: coords.latitude,
     longitude: coords.longitude,
@@ -164,12 +164,12 @@ const sendHeartbeat = async (rideId: string, coords: LocationCoords): Promise<vo
 
 /**
  * Retrieve the currently active/in-progress ride.
- * GET /api/rides/active
+ * GET /rides/active  (baseURL already includes /api)
  * Returns null if no active ride (204 No Content).
  */
 const getActiveRide = async (): Promise<ActiveRide | null> => {
   try {
-    const response = await axiosPrivate.get<ActiveRide>('/api/rides/active');
+    const response = await axiosPrivate.get<ActiveRide>('/rides/active');
     return response.status === 204 ? null : response.data;
   } catch {
     return null;
@@ -180,12 +180,12 @@ const getActiveRide = async (): Promise<ActiveRide | null> => {
 
 /**
  * Retrieve the latest live location of the matched rider.
- * GET /api/location/{rideId}
+ * GET /location/{rideId}  (baseURL already includes /api)
  * Students only — used on the student tracking screen.
  */
 const getRiderLocation = async (rideId: string): Promise<LocationCoords | null> => {
   try {
-    const response = await axiosPrivate.get<LocationCoords>(`/api/location/${rideId}`);
+    const response = await axiosPrivate.get<LocationCoords>(`/location/${rideId}`);
     return response.data;
   } catch {
     return null;
@@ -196,26 +196,26 @@ const getRiderLocation = async (rideId: string): Promise<LocationCoords | null> 
 
 /**
  * Register a device FCM token for push notifications.
- * POST /api/rides/device-token
+ * POST /rides/device-token  (baseURL already includes /api)
  * Call after login.
  */
 const registerDeviceToken = async (token: string): Promise<void> => {
-  await axiosPrivate.post('/api/rides/device-token', { token });
+  await axiosPrivate.post('/rides/device-token', { token });
 };
 
 /**
  * Remove a device token (call on logout).
- * DELETE /api/rides/device-token
+ * DELETE /rides/device-token  (baseURL already includes /api)
  */
 const removeDeviceToken = async (token: string): Promise<void> => {
-  await axiosPrivate.delete('/api/rides/device-token', { data: { token } });
+  await axiosPrivate.delete('/rides/device-token', { data: { token } });
 };
 
 // ─── Fare Estimate ────────────────────────────────────────────────────────────
 
 /**
  * Calculate a fare estimate without creating a ride request.
- * GET /api/rides/estimate?pickupLat=X&pickupLng=Y&dropoffLat=A&dropoffLng=B
+ * GET /rides/estimate?pickupLat=X&pickupLng=Y&dropoffLat=A&dropoffLng=B  (baseURL already includes /api)
  */
 const getFareEstimate = async (
   pickupLat: number,
@@ -223,7 +223,7 @@ const getFareEstimate = async (
   dropoffLat: number,
   dropoffLng: number
 ): Promise<FareEstimate> => {
-  const response = await axiosPrivate.get<FareEstimate>('/api/rides/estimate', {
+  const response = await axiosPrivate.get<FareEstimate>('/rides/estimate', {
     params: { pickupLat, pickupLng, dropoffLat, dropoffLng },
   });
   return response.data;
@@ -233,10 +233,10 @@ const getFareEstimate = async (
 
 /**
  * Fetch paginated ride history for the logged-in user (Student or Rider).
- * GET /api/rides/history?page=1&pageSize=20
+ * GET /rides/history?page=1&pageSize=20  (baseURL already includes /api)
  */
 const getRideHistory = async (page = 1, pageSize = 20): Promise<RideHistoryResponse> => {
-  const response = await axiosPrivate.get<RideHistoryResponse>('/api/rides/history', {
+  const response = await axiosPrivate.get<RideHistoryResponse>('/rides/history', {
     params: { page, pageSize },
   });
   return response.data;
@@ -244,20 +244,20 @@ const getRideHistory = async (page = 1, pageSize = 20): Promise<RideHistoryRespo
 
 /**
  * Submit a 1–5 star rating for a completed ride.
- * POST /api/rides/history/{rideId}/rate
+ * POST /rides/history/{rideId}/rate  (baseURL already includes /api)
  * Students only.
  */
 const rateRide = async (rideId: string, rating: number): Promise<void> => {
-  await axiosPrivate.post(`/api/rides/history/${rideId}/rate`, { rating });
+  await axiosPrivate.post(`/rides/history/${rideId}/rate`, { rating });
 };
 
 // ─── Rider Stats (convenience wrapper) ───────────────────────────────────────
 
 /**
- * GET /api/rider/stats — aggregate stats for the dashboard.
+ * GET /rider/stats — aggregate stats for the dashboard.  (baseURL already includes /api)
  */
 const getStats = async (): Promise<RiderStatsResponse> => {
-  const response = await axiosPrivate.get<RiderStatsResponse>('/api/rider/stats');
+  const response = await axiosPrivate.get<RiderStatsResponse>('/rider/stats');
   return response.data;
 };
 

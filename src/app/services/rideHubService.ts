@@ -72,8 +72,11 @@ class RideHubService {
   async connect(accessToken: string): Promise<void> {
     if (this.connection?.state === HubConnectionState.Connected) return;
 
-    const baseUrl = import.meta.env.VITE_API_BASE_URL || '';
-    this.hubUrl = `${baseUrl}/hubs/rides`;
+    // VITE_API_BASE_URL includes the "/api" segment (e.g. "https://api.nearusab.me/api").
+    // The SignalR hub lives at the root origin ("/hubs/rides"), not under "/api",
+    // so we strip a trailing "/api" before composing the hub URL.
+    const rawBase = (import.meta.env.VITE_API_BASE_URL || '').replace(/\/api$/i, '');
+    this.hubUrl = `${rawBase}/hubs/rides`;
 
     this.connection = new HubConnectionBuilder()
       .withUrl(this.hubUrl, {

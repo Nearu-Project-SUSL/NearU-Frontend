@@ -51,8 +51,21 @@ export const useRiderStore = create<RiderStore>((set) => ({
   clearPendingRequest: () =>
     set({ pendingRequest: null, rideStatus: 'ONLINE_IDLE' }),
 
-  acceptRequest: (ride) =>
-    set({ activeRide: ride, pendingRequest: null, rideStatus: 'EN_ROUTE_PICKUP' }),
+  acceptRequest: (ride) => {
+    // Map the status returned by the backend to our local RideStatus enum.
+    // Falling back to 'EN_ROUTE_PICKUP' only when the backend gives us a status
+    // we don't recognise (should not happen in practice).
+    const backendToLocal: Record<string, RideStatus> = {
+      EN_ROUTE_PICKUP:  'EN_ROUTE_PICKUP',
+      ARRIVED_WAITING:  'ARRIVED_WAITING',
+      RIDE_IN_PROGRESS: 'RIDE_IN_PROGRESS',
+      COMPLETING:       'COMPLETING',
+    };
+    const resolvedStatus: RideStatus =
+      backendToLocal[ride.status] ?? 'EN_ROUTE_PICKUP';
+
+    set({ activeRide: ride, pendingRequest: null, rideStatus: resolvedStatus });
+  },
 
   setArrived: () => set({ rideStatus: 'ARRIVED_WAITING', otpError: null }),
 
