@@ -1,6 +1,15 @@
-import { useState } from 'react';
-import type { FareEstimate, ServiceType } from '../../components/ride/Ridestypes';
+import { useEffect, useState } from 'react';
+import type { ServiceType } from './Ridestypes';
 import { RidesApi } from '../../../api/Ridesapi';
+import {
+  Box,
+  Typography,
+  IconButton,
+  TextField,
+  InputAdornment,
+} from '@mui/material';
+import { useTheme } from '@mui/material';
+ 
 
 interface Props {
   onRideCreated: (
@@ -9,40 +18,92 @@ interface Props {
     estimatedFare?: number,
     distanceKm?: number,
     serviceType?: ServiceType,
+    pickupLat?: number,
+    pickupLng?: number,
+    dropoffLat?: number,
+    dropoffLng?: number,
+    dropoffLabel?: string,
   ) => void;
 }
 
 const SERVICES: { type: ServiceType; label: string; icon: string }[] = [
-  { type: 'PersonalRide',  label: 'Personal ride',  icon: '🛵' },
-  { type: 'FoodDelivery',  label: 'Food delivery',  icon: '🍱' },
-  { type: 'GroceryPickup', label: 'Grocery pickup', icon: '🛒' },
+  { type: 'PersonalRide',  label: 'Personal',  icon: '🛵' },
+  { type: 'FoodDelivery',  label: 'Food',      icon: '🍱' },
+  { type: 'GroceryPickup', label: 'Grocery',   icon: '🛒' },
 ];
 
-// Replace with real map picker — these are Sabaragamuwa Uni coords
-const PICKUP_LAT  = 6.3793,  PICKUP_LNG  = 80.8558;
-const DROPOFF_LAT = 6.3821,  DROPOFF_LNG = 80.8601;
+const SERVICE_TYPE_MAP: Record<ServiceType, number> = {
+  PersonalRide: 0,
+  FoodDelivery: 1,
+  GroceryPickup: 2,
+};
+
+// Sabaragamuwa University default coords
+const DEFAULT_LAT = 6.7145;
+const DEFAULT_LNG = 80.7872;
 
 export function RequestRideScreen({ onRideCreated }: Props) {
-  const [service,      setService]      = useState<ServiceType>('PersonalRide');
-  const [pickupLabel,  setPickupLabel]  = useState('');
-  const [dropoffLabel, setDropoffLabel] = useState('');
-  const [details,      setDetails]      = useState('');
-  const [estimate,     setEstimate]     = useState<FareEstimate | null>(null);
-  const [confirmed,    setConfirmed]    = useState(false);
-  const [estimating,   setEstimating]   = useState(false);
-  const [loading,      setLoading]      = useState(false);
-  const [error,        setError]        = useState('');
+  const [service,       setService]       = useState<ServiceType>('PersonalRide');
+  const [pickupLabel,   setPickupLabel]   = useState('');
+  const [dropoffLabel,  setDropoffLabel]  = useState('');
+  const [details,       setDetails]       = useState('');
+  const [estimatedFare, setEstimatedFare] = useState<number | null>(null);
+  const [distanceKm,    setDistanceKm]    = useState<number | null>(null);
+  const [loading,       setLoading]       = useState(false);
+  const [estimating,    setEstimating]    = useState(false);
+  const [error,         setError]         = useState('');
+  const [locating,      setLocating]      = useState(false);
 
-  async function handleEstimate() {
-    if (!pickupLabel.trim() || !dropoffLabel.trim()) {
-      setError('Please enter both pickup and drop-off locations.');
+  // Real GPS state
+  const [pickupLat,  setPickupLat]  = useState(DEFAULT_LAT);
+  const [pickupLng,  setPickupLng]  = useState(DEFAULT_LNG);
+  const [dropoffLat, setDropoffLat] = useState(DEFAULT_LAT + 0.003);
+  const [dropoffLng, setDropoffLng] = useState(DEFAULT_LNG + 0.003);
+
+  // Get user's real location on mount
+  useEffect(() => {
+    if (!navigator.geolocation) {
+      setPickupLabel('Faculty of Computing, SUSL');
       return;
     }
+    setLocating(true);
+    navigator.geolocation.getCurrentPosition(
+      pos => {
+        setPickupLat(pos.coords.latitude);
+        setPickupLng(pos.coords.longitude);
+        setPickupLabel(`My location (${pos.coords.latitude.toFixed(4)}, ${pos.coords.longitude.toFixed(4)})`);
+        setLocating(false);
+      },
+      () => {
+        setPickupLabel('Faculty of Computing, SUSL');
+        setLocating(false);
+      },
+      { enableHighAccuracy: true, timeout: 8000 },
+    );
+  }, []);
+
+  function handleUseMyLocation() {
+    if (!navigator.geolocation) return;
+    setLocating(true);
+    navigator.geolocation.getCurrentPosition(
+      pos => {
+        setPickupLat(pos.coords.latitude);
+        setPickupLng(pos.coords.longitude);
+        setPickupLabel(`My location (${pos.coords.latitude.toFixed(4)}, ${pos.coords.longitude.toFixed(4)})`);
+        setLocating(false);
+      },
+      () => setLocating(false),
+      { enableHighAccuracy: true },
+    );
+  }
+
+  async function handleEstimate() {
     setError('');
     setEstimating(true);
     try {
-      const res = await RidesApi.getEstimate(PICKUP_LAT, PICKUP_LNG, DROPOFF_LAT, DROPOFF_LNG);
-      setEstimate(res.data);
+      const res = await RidesApi.getEstimate(pickupLat, pickupLng, dropoffLat, dropoffLng);
+      setEstimatedFare(res.data.estimatedFare);
+      setDistanceKm(res.data.distanceKm);
     } catch (e: unknown) {
       setError(e instanceof Error ? e.message : 'Could not get estimate.');
     } finally {
@@ -51,21 +112,21 @@ export function RequestRideScreen({ onRideCreated }: Props) {
   }
 
   async function handleRequest() {
-    if (!estimate || !confirmed) {
-      setError('Please get a fare estimate and confirm it first.');
+    if (!pickupLabel.trim() || !dropoffLabel.trim()) {
+      setError('Please enter both pickup and drop-off locations.');
       return;
     }
     setError('');
     setLoading(true);
     try {
       const res = await RidesApi.createRequest({
-        serviceType: service,
-        details: { note: details },
-        pickupLatitude:   PICKUP_LAT,
-        pickupLongitude:  PICKUP_LNG,
-        dropoffLatitude:  DROPOFF_LAT,
-        dropoffLongitude: DROPOFF_LNG,
-        confirmEstimate: true,
+        serviceType:      SERVICE_TYPE_MAP[service],
+        details:          details.trim() || 'No additional details',
+        pickupLatitude:   pickupLat,
+        pickupLongitude:  pickupLng,
+        dropoffLatitude:  dropoffLat,
+        dropoffLongitude: dropoffLng,
+        confirmEstimate:  true,
       });
       onRideCreated(
         res.data.rideId,
@@ -73,6 +134,9 @@ export function RequestRideScreen({ onRideCreated }: Props) {
         res.data.estimatedFare,
         res.data.distanceKm,
         res.data.serviceType,
+        pickupLat, pickupLng,
+        dropoffLat, dropoffLng,
+        dropoffLabel,
       );
     } catch (e: unknown) {
       setError(e instanceof Error ? e.message : 'Failed to create request.');
@@ -81,225 +145,211 @@ export function RequestRideScreen({ onRideCreated }: Props) {
     }
   }
 
+  const theme = useTheme();
+  const accent = theme.palette.primary.main;
+  const accentAlpha = (a: number) => `rgba(46, 158, 191, ${a})`;
+
+  
   return (
-    // animate-fadeIn comes from your global CSS keyframes
-    <div className="flex flex-col min-h-screen animate-fadeIn"
-      style={{ background: 'var(--bg-base)', color: 'var(--text-primary)' }}>
+    <div
+      className="relative flex flex-col overflow-hidden animate-fadeIn"
+      style={{
+        minHeight: '100vh',
+        background: 'black', 
+      }}
+    >
 
-      {/* Topbar */}
-      <div className="sticky top-0 z-10 flex items-center px-5 py-3 border-b"
-        style={{ background: 'var(--bg-surface)', borderColor: 'var(--nearu-border)' }}>
-        <span className="text-[17px] font-medium" style={{ color: 'var(--text-primary)' }}>
-          Request a ride
-        </span>
-      </div>
+      <Box
+        sx={{
+          mb: 8,
+          px: { xs: 3, md: 6 },
+          py: { xs: 6, md: 8 },
+          display: "flex",
+          flexDirection: "column",
+          alignItems: "center",
+          justifyContent: "space-between",
+          background: "transparent",
+          border: "none",
+          borderRadius: "20px",
+          overflow: "hidden",
+          gap: 4,
+        }}>
 
-      {/* Body */}
-      <div className="flex flex-col flex-1 gap-3.5 px-4 py-[18px] overflow-y-auto">
+        <Box sx={{
+          width:"100%",
+          textAlign:"center",
+        }}>
+          <Typography
+            variant="h2"
+            sx={{
+              fontWeight: 900,
+              color: theme.palette.text.primary,
+              fontSize: { xs: "2.3rem", md: "3.6rem" },
+              letterSpacing: "-0.03em",
+              mb: 2,
+            }}
+          >
+            Rides{" "}
+            <Box component="span" sx={{ color: accent }}>
+              Near U
+            </Box>
+          </Typography>
 
-        {/* ── Service type ── */}
-        <div className="rounded-xl p-4 border animate-slideUp"
-          style={{ background: 'var(--bg-surface)', borderColor: 'var(--nearu-border)' }}>
-          <p className="text-[11px] uppercase tracking-widest mb-3"
-            style={{ color: 'var(--text-secondary)' }}>
-            Service type
-          </p>
-          <div className="grid grid-cols-3 gap-2.5">
+          <Typography
+            variant="body1"
+            sx={{
+              color: theme.palette.text.secondary,
+              fontSize: { xs: "0.95rem", md: "1.05rem" },
+              whiteSpace: "nowrap",
+              overflow: "hidden",
+              textOverflow: "ellipsis",
+            }}
+          >
+            Discover the best ride options near Sabaragamuwa University.
+            From quick trips to long journeys all in one place.
+          </Typography>
+        </Box>
+      </Box>
+
+      {/* CENTERED POPUP PANEL*/}
+      <div className="absolute inset-0 z-10 flex items-center justify-center p-4">
+
+        <div
+          className="w-full max-w-lg rounded-3xl px-6 pt-6 pb-7 animate-slideUp"
+          style={{
+            background: 'rgba(15,15,15,0.96)',
+            backdropFilter: 'blur(24px)',
+            border: '1px solid rgba(255,255,255,0.08)',
+            boxShadow: '0 20px 60px rgba(0,0,0,0.6)',
+          }}
+        >
+
+          {/* drag handle */}
+          <div className="flex justify-center mb-4">
+            <div
+              className="w-10 h-1 rounded-full"
+              style={{ background: 'rgba(255,255,255,0.15)' }}
+            />
+          </div>
+
+          {/* SERVICE SELECTOR */}
+          <div className="flex gap-2 mb-4">
             {SERVICES.map(s => (
               <button
                 key={s.type}
-                onClick={() => { setService(s.type); setEstimate(null); setConfirmed(false); }}
-                className="flex flex-col items-center gap-1.5 rounded-[10px] py-3.5 px-2
-                           border transition-all duration-200 cursor-pointer"
+                onClick={() => setService(s.type)}
+                className="flex items-center gap-1.5 px-3 py-1.5 rounded-full text-[13px] font-medium border"
                 style={{
-                  background:   service === s.type ? 'var(--nearu-accent-subtle)' : 'var(--bg-elevated)',
-                  borderColor:  service === s.type ? 'var(--nearu-accent)'         : 'var(--nearu-border)',
+                  background:
+                    service === s.type
+                      ? 'var(--nearu-accent-subtle)'
+                      : 'rgba(255,255,255,0.06)',
+                  borderColor:
+                    service === s.type
+                      ? 'var(--nearu-accent)'
+                      : 'rgba(255,255,255,0.1)',
+                  color:
+                    service === s.type
+                      ? 'var(--nearu-accent)'
+                      : 'rgba(255,255,255,0.55)',
                 }}
               >
-                <span className="text-[22px] leading-none">{s.icon}</span>
-                <span className="text-[12px]"
-                  style={{ color: service === s.type ? 'var(--nearu-accent)' : 'var(--text-secondary)' }}>
-                  {s.label}
-                </span>
+                {s.icon} {s.label}
               </button>
             ))}
           </div>
-        </div>
 
-        {/* ── Locations ── */}
-        <div className="rounded-xl p-4 border animate-slideUp [animation-delay:50ms]"
-          style={{ background: 'var(--bg-surface)', borderColor: 'var(--nearu-border)' }}>
-          <p className="text-[11px] uppercase tracking-widest mb-3"
-            style={{ color: 'var(--text-secondary)' }}>
-            Locations
-          </p>
-          <div className="flex flex-col gap-2.5">
-
+          {/* LOCATION INPUTS */}
+          <div
+            className="rounded-2xl overflow-hidden mb-3"
+            style={{ background: 'rgba(255,255,255,0.05)' }}
+          >
             {/* Pickup */}
-            <div>
-              <label className="block text-[13px] mb-1.5 font-normal"
-                style={{ color: 'var(--text-secondary)' }}>
-                Pickup point
-              </label>
-              <div className="flex items-center gap-2.5">
-                <span className="w-2 h-2 rounded-full flex-shrink-0"
-                  style={{ background: 'var(--text-secondary)' }} />
-                <input
-                  className="flex-1 rounded-lg px-3 py-2.5 text-[14px] border outline-none
-                             transition-colors duration-200
-                             focus:border-[var(--nearu-accent)]"
-                  style={{
-                    background: 'var(--bg-elevated)',
-                    borderColor: 'var(--nearu-border)',
-                    color: 'var(--text-primary)',
-                  }}
-                  placeholder="e.g. Faculty of Computing"
-                  value={pickupLabel}
-                  onChange={e => setPickupLabel(e.target.value)}
-                />
-              </div>
-            </div>
-
-            {/* Drop-off */}
-            <div>
-              <label className="block text-[13px] mb-1.5 font-normal"
-                style={{ color: 'var(--text-secondary)' }}>
-                Drop-off point
-              </label>
-              <div className="flex items-center gap-2.5">
-                <span className="w-2 h-2 rounded-full flex-shrink-0"
-                  style={{ background: 'var(--nearu-accent)' }} />
-                <input
-                  className="flex-1 rounded-lg px-3 py-2.5 text-[14px] border outline-none
-                             transition-colors duration-200
-                             focus:border-[var(--nearu-accent)]"
-                  style={{
-                    background: 'var(--bg-elevated)',
-                    borderColor: 'var(--nearu-border)',
-                    color: 'var(--text-primary)',
-                  }}
-                  placeholder="e.g. University canteen"
-                  value={dropoffLabel}
-                  onChange={e => setDropoffLabel(e.target.value)}
-                />
-              </div>
-            </div>
-          </div>
-        </div>
-
-        {/* ── Additional details ── */}
-        <div className="rounded-xl p-4 border animate-slideUp [animation-delay:100ms]"
-          style={{ background: 'var(--bg-surface)', borderColor: 'var(--nearu-border)' }}>
-          <p className="text-[11px] uppercase tracking-widest mb-3"
-            style={{ color: 'var(--text-secondary)' }}>
-            Additional details (optional)
-          </p>
-          <textarea
-            className="w-full rounded-lg px-3 py-2.5 text-[14px] border outline-none
-                       resize-none h-[72px] transition-colors duration-200
-                       focus:border-[var(--nearu-accent)]"
-            style={{
-              background: 'var(--bg-elevated)',
-              borderColor: 'var(--nearu-border)',
-              color: 'var(--text-primary)',
-              fontFamily: 'inherit',
-            }}
-            placeholder="Any special instructions for your rider..."
-            value={details}
-            onChange={e => setDetails(e.target.value)}
-          />
-        </div>
-
-        {/* ── Fare estimate ── */}
-        {estimate && (
-          <div className="rounded-xl p-4 border animate-slideDown"
-            style={{ background: 'var(--bg-surface)', borderColor: 'var(--nearu-border)' }}>
-            <p className="text-[11px] uppercase tracking-widest mb-3"
-              style={{ color: 'var(--text-secondary)' }}>
-              Fare estimate
-            </p>
-
-            {[
-              { label: 'Distance',     value: `${estimate.distanceKm.toFixed(2)} km` },
-              { label: 'Base fare',    value: `Rs. ${estimate.baseFare.toFixed(2)}` },
-              { label: 'Rate per km',  value: `Rs. ${estimate.ratePerKm.toFixed(2)}` },
-            ].map(row => (
-              <div key={row.label}
-                className="flex justify-between items-center py-1.5 border-b"
-                style={{ borderColor: 'var(--nearu-border)' }}>
-                <span className="text-[13px]" style={{ color: 'var(--text-secondary)' }}>{row.label}</span>
-                <span className="text-[13px] font-medium" style={{ color: 'var(--text-primary)' }}>{row.value}</span>
-              </div>
-            ))}
-
-            <div className="flex justify-between items-center pt-2 mt-1">
-              <span className="text-[14px] font-medium" style={{ color: 'var(--text-primary)' }}>
-                Total estimate
-              </span>
-              <span className="text-[20px] font-medium" style={{ color: 'var(--nearu-accent)' }}>
-                Rs. {estimate.estimatedFare.toFixed(2)}
-              </span>
-            </div>
-
-            {/* Confirm checkbox */}
-            <div className="flex items-center gap-2 mt-3">
+            <div
+              className="flex items-center gap-3 px-4 py-3 border-b"
+              style={{ borderColor: 'rgba(255,255,255,0.07)' }}
+            >
               <input
-                type="checkbox"
-                id="confirm-est"
-                checked={confirmed}
-                onChange={e => setConfirmed(e.target.checked)}
-                className="w-4 h-4 cursor-pointer"
-                style={{ accentColor: 'var(--nearu-accent)' }}
+                value={pickupLabel}
+                onChange={e => setPickupLabel(e.target.value)}
+                className="w-full bg-transparent text-[14px] outline-none border-none"
+                style={{
+                  color: 'white',
+                  caretColor: 'white',
+                  background: 'transparent',
+                  WebkitBoxShadow: '0 0 0 1000px transparent inset',
+                }}
               />
-              <label htmlFor="confirm-est"
-                className="text-[13px] font-normal cursor-pointer"
-                style={{ color: 'var(--text-secondary)' }}>
-                I confirm this fare estimate
-              </label>
+
+              <button onClick={handleUseMyLocation}></button>
+            </div>
+
+            {/* Dropoff */}
+            <div className="px-4 py-3">
+              <input
+                value={dropoffLabel}
+                onChange={e => setDropoffLabel(e.target.value)}
+                placeholder="Where are you going?"
+                className="w-full bg-transparent text-[14px] outline-none border-none"
+                style={{
+                  color: 'white',
+                  caretColor: 'white',
+                  background: 'transparent',
+                  WebkitBoxShadow: '0 0 0 1000px transparent inset',
+                }}
+              />
             </div>
           </div>
-        )}
 
-        {/* ── Error ── */}
-        {error && (
-          <div className="rounded-lg px-3.5 py-2.5 text-[13px] border animate-slideDown"
-            style={{
-              background: 'rgba(232,76,110,0.12)',
-              borderColor: 'rgba(232,76,110,0.25)',
-              color: '#e84c6e',
-            }}>
-            {error}
+          {/* ── Fare Estimate ── */}
+          {estimatedFare !== null && distanceKm !== null && (
+            <div
+              className="mb-3 rounded-xl p-3 border"
+              style={{
+                background: 'rgba(46,158,191,0.12)',
+                borderColor: 'rgba(46,158,191,0.35)',
+              }}
+            >
+              <div className="flex justify-between text-[13px] text-white/70">
+                <span>Distance</span>
+                <span>{distanceKm.toFixed(2)} km</span>
+              </div>
+
+              <div className="flex justify-between text-[13px] text-white/70 mt-1">
+                <span>Estimated fare</span>
+                <span>Rs. {estimatedFare.toFixed(2)}</span>
+              </div>
+            </div>
+          )}
+
+          {/* ERROR */}
+          {error && (
+            <div className="mb-3 text-red-400 text-[13px]">
+              {error}
+            </div>
+          )}
+
+          {/* BUTTONS */}
+          <div className="flex gap-2.5">
+            <button
+              onClick={handleEstimate}
+              disabled={estimating}
+              className="px-4 py-3 rounded-xl border text-white/80"
+            >
+              {estimating ? '…' : '💰 Estimate'}
+            </button>
+
+            <button
+              onClick={handleRequest}
+              disabled={loading}
+              className="flex-1 py-3 rounded-xl font-semibold text-white"
+              style={{ background: 'var(--nearu-accent)' }}
+            >
+              {loading ? 'Requesting…' : '🛵 Request ride'}
+            </button>
           </div>
-        )}
 
-        {/* ── Get estimate button ── */}
-        <button
-          onClick={handleEstimate}
-          disabled={estimating}
-          className="w-full py-3 rounded-[10px] text-[15px] font-medium border
-                     transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed
-                     active:scale-[0.98]"
-          style={{
-            background: 'transparent',
-            borderColor: 'var(--nearu-border)',
-            color: 'var(--text-primary)',
-          }}
-        >
-          {estimating ? 'Calculating…' : 'Get fare estimate'}
-        </button>
-
-        {/* ── Request ride button ── */}
-        <button
-          onClick={handleRequest}
-          disabled={!estimate || !confirmed || loading}
-          className="w-full py-3 rounded-[10px] text-[15px] font-medium text-white
-                     transition-opacity duration-150 disabled:opacity-50 disabled:cursor-not-allowed
-                     active:scale-[0.98]"
-          style={{ background: 'var(--nearu-accent)' }}
-        >
-          {loading ? 'Submitting…' : 'Request ride'}
-        </button>
-
+        </div>
       </div>
     </div>
   );
