@@ -90,18 +90,34 @@ export default function MapView({
   if (pickupCoords) routePoints.push([pickupCoords.lat, pickupCoords.lng]);
 
   return (
-    <div style={{ height, width: '100%', borderRadius: 'inherit', overflow: 'hidden' }}>
+    <div style={{ height, width: '100%', borderRadius: 'inherit', overflow: 'hidden', position: 'relative' }}>
+      {/* Leaflet attribution must remain visible per CartoDB & OSM terms of service.
+          We re-style it to fit the dark theme instead of hiding it. */}
+      <style>{`
+        .leaflet-control-attribution {
+          background: rgba(10, 10, 10, 0.75) !important;
+          backdrop-filter: blur(6px);
+          color: #6b7280 !important;
+          font-size: 9px !important;
+          border-radius: 6px 0 0 0 !important;
+          padding: 2px 6px !important;
+          border: none !important;
+        }
+        .leaflet-control-attribution a {
+          color: #9ca3af !important;
+        }
+      `}</style>
       <MapContainer
         center={center}
         zoom={15}
         style={{ height: '100%', width: '100%' }}
         zoomControl={false}
-        attributionControl={false}
       >
-        {/* CartoDB Dark Matter — free, no API key */}
+        {/* CartoDB Dark Matter — free, no API key.
+            Full attribution: © OpenStreetMap contributors © CARTO */}
         <TileLayer
           url="https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png"
-          attribution='&copy; <a href="https://carto.com/">CARTO</a>'
+          attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/">CARTO</a>'
           subdomains="abcd"
           maxZoom={20}
         />
