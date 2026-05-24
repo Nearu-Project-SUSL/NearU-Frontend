@@ -70,7 +70,8 @@ class RideHubService {
     if (this.connection?.state === HubConnectionState.Connected) return;
 
     const baseUrl = import.meta.env.VITE_API_BASE_URL || '';
-    this.hubUrl = `${baseUrl}/hubs/rides`;
+    const hubBaseUrl = baseUrl.replace(/\/api\/?$/, '');
+    this.hubUrl = `${hubBaseUrl}/hubs/rides`;
 
     this.connection = new HubConnectionBuilder()
       .withUrl(this.hubUrl, {
