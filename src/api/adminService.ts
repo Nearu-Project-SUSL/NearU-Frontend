@@ -55,6 +55,12 @@ const adminService = {
   suspendRider: async (riderId: string): Promise<any> => {
     const response = await axiosPrivate.put<ApiResponse<any>>(`/admin/riders/${riderId}/suspend`);
     return response.data.data;
+  },
+
+  setRiderTier: async (riderId: string, tier: 'Standard' | 'Premium'): Promise<any> => {
+    const tierValue = tier === 'Premium' ? 1 : 0;
+    const response = await axiosPrivate.put<ApiResponse<any>>(`/admin/riders/${riderId}/tier`, { tier: tierValue });
+    return response.data.data;
   }
 };
 

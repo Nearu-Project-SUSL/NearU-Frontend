@@ -22,7 +22,9 @@ import {
   Chip,
   Avatar,
   Fade,
-  useTheme
+  useTheme,
+  TextField,
+  InputAdornment
 } from '@mui/material';
 import {
   Refresh as RefreshIcon,
@@ -34,7 +36,8 @@ import {
   TrendingUp as TrendIcon,
   CheckCircleOutline as ActiveIcon,
   People as UsersIcon,
-  OnlinePrediction as OnlineIcon
+  OnlinePrediction as OnlineIcon,
+  Search as SearchIcon
 } from '@mui/icons-material';
 import useAuth from '../../hooks/useAuth';
 import Navbar from '../../components/layout/Navbar';
@@ -54,6 +57,7 @@ export default function AdminHome() {
   const [loadingRiders, setLoadingRiders] = useState(true);
   const [actionInProgress, setActionInProgress] = useState<string | null>(null);
   const [currentTab, setCurrentTab] = useState<string>('All');
+  const [searchTerm, setSearchTerm] = useState('');
   
   const accent = theme.palette.primary.main;
   const accentAlpha = (a: number) => `rgba(46, 158, 191, ${a})`;
@@ -124,6 +128,22 @@ export default function AdminHome() {
     }
   };
 
+  // Toggle Rider Service Tier
+  const handleTierChange = async (riderId: string, newTier: 'Standard' | 'Premium') => {
+    setActionInProgress(`${riderId}-tier`);
+    const toastId = toast.loading(`Updating rider tier to ${newTier}...`);
+    try {
+      await adminService.setRiderTier(riderId, newTier);
+      toast.success(`Rider tier successfully updated to ${newTier}!`, { id: toastId });
+      refreshAll();
+    } catch (error: any) {
+      const errorMsg = error.response?.data?.message || `Failed to update rider tier.`;
+      toast.error(errorMsg, { id: toastId });
+    } finally {
+      setActionInProgress(null);
+    }
+  };
+
   // SignalR Lifecycle Setup for live notifications
   useEffect(() => {
     const setupHub = async () => {
@@ -173,6 +193,12 @@ export default function AdminHome() {
   useEffect(() => {
     refreshAll();
   }, []);
+
+  // Filter riders based on name or email search term
+  const filteredRiders = riders.filter(rider => 
+    rider.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    rider.email?.toLowerCase().includes(searchTerm.toLowerCase())
+  );
 
   // Common glassmorphism styles
   const glassStyles = {
@@ -299,7 +325,7 @@ export default function AdminHome() {
 
             {/* Riders Approvals Workspace Panel */}
             <Paper sx={{ ...glassStyles, p: 4 }}>
-              <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 3, flexDirection: { xs: 'column', sm: 'row' }, gap: 2 }}>
+              <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 3, flexDirection: { xs: 'column', md: 'row' }, gap: 3 }}>
                 <Box>
                   <Typography variant="h5" sx={{ fontWeight: 800, color: 'text.primary' }}>
                     Rider Applications
@@ -309,22 +335,48 @@ export default function AdminHome() {
                   </Typography>
                 </Box>
                 
-                {/* Visual Filtering Tabs */}
-                <Tabs 
-                  value={currentTab} 
-                  onChange={handleTabChange} 
-                  variant="scrollable"
-                  scrollButtons="auto"
-                  sx={{
-                    '& .MuiTabs-indicator': { bgcolor: accent },
-                    '& .MuiTab-root': { color: 'text.secondary', fontWeight: 600 },
-                    '& .MuiTab-root.Mui-selected': { color: accent }
-                  }}
-                >
-                  {['All', 'Pending', 'Approved', 'Suspended', 'Rejected'].map((tab) => (
-                    <Tab key={tab} label={tab} value={tab} />
-                  ))}
-                </Tabs>
+                <Box sx={{ display: 'flex', gap: 2.5, alignItems: 'center', flexDirection: { xs: 'column', sm: 'row' }, width: { xs: '100%', md: 'auto' } }}>
+                  <TextField
+                    placeholder="Search name or email..."
+                    size="small"
+                    value={searchTerm}
+                    onChange={(e) => setSearchTerm(e.target.value)}
+                    InputProps={{
+                      startAdornment: (
+                        <InputAdornment position="start">
+                          <SearchIcon sx={{ color: 'text.secondary', fontSize: 20 }} />
+                        </InputAdornment>
+                      ),
+                    }}
+                    sx={{
+                      width: { xs: '100%', sm: 220 },
+                      '& .MuiOutlinedInput-root': {
+                        borderRadius: '0.8rem',
+                        bgcolor: isDark ? 'rgba(255,255,255,0.03)' : 'rgba(0,0,0,0.02)',
+                        '& fieldset': { borderColor: accentAlpha(0.2) },
+                        '&:hover fieldset': { borderColor: accentAlpha(0.4) },
+                        '&.Mui-focused fieldset': { borderColor: accent }
+                      }
+                    }}
+                  />
+
+                  {/* Visual Filtering Tabs */}
+                  <Tabs 
+                    value={currentTab} 
+                    onChange={handleTabChange} 
+                    variant="scrollable"
+                    scrollButtons="auto"
+                    sx={{
+                      '& .MuiTabs-indicator': { bgcolor: accent },
+                      '& .MuiTab-root': { color: 'text.secondary', fontWeight: 600 },
+                      '& .MuiTab-root.Mui-selected': { color: accent }
+                    }}
+                  >
+                    {['All', 'Pending', 'Approved', 'Suspended', 'Rejected'].map((tab) => (
+                      <Tab key={tab} label={tab} value={tab} />
+                    ))}
+                  </Tabs>
+                </Box>
               </Box>
 
               {/* Table Data */}
@@ -348,18 +400,18 @@ export default function AdminHome() {
                           <Typography variant="body2" sx={{ color: 'text.secondary', mt: 2 }}>Loading applicants list...</Typography>
                         </TableCell>
                       </TableRow>
-                    ) : riders.length === 0 ? (
+                    ) : filteredRiders.length === 0 ? (
                       <TableRow>
                         <TableCell colSpan={6} align="center" sx={{ py: 8 }}>
                           <PendingIcon sx={{ fontSize: 48, color: 'text.disabled', mb: 2 }} />
                           <Typography variant="h6" sx={{ color: 'text.primary', fontWeight: 700 }}>No Riders Found</Typography>
                           <Typography variant="body2" sx={{ color: 'text.secondary' }}>
-                            There are no applications matching the "{currentTab}" filter at this time.
+                            {searchTerm ? `No results match your search query: "${searchTerm}"` : `There are no applications matching the "${currentTab}" filter at this time.`}
                           </Typography>
                         </TableCell>
                       </TableRow>
                     ) : (
-                      riders.map((rider) => (
+                      filteredRiders.map((rider) => (
                         <TableRow 
                           key={rider.riderId}
                           sx={{ 
@@ -398,16 +450,24 @@ export default function AdminHome() {
                             />
                           </TableCell>
                           <TableCell>
-                            <Chip 
-                              label={rider.riderTier} 
-                              size="small"
-                              variant="outlined"
-                              sx={{ 
-                                fontWeight: 600,
-                                borderColor: rider.riderTier === 'Premium' ? '#a855f7' : '#9ca3af',
-                                color: rider.riderTier === 'Premium' ? '#a855f7' : 'text.secondary'
-                              }}
-                            />
+                            <Tooltip title={`Click to change to ${rider.riderTier === 'Premium' ? 'Standard' : 'Premium'}`}>
+                              <Chip 
+                                label={actionInProgress === `${rider.riderId}-tier` ? 'Updating...' : rider.riderTier} 
+                                size="small"
+                                variant="outlined"
+                                onClick={() => handleTierChange(rider.riderId, rider.riderTier === 'Premium' ? 'Standard' : 'Premium')}
+                                disabled={actionInProgress !== null}
+                                sx={{ 
+                                  fontWeight: 600,
+                                  cursor: actionInProgress !== null ? 'default' : 'pointer',
+                                  borderColor: rider.riderTier === 'Premium' ? '#a855f7' : '#9ca3af',
+                                  color: rider.riderTier === 'Premium' ? '#a855f7' : 'text.secondary',
+                                  '&:hover': {
+                                    bgcolor: rider.riderTier === 'Premium' ? 'rgba(168, 85, 247, 0.08)' : 'rgba(156, 163, 175, 0.08)',
+                                  }
+                                }}
+                              />
+                            </Tooltip>
                           </TableCell>
                           <TableCell>
                             <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
