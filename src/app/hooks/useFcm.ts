@@ -52,8 +52,18 @@ export function useFcm({ enabled }: UseFcmOptions) {
     try {
       await riderService.registerDeviceToken(token);
       console.info('[FCM] Device token registered with backend.');
-    } catch (err) {
-      console.warn('[FCM] Failed to register token with backend:', err);
+    } catch (err: unknown) {
+      // Log the full error for debugging (401 = expired token, 403 = wrong role, etc.)
+      if (err && typeof err === 'object' && 'response' in err) {
+        const axiosErr = err as { response?: { status: number; data?: unknown } };
+        console.warn(
+          '[FCM] Failed to register token with backend:',
+          `HTTP ${axiosErr.response?.status}`,
+          axiosErr.response?.data
+        );
+      } else {
+        console.warn('[FCM] Failed to register token with backend:', err);
+      }
     }
   }, []);
 
