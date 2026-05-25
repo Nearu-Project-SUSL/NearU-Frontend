@@ -264,10 +264,17 @@ const rateRide = async (rideId: string, rating: number): Promise<void> => {
 
 /**
  * GET /rider/stats — aggregate stats for the dashboard.  (baseURL already includes /api)
+ * Returns null if the endpoint is unavailable (404 from undeployed backend).
  */
-const getStats = async (): Promise<RiderStatsResponse> => {
-  const response = await axiosPrivate.get<RiderStatsResponse>('/rider/stats');
-  return response.data;
+const getStats = async (): Promise<RiderStatsResponse | null> => {
+  try {
+    const response = await axiosPrivate.get<{ success: boolean; data: RiderStatsResponse }>('/rider/stats');
+    // Backend wraps response in ApiResponse<T>: { success, message, data: { totalRides, ... } }
+    return response.data?.data ?? null;
+  } catch {
+    // 404 = endpoint not yet deployed on this backend version; return null gracefully
+    return null;
+  }
 };
 
 // ─── Exports ──────────────────────────────────────────────────────────────────
