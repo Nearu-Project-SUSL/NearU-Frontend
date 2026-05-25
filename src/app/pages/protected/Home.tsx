@@ -1,10 +1,12 @@
-import { useState, useEffect, useRef } from 'react';
-import { useNavigate } from 'react-router';
+import { useState, useEffect, useRef, useCallback } from 'react';
+import { Navigate, useNavigate } from 'react-router';
 import { Sidebar } from '../../components/layout/Sidebar';
 import Navbar from '../../components/layout/Navbar';
 import useAuth from '../../hooks/useAuth';
 import { useNearUTheme } from '../../context/ThemeContext';
 import { useApprovedDeals } from '../../hooks/useDeals';
+import axios from '../../../api/axios';
+import { axiosPrivate } from '../../../api/axios';
 
 import {
   Box,
@@ -16,6 +18,13 @@ import {
   Grow,
   IconButton,
   Button,
+  Dialog,
+  DialogContent,
+  DialogTitle,
+  TextField,
+  CircularProgress,
+  Snackbar,
+  Alert,
   useTheme,
   useMediaQuery,
 } from '@mui/material';
@@ -32,8 +41,22 @@ import {
   ChevronLeft as ChevronLeftIcon,
   ChevronRight as ChevronRightIcon,
   Star as StarIcon,
+  StarBorder as StarBorderIcon,
   Person as UserIcon,
+  Close as CloseIcon,
+  Send as SendIcon,
 } from '@mui/icons-material';
+import { set } from 'date-fns';
+
+
+interface Testimonial{
+  id: number;
+  message: string;
+  rating: number;
+  createdAt: string;
+  userName: string;
+  userInitial: string;
+}
 
 // ─── Service Card Data ───────────────────────────────────────────────────────
 const services = [
@@ -132,6 +155,27 @@ const testimonials = [
     text: 'Found my perfect accommodation through NearU Bodims. The verified listings gave me peace of mind and the booking process was seamless. Thank you NearU!',
   },
 ];
+
+function timeAgo(dateStr: string): string{
+  const diff = Date.now() - new Date(dateStr).getTime();
+  const minutes = Math.floor(diff / 60000);
+  if (minutes < 60) return `${minutes}m ago`;
+  const hours = Math.floor(minutes / 60);
+  if (hours < 24) return `${hours}h ago`;
+  const days = Math.floor(hours / 24);
+  if (days < 7) return `${days} day${days > 1 ? 's' : ''} ago`;
+  const weeks = Math.floor(days / 7);
+  if (weeks < 5) return `${weeks} week${weeks > 1 ? 's' : ''} ago`;
+  const months = Math.floor(days / 30);
+  return `${months} month${months > 1 ? 's' : ''} ago`;
+}
+
+function getAvatarColor(initial: string  | undefined): string{
+  const colors = ['#2E9EBF', '#f97316', '#22d3ee', '#a78bfa', '#34d399', '#fb7185'];
+  if(!initial) return colors[0];
+
+  return colors[initial?.charCodeAt(0) % colors.length || 0];
+}
 
 // ─── Custom Carousel Hook ─────────────────────────────────────────────────────
 function useHorizontalScroll() {
@@ -303,42 +347,224 @@ function DealCard({ deal, index, onViewAll }: { deal: HomeDealCardProps, index: 
 }
 
 // ─── Testimonial Card ─────────────────────────────────────────────────────────
-function TestimonialCard({ t, index }: { t: typeof testimonials[0], index: number }) {
-  const theme = useTheme();
-  const accent = theme.palette.primary.main;
-  const accentAlpha = (a: number) => `rgba(46, 158, 191, ${a})`;
+function TestimonialCard({ t, index }: { t:  Testimonial, index: number }) {
+  const initial = t.userInitial || t.userName?.charAt(0)?.toUpperCase() || '?'
+  const color = getAvatarColor(initial)
 
   return (
     <Grow in timeout={800 + index * 100}>
       <Card
         elevation={0}
         sx={{
+          width: { xs: '100%', md: 320 },
           minWidth: { xs: 240, md: 320 },
-          bgcolor: theme.palette.background.paper,
+          bgcolor: 'rgba(255,255,255,0.02)',
           borderRadius: '20px',
           p: 3,
-          border: `1px solid ${theme.palette.divider}`,
+          border: '1px solid rgba(255,255,255,0.05)',
           transition: 'border 0.3s ease',
-          '&:hover': { border: `1px solid ${accentAlpha(0.35)}` }
+          '&:hover': { border: '1px solid rgba(250, 204, 21, 0.3)' },
         }}
       >
         <Box sx={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', mb: 2 }}>
-           <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
-              <Avatar src={t.image} sx={{ width: 48, height: 48, border: `2px solid ${accent}` }} />
-              <Box>
-                <Typography variant="subtitle1" sx={{ color: theme.palette.text.primary, fontWeight: 700, lineHeight: 1.2 }}>{t.name}</Typography>
-                <Box sx={{ display: 'flex', color: accent, fontSize: '0.8rem', mt: 0.5 }}>
-                  {[1,2,3,4,5].map(i => <StarIcon key={i} fontSize="inherit" />)}
-                </Box>
+          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
+            <Avatar sx={{ width: 48, height: 48, border: `2px solid ${color}`, bgcolor: color, color: '#000', fontWeight: 800, fontSize: '1.1rem' }}>
+              {initial}
+            </Avatar>
+            <Box>
+              <Typography variant="subtitle1" sx={{ color: '#fff', fontWeight: 700, lineHeight: 1.2 }}>{t.userName}</Typography>
+              <Box sx={{ display: 'flex', mt: 0.5 }}>
+                {[1, 2, 3, 4, 5].map((i) =>
+                  i <= t.rating
+                    ? <StarIcon key={i} sx={{ fontSize: '0.85rem', color: '#2E9EBF' }} />
+                    : <StarBorderIcon key={i} sx={{ fontSize: '0.85rem', color: 'rgba(255,255,255,0.3)' }} />
+                )}
               </Box>
-           </Box>
-           <Typography variant="caption" sx={{ color: theme.palette.text.secondary }}>{t.time}</Typography>
+            </Box>
+          </Box>
+          <Typography variant="caption" sx={{ color: 'rgba(255,255,255,0.4)', whiteSpace: 'nowrap' }}>
+            {timeAgo(t.createdAt)}
+          </Typography>
         </Box>
-        <Typography variant="body2" sx={{ color: theme.palette.text.secondary, lineHeight: 1.6, fontStyle: 'italic' }}>
-          "{t.text}"
+        <Typography variant="body2" sx={{ color: 'rgba(255,255,255,0.6)', lineHeight: 1.6, fontStyle: 'italic' }}>
+          "{t.message}"
         </Typography>
       </Card>
     </Grow>
+  )
+}
+// ─── Share Experience Modal ───────────────────────────────────────────────────
+function ShareModal({
+  open,
+  onClose,
+  onSubmitted,
+  token
+}: {
+  open: boolean;
+  onClose:()=> void;
+  onSubmitted:()=> void;
+  token: string;
+}){
+  const [rating, setRating] = useState(0);
+  const [hoverRating, setHoverRating] = useState(0);
+  const [message, setMessage] = useState('');
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState('');
+
+  const handleClose = () => {
+    setRating(0);
+    setHoverRating(0);
+    setMessage('');
+    setError('');
+    onClose();
+  };
+
+  const handleSubmit = async () => {
+    if(rating == 0) {setError('Please select a rating'); return;}
+    if(message.trim() === '') {setError('Please enter your experience'); return;}
+  
+    setLoading(true);
+    setError('');
+
+    try{
+      await axiosPrivate.post(
+        '/testimonials',
+        {message: message.trim(), rating},
+        {headers: {'Authorization': `Bearer ${token}`}}
+      );
+
+      handleClose();
+      onSubmitted();
+    } catch (err: any){
+      setError(err?.response?.data?.message || 'Something went wrong. Please try again.');
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  return (
+    <Dialog
+        open={open}
+        onClose={handleClose}
+        maxWidth="sm"
+        fullWidth
+        PaperProps={{
+          sx: {
+            bgcolor: '#0f0f0f',
+            border: '1px solid rgba(250,204,21,0.2)',
+            borderRadius: '24px',
+            p: 1,
+          },
+        }}
+      >
+        
+        <DialogTitle sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', pb: 1 }}>
+          <Box>
+            
+            <Typography variant="h6" sx={{ fontWeight: 800, color: '#2E9EBF' }}>
+              Share Your Experience
+            </Typography>
+            
+            <Typography variant="body2" sx={{ color: 'rgba(255,255,255,0.4)', mt: 0.3 }}>
+              Help other students by sharing your story
+            </Typography>
+
+          </Box>
+
+          <IconButton onClick={handleClose} sx={{ color: 'rgba(255,255,255,0.4)', '&:hover': { color: '#fff' } }}>
+            <CloseIcon />
+          </IconButton>
+        </DialogTitle>
+
+        <DialogContent sx={{pt:1}}>
+          {/* star rating */}
+          <Box sx={{ mb: 3 }}>
+            <Typography variant="body2" sx={{ color: 'rgba(255,255,255,0.6)', mb: 1.5, fontWeight: 600 }}>
+              How would you rate your experience?
+            </Typography>
+            <Box sx={{ display: 'flex', gap: 1 }}>
+              {[1, 2, 3, 4, 5].map((star) => (
+                <IconButton
+                  key={star}
+                  onClick={() => setRating(star)}
+                  onMouseEnter={() => setHoverRating(star)}
+                  onMouseLeave={() => setHoverRating(0)}
+                  sx={{ p: 0.5, transition: 'transform 0.15s ease', transform: (hoverRating || rating) >= star ? 'scale(1.2)' : 'scale(1)' }}
+                >
+                  {(hoverRating || rating) >= star
+                    ? <StarIcon sx={{ fontSize: 36, color: '#2E9EBF' }} />
+                    : <StarBorderIcon sx={{ fontSize: 36, color: 'rgba(255,255,255,0.2)' }} />
+                  }
+                </IconButton>
+              ))}
+              {rating > 0 && (
+                <Typography sx={{ color: 'rgba(255,255,255,0.4)', alignSelf: 'center', ml: 1, fontSize: '0.85rem' }}>
+                  {['', 'Poor', 'Fair', 'Good', 'Great', 'Excellent!'][rating]}
+                </Typography>
+              )}
+            </Box>
+          </Box>
+
+          {/*message */}
+          <Box sx={{ mb: 2 }}>
+            <Typography variant="body2" sx={{ color: 'rgba(255,255,255,0.6)', mb: 1.5, fontWeight: 600 }}>
+              Your experience
+            </Typography>
+            <TextField
+              multiline
+              rows={4}
+              fullWidth
+              placeholder="Tell us about your experience with NearU..."
+              value={message}
+              onChange={(e) => setMessage(e.target.value)}
+              inputProps={{ maxLength: 500 }}
+              sx={{
+                '& .MuiOutlinedInput-root': {
+                  color: '#fff',
+                  borderRadius: '14px',
+                  bgcolor: 'rgba(255,255,255,0.03)',
+                  '& fieldset': { borderColor: 'rgba(255,255,255,0.1)' },
+                  '&:hover fieldset': { borderColor: 'rgba(46, 158, 191, 0.3)' },
+                  '&.Mui-focused fieldset': { borderColor: '#2E9EBF' },
+                },
+                '& .MuiInputBase-input::placeholder': { color: 'rgba(255,255,255,0.25)' },
+              }}
+            />
+            <Typography variant="caption" sx={{ color: 'rgba(255,255,255,0.25)', display: 'block', textAlign: 'right', mt: 0.5 }}>
+              {message.length}/500
+            </Typography>
+          </Box>
+          
+
+          {error && (
+            <Alert severity="error" sx={{ mb: 2, bgcolor: 'rgba(239,68,68,0.1)', color: '#fca5a5', border: '1px solid rgba(239,68,68,0.2)', borderRadius: '12px', '& .MuiAlert-icon': { color: '#fca5a5' } }}>
+              {error}
+            </Alert>
+          )}
+  
+          <Button
+            fullWidth
+            onClick={handleSubmit}
+            disabled={loading}
+            endIcon={loading ? <CircularProgress size={18} sx={{ color: '#000' }} /> : <SendIcon />}
+            sx={{
+              bgcolor: '#2E9EBF',
+              color: '#000',
+              fontWeight: 800,
+              borderRadius: '14px',
+              py: 1.5,
+              fontSize: '1rem',
+              textTransform: 'none',
+              backgroundImage: 'linear-gradient(135deg, #2E9EBF, #1e608a)',
+              '&:hover': { backgroundImage: 'linear-gradient(135deg, #3da5d9, #2E9EBF)' },
+              '&:disabled': { bgcolor: 'rgba(46, 158, 191, 0.3)', color: 'rgba(0,0,0,0.4)' },
+            }}
+          >
+            {loading ? 'Submitting...' : 'Submit Review'}
+          </Button>
+
+        </DialogContent>
+      </Dialog>
   )
 }
 
@@ -352,13 +578,16 @@ export default function Home() {
   const isMobile = useMediaQuery(theme.breakpoints.down('md'));
   const [showAllServices, setShowAllServices] = useState(false);
   const { data: approvedDeals = [], isLoading: dealsLoading } = useApprovedDeals();
-
   const accent = theme.palette.primary.main;
   const accentAlpha = (a: number) => `rgba(46, 158, 191, ${a})`;
 
-  const { scrollRef: servicesRef, scroll: scrollServices } = useHorizontalScroll();
-  const { scrollRef: dealsRef, scroll: scrollDeals } = useHorizontalScroll();
-  const { scrollRef: testRef, scroll: scrollTest } = useHorizontalScroll();
+  //testimonial state
+  const [testimonials, setTestimonials] = useState<Testimonial[]>([]);
+  const [testimonialsLoading, setTestimonialsLoading] = useState(true);
+  const [currentPage, setCurrentPage] = useState(0);
+  const [modalOpen, setModalOpen] = useState(false);
+  const [snackbar, setSnackbar] = useState<{ open: boolean; message: string; severity: 'success' | 'error' }>({ open: false, message: '', severity: 'success' });
+  const autoRotateRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
   const homeDeals: HomeDealCardProps[] = approvedDeals.map((d) => ({
     id: d.id,
@@ -369,10 +598,62 @@ export default function Home() {
     badgeColor: d.badgeColor || '#ef4444',
   }));
 
+
+  const CARDS_PER_PAGE = 3;
+  const totalPages = Math.ceil(testimonials.length / CARDS_PER_PAGE);
+  const visibleTestimonials = testimonials.slice(currentPage * CARDS_PER_PAGE, currentPage * CARDS_PER_PAGE + CARDS_PER_PAGE);
+  
+
   useEffect(() => {
     const t = setTimeout(() => setVisible(true), 100);
     return () => clearTimeout(t);
   }, []);
+
+  //fetch testimonial from API
+  const fetchTestimonials = useCallback(async ()=> {
+    try{
+      const res = await axios.get('/testimonials');
+      setTestimonials(res.data);
+    } catch{
+      //silently fail - page still works
+    } finally{
+      setTestimonialsLoading(false);
+    }
+  }, []);
+
+  useEffect(() => { fetchTestimonials(); }, [fetchTestimonials]);
+
+  //Auto rotate every 15 sec
+  useEffect(() => {
+    if (testimonials.length <= CARDS_PER_PAGE) return;
+    autoRotateRef.current = setInterval(() => {
+      setCurrentPage((prev) => (prev + 1) % totalPages);
+    }, 15000);
+    return () => {if (autoRotateRef.current) clearInterval(autoRotateRef.current);};
+  }, [testimonials.length, totalPages]);
+
+  const goToPage = (page: number) =>{
+    //reset time when manual navigation
+    if (autoRotateRef.current) clearInterval(autoRotateRef.current);
+    setCurrentPage(page);
+    autoRotateRef.current = setInterval(() => {
+      setCurrentPage((prev) => (prev + 1) % totalPages);
+    }, 15000);
+  };
+
+  const handleShareClick = () => {
+    if(!auth?.accessToken){
+      navigate('/login');
+      return;
+    }
+    setModalOpen(true);
+  }
+
+  const handleSubmitted = () => {
+    setSnackbar({open: true, message: 'Thank you! your experience has been shared.', severity: 'success'});
+    fetchTestimonials(); //refresh list
+    setCurrentPage(0);
+  }
 
   const userName = auth?.user?.username || auth?.user?.email?.split('@')[0] || 'Student';
 
@@ -547,51 +828,104 @@ export default function Home() {
                       </Typography>
                     </Box>
                   </Box>
-                   <Box sx={{ display: { xs: 'none', md: 'flex' }, gap: 1 }}>
-                    <IconButton onClick={() => scrollTest('left')} sx={{ bgcolor: accentAlpha(0.06), color: 'text.primary', '&:hover': { bgcolor: accentAlpha(0.15) } }}>
-                      <ChevronLeftIcon />
-                    </IconButton>
-                    <IconButton onClick={() => scrollTest('right')} sx={{ bgcolor: accentAlpha(0.06), color: 'text.primary', '&:hover': { bgcolor: accentAlpha(0.15) } }}>
+                
+                {/*page navigation arrows only if more than 3 testimonials */}
+                {testimonials.length > CARDS_PER_PAGE && (
+                  <Box sx={{ display: 'flex', gap: 1 }}>
+                        <IconButton
+                          onClick={() => goToPage((currentPage - 1 + totalPages) % totalPages)}
+                          sx={{ bgcolor: 'rgba(255,255,255,0.05)', color: '#fff', '&:hover': { bgcolor: 'rgba(46,158,191,0.2)' } }}
+                        >
+                          <ChevronLeftIcon />
+                        </IconButton>
+                        <IconButton
+                          onClick={() => goToPage((currentPage + 1) % totalPages)}
+                          sx={{ bgcolor: 'rgba(255,255,255,0.05)', color: '#fff', '&:hover': { bgcolor: 'rgba(46,158,191,0.2)' } }}
+                        >
                       <ChevronRightIcon />
                     </IconButton>
                   </Box>
-                </Box>
-
-                <Box
-                  ref={testRef}
-                  sx={{
-                    display: 'flex',
-                    flexDirection: { xs: 'column', md: 'row' },
-                    gap: 3,
-                    overflowX: { xs: 'visible', md: 'auto' },
-                    pb: 2,
-                    px: 1,
-                    mx: -1,
-                    scrollbarWidth: 'none',
-                    '&::-webkit-scrollbar': { display: 'none' },
-                    scrollBehavior: 'smooth',
-                    scrollSnapType: { xs: 'none', md: 'x mandatory' },
-                    '& > *': { scrollSnapAlign: { xs: 'none', md: 'start' } }
-                  }}
-                >
-                  {testimonials.map((t, i) => (
-                    <Box key={t.id} sx={{ width: { xs: '100%', md: 'auto' } }}>
-                      <TestimonialCard t={t} index={i} />
-                    </Box>
-                  ))}
-                </Box>
-
-                <Box sx={{ display: 'flex', justifyContent: 'center', mt: 4 }}>
-                   <Button variant="outlined" sx={{ color: accent, borderColor: accentAlpha(0.4), borderRadius: '12px', px: 4, py: 1.2, fontWeight: 700, '&:hover': { borderColor: accent, bgcolor: accentAlpha(0.08) } }}>
-                     + Share Your Experience
-                   </Button>
-                </Box>
-
+                )}
               </Box>
 
+              {/*testimonial cards*/}
+              {testimonialsLoading ? (
+                <Box sx={{ display: 'flex', justifyContent: 'center', py: 6 }}>
+                  <CircularProgress sx={{ color: '#2E9EBF' }} />
+                </Box>
+              ) : testimonials.length === 0 ? (
+                <Box sx={{ textAlign: 'center', py: 6, color: 'rgba(255,255,255,0.3)' }}>
+                  <Typography variant="body1">No testimonials yet. Be the first to share!</Typography>
+                </Box>
+              ) : (
+                <Fade in key={currentPage} timeout={500}>
+                  <Box sx={{ display: 'flex', flexDirection: { xs: 'column', md: 'row' }, gap: 3 }}>
+                    {visibleTestimonials.map((t, i) => (
+                      <TestimonialCard key={t.id} t={t} index={i} />
+                    ))}
+                  </Box>
+                </Fade>
+              )}
+
+              {/*page dots*/}
+              {totalPages > 1 && (
+                <Box sx={{ display: 'flex', justifyContent: 'center', gap: 1, mt: 3 }}>
+                  {Array.from({ length: totalPages }).map((_, i) => (
+                    <Box
+                      key={i}
+                      onClick={() => goToPage(i)}
+                      sx={{
+                        width: i === currentPage ? 24 : 8,
+                        height: 8,
+                        borderRadius: '4px',
+                        bgcolor: i === currentPage ? '#2E9EBF' : 'rgba(255,255,255,0.15)',
+                        cursor: 'pointer',
+                        transition: 'all 0.3s ease',
+                        '&:hover': { bgcolor: i === currentPage ? '#2E9EBF' : 'rgba(255,255,255,0.3)' },
+                      }}
+                    />
+                  ))}
+                </Box>
+              )}
+
+               <Box sx={{ display: 'flex', justifyContent: 'center', mt: 4 }}>
+                <Button
+                  variant="outlined"
+                  onClick={handleShareClick}
+                  sx={{ color: '#2E9EBF', borderColor: 'rgba(46, 158, 191, 0.1)', borderRadius: '12px', px: 4, py: 1.2, fontWeight: 700, textTransform: 'none', '&:hover': { borderColor: '#2E9EBF', bgcolor: 'rgba(46, 158, 191, 0.1)' } }}
+                >
+                  + Share Your Experience
+                </Button>
+              </Box>
+            </Box>
           </Box>
         </Box>
       </Box>
+
+      {/*share model*/}
+      <ShareModal 
+        open={modalOpen}
+        onClose={() => setModalOpen(false)}
+        onSubmitted={handleSubmitted}
+        token={auth?.accessToken || ''}  
+      />
+
+
+      {/*Success Snackbar*/}
+      <Snackbar
+        open={snackbar.open}
+        autoHideDuration={4000}
+        onClose={() => setSnackbar((s) => ({ ...s, open: false }))}
+        anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
+      >
+        <Alert
+          severity={snackbar.severity}
+          onClose={() => setSnackbar((s) => ({ ...s, open: false }))}
+          sx={{ borderRadius: '12px', fontWeight: 600 }}
+        >
+          {snackbar.message}
+        </Alert>
+      </Snackbar>
     </Box>
   );
 }

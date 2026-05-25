@@ -94,6 +94,17 @@ function MuiThemeWrapper({ children }: { children: React.ReactNode }) {
 
 // ─── Root App ─────────────────────────────────────────────────────────────────
 export default function App() {
+  // Ensure devtools only show up in development environment AND on a local machine (localhost/local IP)
+  const showDevtools =
+    import.meta.env.DEV &&
+    typeof window !== 'undefined' &&
+    (window.location.hostname === 'localhost' ||
+      window.location.hostname === '127.0.0.1' ||
+      window.location.hostname === '[::1]' ||
+      window.location.hostname.startsWith('192.168.') ||
+      window.location.hostname.startsWith('10.') ||
+      window.location.hostname.endsWith('.local'));
+
   return (
     <QueryClientProvider client={queryClient}>
       <AuthProvider>
@@ -117,7 +128,7 @@ export default function App() {
           </MuiThemeWrapper>
         </ThemeProvider>
       </AuthProvider>
-      <ReactQueryDevtools initialIsOpen={false} />
+      {showDevtools && <ReactQueryDevtools initialIsOpen={false} />}
       <Analytics />
     </QueryClientProvider>
   );
