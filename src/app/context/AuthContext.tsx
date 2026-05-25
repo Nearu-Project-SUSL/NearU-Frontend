@@ -1,4 +1,5 @@
-import { createContext, useState, useEffect, ReactNode } from "react";
+import { createContext, useState, useEffect, useCallback, ReactNode } from "react";
+import { useFcm } from "../hooks/useFcm";
 
 interface User {
   id: string; // From backend "userId"
@@ -46,9 +47,17 @@ const AuthContext = createContext<AuthContextType>({
   setAuth: () => {},
 });
 
-export const AuthProvider = ({ children }: { children: ReactNode }) => {
-  // Initialize from localStorage so refresh doesn't log the user out
-  const [auth, setAuth] = useState<AuthState>(getPersistedAuth);
+// ─── Inner provider — has access to auth state ────────────────────────────────
+function AuthProviderInner({ children, auth, setAuth }: {
+  children: ReactNode;
+  auth: AuthState;
+  setAuth: React.Dispatch<React.SetStateAction<AuthState>>;
+}) {
+  const isLoggedIn = !!auth.user && !!auth.accessToken;
+
+  // Initialise FCM for any logged-in user (Students, Riders, etc.)
+  // cleanupFcm() is called on logout to remove the device token from the backend
+  const { cleanupFcm } = useFcm({ enabled: isLoggedIn });
 
   // Keep localStorage in sync whenever auth changes
   useEffect(() => {
@@ -71,14 +80,13 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       const newAccessToken = customEvent.detail;
       setAuth(prev => {
         if (!prev.user) return prev;
-        return {
-          ...prev,
-          accessToken: newAccessToken
-        };
+        return { ...prev, accessToken: newAccessToken };
       });
     };
 
-    const handleLogoutEvent = () => {
+    const handleLogoutEvent = async () => {
+      // Clean up FCM token before wiping auth state
+      await cleanupFcm();
       setAuth({ user: null, accessToken: null, refreshToken: null });
     };
 
@@ -89,13 +97,23 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       window.removeEventListener('auth_token_refreshed', handleRefreshed);
       window.removeEventListener('auth_logout', handleLogoutEvent);
     };
-  }, []);
-
+  }, [cleanupFcm, setAuth]);
 
   return (
     <AuthContext.Provider value={{ auth, setAuth }}>
       {children}
     </AuthContext.Provider>
+  );
+}
+
+// ─── Exported provider — owns the state ──────────────────────────────────────
+export const AuthProvider = ({ children }: { children: ReactNode }) => {
+  const [auth, setAuth] = useState<AuthState>(getPersistedAuth);
+
+  return (
+    <AuthProviderInner auth={auth} setAuth={setAuth}>
+      {children}
+    </AuthProviderInner>
   );
 };
 
