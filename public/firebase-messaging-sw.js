@@ -14,19 +14,23 @@
 importScripts('https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js');
 importScripts('https://www.gstatic.com/firebasejs/10.14.1/firebase-messaging-compat.js');
 
-// ─── Config injection via postMessage ────────────────────────────────────────
-// The main thread sends FIREBASE_CONFIG before the first notification.
-let messaging = null;
+// ─── Firebase Synchronous Initialization ─────────────────────────────────────
+// Initializing synchronously during the first evaluation allows the compat SDK
+// to register 'push' and 'notificationclick' event handlers immediately,
+// avoiding browser warnings.
+const firebaseConfig = {
+  apiKey: "AIzaSyC_teZVOfCG41bZ70cBcHs6DV9cCZKt6xY",
+  authDomain: "nearu-b8243.firebaseapp.com",
+  projectId: "nearu-b8243",
+  storageBucket: "nearu-b8243.firebasestorage.app",
+  messagingSenderId: "529598546014",
+  appId: "1:529598546014:web:08d9c04c512366f10e34cf",
+  measurementId: "G-MGQ46XRDGJ"
+};
 
-self.addEventListener('message', (event) => {
-  if (event.data && event.data.type === 'FIREBASE_CONFIG') {
-    if (firebase.apps.length === 0) {
-      firebase.initializeApp(event.data.config);
-      messaging = firebase.messaging();
-      console.log('[FCM SW] Firebase initialised in service worker.');
-    }
-  }
-});
+firebase.initializeApp(firebaseConfig);
+const messaging = firebase.messaging();
+console.log('[FCM SW] Firebase initialised synchronously in service worker.');
 
 // ─── Background message handler ───────────────────────────────────────────────
 // Fired when a notification arrives and the app tab is NOT in focus.
