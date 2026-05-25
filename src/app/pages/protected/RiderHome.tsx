@@ -16,10 +16,11 @@
  */
 
 import { useCallback, useEffect } from 'react';
-import { Box, Typography, useTheme } from '@mui/material';
+import { Box, Typography, useTheme, CircularProgress } from '@mui/material';
 import { motion, AnimatePresence } from 'motion/react';
 import { useQuery, useMutation } from '@tanstack/react-query';
 import { toast } from 'sonner';
+import axios from 'axios';
 
 // Layout
 import { Sidebar } from '../../components/layout/Sidebar';
@@ -48,6 +49,8 @@ import {
   LocationSearching as LocationIcon,
   SignalWifi4Bar as SignalIcon,
   WifiOff as OfflineIcon,
+  HourglassEmpty as PendingIcon,
+  Block as BlockIcon,
 } from '@mui/icons-material';
 
 // ─── Constants ────────────────────────────────────────────────────────────────
@@ -137,6 +140,18 @@ export default function RiderHome() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
+  // ─── Rider approval status ─────────────────────────────────────────────────
+  // Fetched once on mount to show pending/rejected states instead of
+  // letting the rider click "Go Online" and get a confusing 400 error.
+  const { data: riderStatusData, isLoading: isRiderStatusLoading } = useQuery({
+    queryKey: ['riderStatusProfile'],
+    queryFn: riderService.getRiderStatus,
+    staleTime: 30_000,
+    retry: false,
+  });
+
+  const approvalStatus = riderStatusData?.approvalStatus ?? null;
+
   // ─── Rider stats ────────────────────────────────────────────────────────────
   const { data: stats } = useQuery({
     queryKey: ['riderStats'],
@@ -158,7 +173,18 @@ export default function RiderHome() {
         toast.info("You're now offline.", { icon: '💤' });
       }
     },
-    onError: () => toast.error('Failed to update status. Check your connection.'),
+    onError: (err: unknown) => {
+      // Surface the actual backend error message when available
+      let message = 'Failed to update status. Check your connection.';
+      if (axios.isAxiosError(err)) {
+        const serverMsg =
+          err.response?.data?.message ||
+          err.response?.data?.error ||
+          err.response?.data?.title;
+        if (serverMsg) message = serverMsg;
+      }
+      toast.error(message);
+    },
   });
 
   const acceptMutation = useMutation({
@@ -238,6 +264,144 @@ export default function RiderHome() {
   //  STATE 1: OFFLINE — Go Online screen
   // ─────────────────────────────────────────────────────────────────────────
   if (rideStatus === 'OFFLINE') {
+    // ── Loading approval status ──────────────────────────────────────────
+    if (isRiderStatusLoading) {
+      return (
+        <Box sx={{ display: 'flex', minHeight: '100vh', bgcolor: 'background.default' }}>
+          <Sidebar activeSection="home" />
+          <Box sx={{ flexGrow: 1, display: 'flex', flexDirection: 'column' }}>
+            <Navbar />
+            <Box sx={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+              <CircularProgress sx={{ color: RIDER_ACCENT }} />
+            </Box>
+          </Box>
+        </Box>
+      );
+    }
+
+    // ── Pending approval ──────────────────────────────────────────────────
+    if (approvalStatus === 'Pending') {
+      return (
+        <Box sx={{ display: 'flex', minHeight: '100vh', bgcolor: 'background.default' }}>
+          <Sidebar activeSection="home" />
+          <Box sx={{ flexGrow: 1, display: 'flex', flexDirection: 'column' }}>
+            <Navbar />
+            <Box sx={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', p: 3 }}>
+              <motion.div
+                initial={{ opacity: 0, y: 30 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.5 }}
+                style={{ maxWidth: 420, width: '100%', textAlign: 'center' }}
+              >
+                <Box sx={{
+                  p: 4, borderRadius: '24px',
+                  background: theme.palette.mode === 'dark'
+                    ? 'linear-gradient(145deg, rgba(245,158,11,0.08), rgba(245,158,11,0.02))'
+                    : 'white',
+                  border: '1px solid rgba(245,158,11,0.25)',
+                  boxShadow: '0 20px 60px rgba(245,158,11,0.08)',
+                }}>
+                  <motion.div
+                    animate={{ rotate: [0, 10, -10, 0] }}
+                    transition={{ duration: 2, repeat: Infinity, ease: 'easeInOut' }}
+                    style={{ marginBottom: 20 }}
+                  >
+                    <div style={{
+                      width: 84, height: 84,
+                      background: 'rgba(245,158,11,0.12)',
+                      border: '2px solid rgba(245,158,11,0.3)',
+                      borderRadius: '50%',
+                      display: 'inline-flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                    }}>
+                      <PendingIcon style={{ color: '#f59e0b', fontSize: 42 }} />
+                    </div>
+                  </motion.div>
+                  <Typography variant="h5" sx={{ color: 'text.primary', fontWeight: 800, mb: 1 }}>
+                    Application Under Review
+                  </Typography>
+                  <Typography variant="body1" sx={{ color: 'text.secondary', mb: 2 }}>
+                    Your rider application is pending admin approval. You'll be able to go online once approved.
+                    Please check back later.
+                  </Typography>
+                  <Box sx={{
+                    p: 1.5, borderRadius: 2,
+                    background: 'rgba(245,158,11,0.08)',
+                    border: '1px solid rgba(245,158,11,0.2)',
+                  }}>
+                    <Typography variant="caption" sx={{ color: '#f59e0b' }}>
+                      ⏳ Status: <strong>Pending Approval</strong>
+                    </Typography>
+                  </Box>
+                </Box>
+              </motion.div>
+            </Box>
+          </Box>
+        </Box>
+      );
+    }
+
+    // ── Rejected / Suspended ──────────────────────────────────────────────
+    if (approvalStatus === 'Rejected' || approvalStatus === 'Suspended') {
+      return (
+        <Box sx={{ display: 'flex', minHeight: '100vh', bgcolor: 'background.default' }}>
+          <Sidebar activeSection="home" />
+          <Box sx={{ flexGrow: 1, display: 'flex', flexDirection: 'column' }}>
+            <Navbar />
+            <Box sx={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', p: 3 }}>
+              <motion.div
+                initial={{ opacity: 0, y: 30 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.5 }}
+                style={{ maxWidth: 420, width: '100%', textAlign: 'center' }}
+              >
+                <Box sx={{
+                  p: 4, borderRadius: '24px',
+                  background: theme.palette.mode === 'dark'
+                    ? 'linear-gradient(145deg, rgba(239,68,68,0.08), rgba(239,68,68,0.02))'
+                    : 'white',
+                  border: '1px solid rgba(239,68,68,0.25)',
+                  boxShadow: '0 20px 60px rgba(239,68,68,0.08)',
+                }}>
+                  <div style={{
+                    width: 84, height: 84,
+                    background: 'rgba(239,68,68,0.12)',
+                    border: '2px solid rgba(239,68,68,0.3)',
+                    borderRadius: '50%',
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    margin: '0 auto 20px',
+                  }}>
+                    <BlockIcon style={{ color: '#ef4444', fontSize: 42 }} />
+                  </div>
+                  <Typography variant="h5" sx={{ color: 'text.primary', fontWeight: 800, mb: 1 }}>
+                    Account {approvalStatus}
+                  </Typography>
+                  <Typography variant="body1" sx={{ color: 'text.secondary', mb: 2 }}>
+                    {approvalStatus === 'Suspended'
+                      ? 'Your rider account has been suspended. Please contact support for assistance.'
+                      : 'Your rider application was not approved. Please contact support if you believe this is an error.'}
+                  </Typography>
+                  <Box sx={{
+                    p: 1.5, borderRadius: 2,
+                    background: 'rgba(239,68,68,0.08)',
+                    border: '1px solid rgba(239,68,68,0.2)',
+                  }}>
+                    <Typography variant="caption" sx={{ color: '#ef4444' }}>
+                      Status: <strong>{approvalStatus}</strong>
+                    </Typography>
+                  </Box>
+                </Box>
+              </motion.div>
+            </Box>
+          </Box>
+        </Box>
+      );
+    }
+
+    // ── Approved (or status unknown) — show normal Go Online screen ───────
     return (
       <Box sx={{ display: 'flex', minHeight: '100vh', bgcolor: 'background.default' }}>
         <Sidebar activeSection="home" />
