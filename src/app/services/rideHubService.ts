@@ -54,6 +54,7 @@ export type HubEventCallbacks = {
   onRideRequest?: (request: RideRequest) => void;
   onRideStateChanged?: (payload: RideStatePayload) => void;
   onLocationUpdated?: (payload: LocationPayload) => void;
+  onNewRiderApplication?: (payload: any) => void;
   onReconnecting?: () => void;
   onReconnected?: () => void;
   onDisconnected?: (error?: Error) => void;
@@ -135,6 +136,11 @@ class RideHubService {
     // Live GPS location update — students receive this on the ride channel
     this.connection.on(HUB_EVENTS.LOCATION_UPDATED, (payload: LocationPayload) => {
       this.callbacks.onLocationUpdated?.(payload);
+    });
+
+    // New rider application real-time alert — admins receive this on connection
+    this.connection.on('NewRiderApplication', (payload: any) => {
+      this.callbacks.onNewRiderApplication?.(payload);
     });
 
     this.connection.onreconnecting(() => {
