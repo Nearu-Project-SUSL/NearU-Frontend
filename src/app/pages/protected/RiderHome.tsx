@@ -117,7 +117,7 @@ export default function RiderHome() {
       riderCoords
         ? riderService.getNearbyRequests(riderCoords.latitude, riderCoords.longitude)
         : Promise.resolve([]),
-    enabled: rideStatus === 'ONLINE_IDLE' && !!riderCoords,
+    enabled: isAuthReady && rideStatus === 'ONLINE_IDLE' && !!riderCoords,
     refetchInterval: NEARBY_FALLBACK_POLL_MS,
     retry: false,
   });
@@ -130,6 +130,7 @@ export default function RiderHome() {
 
   // ─── Resume active ride on page refresh ───────────────────────────────────
   useEffect(() => {
+    if (!isAuthReady) return; // Wait for fresh token
     if (rideStatus === 'OFFLINE') return; // Don't check if offline
 
     riderService.getActiveRide().then((ride) => {
@@ -138,9 +139,9 @@ export default function RiderHome() {
         toast.info('Resumed your active ride.', { icon: '🛵' });
       }
     });
-    // Run once on mount only
+    // Run when auth becomes ready (skip on mount while startup refresh is in-flight)
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [isAuthReady]);
 
   // ─── Rider approval status ─────────────────────────────────────────────────
   // Fetched once on mount to show pending/rejected states instead of
@@ -148,6 +149,7 @@ export default function RiderHome() {
   const { data: riderStatusData, isLoading: isRiderStatusLoading } = useQuery({
     queryKey: ['riderStatusProfile'],
     queryFn: riderService.getRiderStatus,
+    enabled: isAuthReady,
     staleTime: 30_000,
     retry: false,
   });
@@ -158,6 +160,7 @@ export default function RiderHome() {
   const { data: stats } = useQuery({
     queryKey: ['riderStats'],
     queryFn: riderService.getStats,
+    enabled: isAuthReady,
     staleTime: 60_000,
     retry: false,
     // getStats returns null on 404 (endpoint not yet deployed) — treat as empty
