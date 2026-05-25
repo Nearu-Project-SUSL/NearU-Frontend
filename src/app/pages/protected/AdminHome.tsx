@@ -2,8 +2,53 @@ import { useNavigate } from 'react-router';
 import { PageLayout } from '../../components/layout/PageLayout';
 import { Sidebar } from '../../components/layout/Sidebar';
 import { Container, Typography, Box, Paper, Grid, Button } from '@mui/material';
+import { useState, useEffect, useCallback } from 'react';
+import { PageLayout } from '../../components/layout/PageLayout';
+import { Sidebar } from '../../components/layout/Sidebar';
+import {
+  Container,
+  Typography,
+  Box,
+  Paper,
+  Grid,
+  Button,
+  Table,
+  TableBody,
+  TableCell,
+  TableContainer,
+  TableHead,
+  TableRow,
+  IconButton,
+  Tooltip,
+  CircularProgress,
+  Tabs,
+  Tab,
+  Chip,
+  Avatar,
+  Fade,
+  useTheme,
+  TextField,
+  InputAdornment
+} from '@mui/material';
+import {
+  Refresh as RefreshIcon,
+  DirectionsBike as BikeIcon,
+  HourglassEmpty as PendingIcon,
+  CheckCircle as CheckIcon,
+  Cancel as RejectIcon,
+  Block as SuspendIcon,
+  TrendingUp as TrendIcon,
+  CheckCircleOutline as ActiveIcon,
+  People as UsersIcon,
+  OnlinePrediction as OnlineIcon,
+  Search as SearchIcon
+} from '@mui/icons-material';
 import useAuth from '../../hooks/useAuth';
 import Navbar from '../../components/layout/Navbar';
+import adminService, { AdminStats, AdminRider } from '../../../api/adminService';
+import { rideHub } from '../../services/rideHubService';
+import { toast } from 'sonner';
+import { useNearUTheme } from '../../context/ThemeContext';
 
 export default function AdminHome() {
   const { auth } = useAuth();
@@ -67,6 +112,7 @@ export default function AdminHome() {
                 ))}
               </Grid>
             </Paper>
+
           </Container>
         </PageLayout>
       </Box>
