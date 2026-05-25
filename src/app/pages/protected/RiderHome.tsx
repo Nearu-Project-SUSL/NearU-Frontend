@@ -61,7 +61,7 @@ const NEARBY_FALLBACK_POLL_MS = 15_000;
 
 // ─── Component ────────────────────────────────────────────────────────────────
 export default function RiderHome() {
-  const { auth } = useAuth();
+  const { auth, isAuthReady } = useAuth();
   const theme = useTheme();
 
   // ─── State machine ─────────────────────────────────────────────────────────
@@ -85,9 +85,11 @@ export default function RiderHome() {
   } = useRiderStore();
 
   // ─── SignalR hub ───────────────────────────────────────────────────────────
+  // Wait for isAuthReady before connecting — ensures we use a fresh, non-expired
+  // token so the SignalR handshake doesn't fail with "Handshake was canceled".
   const { isHubConnected } = useRideHub({
     accessToken: auth.accessToken,
-    enabled: !!auth.accessToken,
+    enabled: !!auth.accessToken && isAuthReady,
   });
 
   // ─── Geolocation tracking ──────────────────────────────────────────────────
@@ -158,6 +160,7 @@ export default function RiderHome() {
     queryFn: riderService.getStats,
     staleTime: 60_000,
     retry: false,
+    // getStats returns null on 404 (endpoint not yet deployed) — treat as empty
   });
 
   // ─── API mutations ─────────────────────────────────────────────────────────
