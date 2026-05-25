@@ -93,6 +93,15 @@ const setStatus = async (isOnline: boolean): Promise<void> => {
   await axiosPrivate.put('/rider/status', { isOnline });
 };
 
+/**
+ * Fetch current rider status profile (availability, tier, approvalStatus).
+ * GET /rider/status  (baseURL already includes /api)
+ */
+const getRiderStatus = async (): Promise<{ riderId: string; isOnline: boolean; approvalStatus: string; riderTier: string }> => {
+  const response = await axiosPrivate.get<any>('/rider/status');
+  return response.data?.data;
+};
+
 // ─── Nearby Requests ──────────────────────────────────────────────────────────
 
 /**
@@ -266,6 +275,7 @@ const getStats = async (): Promise<RiderStatsResponse> => {
 const riderService = {
   // Rider availability
   setStatus,
+  getRiderStatus,
   // Nearby requests (HTTP fallback — primary via SignalR)
   getNearbyRequests,
   // Ride lifecycle
