@@ -7,7 +7,7 @@
  * and live location streaming) is handled separately via SignalR:
  * → see src/app/services/rideHubService.ts
  */
-import axiosPrivate from './axios';
+import { axiosPrivate } from './axios';
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
