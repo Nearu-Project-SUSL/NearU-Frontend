@@ -1,7 +1,10 @@
-import { useState } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { Link, useNavigate } from 'react-router';
 import useAdminTransport from '../../hooks/useAdminTransport';
 import type { AdminRider } from '../../../types/adminTransport';
+import useAuth from '../../hooks/useAuth';
+import { rideHub } from '../../services/rideHubService';
+import { toast } from 'sonner';
 import { 
   Building2, 
   CheckCircle, 
@@ -110,10 +113,50 @@ export default function AdminHome() {
     deleteTrainRoute,
     cancelBooking
   } = useAdminTransport();
+  const { auth } = useAuth();
   const [activeTab, setActiveTab] = useState<'overview' | 'businesses' | 'transport' | 'riders' | 'students' | 'reviews' | 'analytics' | 'settings'>('overview');
   const [selectedBusiness, setSelectedBusiness] = useState<PendingBusiness | null>(null);
   const [selectedRider, setSelectedRider] = useState<AdminRider | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
+  const [riderFilterTab, setRiderFilterTab] = useState<'all' | 'pending' | 'approved' | 'suspended' | 'rejected'>('all');
+  const [riderSearchQuery, setRiderSearchQuery] = useState('');
+
+  // SignalR Lifecycle Setup for live notifications
+  useEffect(() => {
+    const setupHub = async () => {
+      const token = localStorage.getItem('auth_accessToken') || auth?.accessToken;
+      if (!token) return;
+
+      try {
+        await rideHub.connect(token);
+        
+        // Listen to live Rider registration event
+        rideHub.setCallbacks({
+          onNewRiderApplication: (payload: any) => {
+            // Play sound/vibe & show toast
+            toast.info(`🔔 New Rider Application: ${payload.name || payload.email} is waiting for approval!`, {
+              duration: 8000,
+              action: {
+                label: 'Refresh Dashboard',
+                onClick: () => refreshTransport()
+              }
+            });
+            // Refresh list dynamically
+            refreshTransport();
+          }
+        });
+      } catch (err) {
+        console.warn('SignalR connection failed for admin dashboard:', err);
+      }
+    };
+
+    setupHub();
+
+    return () => {
+      // Disconnect or clear callbacks on unmount to avoid memory leaks
+      rideHub.clearCallbacks();
+    };
+  }, [auth?.accessToken, refreshTransport]);
 
   // Sample data
   const [pendingBusinesses, setPendingBusinesses] = useState<PendingBusiness[]>([
@@ -282,7 +325,7 @@ export default function AdminHome() {
     },
     { 
       label: 'Active Riders', 
-      value: '25', 
+      value: analyticsSummary.riders.approved.toString(), 
       icon: Bike, 
       color: 'from-green-500 to-green-600',
       bgColor: 'green',
@@ -290,8 +333,8 @@ export default function AdminHome() {
       changeType: 'increase'
     },
     { 
-      label: 'Today\'s Orders', 
-      value: '342', 
+      label: 'Today\'s Bookings', 
+      value: analyticsSummary.bookingsToday.toString(), 
       icon: ShoppingBag, 
       color: 'from-yellow-500 to-yellow-600',
       bgColor: 'yellow',
@@ -299,8 +342,8 @@ export default function AdminHome() {
       changeType: 'increase'
     },
     { 
-      label: 'Total Revenue', 
-      value: 'Rs. 184K', 
+      label: 'Today\'s Revenue', 
+      value: `Rs. ${analyticsSummary.revenueTodayLkr}`, 
       icon: DollarSign, 
       color: 'from-pink-500 to-pink-600',
       bgColor: 'pink',
@@ -956,101 +999,237 @@ export default function AdminHome() {
           )}
 
           {/* Riders Tab */}
-          {activeTab === 'riders' && (
-            <div className="space-y-6">
-              <div className="flex items-center justify-between">
-                <div>
-                  <h2 className="text-2xl text-white mb-2">Rider Applications</h2>
-                  <p className="text-gray-400">Review and approve rider registrations</p>
-                </div>
-              </div>
+          {activeTab === 'riders' && (() => {
+            const filteredRiders = adminRiders.filter(rider => {
+              const matchesSearch = 
+                rider.fullName.toLowerCase().includes(riderSearchQuery.toLowerCase()) ||
+                rider.email.toLowerCase().includes(riderSearchQuery.toLowerCase()) ||
+                rider.phone.includes(riderSearchQuery);
+              
+              const matchesTab = riderFilterTab === 'all' || rider.status === riderFilterTab;
+              return matchesSearch && matchesTab;
+            });
 
-              <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                {adminRiders.filter(r => r.status === 'pending').map((rider, index) => (
-                  <div 
-                    key={rider.id}
-                    className="relative group animate-fadeIn"
-                    style={{ animationDelay: `${index * 0.05}s` }}
-                  >
-                    <div className="absolute inset-0 bg-gradient-to-br from-green-400/10 to-green-600/10 rounded-2xl blur-xl opacity-0 group-hover:opacity-100 transition-opacity"></div>
-                    <div className="relative bg-gradient-to-br from-gray-900/80 to-black/80 border-2 border-yellow-400/20 rounded-2xl p-6 hover:border-yellow-400/40 transition-all">
-                      <div className="flex items-start justify-between mb-4">
-                        <div className="flex-1">
-                          <h3 className="text-xl text-white mb-1">{rider.fullName}</h3>
-                          <p className="text-green-400 text-sm mb-2">{rider.vehicleType}</p>
-                        </div>
-                        <span className="px-3 py-1 bg-orange-500/20 text-orange-400 rounded-full text-xs font-medium border border-orange-500/30">
-                          Pending
-                        </span>
-                      </div>
-
-                      <div className="space-y-2 mb-4">
-                        <div className="flex items-center gap-2 text-sm">
-                          <Mail className="w-4 h-4 text-gray-500" />
-                          <span className="text-white">{rider.email}</span>
-                        </div>
-                        <div className="flex items-center gap-2 text-sm">
-                          <Phone className="w-4 h-4 text-gray-500" />
-                          <span className="text-white">{rider.phone}</span>
-                        </div>
-                        <div className="flex items-center gap-2 text-sm">
-                          <FileText className="w-4 h-4 text-gray-500" />
-                          <span className="text-gray-400">Vehicle:</span>
-                          <span className="text-white">{rider.vehicleNumber}</span>
-                        </div>
-                        <div className="flex items-center gap-2 text-sm">
-                          <FileText className="w-4 h-4 text-gray-500" />
-                          <span className="text-gray-400">License:</span>
-                          <span className="text-white">{rider.licenseNumber}</span>
-                        </div>
-                        <div className="flex items-center gap-2 text-sm">
-                          <Calendar className="w-4 h-4 text-gray-500" />
-                          <span className="text-gray-400">Joined:</span>
-                          <span className="text-white">{rider.createdAt}</span>
-                        </div>
-                        <div className="flex items-center gap-2 text-sm">
-                          <Activity className="w-4 h-4 text-gray-500" />
-                          <span className="text-gray-400">Availability:</span>
-                          <span className="text-white">{rider.availability}</span>
-                        </div>
-                      </div>
-
-                      <div className="flex gap-2">
-                        <button
-                          onClick={() => setSelectedRider(rider)}
-                          className="flex-1 px-4 py-2 bg-blue-500/10 hover:bg-blue-500/20 text-blue-400 rounded-xl transition-all border border-blue-500/20 hover:border-blue-500/40 text-sm font-medium flex items-center justify-center gap-2 hover:scale-105 duration-300"
-                        >
-                          <Eye className="w-4 h-4" />
-                          View Details
-                        </button>
-                        <button
-                          onClick={() => handleApproveRider(rider.id)}
-                          className="flex-1 px-4 py-2 bg-green-500/10 hover:bg-green-500/20 text-green-400 rounded-xl transition-all border border-green-500/20 hover:border-green-500/40 text-sm font-medium flex items-center justify-center gap-2 hover:scale-105 duration-300"
-                        >
-                          <CheckCircle className="w-4 h-4" />
-                          Approve
-                        </button>
-                        <button
-                          onClick={() => handleRejectRider(rider.id)}
-                          className="px-4 py-2 bg-red-500/10 hover:bg-red-500/20 text-red-400 rounded-xl transition-all border border-red-500/20 hover:border-red-500/40 flex items-center justify-center hover:scale-105 duration-300"
-                        >
-                          <XCircle className="w-4 h-4" />
-                        </button>
-                      </div>
-                    </div>
+            return (
+              <div className="space-y-6">
+                <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+                  <div>
+                    <h2 className="text-2xl text-white mb-2 font-bold tracking-tight">Rider Management</h2>
+                    <p className="text-gray-400 text-sm">Review, approve, suspend, or update platform riders</p>
                   </div>
-                ))}
-              </div>
-
-              {adminRiders.filter(r => r.status === 'pending').length === 0 && (
-                <div className="text-center py-12 bg-gradient-to-br from-gray-900/80 to-black/80 border-2 border-yellow-400/20 rounded-2xl">
-                  <CheckCircle className="w-16 h-16 text-green-400 mx-auto mb-4" />
-                  <h3 className="text-xl text-white mb-2">All Caught Up!</h3>
-                  <p className="text-gray-400">No pending rider approvals at the moment.</p>
                 </div>
-              )}
-            </div>
-          )}
+
+                {/* Search & Tabs Filtering */}
+                <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-yellow-400/10 pb-4">
+                  <div className="flex flex-wrap gap-2">
+                    {[
+                      { id: 'all', label: 'All', count: adminRiders.length },
+                      { id: 'pending', label: 'Pending', count: adminRiders.filter(r => r.status === 'pending').length },
+                      { id: 'approved', label: 'Approved', count: adminRiders.filter(r => r.status === 'approved').length },
+                      { id: 'suspended', label: 'Suspended', count: adminRiders.filter(r => r.status === 'suspended').length },
+                      { id: 'rejected', label: 'Rejected', count: adminRiders.filter(r => r.status === 'rejected').length }
+                    ].map(tab => (
+                      <button
+                        key={tab.id}
+                        onClick={() => setRiderFilterTab(tab.id as any)}
+                        className={`px-4 py-2.5 rounded-xl text-sm font-semibold transition-all duration-200 flex items-center gap-2 hover:scale-[1.02] ${
+                          riderFilterTab === tab.id
+                            ? 'bg-gradient-to-r from-yellow-400 to-yellow-600 text-black shadow-lg shadow-yellow-400/30'
+                            : 'bg-gray-800/40 text-gray-400 hover:bg-gray-800 hover:text-white border border-yellow-400/10'
+                        }`}
+                      >
+                        {tab.label}
+                        <span className={`px-2 py-0.5 rounded-full text-xs font-bold ${
+                          riderFilterTab === tab.id ? 'bg-black/20 text-black' : 'bg-gray-700 text-gray-300'
+                        }`}>
+                          {tab.count}
+                        </span>
+                      </button>
+                    ))}
+                  </div>
+
+                  <div className="relative w-full md:w-72">
+                    <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+                    <input
+                      type="text"
+                      placeholder="Search name, email, or phone..."
+                      value={riderSearchQuery}
+                      onChange={(e) => setRiderSearchQuery(e.target.value)}
+                      className="w-full bg-black/40 border-2 border-yellow-400/20 focus:border-yellow-400/60 rounded-xl pl-10 pr-4 py-2 text-white placeholder:text-gray-500 focus:outline-none transition-all duration-350"
+                    />
+                  </div>
+                </div>
+
+                {filteredRiders.length === 0 ? (
+                  <div className="text-center py-16 bg-gradient-to-br from-gray-900/80 to-black/80 border-2 border-yellow-400/20 rounded-2xl shadow-xl">
+                    <Bike className="w-16 h-16 text-yellow-400/50 mx-auto mb-4 animate-bounce" />
+                    <h3 className="text-xl text-white mb-2 font-semibold">No Riders Found</h3>
+                    <p className="text-gray-400 text-sm max-w-md mx-auto">
+                      {riderSearchQuery 
+                        ? `No results match your search: "${riderSearchQuery}"` 
+                        : `No riders currently have a status of "${riderFilterTab}"`}
+                    </p>
+                  </div>
+                ) : (
+                  <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                    {filteredRiders.map((rider, index) => (
+                      <div 
+                        key={rider.id}
+                        className="relative group animate-fadeIn"
+                        style={{ animationDelay: `${index * 0.05}s` }}
+                      >
+                        <div className="absolute inset-0 bg-gradient-to-br from-yellow-400/5 to-yellow-600/5 rounded-2xl blur-xl opacity-0 group-hover:opacity-100 transition-opacity"></div>
+                        <div className="relative bg-gradient-to-br from-gray-900/80 to-black/80 border-2 border-yellow-400/20 rounded-2xl p-6 hover:border-yellow-400/40 transition-all flex flex-col justify-between h-full shadow-2xl">
+                          <div>
+                            <div className="flex items-start justify-between mb-4">
+                              <div className="flex-1">
+                                <h3 className="text-xl text-white font-bold mb-1 group-hover:text-yellow-400 transition-colors">{rider.fullName}</h3>
+                                <span className="text-yellow-400/60 text-xs font-mono">ID: {rider.id.slice(0, 8)}...</span>
+                              </div>
+                              <span className={`px-3 py-1 rounded-full text-xs font-bold border ${
+                                rider.status === 'approved' ? 'bg-green-500/10 text-green-400 border-green-500/20' :
+                                rider.status === 'pending' ? 'bg-orange-500/10 text-orange-400 border-orange-500/20' :
+                                rider.status === 'suspended' ? 'bg-red-500/10 text-red-400 border-red-500/20' :
+                                'bg-gray-500/10 text-gray-400 border-gray-500/20'
+                              }`}>
+                                {rider.status.charAt(0).toUpperCase() + rider.status.slice(1)}
+                              </span>
+                            </div>
+
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-x-4 gap-y-3 mb-6">
+                              <div className="flex items-center gap-2.5 text-sm">
+                                <Mail className="w-4 h-4 text-gray-500" />
+                                <span className="text-gray-300 truncate" title={rider.email}>{rider.email}</span>
+                              </div>
+                              <div className="flex items-center gap-2.5 text-sm">
+                                <Phone className="w-4 h-4 text-gray-500" />
+                                <span className="text-gray-300">{rider.phone}</span>
+                              </div>
+                              <div className="flex items-center gap-2.5 text-sm">
+                                <Bike className="w-4 h-4 text-gray-500" />
+                                <span className="text-gray-400">Vehicle:</span>
+                                <span className="text-white capitalize">{rider.vehicleType} ({rider.vehicleNumber})</span>
+                              </div>
+                              <div className="flex items-center gap-2.5 text-sm">
+                                <FileText className="w-4 h-4 text-gray-500" />
+                                <span className="text-gray-400">License:</span>
+                                <span className="text-white font-mono">{rider.licenseNumber}</span>
+                              </div>
+                              <div className="flex items-center gap-2.5 text-sm">
+                                <Star className="w-4 h-4 text-yellow-500 fill-yellow-500/20" />
+                                <span className="text-gray-400">Rating:</span>
+                                <span className="text-white font-semibold">
+                                  {rider.ratingAvg > 0 ? `${rider.ratingAvg.toFixed(1)} ★ (${rider.ratingCount} reviews)` : 'No ratings yet'}
+                                </span>
+                              </div>
+                              <div className="flex items-center gap-2.5 text-sm">
+                                <Activity className="w-4 h-4 text-gray-500" />
+                                <span className="text-gray-400">Availability:</span>
+                                <div className="flex items-center gap-1.5">
+                                  <span className={`w-2.5 h-2.5 rounded-full ${
+                                    rider.availability === 'available' ? 'bg-green-500 shadow-[0_0_8px_#22c55e]' :
+                                    rider.availability === 'busy' ? 'bg-yellow-500 shadow-[0_0_8px_#eab308]' :
+                                    'bg-gray-500'
+                                  }`} />
+                                  <span className="text-white capitalize font-semibold">{rider.availability}</span>
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+
+                          <div className="space-y-4">
+                            {/* Quick Availability Actions (Only for approved riders) */}
+                            {rider.status === 'approved' && (
+                              <div className="flex items-center justify-between border-t border-yellow-400/5 pt-3">
+                                <span className="text-xs text-gray-400 font-semibold">Quick Availability:</span>
+                                <div className="flex gap-1.5">
+                                  {(['available', 'busy', 'offline'] as const).map((avail) => (
+                                    <button
+                                      key={avail}
+                                      onClick={() => updateRiderAvailability(rider.id, avail)}
+                                      className={`px-2.5 py-1 rounded-lg text-xs font-bold capitalize transition-all duration-200 ${
+                                        rider.availability === avail
+                                          ? avail === 'available' ? 'bg-green-500/20 text-green-400 border border-green-500/30' :
+                                            avail === 'busy' ? 'bg-yellow-500/20 text-yellow-400 border border-yellow-500/30' :
+                                            'bg-gray-800 text-gray-200 border border-gray-700'
+                                          : 'bg-black/20 text-gray-500 border border-transparent hover:text-gray-300'
+                                      }`}
+                                    >
+                                      {avail}
+                                    </button>
+                                  ))}
+                                </div>
+                              </div>
+                            )}
+
+                            {/* Admin Action Buttons */}
+                            <div className="flex gap-2 pt-3 border-t border-yellow-400/10">
+                              <button
+                                onClick={() => setSelectedRider(rider)}
+                                className="flex-1 px-4 py-2 bg-blue-500/10 hover:bg-blue-500/20 text-blue-400 rounded-xl transition-all border border-blue-500/20 hover:border-blue-500/40 text-sm font-semibold flex items-center justify-center gap-2 hover:scale-[1.02] duration-200"
+                              >
+                                <Eye className="w-4 h-4" />
+                                View Details
+                              </button>
+
+                              {rider.status === 'pending' && (
+                                <>
+                                  <button
+                                    onClick={() => handleApproveRider(rider.id)}
+                                    className="flex-1 px-4 py-2 bg-green-500/10 hover:bg-green-500/20 text-green-400 rounded-xl transition-all border border-green-500/20 hover:border-green-500/40 text-sm font-semibold flex items-center justify-center gap-2 hover:scale-[1.02] duration-200"
+                                  >
+                                    <CheckCircle className="w-4 h-4" />
+                                    Approve
+                                  </button>
+                                  <button
+                                    onClick={() => handleRejectRider(rider.id)}
+                                    className="px-4 py-2 bg-red-500/10 hover:bg-red-500/20 text-red-400 rounded-xl transition-all border border-red-500/20 hover:border-red-500/40 flex items-center justify-center hover:scale-[1.02] duration-200"
+                                    title="Reject Application"
+                                  >
+                                    <XCircle className="w-4 h-4" />
+                                  </button>
+                                </>
+                              )}
+
+                              {rider.status === 'approved' && (
+                                <button
+                                  onClick={() => handleSuspendRider(rider.id)}
+                                  className="flex-1 px-4 py-2 bg-orange-500/10 hover:bg-orange-500/20 text-orange-400 rounded-xl transition-all border border-orange-500/20 hover:border-orange-500/40 text-sm font-semibold flex items-center justify-center gap-2 hover:scale-[1.02] duration-200"
+                                >
+                                  <XCircle className="w-4 h-4" />
+                                  Suspend
+                                </button>
+                              )}
+
+                              {rider.status === 'suspended' && (
+                                <button
+                                  onClick={() => handleReactivateRider(rider.id)}
+                                  className="flex-1 px-4 py-2 bg-blue-500/10 hover:bg-blue-500/20 text-blue-400 rounded-xl transition-all border border-blue-500/20 hover:border-blue-500/40 text-sm font-semibold flex items-center justify-center gap-2 hover:scale-[1.02] duration-200"
+                                >
+                                  <CheckCircle className="w-4 h-4" />
+                                  Reactivate
+                                </button>
+                              )}
+
+                              {rider.status === 'rejected' && (
+                                <button
+                                  onClick={() => handleApproveRider(rider.id)}
+                                  className="flex-1 px-4 py-2 bg-green-500/10 hover:bg-green-500/20 text-green-400 rounded-xl transition-all border border-green-500/20 hover:border-green-500/40 text-sm font-semibold flex items-center justify-center gap-2 hover:scale-[1.02] duration-200"
+                                >
+                                  <CheckCircle className="w-4 h-4" />
+                                  Approve
+                                </button>
+                              )}
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+            );
+          })()}
 
           {/* Students Tab */}
           {activeTab === 'students' && (
