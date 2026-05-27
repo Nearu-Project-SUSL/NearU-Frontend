@@ -27,6 +27,8 @@ const CreateJob = Loadable(lazy(() => import("./pages/protected/CreateJob")));
 const UpdateJob = Loadable(lazy(() => import("./pages/protected/UpdateJob")));
 const MyJobs = Loadable(lazy(() => import("./pages/protected/MyJobs")));
 const Profile = Loadable(lazy(() => import("./pages/protected/Profile")));
+const TransportSelection = Loadable(lazy(() => import("./pages/protected/transport/TransportSelection")));
+const Transport = Loadable(lazy(() => import("./pages/protected/transport/Transport")));
 const FoodPage = Loadable(lazy(() => import("./pages/protected/Food")));
 const ShopDetailPage = Loadable(lazy(() => import("./pages/protected/ShopDetail")));
 const Accommodation = Loadable(lazy(() => import("./pages/public/Accommodation")));
@@ -104,6 +106,26 @@ export const router = createBrowserRouter([
       {
         path: "/food",
         Component: FoodPage,
+      },
+      {
+        path: "/transport",
+        Component: TransportSelection,
+      },
+      {
+        path: "/transport/bus",
+        Component: Transport,
+      },
+      {
+        path: "/transport/train",
+        Component: Transport,
+      },
+      {
+        path: "/transport/tuk",
+        Component: Transport,
+      },
+      {
+        path: "/transport/all",
+        Component: Transport,
       },
       {
         path: "/accommodation",
