@@ -7,7 +7,7 @@
  * and live location streaming) is handled separately via SignalR:
  * → see src/app/services/rideHubService.ts
  */
-import axiosPrivate from './axios';
+import { axiosPrivate } from './axios';
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -91,6 +91,15 @@ export interface RiderStatsResponse {
  */
 const setStatus = async (isOnline: boolean): Promise<void> => {
   await axiosPrivate.put('/rider/status', { isOnline });
+};
+
+/**
+ * Fetch current rider status profile (availability, tier, approvalStatus).
+ * GET /rider/status  (baseURL already includes /api)
+ */
+const getRiderStatus = async (): Promise<{ riderId: string; isOnline: boolean; approvalStatus: string; riderTier: string }> => {
+  const response = await axiosPrivate.get<any>('/rider/status');
+  return response.data?.data;
 };
 
 // ─── Nearby Requests ──────────────────────────────────────────────────────────
@@ -255,10 +264,17 @@ const rateRide = async (rideId: string, rating: number): Promise<void> => {
 
 /**
  * GET /rider/stats — aggregate stats for the dashboard.  (baseURL already includes /api)
+ * Returns null if the endpoint is unavailable (404 from undeployed backend).
  */
-const getStats = async (): Promise<RiderStatsResponse> => {
-  const response = await axiosPrivate.get<RiderStatsResponse>('/rider/stats');
-  return response.data;
+const getStats = async (): Promise<RiderStatsResponse | null> => {
+  try {
+    const response = await axiosPrivate.get<{ success: boolean; data: RiderStatsResponse }>('/rider/stats');
+    // Backend wraps response in ApiResponse<T>: { success, message, data: { totalRides, ... } }
+    return response.data?.data ?? null;
+  } catch {
+    // 404 = endpoint not yet deployed on this backend version; return null gracefully
+    return null;
+  }
 };
 
 // ─── Exports ──────────────────────────────────────────────────────────────────
@@ -266,6 +282,7 @@ const getStats = async (): Promise<RiderStatsResponse> => {
 const riderService = {
   // Rider availability
   setStatus,
+  getRiderStatus,
   // Nearby requests (HTTP fallback — primary via SignalR)
   getNearbyRequests,
   // Ride lifecycle

@@ -6,6 +6,9 @@
  * - Calls GoOnline/GoOffline on the hub when rider toggles availability
  * - Joins/leaves the ride-specific channel when a ride is accepted/completed
  * - Propagates server-pushed events into the Zustand riderStore
+ *
+ * The backend sends a single unified "RideStateChanged" event with a status
+ * string. This hook maps those status strings to frontend state transitions.
  */
 
 import { useEffect, useRef, useCallback } from 'react';
@@ -26,7 +29,6 @@ export function useRideHub({ accessToken, enabled = true }: UseRideHubOptions) {
     rideStatus,
     activeRide,
     setIncomingRequest,
-    acceptRequest,
     setArrived,
     startRide,
     setCompleting,
@@ -45,7 +47,7 @@ export function useRideHub({ accessToken, enabled = true }: UseRideHubOptions) {
     const connect = async () => {
       try {
         rideHub.setCallbacks({
-          // ── Incoming ride request broadcast ──────────────────────────────
+          // ── Incoming ride request broadcast to OnlineRiders group ─────────
           onRideRequest: (request) => {
             if (!mounted) return;
             // Only surface the request if we are idle
@@ -55,42 +57,60 @@ export function useRideHub({ accessToken, enabled = true }: UseRideHubOptions) {
             }
           },
 
-          // ── Ride accepted (confirmation from server) ──────────────────────
-          onRideAccepted: (ride) => {
+          // ── Unified state machine update from server ───────────────────────
+          // Maps backend RideRequestStatus enum strings to frontend state.
+          //   Pending             → (initial, no client action needed)
+          //   Accepted            → EN_ROUTE_PICKUP   (rider accepted)
+          //   RiderEnRoute        → EN_ROUTE_PICKUP   (synonym, same state)
+          //   RiderArrived        → ARRIVED_WAITING   (rider at pickup)
+          //   InProgress          → RIDE_IN_PROGRESS  (OTP verified, trip started)
+          //   PendingConfirmation → COMPLETING        (rider marked done, waiting for student)
+          //   Completed           → finish ride       (student confirmed)
+          //   Cancelled           → finish ride       (cancelled by student)
+          onRideStateChanged: (payload) => {
             if (!mounted) return;
-            acceptRequest(ride);
-          },
+            console.info('[RideHub] State changed:', payload.status, payload);
 
-          // ── Rider arrived ─────────────────────────────────────────────────
-          onRiderArrived: () => {
-            if (!mounted) return;
-            setArrived();
-          },
+            const { rideStatus: cur } = useRiderStore.getState();
 
-          // ── OTP verified / ride started ───────────────────────────────────
-          onRideStarted: () => {
-            if (!mounted) return;
-            startRide();
-          },
+            switch (payload.status) {
+              case 'Accepted':
+              case 'RiderEnRoute':
+                // Ride acceptance is driven by HTTP (acceptRide mutation returns the ride object).
+                // This event is a confirmation — no further state action needed here.
+                break;
 
-          // ── Rider-side complete (waiting for student confirm) ─────────────
-          onRideCompleted: () => {
-            if (!mounted) return;
-            setCompleting();
-          },
+              case 'RiderArrived':
+                if (cur === 'EN_ROUTE_PICKUP') {
+                  setArrived();
+                }
+                break;
 
-          // ── Student confirmed — ride fully done ───────────────────────────
-          onRideConfirmed: () => {
-            if (!mounted) return;
-            finishRide();
-            toast.success('Ride completed & confirmed! Great job! 🎉', { duration: 5000 });
-          },
+              case 'InProgress':
+                if (cur === 'ARRIVED_WAITING') {
+                  startRide();
+                }
+                break;
 
-          // ── Student cancelled ─────────────────────────────────────────────
-          onRideCancelled: (reason) => {
-            if (!mounted) return;
-            toast.warning(`Ride cancelled: ${reason}`, { duration: 5000 });
-            finishRide();
+              case 'PendingConfirmation':
+                if (cur === 'RIDE_IN_PROGRESS') {
+                  setCompleting();
+                }
+                break;
+
+              case 'Completed':
+                finishRide();
+                toast.success('Ride completed & confirmed! Great job! 🎉', { duration: 5000 });
+                break;
+
+              case 'Cancelled':
+                toast.warning('Ride was cancelled.', { duration: 5000 });
+                finishRide();
+                break;
+
+              default:
+                console.warn('[RideHub] Unhandled status:', payload.status);
+            }
           },
 
           // ── Connection lifecycle ──────────────────────────────────────────

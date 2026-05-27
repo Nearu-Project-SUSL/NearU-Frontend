@@ -91,20 +91,18 @@ export default function MapView({
 
   return (
     <div style={{ height, width: '100%', borderRadius: 'inherit', overflow: 'hidden', position: 'relative' }}>
-      {/* Leaflet attribution must remain visible per CartoDB & OSM terms of service.
-          We re-style it to fit the dark theme instead of hiding it. */}
+      {/* Re-style attribution for light theme */}
       <style>{`
         .leaflet-control-attribution {
-          background: rgba(10, 10, 10, 0.75) !important;
-          backdrop-filter: blur(6px);
-          color: #6b7280 !important;
+          background: rgba(255, 255, 255, 0.8) !important;
+          color: #4b5563 !important;
           font-size: 9px !important;
           border-radius: 6px 0 0 0 !important;
           padding: 2px 6px !important;
           border: none !important;
         }
         .leaflet-control-attribution a {
-          color: #9ca3af !important;
+          color: #2563eb !important;
         }
       `}</style>
       <MapContainer
@@ -113,13 +111,11 @@ export default function MapView({
         style={{ height: '100%', width: '100%' }}
         zoomControl={false}
       >
-        {/* CartoDB Dark Matter — free, no API key.
-            Full attribution: © OpenStreetMap contributors © CARTO */}
+        {/* OpenStreetMap Standard tile layer */}
         <TileLayer
-          url="https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png"
-          attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/">CARTO</a>'
-          subdomains="abcd"
-          maxZoom={20}
+          url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+          attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+          maxZoom={19}
         />
 
         {/* Auto-pan when rider moves */}

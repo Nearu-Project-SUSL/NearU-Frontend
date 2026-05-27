@@ -51,9 +51,19 @@ export type LocationPayload = {
 };
 
 export type HubEventCallbacks = {
+  /** Fired when the server broadcasts a new ride request to the OnlineRiders group */
   onRideRequest?: (request: RideRequest) => void;
+  /**
+   * Fired on every server-pushed state transition for a ride.
+   * status values mirror RideRequestStatus enum:
+   *   Pending | Accepted | RiderEnRoute | RiderArrived |
+   *   InProgress | PendingConfirmation | Completed | Cancelled
+   */
   onRideStateChanged?: (payload: RideStatePayload) => void;
+  /** Fired when the server pushes a live GPS coordinate update */
   onLocationUpdated?: (payload: LocationPayload) => void;
+  /** Fired when a new rider application is submitted (Admins only) */
+  onNewRiderApplication?: (payload: any) => void;
   onReconnecting?: () => void;
   onReconnected?: () => void;
   onDisconnected?: (error?: Error) => void;
@@ -81,8 +91,10 @@ class RideHubService {
 
     this.connection = new HubConnectionBuilder()
       .withUrl(this.hubUrl, {
-        // JWT must be passed as query string per the backend spec
-        accessTokenFactory: () => accessToken,
+        // Always return the freshest token from localStorage so reconnects
+        // after a token refresh use the new JWT instead of a stale one.
+        accessTokenFactory: () =>
+          localStorage.getItem('auth_accessToken') ?? accessToken,
       })
       .withAutomaticReconnect({
         nextRetryDelayInMilliseconds: (retryContext) => {
@@ -135,6 +147,11 @@ class RideHubService {
     // Live GPS location update — students receive this on the ride channel
     this.connection.on(HUB_EVENTS.LOCATION_UPDATED, (payload: LocationPayload) => {
       this.callbacks.onLocationUpdated?.(payload);
+    });
+
+    // New rider application real-time alert — admins receive this on connection
+    this.connection.on('NewRiderApplication', (payload: any) => {
+      this.callbacks.onNewRiderApplication?.(payload);
     });
 
     this.connection.onreconnecting(() => {
