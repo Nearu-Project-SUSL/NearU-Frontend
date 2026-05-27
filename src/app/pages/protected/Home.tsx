@@ -226,7 +226,7 @@ function ServiceCard({ service, index }: { service: typeof services[0], index: n
         sx={{
           minWidth: { xs: 260, md: 300 },
           height: 280,
-          bgcolor: theme.palette.background.paper,
+          bgcolor: 'var(--bg-surface)',
           borderRadius: '24px',
           position: 'relative',
           overflow: 'hidden',
@@ -249,7 +249,7 @@ function ServiceCard({ service, index }: { service: typeof services[0], index: n
              inset: 0,
              borderRadius: '24px',
              padding: '2px',
-             background: hovered ? `linear-gradient(135deg, ${accentAlpha(0.4)}, ${accentAlpha(0.05)})` : accentAlpha(0.06),
+             background: hovered ? `linear-gradient(135deg, var(--nearu-accent), var(--nearu-accent-subtle))` : 'var(--nearu-border)',
              WebkitMask: 'linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0)',
              WebkitMaskComposite: 'xor',
              maskComposite: 'exclude',
@@ -274,7 +274,7 @@ function ServiceCard({ service, index }: { service: typeof services[0], index: n
              )}
 
              {/* Gradient Overlay bottom to top */}
-             <Box sx={{ position: 'absolute', bottom: 0, left: 0, right: 0, height: '60%', background: `linear-gradient(to top, ${theme.palette.background.paper}, transparent)` }} />
+             <Box sx={{ position: 'absolute', bottom: 0, left: 0, right: 0, height: '60%', background: `linear-gradient(to top, var(--bg-surface), transparent)` }} />
 
              {/* Badge */}
              {service.badge && (
@@ -284,10 +284,10 @@ function ServiceCard({ service, index }: { service: typeof services[0], index: n
              )}
           </Box>
 
-          <Typography variant="h6" sx={{ color: theme.palette.text.primary, fontWeight: 700, mb: 1, fontSize: '1.2rem', fontFamily: '"Outfit", "Inter", sans-serif' }}>
+          <Typography variant="h6" sx={{ color: 'var(--text-primary)', fontWeight: 700, mb: 1, fontSize: '1.2rem', fontFamily: '"Outfit", "Inter", sans-serif' }}>
             {service.label}
           </Typography>
-          <Typography variant="body2" sx={{ color: theme.palette.text.secondary, fontSize: '0.85rem', lineHeight: 1.5, display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>
+          <Typography variant="body2" sx={{ color: 'var(--text-secondary)', fontSize: '0.85rem', lineHeight: 1.5, display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>
             {service.description}
           </Typography>
         </CardActionArea>
@@ -309,29 +309,29 @@ function DealCard({ deal, index }: { deal: typeof hotDeals[0], index: number }) 
         elevation={0}
         sx={{
           minWidth: { xs: 280, md: 340 },
-          bgcolor: theme.palette.background.paper,
+          bgcolor: 'var(--bg-surface)',
           borderRadius: '24px',
           overflow: 'hidden',
-          border: `1px solid ${accentAlpha(0.2)}`,
+          border: `1px solid var(--nearu-border)`,
           transition: 'all 0.3s ease',
           transform: hovered ? 'translateY(-5px)' : 'none',
-          boxShadow: hovered ? `0 15px 35px ${accentAlpha(0.12)}` : 'none',
+          boxShadow: hovered ? `0 15px 35px var(--nearu-accent-subtle)` : 'none',
         }}
         onMouseEnter={() => setHovered(true)}
         onMouseLeave={() => setHovered(false)}
       >
         <Box sx={{ height: 180, position: 'relative', overflow: 'hidden' }}>
           <Box sx={{ width: '100%', height: '100%', backgroundImage: `url(${deal.image})`, backgroundSize: 'cover', backgroundPosition: 'center', transition: 'transform 0.5s ease', transform: hovered ? 'scale(1.05)' : 'scale(1)' }} />
-          <Box sx={{ position: 'absolute', top: 16, right: 16, bgcolor: deal.badgeColor, color: 'text.primary', px: 1.5, py: 0.5, borderRadius: '8px', fontWeight: 800, fontSize: '0.8rem', zIndex: 2 }}>
+          <Box sx={{ position: 'absolute', top: 16, right: 16, bgcolor: deal.badgeColor, color: '#fff', px: 1.5, py: 0.5, borderRadius: '8px', fontWeight: 800, fontSize: '0.8rem', zIndex: 2 }}>
             {deal.badge}
           </Box>
-          <Box sx={{ position: 'absolute', inset: 0, background: `linear-gradient(to top, ${theme.palette.background.paper}, transparent)`, zIndex: 1 }} />
+          <Box sx={{ position: 'absolute', inset: 0, background: `linear-gradient(to top, var(--bg-surface), transparent)`, zIndex: 1 }} />
         </Box>
         <Box sx={{ p: 3, pt: 1 }}>
-          <Typography variant="h6" sx={{ color: accent, fontWeight: 700, mb: 1, fontSize: '1.1rem' }}>
+          <Typography variant="h6" sx={{ color: 'var(--nearu-accent)', fontWeight: 700, mb: 1, fontSize: '1.1rem' }}>
             {deal.title}
           </Typography>
-          <Typography variant="body2" sx={{ color: theme.palette.text.secondary, mb: 3, fontSize: '0.85rem', lineHeight: 1.6, minHeight: 40 }}>
+          <Typography variant="body2" sx={{ color: 'var(--text-secondary)', mb: 3, fontSize: '0.85rem', lineHeight: 1.6, minHeight: 40 }}>
             {deal.description}
           </Typography>
           <Button
@@ -367,12 +367,12 @@ function TestimonialCard({ t, index }: { t:  Testimonial, index: number }) {
         sx={{
           width: { xs: '100%', md: 320 },
           minWidth: { xs: 240, md: 320 },
-          bgcolor: 'rgba(255,255,255,0.02)',
+          bgcolor: 'var(--bg-surface)',
           borderRadius: '20px',
           p: 3,
-          border: '1px solid rgba(255,255,255,0.05)',
+          border: '1px solid var(--nearu-border)',
           transition: 'border 0.3s ease',
-          '&:hover': { border: '1px solid rgba(250, 204, 21, 0.3)' },
+          '&:hover': { border: '1px solid var(--nearu-accent)' },
         }}
       >
         <Box sx={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', mb: 2 }}>
@@ -381,21 +381,21 @@ function TestimonialCard({ t, index }: { t:  Testimonial, index: number }) {
               {initial}
             </Avatar>
             <Box>
-              <Typography variant="subtitle1" sx={{ color: '#fff', fontWeight: 700, lineHeight: 1.2 }}>{t.userName}</Typography>
+              <Typography variant="subtitle1" sx={{ color: 'var(--text-primary)', fontWeight: 700, lineHeight: 1.2 }}>{t.userName}</Typography>
               <Box sx={{ display: 'flex', mt: 0.5 }}>
                 {[1, 2, 3, 4, 5].map((i) =>
                   i <= t.rating
-                    ? <StarIcon key={i} sx={{ fontSize: '0.85rem', color: '#2E9EBF' }} />
-                    : <StarBorderIcon key={i} sx={{ fontSize: '0.85rem', color: 'rgba(255,255,255,0.3)' }} />
+                    ? <StarIcon key={i} sx={{ fontSize: '0.85rem', color: 'var(--nearu-accent)' }} />
+                    : <StarBorderIcon key={i} sx={{ fontSize: '0.85rem', color: 'var(--text-secondary)', opacity: 0.3 }} />
                 )}
               </Box>
             </Box>
           </Box>
-          <Typography variant="caption" sx={{ color: 'rgba(255,255,255,0.4)', whiteSpace: 'nowrap' }}>
+          <Typography variant="caption" sx={{ color: 'var(--text-secondary)', whiteSpace: 'nowrap' }}>
             {timeAgo(t.createdAt)}
           </Typography>
         </Box>
-        <Typography variant="body2" sx={{ color: 'rgba(255,255,255,0.6)', lineHeight: 1.6, fontStyle: 'italic' }}>
+        <Typography variant="body2" sx={{ color: 'var(--text-secondary)', lineHeight: 1.6, fontStyle: 'italic' }}>
           "{t.message}"
         </Typography>
       </Card>
@@ -459,10 +459,11 @@ function ShareModal({
         fullWidth
         PaperProps={{
           sx: {
-            bgcolor: '#0f0f0f',
-            border: '1px solid rgba(250,204,21,0.2)',
+            bgcolor: 'var(--bg-surface)',
+            border: '1px solid var(--nearu-border)',
             borderRadius: '24px',
             p: 1,
+            backgroundImage: 'none'
           },
         }}
       >
@@ -470,17 +471,17 @@ function ShareModal({
         <DialogTitle sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', pb: 1 }}>
           <Box>
             
-            <Typography variant="h6" sx={{ fontWeight: 800, color: '#2E9EBF' }}>
+            <Typography variant="h6" sx={{ fontWeight: 800, color: 'var(--nearu-accent)' }}>
               Share Your Experience
             </Typography>
             
-            <Typography variant="body2" sx={{ color: 'rgba(255,255,255,0.4)', mt: 0.3 }}>
+            <Typography variant="body2" sx={{ color: 'var(--text-secondary)', mt: 0.3 }}>
               Help other students by sharing your story
             </Typography>
 
           </Box>
 
-          <IconButton onClick={handleClose} sx={{ color: 'rgba(255,255,255,0.4)', '&:hover': { color: '#fff' } }}>
+          <IconButton onClick={handleClose} sx={{ color: 'var(--text-secondary)', '&:hover': { color: 'var(--text-primary)' } }}>
             <CloseIcon />
           </IconButton>
         </DialogTitle>
@@ -501,13 +502,13 @@ function ShareModal({
                   sx={{ p: 0.5, transition: 'transform 0.15s ease', transform: (hoverRating || rating) >= star ? 'scale(1.2)' : 'scale(1)' }}
                 >
                   {(hoverRating || rating) >= star
-                    ? <StarIcon sx={{ fontSize: 36, color: '#2E9EBF' }} />
-                    : <StarBorderIcon sx={{ fontSize: 36, color: 'rgba(255,255,255,0.2)' }} />
+                    ? <StarIcon sx={{ fontSize: 36, color: 'var(--nearu-accent)' }} />
+                    : <StarBorderIcon sx={{ fontSize: 36, color: 'var(--nearu-border)' }} />
                   }
                 </IconButton>
               ))}
               {rating > 0 && (
-                <Typography sx={{ color: 'rgba(255,255,255,0.4)', alignSelf: 'center', ml: 1, fontSize: '0.85rem' }}>
+                <Typography sx={{ color: 'var(--text-secondary)', alignSelf: 'center', ml: 1, fontSize: '0.85rem' }}>
                   {['', 'Poor', 'Fair', 'Good', 'Great', 'Excellent!'][rating]}
                 </Typography>
               )}
@@ -529,17 +530,17 @@ function ShareModal({
               inputProps={{ maxLength: 500 }}
               sx={{
                 '& .MuiOutlinedInput-root': {
-                  color: '#fff',
+                  color: 'var(--text-primary)',
                   borderRadius: '14px',
                   bgcolor: 'rgba(255,255,255,0.03)',
-                  '& fieldset': { borderColor: 'rgba(255,255,255,0.1)' },
+                  '& fieldset': { borderColor: 'var(--nearu-border)' },
                   '&:hover fieldset': { borderColor: 'rgba(46, 158, 191, 0.3)' },
-                  '&.Mui-focused fieldset': { borderColor: '#2E9EBF' },
+                  '&.Mui-focused fieldset': { borderColor: 'var(--nearu-accent)' },
                 },
-                '& .MuiInputBase-input::placeholder': { color: 'rgba(255,255,255,0.25)' },
+                '& .MuiInputBase-input::placeholder': { color: 'var(--text-secondary)', opacity: 0.5 },
               }}
             />
-            <Typography variant="caption" sx={{ color: 'rgba(255,255,255,0.25)', display: 'block', textAlign: 'right', mt: 0.5 }}>
+            <Typography variant="caption" sx={{ color: 'var(--text-secondary)', opacity: 0.5, display: 'block', textAlign: 'right', mt: 0.5 }}>
               {message.length}/500
             </Typography>
           </Box>
@@ -557,16 +558,16 @@ function ShareModal({
             disabled={loading}
             endIcon={loading ? <CircularProgress size={18} sx={{ color: '#000' }} /> : <SendIcon />}
             sx={{
-              bgcolor: '#2E9EBF',
+              bgcolor: 'var(--nearu-accent)',
               color: '#000',
               fontWeight: 800,
               borderRadius: '14px',
               py: 1.5,
               fontSize: '1rem',
               textTransform: 'none',
-              backgroundImage: 'linear-gradient(135deg, #2E9EBF, #1e608a)',
-              '&:hover': { backgroundImage: 'linear-gradient(135deg, #3da5d9, #2E9EBF)' },
-              '&:disabled': { bgcolor: 'rgba(46, 158, 191, 0.3)', color: 'rgba(0,0,0,0.4)' },
+              backgroundImage: 'linear-gradient(135deg, var(--nearu-accent), #1e608a)',
+              '&:hover': { backgroundImage: 'linear-gradient(135deg, #3da5d9, var(--nearu-accent))' },
+              '&:disabled': { bgcolor: 'var(--nearu-accent-subtle)', color: 'rgba(0,0,0,0.4)' },
             }}
           >
             {loading ? 'Submitting...' : 'Submit Review'}
@@ -587,8 +588,7 @@ export default function Home() {
   const [showAllServices, setShowAllServices] = useState(false);
   const navigate = useNavigate();
 
-  const accent = theme.palette.primary.main;
-  const accentAlpha = (a: number) => `rgba(46, 158, 191, ${a})`;
+
 
   //testimonial state
   const [testimonials, setTestimonials] = useState<Testimonial[]>([]);
@@ -660,7 +660,7 @@ export default function Home() {
   const userName = auth?.user?.username || auth?.user?.email?.split('@')[0] || 'Student';
 
   return (
-    <Box sx={{ display: 'flex', height: '100vh', overflow: 'hidden', bgcolor: 'background.default', backgroundImage: `radial-gradient(circle at top right, ${accentAlpha(0.04)} 0%, transparent 40%)` }}>
+    <Box sx={{ display: 'flex', height: '100vh', overflow: 'hidden', bgcolor: 'var(--bg-base)', backgroundImage: `radial-gradient(circle at top right, var(--nearu-accent-subtle) 0%, transparent 40%)` }}>
       <Sidebar activeSection="home" />
 
       <Box sx={{ flex: 1, display: 'flex', flexDirection: 'column', minWidth: 0, overflow: 'hidden' }}>
@@ -673,10 +673,10 @@ export default function Home() {
               {/* ── Hero ─────────────────────────────────────────── */}
               <Fade in={visible} timeout={600}>
                 <Box sx={{ mb: 6, position: 'relative' }}>
-                  <Typography variant="h2" sx={{ fontWeight: 800, color: 'text.primary', fontSize: { xs: '2.5rem', md: '3.5rem' }, letterSpacing: '-0.03em', mb: 1 }}>
-                    Hello <Box component="span" sx={{ color: accent }}>{userName}</Box>
+                  <Typography variant="h2" sx={{ fontWeight: 800, color: 'var(--text-primary)', fontSize: { xs: '2.5rem', md: '3.5rem' }, letterSpacing: '-0.03em', mb: 1 }}>
+                    Hello <Box component="span" sx={{ color: 'var(--nearu-accent)' }}>{userName}</Box>
                   </Typography>
-                  <Typography variant="h5" sx={{ color: 'text.secondary', fontWeight: 500 }}>
+                  <Typography variant="h5" sx={{ color: 'var(--text-secondary)', fontWeight: 500 }}>
                     What would you like to do today?
                   </Typography>
                   <style>{`
@@ -698,16 +698,16 @@ export default function Home() {
               <Box sx={{ mb: 8 }}>
                 <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 3 }}>
                   <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
-                    <SparkleIcon sx={{ color: accent, fontSize: 24 }} />
-                    <Typography variant="h5" sx={{ fontWeight: 800, color: 'text.primary', letterSpacing: '-0.01em' }}>
+                    <SparkleIcon sx={{ color: 'var(--nearu-accent)', fontSize: 24 }} />
+                    <Typography variant="h5" sx={{ fontWeight: 800, color: 'var(--text-primary)', letterSpacing: '-0.01em' }}>
                       Explore Services
                     </Typography>
                   </Box>
                   <Box sx={{ display: { xs: 'none', md: 'flex' }, gap: 1 }}>
-                    <IconButton onClick={() => scrollServices('left')} sx={{ bgcolor: accentAlpha(0.06), color: 'text.primary', '&:hover': { bgcolor: accentAlpha(0.15) } }}>
+                    <IconButton onClick={() => scrollServices('left')} sx={{ bgcolor: 'var(--bg-surface)', color: 'var(--text-primary)', border: '1px solid var(--nearu-border)', '&:hover': { bgcolor: 'var(--nearu-accent-subtle)' } }}>
                       <ChevronLeftIcon />
                     </IconButton>
-                    <IconButton onClick={() => scrollServices('right')} sx={{ bgcolor: accentAlpha(0.06), color: 'text.primary', '&:hover': { bgcolor: accentAlpha(0.15) } }}>
+                    <IconButton onClick={() => scrollServices('right')} sx={{ bgcolor: 'var(--bg-surface)', color: 'var(--text-primary)', border: '1px solid var(--nearu-border)', '&:hover': { bgcolor: 'var(--nearu-accent-subtle)' } }}>
                       <ChevronRightIcon />
                     </IconButton>
                   </Box>
@@ -743,14 +743,14 @@ export default function Home() {
                       variant="outlined"
                       onClick={() => setShowAllServices(!showAllServices)}
                       sx={{
-                        color: accent,
-                        borderColor: accentAlpha(0.4),
+                        color: 'var(--nearu-accent)',
+                        borderColor: 'var(--nearu-border)',
                         borderRadius: '12px',
                         px: 4,
                         py: 1.2,
                         fontWeight: 700,
                         textTransform: 'none',
-                        '&:hover': { borderColor: accent, bgcolor: accentAlpha(0.08) }
+                        '&:hover': { borderColor: 'var(--nearu-accent)', bgcolor: 'var(--nearu-accent-subtle)' }
                       }}
                     >
                       {showAllServices ? 'Show Less' : `View All Services (${services.length})`}
@@ -763,21 +763,21 @@ export default function Home() {
               <Box sx={{ mb: 8 }}>
                 <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 3 }}>
                   <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
-                    <OffersIcon sx={{ color: accent, fontSize: 24 }} />
+                    <OffersIcon sx={{ color: 'var(--nearu-accent)', fontSize: 24 }} />
                     <Box>
-                      <Typography variant="h5" sx={{ fontWeight: 800, color: accent, letterSpacing: '-0.01em', lineHeight: 1.2 }}>
+                      <Typography variant="h5" sx={{ fontWeight: 800, color: 'var(--nearu-accent)', letterSpacing: '-0.01em', lineHeight: 1.2 }}>
                         Hot Deals & Offers
                       </Typography>
-                      <Typography variant="body2" sx={{ color: 'text.secondary' }}>
+                      <Typography variant="body2" sx={{ color: 'var(--text-secondary)' }}>
                         Limited time exclusive offers just for you
                       </Typography>
                     </Box>
                   </Box>
                   <Box sx={{ display: { xs: 'none', md: 'flex' }, gap: 1 }}>
-                    <IconButton onClick={() => scrollDeals('left')} sx={{ bgcolor: accentAlpha(0.06), color: 'text.primary', '&:hover': { bgcolor: accentAlpha(0.15) } }}>
+                    <IconButton onClick={() => scrollDeals('left')} sx={{ bgcolor: 'var(--bg-surface)', color: 'var(--text-primary)', border: '1px solid var(--nearu-border)', '&:hover': { bgcolor: 'var(--nearu-accent-subtle)' } }}>
                       <ChevronLeftIcon />
                     </IconButton>
-                    <IconButton onClick={() => scrollDeals('right')} sx={{ bgcolor: accentAlpha(0.06), color: 'text.primary', '&:hover': { bgcolor: accentAlpha(0.15) } }}>
+                    <IconButton onClick={() => scrollDeals('right')} sx={{ bgcolor: 'var(--bg-surface)', color: 'var(--text-primary)', border: '1px solid var(--nearu-border)', '&:hover': { bgcolor: 'var(--nearu-accent-subtle)' } }}>
                       <ChevronRightIcon />
                     </IconButton>
                   </Box>
@@ -812,12 +812,12 @@ export default function Home() {
               <Box sx={{ mb: 6 }}>
                 <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 3 }}>
                   <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
-                    <UserIcon sx={{ color: accent, fontSize: 24 }} />
+                    <UserIcon sx={{ color: 'var(--nearu-accent)', fontSize: 24 }} />
                     <Box>
-                      <Typography variant="h5" sx={{ fontWeight: 800, color: accent, letterSpacing: '-0.01em', lineHeight: 1.2 }}>
+                      <Typography variant="h5" sx={{ fontWeight: 800, color: 'var(--nearu-accent)', letterSpacing: '-0.01em', lineHeight: 1.2 }}>
                         What Students Say
                       </Typography>
-                      <Typography variant="body2" sx={{ color: 'text.secondary' }}>
+                      <Typography variant="body2" sx={{ color: 'var(--text-secondary)' }}>
                         Real experiences from our community members
                       </Typography>
                     </Box>
@@ -828,13 +828,13 @@ export default function Home() {
                   <Box sx={{ display: 'flex', gap: 1 }}>
                         <IconButton
                           onClick={() => goToPage((currentPage - 1 + totalPages) % totalPages)}
-                          sx={{ bgcolor: 'rgba(255,255,255,0.05)', color: '#fff', '&:hover': { bgcolor: 'rgba(46,158,191,0.2)' } }}
+                          sx={{ bgcolor: 'var(--bg-surface)', color: 'var(--text-primary)', border: '1px solid var(--nearu-border)', '&:hover': { bgcolor: 'var(--nearu-accent-subtle)' } }}
                         >
                           <ChevronLeftIcon />
                         </IconButton>
                         <IconButton
                           onClick={() => goToPage((currentPage + 1) % totalPages)}
-                          sx={{ bgcolor: 'rgba(255,255,255,0.05)', color: '#fff', '&:hover': { bgcolor: 'rgba(46,158,191,0.2)' } }}
+                          sx={{ bgcolor: 'var(--bg-surface)', color: 'var(--text-primary)', border: '1px solid var(--nearu-border)', '&:hover': { bgcolor: 'var(--nearu-accent-subtle)' } }}
                         >
                       <ChevronRightIcon />
                     </IconButton>
@@ -845,10 +845,10 @@ export default function Home() {
               {/*testimonial cards*/}
               {testimonialsLoading ? (
                 <Box sx={{ display: 'flex', justifyContent: 'center', py: 6 }}>
-                  <CircularProgress sx={{ color: '#2E9EBF' }} />
+                  <CircularProgress sx={{ color: 'var(--nearu-accent)' }} />
                 </Box>
               ) : testimonials.length === 0 ? (
-                <Box sx={{ textAlign: 'center', py: 6, color: 'rgba(255,255,255,0.3)' }}>
+                <Box sx={{ textAlign: 'center', py: 6, color: 'var(--text-secondary)', opacity: 0.5 }}>
                   <Typography variant="body1">No testimonials yet. Be the first to share!</Typography>
                 </Box>
               ) : (
@@ -872,10 +872,10 @@ export default function Home() {
                         width: i === currentPage ? 24 : 8,
                         height: 8,
                         borderRadius: '4px',
-                        bgcolor: i === currentPage ? '#2E9EBF' : 'rgba(255,255,255,0.15)',
+                        bgcolor: i === currentPage ? 'var(--nearu-accent)' : 'var(--nearu-border)',
                         cursor: 'pointer',
                         transition: 'all 0.3s ease',
-                        '&:hover': { bgcolor: i === currentPage ? '#2E9EBF' : 'rgba(255,255,255,0.3)' },
+                        '&:hover': { bgcolor: i === currentPage ? 'var(--nearu-accent)' : 'var(--text-secondary)' },
                       }}
                     />
                   ))}
@@ -886,7 +886,7 @@ export default function Home() {
                 <Button
                   variant="outlined"
                   onClick={handleShareClick}
-                  sx={{ color: '#2E9EBF', borderColor: 'rgba(46, 158, 191, 0.1)', borderRadius: '12px', px: 4, py: 1.2, fontWeight: 700, textTransform: 'none', '&:hover': { borderColor: '#2E9EBF', bgcolor: 'rgba(46, 158, 191, 0.1)' } }}
+                  sx={{ color: 'var(--nearu-accent)', borderColor: 'var(--nearu-border)', borderRadius: '12px', px: 4, py: 1.2, fontWeight: 700, textTransform: 'none', '&:hover': { borderColor: 'var(--nearu-accent)', bgcolor: 'var(--nearu-accent-subtle)' } }}
                 >
                   + Share Your Experience
                 </Button>
