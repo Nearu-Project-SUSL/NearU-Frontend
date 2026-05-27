@@ -1032,7 +1032,7 @@ const heroTitleWordVariants = {
     opacity: 1,
     transition: {
       duration: 0.85,
-      ease: [0.16, 1, 0.3, 1], // Custom ultra-smooth easeOutExpo
+      ease: [0.16, 1, 0.3, 1] as const, // Custom ultra-smooth easeOutExpo
     },
   },
 };
@@ -1177,7 +1177,7 @@ export default function LandingPage() {
       opacity: 1,
       transition: {
         duration: isMobile ? 0.65 : 0.85,
-        ease: [0.16, 1, 0.3, 1],
+        ease: [0.16, 1, 0.3, 1] as const,
       },
     },
   };
