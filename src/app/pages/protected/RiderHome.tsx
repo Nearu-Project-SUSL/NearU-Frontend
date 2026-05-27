@@ -274,7 +274,7 @@ export default function RiderHome() {
     if (isRiderStatusLoading) {
       return (
         <Box sx={{ display: 'flex', minHeight: '100vh', bgcolor: 'background.default' }}>
-          <Sidebar activeSection="home" />
+          <Sidebar activeSection="rider" />
           <Box sx={{ flexGrow: 1, display: 'flex', flexDirection: 'column' }}>
             <Navbar />
             <Box sx={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
@@ -289,7 +289,7 @@ export default function RiderHome() {
     if (approvalStatus === 'Pending') {
       return (
         <Box sx={{ display: 'flex', minHeight: '100vh', bgcolor: 'background.default' }}>
-          <Sidebar activeSection="home" />
+          <Sidebar activeSection="rider" />
           <Box sx={{ flexGrow: 1, display: 'flex', flexDirection: 'column' }}>
             <Navbar />
             <Box sx={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', p: 3 }}>
@@ -352,7 +352,7 @@ export default function RiderHome() {
     if (approvalStatus === 'Rejected' || approvalStatus === 'Suspended') {
       return (
         <Box sx={{ display: 'flex', minHeight: '100vh', bgcolor: 'background.default' }}>
-          <Sidebar activeSection="home" />
+          <Sidebar activeSection="rider" />
           <Box sx={{ flexGrow: 1, display: 'flex', flexDirection: 'column' }}>
             <Navbar />
             <Box sx={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', p: 3 }}>
@@ -410,7 +410,7 @@ export default function RiderHome() {
     // ── Approved (or status unknown) — show normal Go Online screen ───────
     return (
       <Box sx={{ display: 'flex', minHeight: '100vh', bgcolor: 'background.default' }}>
-        <Sidebar activeSection="home" />
+        <Sidebar activeSection="rider" />
         <Box sx={{ flexGrow: 1, display: 'flex', flexDirection: 'column' }}>
           <Navbar />
           <Box
@@ -563,7 +563,7 @@ export default function RiderHome() {
   // ─────────────────────────────────────────────────────────────────────────
   return (
     <Box sx={{ display: 'flex', height: '100vh', overflow: 'hidden', bgcolor: 'background.default' }}>
-      <Sidebar activeSection="home" />
+      <Sidebar activeSection="rider" />
       <Box sx={{ flexGrow: 1, display: 'flex', flexDirection: 'column', position: 'relative', overflow: 'hidden' }}>
         <Navbar />
 
