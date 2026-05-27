@@ -7,7 +7,7 @@ import {
   Chip,
 } from '@mui/material';
 import { Close as CloseIcon } from '@mui/icons-material';
-import type { MenuItem } from '../../../data/foodMockData';
+import { MenuItem } from '../food/MenuItemCard';
 
 interface MenuItemDialogProps {
   item: MenuItem | null;        // either menuitem or null (when closed)

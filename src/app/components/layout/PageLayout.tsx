@@ -15,8 +15,11 @@ export function PageLayout({ children }: PageLayoutProps) {
       component="main"
       sx={{ 
         flexGrow: 1, 
-        ml: `${isExpanded ? DRAWER_WIDTH : COLLAPSED_WIDTH}px`,
-        width: `calc(100% - ${isExpanded ? DRAWER_WIDTH : COLLAPSED_WIDTH}px)`,
+        ml: { xs: 0, md: `${isExpanded ? DRAWER_WIDTH : COLLAPSED_WIDTH}px` },
+        width: { 
+          xs: '100%',   
+          md: `calc(100% - ${isExpanded ? DRAWER_WIDTH : COLLAPSED_WIDTH}px)` 
+        },
         transition: 'margin-left 0.28s cubic-bezier(0.4, 0, 0.2, 1), width 0.28s cubic-bezier(0.4, 0, 0.2, 1)',
         minHeight: '100vh',
         bgcolor: 'background.default',

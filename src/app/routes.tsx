@@ -1,13 +1,9 @@
 import { lazy, Suspense } from "react";
 import { createBrowserRouter } from "react-router";
 
-// Public Pages (non-lazy — needed immediately)
+// LoadingScreen is eagerly imported so it can be used as the Suspense fallback
 import LoadingScreen from "./pages/public/LoadingScreen";
-import FoodPage from "./pages/protected/Food";
-import ShopDetailPage from "./pages/protected/ShopDetail";
-
 import ProtectedRoute from "./routing/ProtectedRoute";
-import Unauthorized from "./pages/public/Unauthorized";
 
 // Helper for wrapping lazy pages in Suspense
 const Loadable = (Component: any) => (props: any) => (
@@ -21,6 +17,8 @@ const Login = Loadable(lazy(() => import("./pages/public/Login")));
 const Register = Loadable(lazy(() => import("./pages/public/Register")));
 const ForgotPassword = Loadable(lazy(() => import("./pages/public/ForgotPassword")));
 const ResetPassword = Loadable(lazy(() => import("./pages/public/ResetPassword")));
+const Unauthorized = Loadable(lazy(() => import("./pages/public/Unauthorized")));
+const LandingPage = Loadable(lazy(() => import("./pages/public/LandingPage")));
 
 // ── Protected Pages (lazy) ────────────────────────────────────────────────────
 const Home = Loadable(lazy(() => import("./pages/protected/Home")));
@@ -31,8 +29,12 @@ const MyJobs = Loadable(lazy(() => import("./pages/protected/MyJobs")));
 const Profile = Loadable(lazy(() => import("./pages/protected/Profile")));
 const TransportSelection = Loadable(lazy(() => import("./pages/protected/transport/TransportSelection")));
 const Transport = Loadable(lazy(() => import("./pages/protected/transport/Transport")));
+const FoodPage = Loadable(lazy(() => import("./pages/protected/Food")));
+const ShopDetailPage = Loadable(lazy(() => import("./pages/protected/ShopDetail")));
 const Accommodation = Loadable(lazy(() => import("./pages/public/Accommodation")));
 const AccommodationDetail = Loadable(lazy(() => import("./pages/public/AccommodationDetail")));
+const Gifts = Loadable(lazy(() => import("./pages/protected/Gifts")));
+const GiftShopDetailPage = Loadable(lazy(() => import("./pages/protected/GiftShopDetail")));
 
 // ── Role-specific Pages (lazy) ────────────────────────────────────────────────
 const AdminHome = Loadable(lazy(() => import("./pages/protected/AdminHome")));
@@ -44,7 +46,7 @@ export const router = createBrowserRouter([
   // Public Routes - Accessible to anyone
   {
     path: "/",
-    Component: LoadingScreen,
+    Component: LandingPage,
   },
   {
     path: "/register",
@@ -130,6 +132,14 @@ export const router = createBrowserRouter([
       {
         path: "/accommodation/:id",
         Component: AccommodationDetail,
+      },
+      {
+        path: "/gifts",
+        Component: Gifts,
+      },
+      {
+        path: "/gifts/:id",
+        Component: GiftShopDetailPage,
       },
     ]
   },

@@ -20,9 +20,12 @@ import {
 import { Sidebar } from '../../components/layout/Sidebar';
 import Navbar from '../../components/layout/Navbar';
 import { PageLayout } from '../../components/layout/PageLayout';
-import MenuItemCard from '../../components/food/MenuItemCard';
+import MenuItemCard, { MenuItem } from '../../components/food/MenuItemCard';
 import MenuItemDialog from '../../components/food/MenuItemDialog';
 import AddMenuItem,{AddMenuItemFormData} from '../../../app/components/food/AddMenuItem';
+import UpdateMenuItemDialog from '../../components/food/UpdateMenuItemDialog';
+import DeleteMenuItemDialog from '../../components/food/DeleteMenuItemDialog';
+import { deleteMenuItem, updateMenuItem } from '../../../api/foodapi';
 
 import { type MenuItemResponse } from '../../../api/foodapi';
 import { addMenuItem } from '../../../api/foodapi';
@@ -45,6 +48,9 @@ export default function ShopDetailPage() {
   const [selectedItem, setSelectedItem] = useState<MenuItemResponse | null>(null);
   const [openAddItem, setOpenAddItem] = useState(false);
 
+  const [itemToEdit, setItemToEdit] = useState<MenuItem | null>(null);
+  const [itemToDelete, setItemToDelete] = useState<MenuItem | null>(null);
+
   if (shopLoading || menuLoading) {
     return (
       <Box sx={{ display: 'flex', justifyContent: 'center', mt: 10 }}>
@@ -62,7 +68,7 @@ export default function ShopDetailPage() {
             <Typography variant="h5" sx={{ color: '#fff', mb: 2 }}>
               Shop not found
             </Typography>
-            <IconButton onClick={() => navigate('/food')} sx={{ color: '#facc15' }}>
+            <IconButton onClick={() => navigate('/food')} sx={{ color: '#2E9EBF' }}>
               <BackIcon />
             </IconButton>
           </Box>
@@ -88,7 +94,34 @@ export default function ShopDetailPage() {
     setOpenAddItem(false);
   };
 
+  const handleUpdateMenuItem = async (data: {
+    name:string;
+    description: string;
+    price: number;
+    photo: File | null;
+  }) => {
+    if(!id || !itemToEdit) return;
 
+    await updateMenuItem(id, itemToEdit.id, data);
+
+    await queryClient.invalidateQueries({
+      queryKey:['menuitems', id]
+    });
+
+    setItemToEdit(null);
+  };
+
+  const handleDeleteMenuItem = async () => {
+    if (!id || !itemToDelete) return;
+
+    await deleteMenuItem(id, itemToDelete.id);
+
+    await queryClient.invalidateQueries({
+      queryKey:['menuitems', id]
+    });
+
+    setItemToDelete(null);
+  }
 
   return(
     <Box
@@ -139,7 +172,7 @@ export default function ShopDetailPage() {
                           onClick={() => navigate('/food')}
                           sx={{
                             position:'absolute',
-                            top:80,
+                            top:{xs:70, md:80},
                             left:24,
                             bgcolor:'rgba(255, 255, 255, 0.5)',
                             color:'#fff',
@@ -162,6 +195,7 @@ export default function ShopDetailPage() {
                                   color:'#fff',
                                   fontWeight:'800',
                                   fontSize:{xs:'1.8rem', md:'2.8rem'},
+                                  left:{xs:24, md:48},
                                   letterSpacing:'-0.02rem',
                                   textShadow:'0 2px 20px rgba(0,0,0,0.8)'
                                 }}>
@@ -175,7 +209,7 @@ export default function ShopDetailPage() {
 
 
                 {/*main content*/}
-                <Box sx={{px:{xs:2.5, md:5}, py:5, maxWidth:'1400', mx:'auto', width:'100%'  }}>
+                <Box sx={{px:{xs:2.5, md:5}, py:5, maxWidth:1400, mx:'auto', width:'100%'  }}>
                   
 
                   <Box sx={{mb:6}}>
@@ -202,7 +236,7 @@ export default function ShopDetailPage() {
                   </Box>
 
 
-                  <Grid container spacing={5}>
+                  <Grid container spacing={{xs:3, md:5}}>
 
                     <Grid size={{xs:12, md:8}}>
                       {/*menu section*/}
@@ -218,7 +252,7 @@ export default function ShopDetailPage() {
                           }}
                         >
                           <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
-                            <MenuIcon sx={{ color: '#facc15', fontSize: 24 }} />
+                            <MenuIcon sx={{ color: '#2E9EBF', fontSize: 24 }} />
                             <Typography variant="h6" sx={{ color: '#fff', fontWeight: 700 }}>
                               Menu
                             </Typography>
@@ -228,8 +262,8 @@ export default function ShopDetailPage() {
                             component="button"
                             onClick={() => setOpenAddItem(true)}
                             style={{
-                              background: '#facc15',
-                              color: '#111',
+                              background: '#2E9EBF',
+                              color: '#fff',
                               border: 'none',
                               borderRadius: '999px',
                               padding: '10px 18px',
@@ -247,11 +281,16 @@ export default function ShopDetailPage() {
                               <Grid size={{ xs: 12, sm: 6 }}>
                                 <MenuItemCard
                                   item={{
-                                    ...item,
+                                    id: item.id,
+                                    foodShopId: item.foodShopId,
+                                    name: item.name,
                                     description: item.description ?? '',
+                                    price: item.price,
                                     photoUrl: item.photoUrl ?? '',
                                   }}
                                   onClick={(menuItem) => setSelectedItem(item)}
+                                  onEdit={(menuItem) => setItemToEdit(menuItem)}
+                                  onDelete={(menuItem) => setItemToDelete(menuItem)}
                                 />
                               </Grid>
                             ))}
@@ -354,6 +393,18 @@ export default function ShopDetailPage() {
           open={openAddItem}
           onClose={() => setOpenAddItem(false)}
           onSubmit={handleAddMenuItem}
+        />
+
+        <UpdateMenuItemDialog
+          item={itemToEdit}
+          onClose={() => setItemToEdit(null)}
+          onSubmit={handleUpdateMenuItem}
+        />
+
+        <DeleteMenuItemDialog
+          item={itemToDelete}
+          onClose={() => setItemToDelete(null)}
+          onConfirm={handleDeleteMenuItem}
         />
       </Box>
   );

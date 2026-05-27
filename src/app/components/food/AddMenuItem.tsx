@@ -123,14 +123,29 @@ export default function AddMenuItem({
             type="number"
             value={formData.price}
             onChange={handleChange}
+            sx={{
+              '& input[type=number]': {
+                MozAppearance: 'textfield', // Firefox
+              },
+              '& input[type=number]::-webkit-outer-spin-button': {
+                WebkitAppearance: 'none',
+                margin: 0,
+              },
+              '& input[type=number]::-webkit-inner-spin-button': {
+                WebkitAppearance: 'none',
+                margin: 0,
+              },
+            }}
           />
           
           <Button
             variant="outlined"
             component="label"
+            htmlFor="add-menu-item-photo"
           >
             Upload Photo
             <input
+              id="add-menu-item-photo"
               type="file"
               hidden
               accept="image/*"

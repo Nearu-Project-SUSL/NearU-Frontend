@@ -203,7 +203,7 @@ export default function UpdateJob() {
                     <Box sx={{ p: 4, bgcolor: 'rgba(255,255,255,0.02)', borderRadius: '24px', border: '1px solid rgba(255,255,255,0.05)' }}>
                       <Typography variant="h6" sx={{ color: '#fff', mb: 3, fontWeight: 700 }}>Basic Information</Typography>
                       <Grid container spacing={3}>
-                        <Grid item xs={12} sm={6}>
+                        <Grid size={{ xs: 12, sm: 6 }}>
                           <TextField
                             fullWidth
                             required
@@ -217,7 +217,7 @@ export default function UpdateJob() {
                             sx={textFieldStyles}
                           />
                         </Grid>
-                        <Grid item xs={12} sm={6}>
+                        <Grid size={{ xs: 12, sm: 6 }}>
                           <TextField
                             fullWidth
                             required
@@ -231,7 +231,7 @@ export default function UpdateJob() {
                             sx={textFieldStyles}
                           />
                         </Grid>
-                        <Grid item xs={12} sm={6}>
+                        <Grid size={{ xs: 12, sm: 6 }}>
                           <TextField
                             fullWidth
                             required
@@ -245,7 +245,7 @@ export default function UpdateJob() {
                             sx={textFieldStyles}
                           />
                         </Grid>
-                        <Grid item xs={12} sm={6}>
+                        <Grid size={{ xs: 12, sm: 6 }}>
                           <TextField
                             fullWidth
                             required
@@ -260,7 +260,7 @@ export default function UpdateJob() {
                             sx={textFieldStyles}
                           />
                         </Grid>
-                        <Grid item xs={12} sm={12}>
+                        <Grid size={{ xs: 12, sm: 12 }}>
                           <Box sx={{ 
                             border: '1px dashed rgba(255,255,255,0.2)', 
                             borderRadius: '12px', 
@@ -317,9 +317,9 @@ export default function UpdateJob() {
                                     <Box component="img" src={logoPreview} alt="Logo preview" sx={{ height: 64, width: 64, borderRadius: '12px', objectFit: 'cover', border: '1px solid rgba(255,255,255,0.1)' }} />
                                     {isUploadingLogo && <Typography variant="caption" sx={{ color: '#facc15' }}>Uploading to ImageKit...</Typography>}
                                     {!isUploadingLogo && logoUrl && <Typography variant="caption" sx={{ color: '#22c55e' }}>✓ Uploaded to ImageKit</Typography>}
-                                    <Button variant="outlined" component="label" size="small" disabled={isUploadingLogo} sx={{ color: '#fff', borderColor: 'rgba(255,255,255,0.3)', textTransform: 'none', fontSize: '0.75rem', '&:hover': { borderColor: '#facc15', color: '#facc15' } }}>
+                                    <Button variant="outlined" component="label" htmlFor="update-job-logo-change" size="small" disabled={isUploadingLogo} sx={{ color: '#fff', borderColor: 'rgba(255,255,255,0.3)', textTransform: 'none', fontSize: '0.75rem', '&:hover': { borderColor: '#facc15', color: '#facc15' } }}>
                                       Change Image
-                                      <input type="file" hidden accept="image/*" onChange={handleFileChange} />
+                                      <input id="update-job-logo-change" type="file" hidden accept="image/*" onChange={handleFileChange} />
                                     </Button>
                                   </Box>
                                 ) : (
@@ -327,9 +327,9 @@ export default function UpdateJob() {
                                     <ImageIcon sx={{ color: 'rgba(255,255,255,0.3)', fontSize: 32 }} />
                                     <Typography variant="caption" sx={{ color: 'rgba(255,255,255,0.5)' }}>Max 5MB • PNG, JPG, WebP</Typography>
                                     <Typography variant="caption" sx={{ color: '#facc15' }}>Powered by ImageKit Cloud</Typography>
-                                    <Button variant="contained" component="label" size="small" disabled={isUploadingLogo} sx={{ mt: 1, bgcolor: 'rgba(255,255,255,0.1)', color: '#fff', textTransform: 'none', boxShadow: 'none', fontSize: '0.75rem', '&:hover': { bgcolor: 'rgba(255,255,255,0.2)', boxShadow: 'none' } }}>
+                                    <Button variant="contained" component="label" htmlFor="update-job-logo-select" size="small" disabled={isUploadingLogo} sx={{ mt: 1, bgcolor: 'rgba(255,255,255,0.1)', color: '#fff', textTransform: 'none', boxShadow: 'none', fontSize: '0.75rem', '&:hover': { bgcolor: 'rgba(255,255,255,0.2)', boxShadow: 'none' } }}>
                                       {isUploadingLogo ? 'Uploading...' : 'Select Image'}
-                                      <input type="file" hidden accept="image/*" onChange={handleFileChange} />
+                                      <input id="update-job-logo-select" type="file" hidden accept="image/*" onChange={handleFileChange} />
                                     </Button>
                                   </Box>
                                 )}
@@ -354,7 +354,7 @@ export default function UpdateJob() {
                             )}
                           </Box>
                         </Grid>
-                        <Grid item xs={12} sm={6}>
+                        <Grid size={{ xs: 12, sm: 6 }}>
                           <TextField
                             select
                             fullWidth
@@ -373,7 +373,7 @@ export default function UpdateJob() {
                             ))}
                           </TextField>
                         </Grid>
-                        <Grid item xs={12} sm={6}>
+                        <Grid size={{ xs: 12, sm: 6 }}>
                           <TextField
                             select
                             fullWidth
@@ -398,7 +398,7 @@ export default function UpdateJob() {
                     <Box sx={{ p: 4, bgcolor: 'rgba(255,255,255,0.02)', borderRadius: '24px', border: '1px solid rgba(255,255,255,0.05)' }}>
                       <Typography variant="h6" sx={{ color: '#fff', mb: 3, fontWeight: 700 }}>Job Details</Typography>
                       <Grid container spacing={3}>
-                        <Grid item xs={12}>
+                        <Grid size={{ xs: 12 }}>
                           <TextField
                             fullWidth
                             required
@@ -412,7 +412,7 @@ export default function UpdateJob() {
                             sx={textFieldStyles}
                           />
                         </Grid>
-                        <Grid item xs={12}>
+                        <Grid size={{ xs: 12 }}>
                           <TextField
                             fullWidth
                             required
@@ -429,7 +429,7 @@ export default function UpdateJob() {
                             sx={textFieldStyles}
                           />
                         </Grid>
-                        <Grid item xs={12}>
+                        <Grid size={{ xs: 12 }}>
                           <TextField
                             fullWidth
                             label="Tags (comma separated)"
@@ -443,7 +443,7 @@ export default function UpdateJob() {
                             sx={textFieldStyles}
                           />
                         </Grid>
-                        <Grid item xs={12}>
+                        <Grid size={{ xs: 12 }}>
                           <TextField
                             fullWidth
                             multiline

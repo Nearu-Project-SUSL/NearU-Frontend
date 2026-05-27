@@ -29,16 +29,25 @@ import useAuth from '../../hooks/useAuth';
 import Navbar from '../../components/layout/Navbar';
 import { useNavigate } from 'react-router';
 import { toast } from 'sonner';
+import authService from '../../../api/authService';
 
 export default function RiderProfile() {
   const { auth, setAuth } = useAuth();
   const navigate = useNavigate();
 
-  const handleLogout = () => {
-    setAuth({ user: null, accessToken: null, refreshToken: null });
-    localStorage.removeItem('accessToken');
-    toast.success('Logged out successfully');
-    navigate('/login');
+  const handleLogout = async () => {
+    try {
+      if (auth.refreshToken) {
+        await authService.logout(auth.refreshToken);
+      }
+    } catch (error) {
+      console.error('Logout failed on the backend:', error);
+    } finally {
+      setAuth({ user: null, accessToken: null, refreshToken: null });
+      localStorage.removeItem('accessToken');
+      toast.success('Logged out successfully');
+      navigate('/login');
+    }
   };
 
   return (
@@ -52,9 +61,10 @@ export default function RiderProfile() {
             
             <Grid container spacing={4}>
               {/* Profile Card */}
-              <Grid xs={12} md={4}>
+              <Grid size={{ xs: 12, md: 4 }}>
                 <Paper sx={{ p: 4, textAlign: 'center', bgcolor: 'rgba(255, 255, 255, 0.03)', borderRadius: '1.5rem', border: '1px solid rgba(255, 255, 255, 0.1)' }}>
                   <Avatar 
+                    src={auth?.user?.profilePictureUrl}
                     sx={{ 
                       width: 100, 
                       height: 100, 
@@ -66,10 +76,10 @@ export default function RiderProfile() {
                       fontWeight: 'bold'
                     }}
                   >
-                    {auth?.user?.email?.charAt(0).toUpperCase() || <UserIcon fontSize="large" />}
+                    {!auth?.user?.profilePictureUrl && (auth?.user?.username?.charAt(0).toUpperCase() || auth?.user?.email?.charAt(0).toUpperCase() || <UserIcon fontSize="large" />)}
                   </Avatar>
                   <Typography variant="h6" sx={{ color: 'white', mb: 0.5 }}>
-                    {auth?.user?.email?.split('@')[0] || 'Rider'}
+                    {auth?.user?.username || auth?.user?.email?.split('@')[0] || 'Rider'}
                   </Typography>
                   <Typography variant="body2" sx={{ color: '#10b981', mb: 3 }}>
                     Active Rider
@@ -86,7 +96,7 @@ export default function RiderProfile() {
               </Grid>
 
               {/* Settings List */}
-              <Grid xs={12} md={8}>
+              <Grid size={{ xs: 12, md: 8 }}>
                 <Paper sx={{ bgcolor: 'rgba(255, 255, 255, 0.03)', borderRadius: '1.5rem', border: '1px solid rgba(255, 255, 255, 0.1)', overflow: 'hidden' }}>
                   <List disablePadding>
                     <ListItem sx={{ py: 2, px: 3 }}>

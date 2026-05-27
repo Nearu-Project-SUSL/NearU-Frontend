@@ -28,6 +28,14 @@ export interface JobResponse {
   postedAt: string;
 }
 
+export interface PagedJobResponse {
+  items: JobResponse[];
+  totalCount: number;
+  totalPages: number;
+  currentPage: number;
+  pageSize: number;
+}
+
 export interface CreateJobData {
   title: string;
   company: string;
@@ -59,9 +67,24 @@ export interface UpdateJobData {
 }
 
 const jobService = {
-  getAllJobs: async (): Promise<JobResponse[]> => {
-    const response = await axios.get<ApiResponse<JobResponse[]>>('/job');
-    return response.data.data;
+  getAllJobs: async (page: number = 1, pageSize: number = 10): Promise<PagedJobResponse> => {
+    const response = await axios.get<ApiResponse<PagedJobResponse | JobResponse[]>>('/job', {
+      params: { page, pageSize },
+    });
+    const raw = response.data.data;
+
+    // Guard against old backend that returns a flat JobResponse[] array
+    if (Array.isArray(raw)) {
+      return {
+        items: raw as JobResponse[],
+        totalCount: raw.length,
+        totalPages: 1,
+        currentPage: 1,
+        pageSize: raw.length,
+      };
+    }
+
+    return raw as PagedJobResponse;
   },
 
   getNewJobs: async (): Promise<JobResponse[]> => {
@@ -92,47 +115,27 @@ const jobService = {
   },
 
   uploadLogo: async (file: File): Promise<string> => {
-    const token = localStorage.getItem('auth_accessToken');
     const formData = new FormData();
     formData.append('file', file);
 
-    const response = await axiosPrivate.post<ApiResponse<{ url: string }>>('/job/upload-logo', formData, {
-      headers: {
-        Authorization: `Bearer ${token}`,
-        'Content-Type': 'multipart/form-data'
-      }
-    });
+    const response = await axiosPrivate.post<ApiResponse<{ url: string }>>('/job/upload-logo', formData);
     return response.data.data.url;
   },
 
   createJob: async (data: CreateJobData): Promise<JobResponse> => {
-    const token = localStorage.getItem('auth_accessToken');
-    const response = await axiosPrivate.post<ApiResponse<JobResponse>>('/job', data, {
-      headers: {
-        Authorization: `Bearer ${token}`
-      }
-    });
+    const response = await axiosPrivate.post<ApiResponse<JobResponse>>('/job', data);
     return response.data.data;
   },
 
   updateJob: async (id: string, data: UpdateJobData): Promise<JobResponse> => {
-    const token = localStorage.getItem('auth_accessToken');
-    const response = await axiosPrivate.put<ApiResponse<JobResponse>>(`/job/${id}`, data, {
-      headers: {
-        Authorization: `Bearer ${token}`
-      }
-    });
+    const response = await axiosPrivate.put<ApiResponse<JobResponse>>(`/job/${id}`, data);
     return response.data.data;
   },
 
   deleteJob: async (id: string): Promise<void> => {
-    const token = localStorage.getItem('auth_accessToken');
-    await axiosPrivate.delete(`/job/${id}`, {
-      headers: {
-        Authorization: `Bearer ${token}`
-      }
-    });
+    await axiosPrivate.delete(`/job/${id}`);
   },
+
 };
 
 export default jobService;

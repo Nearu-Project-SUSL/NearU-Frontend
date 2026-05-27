@@ -57,6 +57,7 @@ export interface AuthResponse {
     username: string;
     email: string;
     roles: string[];
+    profilePictureUrl?: string;
   };
 }
 
@@ -98,7 +99,28 @@ const authService = {
         id: apiData.userId,
         username: apiData.username,
         email: apiData.email,
-        roles: apiData.role ? [apiData.role] : []
+        roles: apiData.role ? [apiData.role === 'Business' ? 'BusinessOwner' : apiData.role] : [],
+        profilePictureUrl: apiData.profilePictureUrl || apiData.profilePicture || undefined
+      }
+    };
+  },
+
+  loginWithGoogle: async (credential: string): Promise<AuthResponse> => {
+    const response = await axios.post<ApiResponse<any>>('/auth/google-login', {
+      token: credential
+    });
+    
+    const apiData = response.data.data;
+    
+    return {
+      accessToken: apiData.accessToken,
+      refreshToken: apiData.refreshToken,
+      user: {
+        id: apiData.userId,
+        username: apiData.username,
+        email: apiData.email,
+        roles: apiData.role ? [apiData.role === 'Business' ? 'BusinessOwner' : apiData.role] : [],
+        profilePictureUrl: apiData.profilePictureUrl || apiData.profilePicture || undefined
       }
     };
   },
@@ -114,7 +136,8 @@ const authService = {
         year: data.year,
         address: data.address,
         city: data.city,
-        dateOfBirth: data.dateOfBirth
+        dateOfBirth: data.dateOfBirth,
+        role: 'Student'
     });
     
     // Extract from ApiResponse wrapper
@@ -131,7 +154,8 @@ const authService = {
         email: data.email,
         password: data.password,
         mobileNumber: data.phone,
-        address: data.address
+        address: data.address,
+        role: 'Business'
     });
     
     // Extract from ApiResponse wrapper
@@ -148,7 +172,8 @@ const authService = {
         email: data.email,
         password: data.password,
         mobileNumber: data.phone,
-        address: data.address
+        address: data.address,
+        role: 'Rider'
     });
     
     // Extract from ApiResponse wrapper
@@ -179,8 +204,8 @@ const authService = {
     return { message: response.data.message };
   },
 
-  logout: async (): Promise<void> => {
-    await axios.post('/auth/logout');
+  logout: async (refreshToken: string): Promise<void> => {
+    await axios.post('/auth/logout', { refreshToken });
   },
 };
 
