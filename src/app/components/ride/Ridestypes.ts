@@ -37,6 +37,14 @@ export interface RideSummary{
   otpExpiresAt?: string;
 }
 
+export interface RideLocationResponse {
+  rideId: string;
+  latitude: number;
+  longitude: number;
+  distanceToPickupKm?: number;
+  updatedAtUtc: string;
+}
+
 export interface ApiResponse<T> {
   success: boolean;
   message: string;

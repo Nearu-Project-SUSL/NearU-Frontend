@@ -8,6 +8,7 @@ interface Props {
   riderName?: string;
   riderVehicle?: string;
   riderRating?: number;
+  distanceToPickupKm?: number;
   onRideStarted: () => void; // called when SignalR fires InProgress status
 }
 
@@ -18,6 +19,7 @@ export function AcceptedRideScreen({
   riderName = 'Your rider',
   riderVehicle,
   riderRating,
+  distanceToPickupKm,
   onRideStarted,
 }: Props) {
   const [currentExpiry, setCurrentExpiry] = useState(otpExpiresAt);
@@ -106,7 +108,9 @@ export function AcceptedRideScreen({
           />
 
           <span className="text-[13px] text-white/60 text-center">
-            Rider is approaching your pickup location
+            {distanceToPickupKm != null 
+              ? `Rider is ${distanceToPickupKm.toFixed(2)} km away` 
+              : 'Rider is approaching your pickup location'}
           </span>
         </div>
 

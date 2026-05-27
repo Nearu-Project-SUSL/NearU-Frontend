@@ -9,6 +9,22 @@ import {
   InputAdornment,
 } from '@mui/material';
 import { useTheme } from '@mui/material';
+import { MapContainer, TileLayer, Marker, useMapEvents } from 'react-leaflet';
+import L from 'leaflet';
+
+// Fix Leaflet marker icon issue
+import markerIcon from 'leaflet/dist/images/marker-icon.png';
+import markerIconRetina from 'leaflet/dist/images/marker-icon-2x.png';
+import markerShadow from 'leaflet/dist/images/marker-shadow.png';
+
+const DefaultIcon = L.icon({
+  iconUrl: markerIcon,
+  iconRetinaUrl: markerIconRetina,
+  shadowUrl: markerShadow,
+  iconSize: [25, 41],
+  iconAnchor: [12, 41],
+});
+L.Marker.prototype.options.icon = DefaultIcon;
  
 
 interface Props {
@@ -42,6 +58,23 @@ const SERVICE_TYPE_MAP: Record<ServiceType, number> = {
 const DEFAULT_LAT = 6.7145;
 const DEFAULT_LNG = 80.7872;
 
+function MapEvents({ onMapClick }: { onMapClick: (lat: number, lng: number) => void }) {
+  useMapEvents({
+    click(e) {
+      onMapClick(e.latlng.lat, e.latlng.lng);
+    },
+  });
+  return null;
+}
+
+function MapRecenter({ center }: { center: [number, number] }) {
+  const map = useMapEvents({});
+  useEffect(() => {
+    map.setView(center, map.getZoom());
+  }, [center, map]);
+  return null;
+}
+
 export function RequestRideScreen({ onRideCreated }: Props) {
   const [service,       setService]       = useState<ServiceType>('PersonalRide');
   const [pickupLabel,   setPickupLabel]   = useState('');
@@ -59,6 +92,8 @@ export function RequestRideScreen({ onRideCreated }: Props) {
   const [pickupLng,  setPickupLng]  = useState(DEFAULT_LNG);
   const [dropoffLat, setDropoffLat] = useState(DEFAULT_LAT + 0.003);
   const [dropoffLng, setDropoffLng] = useState(DEFAULT_LNG + 0.003);
+
+  const [pickingMode, setPickingMode] = useState<'pickup' | 'dropoff'>('pickup');
 
   // Get user's real location on mount
   useEffect(() => {
@@ -82,6 +117,13 @@ export function RequestRideScreen({ onRideCreated }: Props) {
     );
   }, []);
 
+  // Re-estimate whenever locations change
+  useEffect(() => {
+    if (pickupLat && pickupLng && dropoffLat && dropoffLng) {
+      handleEstimate();
+    }
+  }, [pickupLat, pickupLng, dropoffLat, dropoffLng]);
+
   function handleUseMyLocation() {
     if (!navigator.geolocation) return;
     setLocating(true);
@@ -97,15 +139,60 @@ export function RequestRideScreen({ onRideCreated }: Props) {
     );
   }
 
+  async function handleSearch(query: string, mode: 'pickup' | 'dropoff') {
+    if (!query || query.length < 3) return;
+    try {
+      const res = await fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(query)}&limit=1`);
+      const data = await res.json();
+      if (data && data.length > 0) {
+        const { lat, lon, display_name } = data[0];
+        const nLat = parseFloat(lat);
+        const nLng = parseFloat(lon);
+        
+        if (mode === 'pickup') {
+          setPickupLat(nLat);
+          setPickupLng(nLng);
+          setPickupLabel(display_name);
+        } else {
+          setDropoffLat(nLat);
+          setDropoffLng(nLng);
+          setDropoffLabel(display_name);
+        }
+      }
+    } catch (err) {
+      console.error("Geocoding failed:", err);
+    }
+  }
+
+  async function getRoadDistanceKm(
+    lat1: number, lng1: number,
+    lat2: number, lng2:number
+  ): Promise<number>{
+    const res = await fetch(
+      `https://router.project-osrm.org/route/v1/driving/${lng1},${lat1};${lng2},${lat2}?overview=false`
+    );
+    const data = await res.json();
+
+    //OSRM return distance in meters
+    return data.routes[0].distance / 1000;
+  }
+
   async function handleEstimate() {
     setError('');
     setEstimating(true);
     try {
+      const roadKm = await getRoadDistanceKm(pickupLat, pickupLng, dropoffLat, dropoffLng);
+
       const res = await RidesApi.getEstimate(pickupLat, pickupLng, dropoffLat, dropoffLng);
+
+      setDistanceKm(roadKm);
       setEstimatedFare(res.data.estimatedFare);
-      setDistanceKm(res.data.distanceKm);
-    } catch (e: unknown) {
-      setError(e instanceof Error ? e.message : 'Could not get estimate.');
+
+    } catch (e: any) {
+      const backendError = e.response?.data?.message || e.message || 'Could not get estimate.';
+      setError(backendError);
+      setEstimatedFare(null);
+      setDistanceKm(null);
     } finally {
       setEstimating(false);
     }
@@ -121,7 +208,7 @@ export function RequestRideScreen({ onRideCreated }: Props) {
     try {
       const res = await RidesApi.createRequest({
         serviceType:      SERVICE_TYPE_MAP[service],
-        details:          details.trim() || 'No additional details',
+        details:          { note: details.trim() || 'No additional details' } as any,
         pickupLatitude:   pickupLat,
         pickupLongitude:  pickupLng,
         dropoffLatitude:  dropoffLat,
@@ -138,8 +225,9 @@ export function RequestRideScreen({ onRideCreated }: Props) {
         dropoffLat, dropoffLng,
         dropoffLabel,
       );
-    } catch (e: unknown) {
-      setError(e instanceof Error ? e.message : 'Failed to create request.');
+    } catch (e: any) {
+      const backendError = e.response?.data?.message || e.message || 'Failed to create request.';
+      setError(backendError);
     } finally {
       setLoading(false);
     }
@@ -149,206 +237,189 @@ export function RequestRideScreen({ onRideCreated }: Props) {
   const accent = theme.palette.primary.main;
   const accentAlpha = (a: number) => `rgba(46, 158, 191, ${a})`;
 
-  
   return (
-    <div
-      className="relative flex flex-col overflow-hidden animate-fadeIn"
-      style={{
-        minHeight: '100vh',
-        background: 'black', 
-      }}
-    >
+    <div className="relative w-full h-screen overflow-hidden bg-[#0b0b0b]">
+      {/* FULL SCREEN MAP */}
+      <div className="absolute inset-0 z-0">
+        <MapContainer
+          center={[pickupLat, pickupLng]}
+          zoom={15}
+          zoomControl={false} // hide default zoom for cleaner UI
+          style={{ height: '100%', width: '100%' }}
+        >
+          <TileLayer
+            url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+            attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OSM</a>'
+            // Use a dark map style if possible, or adjust opacity
+            className="map-tiles"
+          />
+          <MapRecenter center={[pickupLat, pickupLng]} />
+          
+          <Marker position={[pickupLat, pickupLng]} icon={DefaultIcon}>
+            {/* Pickup Marker */}
+          </Marker>
+          <Marker position={[dropoffLat, dropoffLng]} icon={DefaultIcon}>
+            {/* Dropoff Marker */}
+          </Marker>
+          
+          <MapEvents 
+            onMapClick={(lat, lng) => {
+              if (pickingMode === 'pickup') {
+                setPickupLat(lat);
+                setPickupLng(lng);
+                setPickupLabel(`Location (${lat.toFixed(4)}, ${lng.toFixed(4)})`);
+              } else {
+                setDropoffLat(lat);
+                setDropoffLng(lng);
+                setDropoffLabel(`Location (${lat.toFixed(4)}, ${lng.toFixed(4)})`);
+              }
+            }} 
+          />
+        </MapContainer>
+      </div>
 
-      <Box
-        sx={{
-          mb: 8,
-          px: { xs: 3, md: 6 },
-          py: { xs: 6, md: 8 },
-          display: "flex",
-          flexDirection: "column",
-          alignItems: "center",
-          justifyContent: "space-between",
-          background: "transparent",
-          border: "none",
-          borderRadius: "20px",
-          overflow: "hidden",
-          gap: 4,
-        }}>
-
-        <Box sx={{
-          width:"100%",
-          textAlign:"center",
-        }}>
-          <Typography
-            variant="h2"
-            sx={{
-              fontWeight: 900,
-              color: theme.palette.text.primary,
-              fontSize: { xs: "2.3rem", md: "3.6rem" },
-              letterSpacing: "-0.03em",
-              mb: 2,
-            }}
-          >
-            Rides{" "}
-            <Box component="span" sx={{ color: accent }}>
-              Near U
-            </Box>
-          </Typography>
-
-          <Typography
-            variant="body1"
-            sx={{
-              color: theme.palette.text.secondary,
-              fontSize: { xs: "0.95rem", md: "1.05rem" },
-              whiteSpace: "nowrap",
-              overflow: "hidden",
-              textOverflow: "ellipsis",
-            }}
-          >
-            Discover the best ride options near Sabaragamuwa University.
-            From quick trips to long journeys all in one place.
-          </Typography>
-        </Box>
-      </Box>
-
-      {/* CENTERED POPUP PANEL*/}
-      <div className="absolute inset-0 z-10 flex items-center justify-center p-4">
-
-        <div
-          className="w-full max-w-lg rounded-3xl px-6 pt-6 pb-7 animate-slideUp"
+      {/* TOP HEADER */}
+      <div className="absolute top-6 left-1/2 -translate-x-1/2 z-20 w-full max-w-md px-4">
+        <div 
+          className="rounded-2xl p-4 flex items-center justify-between"
           style={{
-            background: 'rgba(15,15,15,0.96)',
-            backdropFilter: 'blur(24px)',
+            background: 'rgba(15,15,15,0.85)',
+            backdropFilter: 'blur(16px)',
             border: '1px solid rgba(255,255,255,0.08)',
-            boxShadow: '0 20px 60px rgba(0,0,0,0.6)',
           }}
         >
-
-          {/* drag handle */}
-          <div className="flex justify-center mb-4">
-            <div
-              className="w-10 h-1 rounded-full"
-              style={{ background: 'rgba(255,255,255,0.15)' }}
-            />
+          <h1 className="text-[20px] font-bold">
+            Near<span style={{ color: 'var(--nearu-accent)' }}>U</span> Rides
+          </h1>
+          <div className="flex gap-2">
+             {SERVICES.map(s => (
+                <button
+                  key={s.type}
+                  onClick={() => setService(s.type)}
+                  className="w-9 h-9 rounded-full flex items-center justify-center text-[16px] transition-all"
+                  style={{
+                    background: service === s.type ? 'var(--nearu-accent)' : 'rgba(255,255,255,0.05)',
+                    transform: service === s.type ? 'scale(1.1)' : 'scale(1)',
+                    boxShadow: service === s.type ? '0 0 15px var(--nearu-accent)' : 'none'
+                  }}
+                  title={s.label}
+                >
+                  {s.icon}
+                </button>
+             ))}
           </div>
+        </div>
+      </div>
 
-          {/* SERVICE SELECTOR */}
-          <div className="flex gap-2 mb-4">
-            {SERVICES.map(s => (
-              <button
-                key={s.type}
-                onClick={() => setService(s.type)}
-                className="flex items-center gap-1.5 px-3 py-1.5 rounded-full text-[13px] font-medium border"
-                style={{
-                  background:
-                    service === s.type
-                      ? 'var(--nearu-accent-subtle)'
-                      : 'rgba(255,255,255,0.06)',
-                  borderColor:
-                    service === s.type
-                      ? 'var(--nearu-accent)'
-                      : 'rgba(255,255,255,0.1)',
-                  color:
-                    service === s.type
-                      ? 'var(--nearu-accent)'
-                      : 'rgba(255,255,255,0.55)',
-                }}
-              >
-                {s.icon} {s.label}
-              </button>
-            ))}
-          </div>
-
-          {/* LOCATION INPUTS */}
-          <div
-            className="rounded-2xl overflow-hidden mb-3"
-            style={{ background: 'rgba(255,255,255,0.05)' }}
-          >
-            {/* Pickup */}
-            <div
-              className="flex items-center gap-3 px-4 py-3 border-b"
-              style={{ borderColor: 'rgba(255,255,255,0.07)' }}
+      {/* FLOATING REQUEST DIALOG (BOTTOM) */}
+      <div className="absolute bottom-8 left-1/2 -translate-x-1/2 z-20 w-full max-w-md px-4">
+        <div
+          className="rounded-3xl p-6 animate-slideUp"
+          style={{
+            background: 'rgba(18,18,18,0.94)',
+            backdropFilter: 'blur(24px)',
+            border: '1px solid rgba(255,255,255,0.1)',
+            boxShadow: '0 20px 80px rgba(0,0,0,0.8)',
+          }}
+        >
+          {/* LOCATION MODE SELECTOR */}
+          <div className="flex bg-white/5 rounded-xl overflow-hidden mb-4 p-1 border border-white/5">
+            <button
+              onClick={() => setPickingMode('pickup')}
+              className="flex-1 py-2 text-[12px] font-semibold rounded-lg transition-all"
+              style={{
+                background: pickingMode === 'pickup' ? 'var(--nearu-accent)' : 'transparent',
+                color: pickingMode === 'pickup' ? 'white' : 'white/40'
+              }}
             >
+              Pickup
+            </button>
+            <button
+              onClick={() => setPickingMode('dropoff')}
+              className="flex-1 py-2 text-[12px] font-semibold rounded-lg transition-all"
+              style={{
+                background: pickingMode === 'dropoff' ? 'var(--nearu-accent)' : 'transparent',
+                color: pickingMode === 'dropoff' ? 'white' : 'white/40'
+              }}
+            >
+              Drop-off
+            </button>
+          </div>
+
+          {/* INPUTS SECTION */}
+          <div className="space-y-3 mb-5">
+            <div 
+              className="flex items-center gap-3 px-4 py-3 rounded-xl border transition-all"
+              style={{ 
+                background: 'rgba(255,255,255,0.03)',
+                borderColor: pickingMode === 'pickup' ? 'var(--nearu-accent)' : 'rgba(255,255,255,0.08)'
+              }}
+            >
+              <div className="w-2 h-2 rounded-full" style={{ background: 'var(--nearu-accent)' }} />
               <input
                 value={pickupLabel}
                 onChange={e => setPickupLabel(e.target.value)}
-                className="w-full bg-transparent text-[14px] outline-none border-none"
-                style={{
-                  color: 'white',
-                  caretColor: 'white',
-                  background: 'transparent',
-                  WebkitBoxShadow: '0 0 0 1000px transparent inset',
-                }}
+                onKeyDown={e => e.key === 'Enter' && handleSearch(pickupLabel, 'pickup')}
+                onBlur={() => handleSearch(pickupLabel, 'pickup')}
+                className="w-full bg-transparent text-[14px] outline-none text-white/90"
+                placeholder="Enter pickup address..."
               />
-
-              <button onClick={handleUseMyLocation}></button>
+              <button onClick={handleUseMyLocation} className="text-white/40 hover:text-white transition-colors">📍</button>
             </div>
 
-            {/* Dropoff */}
-            <div className="px-4 py-3">
+            <div 
+              className="flex items-center gap-3 px-4 py-3 rounded-xl border transition-all"
+              style={{ 
+                background: 'rgba(255,255,255,0.03)',
+                borderColor: pickingMode === 'dropoff' ? 'var(--nearu-accent)' : 'rgba(255,255,255,0.08)'
+              }}
+            >
+              <div className="w-2 h-2 rounded-full bg-red-500" />
               <input
                 value={dropoffLabel}
                 onChange={e => setDropoffLabel(e.target.value)}
-                placeholder="Where are you going?"
-                className="w-full bg-transparent text-[14px] outline-none border-none"
-                style={{
-                  color: 'white',
-                  caretColor: 'white',
-                  background: 'transparent',
-                  WebkitBoxShadow: '0 0 0 1000px transparent inset',
-                }}
+                onKeyDown={e => e.key === 'Enter' && handleSearch(dropoffLabel, 'dropoff')}
+                onBlur={() => handleSearch(dropoffLabel, 'dropoff')}
+                placeholder="Where to?"
+                className="w-full bg-transparent text-[14px] outline-none text-white/90"
               />
             </div>
           </div>
 
-          {/* ── Fare Estimate ── */}
-          {estimatedFare !== null && distanceKm !== null && (
-            <div
-              className="mb-3 rounded-xl p-3 border"
-              style={{
-                background: 'rgba(46,158,191,0.12)',
-                borderColor: 'rgba(46,158,191,0.35)',
-              }}
-            >
-              <div className="flex justify-between text-[13px] text-white/70">
-                <span>Distance</span>
-                <span>{distanceKm.toFixed(2)} km</span>
-              </div>
-
-              <div className="flex justify-between text-[13px] text-white/70 mt-1">
-                <span>Estimated fare</span>
-                <span>Rs. {estimatedFare.toFixed(2)}</span>
-              </div>
+          {/* ESTIMATE / INFO */}
+          {estimating ? (
+            <div className="mb-5 flex items-center justify-center gap-2 text-[13px] text-white/40">
+              <div className="w-4 h-4 border-2 border-nearu-accent border-t-transparent rounded-full animate-spin" />
+              Calculating fare...
+            </div>
+          ) : estimatedFare !== null && (
+            <div className="mb-5 flex items-center justify-between bg-nearu-accent/10 rounded-2xl p-4 border border-nearu-accent/20">
+               <div>
+                  <p className="text-[11px] uppercase tracking-wider text-white/40 mb-0.5">Estimated Fare</p>
+                  <p className="text-[20px] font-bold text-white">Rs. {estimatedFare.toFixed(2)}</p>
+               </div>
+               <div className="text-right">
+                  <p className="text-[11px] uppercase tracking-wider text-white/40 mb-0.5">Distance</p>
+                  <p className="text-[15px] font-medium text-white/80">{distanceKm?.toFixed(2)} km</p>
+               </div>
             </div>
           )}
 
-          {/* ERROR */}
-          {error && (
-            <div className="mb-3 text-red-400 text-[13px]">
-              {error}
-            </div>
-          )}
+          {/* ERROR DISPLAY */}
+          {error && <p className="text-red-400 text-[12px] mb-4 text-center">{error}</p>}
 
-          {/* BUTTONS */}
-          <div className="flex gap-2.5">
-            <button
-              onClick={handleEstimate}
-              disabled={estimating}
-              className="px-4 py-3 rounded-xl border text-white/80"
-            >
-              {estimating ? '…' : '💰 Estimate'}
-            </button>
-
-            <button
-              onClick={handleRequest}
-              disabled={loading}
-              className="flex-1 py-3 rounded-xl font-semibold text-white"
-              style={{ background: 'var(--nearu-accent)' }}
-            >
-              {loading ? 'Requesting…' : '🛵 Request ride'}
-            </button>
-          </div>
-
+          {/* MAIN ACTION */}
+          <button
+            onClick={handleRequest}
+            disabled={loading || !estimatedFare}
+            className="w-full py-4 rounded-2xl font-bold text-white transition-all active:scale-[0.98] disabled:opacity-50"
+            style={{ 
+              background: 'var(--nearu-accent)',
+              boxShadow: '0 8px 30px rgba(46, 158, 191, 0.4)'
+            }}
+          >
+            {loading ? 'Requesting Ride...' : 'Confirm and Ride 🛵'}
+          </button>
         </div>
       </div>
     </div>

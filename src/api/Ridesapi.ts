@@ -1,4 +1,4 @@
-import { axiosPrivate } from './axios'; // adjust path if needed
+import { axiosPrivate } from './axios'; 
 import type { ApiResponse, FareEstimate, RideSummary, ServiceType } from '../app/components/ride/Ridestypes';
 
 export const RidesApi = {
@@ -11,7 +11,7 @@ export const RidesApi = {
 
   createRequest: (body: {
     serviceType: number;
-    details: string;
+    details: object;
     pickupLatitude: number;
     pickupLongitude: number;
     dropoffLatitude: number;

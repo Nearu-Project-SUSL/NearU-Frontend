@@ -11,6 +11,7 @@ import { PendingRideScreen } from '../../components/ride/Pendingridescreen';
 import { AcceptedRideScreen } from '../../components/ride/Acceptedridescreen';
 import { InProgressRideScreen } from '../../components/ride/Inprogressridescreen';
 import { CompletedScreen } from '../../components/ride/Completedscreen';
+import { RidesApi } from '../../../api/Ridesapi';
 
 import Navbar from "../../components/layout/Navbar";
 import { Sidebar } from "../../components/layout/Sidebar";
@@ -37,14 +38,7 @@ function ConfirmCompleteScreen({
     setLoading(true);
 
     try {
-      await fetch('/api/student-confirm', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${localStorage.getItem('accessToken') ?? ''}`,
-        },
-        body: JSON.stringify({ rideId }),
-      });
+      await RidesApi.studentConfirm(rideId);
     } catch {
       // proceed anyway
     } finally {
@@ -207,6 +201,9 @@ interface ActiveRide {
   riderVehicle?: string;
   riderRating?: number;
   dropoffLabel?: string;
+  latitude?: number;
+  longitude?: number;
+  distanceToPickupKm?: number;
 }
 
 
@@ -264,10 +261,14 @@ export default function RidesPage() {
   useEffect(() => {
     if (!ride?.rideId) return;
 
+    const baseUrl = import.meta.env.VITE_API_BASE_URL || 'https://api.nearusab.me/api';
+    const hubBaseUrl = baseUrl.replace(/\/api\/?$/, '');
+    const hubUrl = `${hubBaseUrl}/hubs/rides`;
+
     const conn = new signalR.HubConnectionBuilder()
-      .withUrl('/hubs/rides', {
+      .withUrl(hubUrl, {
         accessTokenFactory: () =>
-          localStorage.getItem('accessToken') ?? '',
+          localStorage.getItem('auth_accessToken') ?? '',
       })
       .withAutomaticReconnect()
       .configureLogging(signalR.LogLevel.Warning)
@@ -334,6 +335,31 @@ export default function RidesPage() {
                 riderName: data.riderName,
                 riderVehicle: data.riderVehicle,
                 riderRating: data.riderRating,
+              }
+            : r
+        );
+      }
+    );
+    
+    // Live location updates
+    
+    conn.on(
+      'LocationUpdated',
+      (data: {
+        rideId: string;
+        latitude: number;
+        longitude: number;
+        distanceToPickupKm?: number;
+      }) => {
+        if (data.rideId !== ride.rideId) return;
+        
+        setRide(r =>
+          r
+            ? {
+                ...r,
+                latitude: data.latitude,
+                longitude: data.longitude,
+                distanceToPickupKm: data.distanceToPickupKm,
               }
             : r
         );
@@ -412,6 +438,7 @@ export default function RidesPage() {
             riderName={ride?.riderName}
             riderVehicle={ride?.riderVehicle}
             riderRating={ride?.riderRating}
+            distanceToPickupKm={ride?.distanceToPickupKm}
             onRideStarted={() => setScreen('in-progress')}
           />
         </RideLayout>
