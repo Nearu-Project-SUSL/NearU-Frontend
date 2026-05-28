@@ -1,5 +1,23 @@
 import { useEffect, useState } from 'react';
 import { RidesApi } from '../../../api/Ridesapi';
+import {
+  Box,
+  Typography,
+  Paper,
+  Button,
+  Stack,
+  Chip,
+  Stepper,
+  Step,
+  StepLabel,
+  StepContent,
+  CircularProgress,
+  alpha,
+} from '@mui/material';
+import {
+  Check as CheckIcon,
+  Search as SearchIcon,
+} from '@mui/icons-material';
 
 interface Props {
   rideId: string;
@@ -10,22 +28,22 @@ interface Props {
 const STEPS = [
   {
     label: 'Request submitted',
-    sub: 'Broadcasted to nearby riders',
+    description: 'Broadcasted to nearby riders',
     state: 'done',
   },
   {
     label: 'Rider accepts',
-    sub: 'Waiting for a rider to pick up your request',
+    description: 'Waiting for a rider to pick up your request',
     state: 'active',
   },
   {
     label: 'Rider verifies OTP',
-    sub: 'You will receive an OTP once accepted',
+    description: 'You will receive an OTP once accepted',
     state: 'pending',
   },
   {
     label: 'Ride in progress',
-    sub: 'Track your rider live on the map',
+    description: 'Track your rider live on the map',
     state: 'pending',
   },
 ];
@@ -43,14 +61,6 @@ export function PendingRideScreen({ rideId, onAccepted, onCancel }: Props) {
     return () => clearInterval(id);
   }, []);
 
-  // Placeholder poll — SignalR will push the real status change in production
-  useEffect(() => {
-    const id = setInterval(() => {
-      console.log('[Rides] polling status for', rideId);
-    }, 5000);
-    return () => clearInterval(id);
-  }, [rideId]);
-
   async function handleCancel() {
     setCancelling(true);
     try {
@@ -62,148 +72,206 @@ export function PendingRideScreen({ rideId, onAccepted, onCancel }: Props) {
     }
   }
 
+  const activeStep = 1;
+
   return (
-    <div
-      className="flex flex-col min-h-screen items-center justify-center p-4 animate-fadeIn"
-      style={{
-        background: '#0b0b0b',
+    <Box
+      sx={{
+        display: 'flex',
+        flexDirection: 'column',
+        minHeight: '100vh',
+        alignItems: 'center',
+        justifyContent: 'center',
+        p: 2,
+        bgcolor: '#0b0b0b',
         color: 'var(--text-primary)',
+        animation: 'fadeIn 0.5s ease-out',
+        position: 'relative',
       }}
     >
-      {/* TOP STATUS BADGE */}
-      <div className="absolute top-5 left-0 right-0 flex justify-center">
-        <div
-          className="px-3 py-1 rounded-full text-[12px] font-medium"
-          style={{
-            background: 'rgba(239,171,58,0.12)',
+      {/* TOP STATUS */}
+      <Box sx={{ position: 'absolute', top: 20, display: 'flex', justifyContent: 'center', width: '100%' }}>
+        <Chip
+          label={`Finding a rider${dots}`}
+          sx={{
+            bgcolor: alpha('#efab3a', 0.12),
             color: '#efab3a',
+            fontWeight: 500,
+            fontSize: '12px',
           }}
-        >
-          Finding a rider{dots}
-        </div>
-      </div>
+        />
+      </Box>
 
       {/* MAIN POPUP */}
-      <div
-        className="w-full max-w-xl rounded-3xl px-6 py-6 animate-slideUp"
-        style={{
-          background: 'rgba(18,18,18,0.96)',
+      <Paper
+        elevation={24}
+        sx={{
+          width: '100%',
+          maxWidth: 550,
+          borderRadius: 5,
+          p: 4,
+          bgcolor: alpha('#121212', 0.96),
           backdropFilter: 'blur(24px)',
-          border: '1px solid rgba(255,255,255,0.08)',
+          border: '1px solid',
+          borderColor: alpha('#fff', 0.08),
           boxShadow: '0 25px 80px rgba(0,0,0,0.6)',
+          animation: 'slideUp 0.5s ease-out',
         }}
       >
-
         {/* TITLE */}
-        <div className="text-center mb-5">
-          <h2 className="text-[18px] font-semibold">
+        <Box sx={{ textAlign: 'center', mb: 3 }}>
+          <Typography variant="h6" sx={{ fontWeight: 600 }}>
             Waiting for a rider
-          </h2>
-          <p className="text-[12px] text-white/50 mt-1">
+          </Typography>
+          <Typography variant="caption" sx={{ color: alpha('#fff', 0.5), mt: 0.5 }}>
             We’re matching you with the nearest available rider
-          </p>
-        </div>
+          </Typography>
+        </Box>
 
-        {/* STATUS CARD (replaces map box) */}
-        <div
-          className="rounded-2xl p-5 mb-5 flex flex-col items-center justify-center"
-          style={{
-            background: 'rgba(255,255,255,0.04)',
-            border: '1px solid rgba(255,255,255,0.06)',
+        {/* STATUS CARD */}
+        <Box
+          sx={{
+            borderRadius: 4,
+            p: 3,
+            mb: 3,
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
+            bgcolor: alpha('#fff', 0.04),
+            border: '1px solid',
+            borderColor: alpha('#fff', 0.06),
           }}
         >
-          <div
-            className="w-3 h-3 rounded-full mb-3 animate-pulse"
-            style={{ background: 'var(--nearu-accent)' }}
+          <Box
+             sx={{
+               width: 12,
+               height: 12,
+               borderRadius: '50%',
+               mb: 1.5,
+               bgcolor: 'var(--nearu-accent)',
+               boxShadow: `0 0 10px var(--nearu-accent)`,
+               animation: 'pulse 1.5s infinite',
+             }}
           />
-
-          <span className="text-[13px] text-white/60 text-center">
+          <Typography variant="body2" sx={{ color: alpha('#fff', 0.6), textAlign: 'center' }}>
             Searching nearby riders{dots}
-          </span>
-        </div>
+          </Typography>
+        </Box>
 
         {/* PROGRESS STEPS */}
-        <div className="rounded-2xl p-4 border mb-5"
-          style={{
-            background: 'rgba(255,255,255,0.03)',
-            borderColor: 'rgba(255,255,255,0.08)',
+        <Box
+          sx={{
+            borderRadius: 4,
+            p: 3,
+            mb: 3,
+            border: '1px solid',
+            bgcolor: alpha('#fff', 0.03),
+            borderColor: alpha('#fff', 0.08),
           }}
         >
-          <p className="text-[11px] uppercase tracking-widest mb-3 text-white/50">
+          <Typography variant="caption" sx={{ textTransform: 'uppercase', letterSpacing: 2, mb: 2, color: alpha('#fff', 0.5) }}>
             Ride progress
-          </p>
+          </Typography>
 
-          <div className="flex flex-col gap-3">
-            {STEPS.map((step, i) => (
-              <div key={i} className="flex gap-3 items-start">
-
-                <div
-                  className="w-7 h-7 rounded-full flex items-center justify-center text-[12px] border"
-                  style={
-                    step.state === 'done'
-                      ? { background: 'rgba(99,195,74,0.15)', color: '#63c34a', borderColor: 'rgba(99,195,74,0.3)' }
-                      : step.state === 'active'
-                      ? { background: 'rgba(46,158,191,0.15)', color: '#2e9ebf', borderColor: '#2e9ebf' }
-                      : { background: 'rgba(255,255,255,0.03)', color: 'rgba(255,255,255,0.4)', borderColor: 'rgba(255,255,255,0.08)' }
-                  }
+          <Stepper activeStep={activeStep} orientation="vertical" sx={{ 
+            '& .MuiStepConnector-line': { borderColor: alpha('#fff', 0.1) },
+          }}>
+            {STEPS.map((step, index) => (
+              <Step key={step.label} active={index <= activeStep} completed={index < activeStep}>
+                <StepLabel
+                  StepIconComponent={({ active, completed }) => (
+                    <Box
+                      sx={{
+                        width: 28,
+                        height: 28,
+                        borderRadius: '50%',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        fontSize: 12,
+                        border: '1px solid',
+                        bgcolor: completed ? alpha('#63c34a', 0.15) : active ? alpha('#2e9ebf', 0.15) : alpha('#fff', 0.03),
+                        color: completed ? '#63c34a' : active ? '#2e9ebf' : alpha('#fff', 0.4),
+                        borderColor: completed ? alpha('#63c34a', 0.3) : active ? '#2e9ebf' : alpha('#fff', 0.08),
+                      }}
+                    >
+                      {completed ? <CheckIcon sx={{ fontSize: 14 }} /> : index + 1}
+                    </Box>
+                  )}
                 >
-                  {step.state === 'done' ? '✓' : i + 1}
-                </div>
-
-                <div>
-                  <div className="text-[14px] font-medium">
+                  <Typography variant="body2" sx={{ fontWeight: 500, color: index <= activeStep ? 'white' : alpha('#fff', 0.4) }}>
                     {step.label}
-                  </div>
-                  <div className="text-[12px] text-white/50">
-                    {step.sub}
-                  </div>
-                </div>
-
-              </div>
+                  </Typography>
+                  <Typography variant="caption" sx={{ color: alpha('#fff', 0.4) }}>
+                    {step.description}
+                  </Typography>
+                </StepLabel>
+              </Step>
             ))}
-          </div>
-        </div>
+          </Stepper>
+        </Box>
 
         {/* RIDER ID */}
-        <div
-          className="rounded-xl px-3 py-2 text-[12px] mb-4"
-          style={{
-            background: 'rgba(255,255,255,0.03)',
-            border: '1px solid rgba(255,255,255,0.06)',
-            color: 'rgba(255,255,255,0.6)',
+        <Box
+          sx={{
+            borderRadius: 3,
+            px: 2,
+            py: 1,
+            mb: 3,
+            fontSize: '12px',
+            bgcolor: alpha('#fff', 0.03),
+            border: '1px solid',
+            borderColor: alpha('#fff', 0.06),
+            color: alpha('#fff', 0.6),
           }}
         >
           Ride ID:{" "}
-          <span style={{ color: 'var(--nearu-accent)', fontFamily: 'monospace' }}>
+          <Box component="span" sx={{ color: 'var(--nearu-accent)', fontFamily: 'monospace' }}>
             {rideId.slice(0, 8)}…
-          </span>
-        </div>
+          </Box>
+        </Box>
 
         {/* ACTIONS */}
-        <button
-          onClick={handleCancel}
-          disabled={cancelling}
-          className="w-full py-3 rounded-xl text-[14px] font-medium transition"
-          style={{
-            background: 'rgba(232,76,110,0.12)',
-            border: '1px solid rgba(232,76,110,0.25)',
-            color: '#e84c6e',
-          }}
-        >
-          {cancelling ? 'Cancelling…' : 'Cancel request'}
-        </button>
+        <Stack spacing={2}>
+          <Button
+            fullWidth
+            onClick={handleCancel}
+            disabled={cancelling}
+            variant="outlined"
+            sx={{
+              py: 1.5,
+              borderRadius: 3,
+              fontSize: '14px',
+              fontWeight: 500,
+              color: '#e84c6e',
+              borderColor: alpha('#e84c6e', 0.25),
+              bgcolor: alpha('#e84c6e', 0.12),
+              '&:hover': {
+                bgcolor: alpha('#e84c6e', 0.2),
+                borderColor: alpha('#e84c6e', 0.4),
+              },
+              textTransform: 'none',
+            }}
+          >
+            {cancelling ? <CircularProgress size={20} color="inherit" /> : 'Cancel request'}
+          </Button>
 
-        {/* DEV ONLY — remove before production */}
-        <button
-          onClick={() => onAccepted(new Date(Date.now() + 10 * 60 * 1000).toISOString())}
-          className="w-full py-3 rounded-[10px] text-[13px] font-medium border active:scale-[0.98]"
-          style={{ background: 'transparent', borderColor: 'var(--nearu-border)', color: 'var(--text-secondary)' }}
-        >
-          [Dev] Simulate rider accepted →
-        </button>
-
-      </div>
-    </div>
-
+          {/* DEV ONLY */}
+          <Button
+            fullWidth
+            variant="text"
+            onClick={() => onAccepted(new Date(Date.now() + 10 * 60 * 1000).toISOString())}
+            sx={{
+              fontSize: '13px',
+              color: alpha('#fff', 0.4),
+              textTransform: 'none',
+              '&:hover': { bgcolor: alpha('#fff', 0.05) }
+            }}
+          >
+            [Dev] Simulate rider accepted →
+          </Button>
+        </Stack>
+      </Paper>
+    </Box>
   );
-}
+}

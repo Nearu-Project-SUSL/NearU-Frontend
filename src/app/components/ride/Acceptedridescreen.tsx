@@ -1,15 +1,32 @@
 import { useState } from 'react';
 import { RidesApi } from '../../../api/Ridesapi';
+import {
+  Box,
+  Typography,
+  Paper,
+  Button,
+  Stack,
+  Avatar,
+  Rating,
+  Chip,
+  IconButton,
+  CircularProgress,
+} from '@mui/material';
+
+import {
+  Refresh as RefreshIcon,
+  Star as StarIcon,
+} from '@mui/icons-material';
 
 interface Props {
   rideId: string;
-  otp?: string;              // pushed via SignalR OtpIssued event after acceptance
+  otp?: string;
   otpExpiresAt?: string;
   riderName?: string;
   riderVehicle?: string;
   riderRating?: number;
   distanceToPickupKm?: number;
-  onRideStarted: () => void; // called when SignalR fires InProgress status
+  onRideStarted: () => void;
 }
 
 export function AcceptedRideScreen({
@@ -23,7 +40,7 @@ export function AcceptedRideScreen({
   onRideStarted,
 }: Props) {
   const [currentExpiry, setCurrentExpiry] = useState(otpExpiresAt);
-  const [refreshing, setRefreshing]       = useState(false);
+  const [refreshing, setRefreshing] = useState(false);
 
   const initials = riderName
     .split(' ')
@@ -32,16 +49,16 @@ export function AcceptedRideScreen({
     .slice(0, 2)
     .toUpperCase();
 
-  // OTP digits — show dots if not yet received via SignalR
   const otpDigits = otp?.split('') ?? [];
 
   async function handleRefresh() {
     setRefreshing(true);
     try {
       const res = await RidesApi.refreshOtp(rideId);
-      // New OTP is delivered to student via SignalR OtpIssued event
-      // Update expiry from response so timer resets
-      if (res.data.otpExpiresAt) setCurrentExpiry(res.data.otpExpiresAt);
+
+      if (res.data.otpExpiresAt) {
+        setCurrentExpiry(res.data.otpExpiresAt);
+      }
     } catch {
       // ignore
     } finally {
@@ -50,194 +67,282 @@ export function AcceptedRideScreen({
   }
 
   return (
-    <div
-      className="flex flex-col min-h-screen items-center justify-center p-4 animate-fadeIn"
-      style={{
-        background: '#0b0b0b',
+    <Box
+      sx={{
+        display: 'flex',
+        flexDirection: 'column',
+        minHeight: '100vh',
+        alignItems: 'center',
+        justifyContent: 'center',
+        p: 2,
+        bgcolor: 'var(--bg-base)',
         color: 'var(--text-primary)',
+        animation: 'fadeIn 0.5s ease-out',
+        position: 'relative',
       }}
     >
       {/* TOP STATUS */}
-      <div className="absolute top-5 left-0 right-0 flex justify-center">
-        <div
-          className="px-3 py-1 rounded-full text-[12px] font-medium"
-          style={{
-            background: 'var(--nearu-accent-subtle)',
-            color: 'var(--nearu-accent)',
-          }}
-        >
-          Rider on the way
-        </div>
-      </div>
-
-      {/* MAIN CARD */}
-      <div
-        className="w-full max-w-xl rounded-3xl px-6 py-6 animate-slideUp"
-        style={{
-          background: 'rgba(18,18,18,0.96)',
-          backdropFilter: 'blur(24px)',
-          border: '1px solid rgba(255,255,255,0.08)',
-          boxShadow: '0 25px 80px rgba(0,0,0,0.6)',
+      <Box
+        sx={{
+          position: 'absolute',
+          top: 20,
+          display: 'flex',
+          justifyContent: 'center',
+          width: '100%',
         }}
       >
+        <Chip
+          label="Rider on the way"
+          sx={{
+            bgcolor: 'var(--nearu-accent-subtle)',
+            color: 'var(--nearu-accent)',
+            fontWeight: 500,
+            fontSize: '12px',
+          }}
+        />
+      </Box>
 
+      {/* MAIN CARD */}
+      <Paper
+        elevation={24}
+        sx={{
+          width: '100%',
+          maxWidth: 550,
+          borderRadius: 5,
+          p: 4,
+          bgcolor: 'var(--bg-surface)',
+          backdropFilter: 'blur(24px)',
+          border: '1px solid',
+          borderColor: 'var(--nearu-border)',
+          boxShadow: '0 25px 80px rgba(0,0,0,0.6)',
+          animation: 'slideUp 0.5s ease-out',
+        }}
+      >
         {/* TITLE */}
-        <div className="text-center mb-5">
-          <h2 className="text-[18px] font-semibold">
+        <Box sx={{ textAlign: 'center', mb: 3 }}>
+          <Typography variant="h6" sx={{ fontWeight: 600, color: 'var(--text-primary)' }}>
             Your rider is coming
-          </h2>
-          <p className="text-[12px] text-white/50 mt-1">
-            Verify OTP when the rider arrives
-          </p>
-        </div>
+          </Typography>
 
-        {/* STATUS CARD (replaces map box) */}
-        <div
-          className="rounded-2xl p-5 mb-5 flex flex-col items-center justify-center"
-          style={{
-            background: 'rgba(255,255,255,0.04)',
-            border: '1px solid rgba(255,255,255,0.06)',
+          <Typography variant="caption" sx={{ color: 'var(--text-secondary)', mt: 0.5 }}>
+            Verify OTP when the rider arrives
+          </Typography>
+        </Box>
+
+        {/* STATUS CARD */}
+        <Box
+          sx={{
+            borderRadius: 4,
+            p: 3,
+            mb: 3,
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
+            bgcolor: 'var(--bg-elevated)',
+            border: '1px solid',
+            borderColor: 'var(--nearu-border)',
           }}
         >
-          <div
-            className="w-3 h-3 rounded-full mb-3"
-            style={{
-              background: 'var(--nearu-accent)',
+          <Box
+            sx={{
+              width: 12,
+              height: 12,
+              borderRadius: '50%',
+              mb: 2,
+              bgcolor: 'var(--nearu-accent)',
               boxShadow: '0 0 0 8px var(--nearu-accent-subtle)',
             }}
           />
 
-          <span className="text-[13px] text-white/60 text-center">
-            {distanceToPickupKm != null 
-              ? `Rider is ${distanceToPickupKm.toFixed(2)} km away` 
+          <Typography
+            variant="body2"
+            sx={{
+              color: 'var(--text-secondary)',
+              textAlign: 'center',
+            }}
+          >
+            {distanceToPickupKm != null
+              ? `Rider is ${distanceToPickupKm.toFixed(2)} km away`
               : 'Rider is approaching your pickup location'}
-          </span>
-        </div>
+          </Typography>
+        </Box>
 
         {/* RIDER CARD */}
-        <div
-          className="flex items-center gap-3.5 rounded-2xl px-4 py-3 mb-5 border"
-          style={{
-            background: 'rgba(255,255,255,0.03)',
-            borderColor: 'rgba(255,255,255,0.08)',
+        <Paper
+          elevation={0}
+          sx={{
+            display: 'flex',
+            alignItems: 'center',
+            gap: 2,
+            borderRadius: 4,
+            px: 2,
+            py: 1.5,
+            mb: 3,
+            bgcolor: 'var(--bg-elevated)',
+            border: '1px solid',
+            borderColor: 'var(--nearu-border)',
           }}
         >
-          <div
-            className="w-11 h-11 rounded-full flex items-center justify-center font-medium"
-            style={{
-              background: 'var(--nearu-accent-subtle)',
+          <Avatar
+            sx={{
+              width: 44,
+              height: 44,
+              bgcolor: 'var(--nearu-accent-subtle)',
               border: '1px solid var(--nearu-accent)',
               color: 'var(--nearu-accent)',
+              fontWeight: 600,
             }}
           >
             {initials}
-          </div>
+          </Avatar>
 
-          <div className="flex-1">
-            <div className="text-[15px] font-medium">
+          <Box sx={{ flex: 1 }}>
+            <Typography variant="body1" sx={{ fontWeight: 500, color: 'var(--text-primary)' }}>
               {riderName}
-            </div>
+            </Typography>
+
             {riderVehicle && (
-              <div className="text-[12px] text-white/50">
+              <Typography variant="caption" sx={{ color: 'var(--text-secondary)' }}>
                 {riderVehicle}
-              </div>
+              </Typography>
             )}
-          </div>
+          </Box>
 
           {riderRating != null && (
-            <div className="text-[14px] font-medium text-yellow-400">
-              {riderRating.toFixed(1)} ★
-            </div>
+            <Stack direction="row" alignItems="center" spacing={0.5}>
+              <Typography variant="body2" sx={{ fontWeight: 600, color: 'var(--nearu-accent)' }}>
+                {riderRating.toFixed(1)}
+              </Typography>
+              <StarIcon sx={{ fontSize: 16, color: 'var(--nearu-accent)' }} />
+            </Stack>
           )}
-        </div>
+        </Paper>
 
         {/* OTP CARD */}
-        <div
-          className="rounded-2xl p-5 mb-5 border"
-          style={{
-            background: 'rgba(255,255,255,0.03)',
-            borderColor: 'rgba(255,255,255,0.08)',
+        <Paper
+          elevation={0}
+          sx={{
+            borderRadius: 4,
+            p: 3,
+            mb: 3,
+            bgcolor: 'var(--bg-elevated)',
+            border: '1px solid',
+            borderColor: 'var(--nearu-border)',
+            textAlign: 'center',
           }}
         >
-          <div className="text-center mb-4">
-            <p className="text-[11px] uppercase tracking-widest text-white/50">
+          <Box sx={{ mb: 2 }}>
+            <Typography
+              variant="caption"
+              sx={{
+                textTransform: 'uppercase',
+                letterSpacing: 2,
+                color: 'var(--text-secondary)',
+              }}
+            >
               Your OTP
-            </p>
-            <p className="text-[12px] text-white/40 mt-1">
+            </Typography>
+
+            <Typography variant="caption" sx={{ color: 'var(--text-secondary)' }}>
               Share only with your rider
-            </p>
-          </div>
+            </Typography>
+          </Box>
 
           {/* OTP BOXES */}
-          <div className="flex justify-center gap-3 mb-4">
+          <Stack direction="row" spacing={1.5} justifyContent="center" sx={{ mb: 2.5 }}>
             {otpDigits.length === 4
               ? otpDigits.map((d, i) => (
-                  <div
+                  <Paper
                     key={i}
-                    className="w-14 h-16 rounded-xl flex items-center justify-center text-[26px] font-semibold"
-                    style={{
-                      background: 'rgba(255,255,255,0.04)',
+                    sx={{
+                      width: 56,
+                      height: 64,
+                      borderRadius: 3,
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      fontSize: 26,
+                      fontWeight: 600,
+                      bgcolor: 'var(--bg-surface)',
                       border: '1px solid var(--nearu-accent)',
                       color: 'var(--nearu-accent)',
                     }}
                   >
                     {d}
-                  </div>
+                  </Paper>
                 ))
               : [0, 1, 2, 3].map(i => (
-                  <div
+                  <Paper
                     key={i}
-                    className="w-14 h-16 rounded-xl flex items-center justify-center text-[20px]"
-                    style={{
-                      background: 'rgba(255,255,255,0.04)',
-                      border: '1px solid rgba(255,255,255,0.08)',
-                      color: 'rgba(255,255,255,0.3)',
+                    sx={{
+                      width: 56,
+                      height: 64,
+                      borderRadius: 3,
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      fontSize: 20,
+                      bgcolor: 'var(--bg-elevated)',
+                      border: '1px solid var(--nearu-border)',
+                      color: 'var(--text-secondary)',
                     }}
                   >
                     •
-                  </div>
+                  </Paper>
                 ))}
-          </div>
+          </Stack>
 
-          <button
+          <Button
+            fullWidth
             onClick={handleRefresh}
             disabled={refreshing}
-            className="w-full py-2.5 rounded-xl text-[13px] font-medium border"
-            style={{
-              background: 'transparent',
-              borderColor: 'rgba(255,255,255,0.1)',
-              color: 'rgba(255,255,255,0.7)',
+            startIcon={<RefreshIcon />}
+            sx={{
+              py: 1,
+              fontSize: '13px',
+              color: 'var(--text-secondary)',
+              textTransform: 'none',
+              '&:hover': {
+                bgcolor: 'var(--bg-elevated)',
+              },
             }}
           >
-            {refreshing ? 'Refreshing…' : '↺ Refresh OTP'}
-          </button>
-        </div>
+            {refreshing ? 'Refreshing…' : 'Refresh OTP'}
+          </Button>
+        </Paper>
 
         {/* INFO */}
-        <div
-          className="rounded-xl px-3.5 py-3 text-[12px] mb-4 border"
-          style={{
-            background: 'rgba(255,255,255,0.03)',
-            borderColor: 'rgba(255,255,255,0.08)',
-            color: 'rgba(255,255,255,0.5)',
+        <Box
+          sx={{
+            borderRadius: 3,
+            p: 2,
+            mb: 3,
+            bgcolor: 'var(--bg-elevated)',
+            border: '1px solid var(--nearu-border)',
           }}
         >
-          Rider will use this OTP to start your ride. Tracking begins after verification.
-        </div>
+          <Typography variant="caption" sx={{ color: 'var(--text-secondary)' }}>
+            Rider will use this OTP to start your ride. Tracking begins after verification.
+          </Typography>
+        </Box>
 
         {/* DEV BUTTON */}
-        <button
+        <Button
+          fullWidth
+          variant="text"
           onClick={onRideStarted}
-          className="w-full py-3 rounded-xl text-[13px] border"
-          style={{
-            background: 'transparent',
-            borderColor: 'rgba(255,255,255,0.1)',
-            color: 'rgba(255,255,255,0.6)',
+          sx={{
+            fontSize: '13px',
+            color: 'var(--text-secondary)',
+            textTransform: 'none',
+            '&:hover': {
+              bgcolor: 'var(--bg-elevated)',
+            },
           }}
         >
           [Dev] Simulate ride started →
-        </button>
-      </div>
-    </div>
+        </Button>
+      </Paper>
+    </Box>
   );
 }

@@ -1,13 +1,23 @@
+import {
+  Box,
+  Typography,
+  Paper,
+  Button,
+  Stack,
+  Avatar,
+  Chip,
+} from '@mui/material';
+
 interface Props {
   riderName?: string;
   riderVehicle?: string;
   estimatedFare: number;
   dropoffLabel?: string;
-  onRiderCompleted:()=> void;
+  onRiderCompleted: () => void;
 }
 
 export function InProgressRideScreen({
-  riderName    = 'Your rider',
+  riderName = 'Your rider',
   riderVehicle,
   estimatedFare,
   dropoffLabel = 'Drop-off point',
@@ -21,153 +31,239 @@ export function InProgressRideScreen({
     .toUpperCase();
 
   return (
-    <div
-      className="flex flex-col min-h-screen items-center justify-center p-4 animate-fadeIn"
-      style={{
-        background: '#0b0b0b',
+    <Box
+      sx={{
+        display: 'flex',
+        flexDirection: 'column',
+        minHeight: '100vh',
+        alignItems: 'center',
+        justifyContent: 'center',
+        p: 2,
+        bgcolor: 'var(--bg-base)',
         color: 'var(--text-primary)',
+        animation: 'fadeIn 0.5s ease-out',
+        position: 'relative',
       }}
     >
       {/* TOP STATUS */}
-      <div className="absolute top-5 left-0 right-0 flex justify-center">
-        <div
-          className="px-3 py-1 rounded-full text-[12px] font-medium"
-          style={{
-            background: 'rgba(99,195,74,0.12)',
-            color: '#63c34a',
-          }}
-        >
-          ● Ride in progress
-        </div>
-      </div>
-
-      {/* MAIN CARD */}
-      <div
-        className="w-full max-w-xl rounded-3xl px-6 py-6 animate-slideUp"
-        style={{
-          background: 'rgba(18,18,18,0.96)',
-          backdropFilter: 'blur(24px)',
-          border: '1px solid rgba(255,255,255,0.08)',
-          boxShadow: '0 25px 80px rgba(0,0,0,0.6)',
+      <Box
+        sx={{
+          position: 'absolute',
+          top: 20,
+          display: 'flex',
+          justifyContent: 'center',
+          width: '100%',
         }}
       >
+        <Chip
+          label="● Ride in progress"
+          sx={{
+            bgcolor: 'var(--nearu-accent-subtle)',
+            color: 'var(--nearu-accent)',
+            fontWeight: 500,
+            fontSize: '12px',
+          }}
+        />
+      </Box>
 
+      {/* MAIN CARD */}
+      <Paper
+        elevation={24}
+        sx={{
+          width: '100%',
+          maxWidth: 550,
+          borderRadius: 5,
+          p: 4,
+          bgcolor: 'var(--bg-surface)',
+          backdropFilter: 'blur(24px)',
+          border: '1px solid var(--nearu-border)',
+          boxShadow: '0 25px 80px rgba(0,0,0,0.6)',
+          animation: 'slideUp 0.5s ease-out',
+        }}
+      >
         {/* TITLE */}
-        <div className="text-center mb-5">
-          <h2 className="text-[18px] font-semibold">
+        <Box sx={{ textAlign: 'center', mb: 3 }}>
+          <Typography variant="h6" sx={{ fontWeight: 600, color: 'var(--text-primary)' }}>
             Your trip is ongoing
-          </h2>
-          <p className="text-[12px] text-white/50 mt-1">
-            Live tracking active
-          </p>
-        </div>
+          </Typography>
 
-        {/* LIVE STATUS CARD (replaces map box) */}
-        <div
-          className="rounded-2xl p-5 mb-5 flex flex-col items-center justify-center"
-          style={{
-            background: 'rgba(255,255,255,0.04)',
-            border: '1px solid rgba(255,255,255,0.06)',
+          <Typography
+            variant="caption"
+            sx={{ color: 'var(--text-secondary)', mt: 0.5, display: 'block' }}
+          >
+            Live tracking active
+          </Typography>
+        </Box>
+
+        {/* LIVE STATUS CARD */}
+        <Box
+          sx={{
+            borderRadius: 4,
+            p: 3,
+            mb: 3,
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
+            bgcolor: 'var(--bg-elevated)',
+            border: '1px solid var(--nearu-border)',
           }}
         >
-          <div
-            className="w-3 h-3 rounded-full mb-3"
-            style={{
-              background: 'var(--nearu-accent)',
+          <Box
+            sx={{
+              width: 12,
+              height: 12,
+              borderRadius: '50%',
+              mb: 2,
+              bgcolor: 'var(--nearu-accent)',
               boxShadow: '0 0 0 8px var(--nearu-accent-subtle)',
             }}
           />
 
-          <span className="text-[13px] text-white/60 text-center">
+          <Typography
+            variant="body2"
+            sx={{
+              color: 'var(--text-secondary)',
+              textAlign: 'center',
+            }}
+          >
             Navigating to your destination
-          </span>
-        </div>
+          </Typography>
+        </Box>
 
         {/* RIDER CARD */}
-        <div
-          className="flex items-center gap-3.5 rounded-2xl px-4 py-3 mb-5"
-          style={{
-            background: 'rgba(255,255,255,0.03)',
-            border: '1px solid rgba(255,255,255,0.08)',
+        <Paper
+          elevation={0}
+          sx={{
+            display: 'flex',
+            alignItems: 'center',
+            gap: 2,
+            borderRadius: 4,
+            px: 2,
+            py: 1.5,
+            mb: 3,
+            bgcolor: 'var(--bg-elevated)',
+            border: '1px solid var(--nearu-border)',
           }}
         >
-          <div
-            className="w-11 h-11 rounded-full flex items-center justify-center font-medium"
-            style={{
-              background: 'var(--nearu-accent-subtle)',
+          <Avatar
+            sx={{
+              width: 44,
+              height: 44,
+              bgcolor: 'var(--nearu-accent-subtle)',
               border: '1px solid var(--nearu-accent)',
               color: 'var(--nearu-accent)',
+              fontWeight: 600,
             }}
           >
             {initials}
-          </div>
+          </Avatar>
 
-          <div className="flex-1">
-            <div className="text-[15px] font-medium">
+          <Box sx={{ flex: 1 }}>
+            <Typography variant="body1" sx={{ fontWeight: 500, color: 'var(--text-primary)' }}>
               {riderName}
-            </div>
+            </Typography>
+
             {riderVehicle && (
-              <div className="text-[12px] text-white/50">
+              <Typography
+                variant="caption"
+                sx={{ color: 'var(--text-secondary)', display: 'block' }}
+              >
                 {riderVehicle}
-              </div>
+              </Typography>
             )}
-          </div>
-        </div>
+          </Box>
+        </Paper>
 
         {/* TRIP INFO */}
-        <div
-          className="rounded-2xl p-4 mb-5"
-          style={{
-            background: 'rgba(255,255,255,0.03)',
-            border: '1px solid rgba(255,255,255,0.08)',
+        <Paper
+          elevation={0}
+          sx={{
+            borderRadius: 4,
+            p: 3,
+            mb: 3,
+            bgcolor: 'var(--bg-elevated)',
+            border: '1px solid var(--nearu-border)',
           }}
         >
-          <div className="flex justify-between py-2 border-b border-white/10">
-            <span className="text-[13px] text-white/50">
+          <Box
+            sx={{
+              display: 'flex',
+              justifyContent: 'space-between',
+              pb: 1.5,
+              borderBottom: '1px solid var(--nearu-border)',
+            }}
+          >
+            <Typography variant="caption" sx={{ color: 'var(--text-secondary)' }}>
               Destination
-            </span>
-            <span className="text-[13px] text-white/80 font-medium">
-              {dropoffLabel}
-            </span>
-          </div>
+            </Typography>
 
-          <div className="flex justify-between pt-3">
-            <span className="text-[14px] font-medium">
+            <Typography variant="body2" sx={{ fontWeight: 500, color: 'var(--text-primary)' }}>
+              {dropoffLabel}
+            </Typography>
+          </Box>
+
+          <Box
+            sx={{
+              display: 'flex',
+              justifyContent: 'space-between',
+              pt: 2,
+              alignItems: 'center',
+            }}
+          >
+            <Typography variant="body1" sx={{ fontWeight: 500, color: 'var(--text-primary)' }}>
               Estimated fare
-            </span>
-            <span className="text-[20px] font-semibold text-green-400">
+            </Typography>
+
+            <Typography variant="h5" sx={{ fontWeight: 600, color: 'var(--nearu-accent)' }}>
               Rs. {estimatedFare.toFixed(2)}
-            </span>
-          </div>
-        </div>
+            </Typography>
+          </Box>
+        </Paper>
 
         {/* LIVE STATUS */}
-        <div
-          className="rounded-xl px-3.5 py-3 text-[13px] mb-4"
-          style={{
-            background: 'rgba(255,255,255,0.03)',
-            border: '1px solid rgba(255,255,255,0.08)',
-            color: 'rgba(255,255,255,0.55)',
+        <Box
+          sx={{
+            borderRadius: 3,
+            p: 2,
+            mb: 3,
+            bgcolor: 'var(--bg-elevated)',
+            border: '1px solid var(--nearu-border)',
           }}
         >
-          Waiting for rider to complete the trip…
-        </div>
+          <Typography
+            variant="caption"
+            sx={{
+              color: 'var(--text-secondary)',
+              textAlign: 'center',
+              display: 'block',
+            }}
+          >
+            Waiting for rider to complete the trip…
+          </Typography>
+        </Box>
 
-        {/* DEV ONLY — remove before production */}
-        {/* In production this screen changes automatically via SignalR when rider presses complete */}
-        <button
+        {/* DEV ONLY */}
+        <Button
+          fullWidth
           onClick={onRiderCompleted}
-          className="w-full py-3 rounded-[10px] text-[13px] font-medium border
-                    active:scale-[0.98] transition-all"
-          style={{
-            background:  'rgba(99,195,74,0.08)',
-            borderColor: 'rgba(99,195,74,0.2)',
-            color:       '#63c34a',
-          }}>
+          variant="outlined"
+          sx={{
+            py: 1.5,
+            borderRadius: 2.5,
+            fontSize: '13px',
+            fontWeight: 500,
+            color: 'var(--nearu-accent)',
+            borderColor: 'var(--nearu-accent)',
+            bgcolor: 'var(--nearu-accent-subtle)',
+            textTransform: 'none',
+            '&:hover': {
+              bgcolor: 'var(--bg-elevated)',
+            },
+          }}
+        >
           [Dev] Simulate rider completed →
-        </button>
-
-      </div>
-    </div>
+        </Button>
+      </Paper>
+    </Box>
   );
 }
