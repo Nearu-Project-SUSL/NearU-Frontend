@@ -80,8 +80,9 @@ export function RequestRideScreen({ onRideCreated }: Props) {
   const [pickupLabel,   setPickupLabel]   = useState('');
   const [dropoffLabel,  setDropoffLabel]  = useState('');
   const [details,       setDetails]       = useState('');
-  const [estimatedFare, setEstimatedFare] = useState<number | null>(null);
-  const [distanceKm,    setDistanceKm]    = useState<number | null>(null);
+  const [estimatedFare,    setEstimatedFare]    = useState<number | null>(null);
+  const [distanceKm,       setDistanceKm]       = useState<number | null>(null);
+  const [estimatedMinutes, setEstimatedMinutes] = useState<number | null>(null);
   const [loading,       setLoading]       = useState(false);
   const [estimating,    setEstimating]    = useState(false);
   const [error,         setError]         = useState('');
@@ -164,35 +165,28 @@ export function RequestRideScreen({ onRideCreated }: Props) {
     }
   }
 
-  async function getRoadDistanceKm(
-    lat1: number, lng1: number,
-    lat2: number, lng2:number
-  ): Promise<number>{
-    const res = await fetch(
-      `https://router.project-osrm.org/route/v1/driving/${lng1},${lat1};${lng2},${lat2}?overview=false`
-    );
-    const data = await res.json();
-
-    //OSRM return distance in meters
-    return data.routes[0].distance / 1000;
-  }
-
   async function handleEstimate() {
     setError('');
     setEstimating(true);
     try {
-      const roadKm = await getRoadDistanceKm(pickupLat, pickupLng, dropoffLat, dropoffLng);
-
+      // Backend now calls OSRM internally — no need to call it from the browser too.
+      // distanceKm is true road distance, estimatedDurationSeconds comes from OSRM route.
       const res = await RidesApi.getEstimate(pickupLat, pickupLng, dropoffLat, dropoffLng);
+      const { estimatedFare, distanceKm, estimatedDurationSeconds } = res.data;
 
-      setDistanceKm(roadKm);
-      setEstimatedFare(res.data.estimatedFare);
-
+      setDistanceKm(distanceKm);
+      setEstimatedFare(estimatedFare);
+      setEstimatedMinutes(
+        estimatedDurationSeconds > 0
+          ? Math.ceil(estimatedDurationSeconds / 60)
+          : null
+      );
     } catch (e: any) {
       const backendError = e.response?.data?.message || e.message || 'Could not get estimate.';
       setError(backendError);
       setEstimatedFare(null);
       setDistanceKm(null);
+      setEstimatedMinutes(null);
     } finally {
       setEstimating(false);
     }
@@ -393,15 +387,22 @@ export function RequestRideScreen({ onRideCreated }: Props) {
               Calculating fare...
             </div>
           ) : estimatedFare !== null && (
-            <div className="mb-5 flex items-center justify-between bg-nearu-accent/10 rounded-2xl p-4 border border-nearu-accent/20">
-               <div>
+            <div className="mb-5 bg-nearu-accent/10 rounded-2xl p-4 border border-nearu-accent/20">
+              <div className="flex items-center justify-between">
+                <div>
                   <p className="text-[11px] uppercase tracking-wider text-white/40 mb-0.5">Estimated Fare</p>
                   <p className="text-[20px] font-bold text-white">Rs. {estimatedFare.toFixed(2)}</p>
-               </div>
-               <div className="text-right">
-                  <p className="text-[11px] uppercase tracking-wider text-white/40 mb-0.5">Distance</p>
+                </div>
+                <div className="text-right">
+                  <p className="text-[11px] uppercase tracking-wider text-white/40 mb-0.5">Road Distance</p>
                   <p className="text-[15px] font-medium text-white/80">{distanceKm?.toFixed(2)} km</p>
-               </div>
+                </div>
+              </div>
+              {estimatedMinutes !== null && (
+                <p className="text-[11px] text-white/40 mt-2 text-center">
+                  ⏱ Estimated travel time: ~{estimatedMinutes} min
+                </p>
+              )}
             </div>
           )}
 
