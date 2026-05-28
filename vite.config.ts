@@ -27,4 +27,20 @@ export default defineConfig({
 
   // File types to support raw imports. Never add .css, .tsx, or .ts files to this.
   assetsInclude: ['**/*.svg', '**/*.csv'],
+
+  server: {
+    proxy: {
+      '/api': {
+        target: 'http://localhost:5059', // your .NET backend port
+        changeOrigin: true,
+      },
+      '/hubs': {
+        target: 'http://localhost:5059',
+        changeOrigin: true,
+        ws: true, // needed for SignalR websockets
+      },
+    },
+  },
 })
+
+

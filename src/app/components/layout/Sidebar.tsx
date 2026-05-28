@@ -171,7 +171,7 @@ export function Sidebar({ activeSection }: SidebarProps) {
                     <ListItemIcon
                       sx={{
                         minWidth: 0,
-                        mr: expanded ? 1.5 : 'auto',
+                        mr: expanded ? 1.5 : 0,
                         color: 'inherit',
                         transition: 'margin 0.28s ease',
                       }}
@@ -207,7 +207,7 @@ export function Sidebar({ activeSection }: SidebarProps) {
             onClick={() => { if (isMobileOpen) toggleMobileSidebar(); }}
             sx={{
               py: 1.25,
-              px: expanded ? 2 : 1.25,
+              px: expanded ? 1.75 : 1.25,
               borderRadius: '11px',
               border: `1px solid ${accentAlpha(0.15)}`,
               bgcolor: accentAlpha(0.04),
