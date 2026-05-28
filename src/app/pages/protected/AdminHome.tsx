@@ -1,3 +1,4 @@
+import { useNavigate } from 'react-router';
 import { useState, useEffect, useCallback } from 'react';
 import { PageLayout } from '../../components/layout/PageLayout';
 import { Sidebar } from '../../components/layout/Sidebar';
@@ -48,6 +49,7 @@ import { useNearUTheme } from '../../context/ThemeContext';
 
 export default function AdminHome() {
   const { auth } = useAuth();
+  const navigate = useNavigate();
   const { isDark } = useNearUTheme();
   const theme = useTheme();
   
@@ -220,7 +222,7 @@ export default function AdminHome() {
             
             {/* Upper Header Welcome banner */}
             <Fade in timeout={800}>
-              <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 4 }}>
+              <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 4, flexDirection: { xs: 'column', sm: 'row' }, gap: 2 }}>
                 <Box>
                   <Typography variant="h4" sx={{ fontWeight: 800, color: 'text.primary', mb: 0.5 }}>
                     NearU Command Center
@@ -229,21 +231,39 @@ export default function AdminHome() {
                     Welcome back, <span style={{ color: accent, fontWeight: 700 }}>{auth?.user?.username || 'Admin'}</span>. Real-time platform management.
                   </Typography>
                 </Box>
-                <Tooltip title="Force Refresh Dashboard">
-                  <IconButton 
-                    onClick={refreshAll} 
-                    disabled={loadingStats || loadingRiders}
+                <Box sx={{ display: 'flex', gap: 2, alignItems: 'center' }}>
+                  <Button
+                    variant="contained"
+                    onClick={() => navigate('/admin/deals')}
                     sx={{ 
-                      bgcolor: accentAlpha(0.1), 
-                      color: accent,
-                      border: `1px solid ${accentAlpha(0.2)}`,
-                      p: 1.5,
-                      '&:hover': { bgcolor: accentAlpha(0.2) } 
+                      fontWeight: 700, 
+                      borderRadius: '12px', 
+                      bgcolor: '#ef4444', 
+                      color: '#fff',
+                      textTransform: 'none',
+                      px: 3,
+                      py: 1.2,
+                      '&:hover': { bgcolor: '#dc2626' }
                     }}
                   >
-                    {loadingStats || loadingRiders ? <CircularProgress size={24} color="inherit" /> : <RefreshIcon />}
-                  </IconButton>
-                </Tooltip>
+                    Review Deals & Offers
+                  </Button>
+                  <Tooltip title="Force Refresh Dashboard">
+                    <IconButton 
+                      onClick={refreshAll} 
+                      disabled={loadingStats || loadingRiders}
+                      sx={{ 
+                        bgcolor: accentAlpha(0.1), 
+                        color: accent,
+                        border: `1px solid ${accentAlpha(0.2)}`,
+                        p: 1.5,
+                        '&:hover': { bgcolor: accentAlpha(0.2) } 
+                      }}
+                    >
+                      {loadingStats || loadingRiders ? <CircularProgress size={24} color="inherit" /> : <RefreshIcon />}
+                    </IconButton>
+                  </Tooltip>
+                </Box>
               </Box>
             </Fade>
 
