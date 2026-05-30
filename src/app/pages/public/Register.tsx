@@ -109,7 +109,7 @@ export default function Register() {
 
   const faculties = ['Computing', 'Engineering', 'Management', 'Social Sciences', 'Applied Sciences'];
   const years = ['1st Year', '2nd Year', '3rd Year', '4th Year'];
-  const businessTypes = ['Food Vendor', 'Accommodation', 'Transport', 'Retail Shop', 'Services'];
+  const businessTypes = ['Food Vendor', 'Accommodation', 'Custom Gifts'];
   const vehicleTypes = ['Tuk Tuk', 'Motorcycle', 'Bicycle', 'Car'];
 
   const steps = ['Basic Info', 'Personal Details', 'Additional Info'];
