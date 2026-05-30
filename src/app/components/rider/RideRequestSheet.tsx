@@ -6,7 +6,7 @@
  */
 import { useEffect, useRef, useState } from 'react';
 import { Drawer } from 'vaul';
-import { motion } from 'motion/react';
+import { motion } from 'framer-motion';
 import type { RideRequest } from '../../../api/riderService';
 import {
   LocationOn as LocationIcon,
@@ -59,7 +59,7 @@ export default function RideRequestSheet({
   return (
     <Drawer.Root open dismissible={false}>
       <Drawer.Portal>
-        <Drawer.Overlay style={{ background: 'rgba(0,0,0,0.6)', position: 'fixed', inset: 0, zIndex: 1300 }} />
+        <Drawer.Overlay style={{ background: 'rgba(0,0,0,0.7)', position: 'fixed', inset: 0, zIndex: 1300 }} />
         <Drawer.Content
           style={{
             position: 'fixed',
@@ -67,10 +67,12 @@ export default function RideRequestSheet({
             left: 0,
             right: 0,
             zIndex: 1400,
-            borderTopLeftRadius: 24,
-            borderTopRightRadius: 24,
-            background: '#161616',
-            border: `1px solid ${ACCENT_ALPHA(0.3)}`,
+            borderTopLeftRadius: 28,
+            borderTopRightRadius: 28,
+            background: 'rgba(20, 20, 20, 0.95)',
+            backdropFilter: 'blur(24px)',
+            WebkitBackdropFilter: 'blur(24px)',
+            border: `1px solid rgba(16, 185, 129, 0.25)`,
             borderBottom: 'none',
             outline: 'none',
             overflow: 'hidden',
@@ -80,7 +82,7 @@ export default function RideRequestSheet({
           <div
             style={{
               height: 4,
-              background: '#222',
+              background: '#1a1a1a',
               position: 'relative',
               overflow: 'hidden',
             }}
@@ -100,94 +102,105 @@ export default function RideRequestSheet({
                   ? '#f59e0b'
                   : '#ef4444',
                 transition: 'background 0.5s ease',
+                boxShadow: countdown > 8 
+                  ? `0 0 10px ${ACCENT_ALPHA(0.5)}` 
+                  : countdown > 4 
+                  ? '0 0 10px rgba(245,158,11,0.5)' 
+                  : '0 0 10px rgba(239,68,68,0.5)'
               }}
             />
           </div>
 
           {/* Sheet handle */}
-          <div style={{ display: 'flex', justifyContent: 'center', paddingTop: 12, paddingBottom: 4 }}>
-            <div style={{ width: 40, height: 4, background: '#333', borderRadius: 2 }} />
+          <div style={{ display: 'flex', justifyContent: 'center', paddingTop: 14, paddingBottom: 4 }}>
+            <div style={{ width: 44, height: 4, background: 'rgba(255,255,255,0.12)', borderRadius: 2 }} />
           </div>
 
-          <div style={{ padding: '16px 20px 32px' }}>
+          <div style={{ padding: '16px 24px 36px' }}>
             {/* Header */}
-            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 20 }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 24 }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
                 <div style={{
-                  width: 44, height: 44,
-                  background: ACCENT_ALPHA(0.15),
-                  border: `1px solid ${ACCENT_ALPHA(0.35)}`,
-                  borderRadius: 12,
+                  width: 48, height: 48,
+                  background: ACCENT_ALPHA(0.12),
+                  border: `1px solid ${ACCENT_ALPHA(0.3)}`,
+                  borderRadius: 14,
                   display: 'flex', alignItems: 'center', justifyContent: 'center',
+                  boxShadow: `0 0 15px ${ACCENT_ALPHA(0.15)}`
                 }}>
-                  <BikeIcon style={{ color: RIDER_ACCENT, fontSize: 22 }} />
+                  <BikeIcon style={{ color: RIDER_ACCENT, fontSize: 24 }} />
                 </div>
                 <div>
-                  <p style={{ color: 'white', fontWeight: 700, margin: 0, fontSize: 16 }}>New Ride Request</p>
-                  <p style={{ color: '#9ca3af', margin: 0, fontSize: 13 }}>from {request.studentName}</p>
+                  <p style={{ color: 'white', fontWeight: 800, margin: 0, fontSize: 17, letterSpacing: '-0.01em' }}>New Ride Request</p>
+                  <p style={{ color: '#9ca3af', margin: '2px 0 0', fontSize: 13, fontWeight: 500 }}>from {request.studentName}</p>
                 </div>
               </div>
 
               {/* Countdown badge */}
               <div style={{
-                display: 'flex', alignItems: 'center', gap: 5,
-                padding: '6px 12px',
+                display: 'flex', alignItems: 'center', gap: 6,
+                padding: '6px 14px',
                 borderRadius: 20,
                 background: countdown > 8 ? ACCENT_ALPHA(0.12) : countdown > 4 ? 'rgba(245,158,11,0.12)' : 'rgba(239,68,68,0.12)',
                 border: `1px solid ${countdown > 8 ? ACCENT_ALPHA(0.3) : countdown > 4 ? 'rgba(245,158,11,0.3)' : 'rgba(239,68,68,0.3)'}`,
               }}>
                 <ClockIcon style={{ fontSize: 14, color: countdown > 8 ? RIDER_ACCENT : countdown > 4 ? '#f59e0b' : '#ef4444' }} />
-                <span style={{ color: 'white', fontWeight: 700, fontSize: 15 }}>{countdown}s</span>
+                <span style={{ color: 'white', fontWeight: 800, fontSize: 14, fontFamily: 'monospace' }}>{countdown}s</span>
               </div>
             </div>
 
             {/* Route info */}
             <div style={{
-              background: '#1e1e1e',
-              border: '1px solid #2e2e2e',
-              borderRadius: 16,
-              padding: 16,
-              marginBottom: 16,
+              background: 'rgba(255, 255, 255, 0.02)',
+              border: '1px solid rgba(255, 255, 255, 0.06)',
+              borderRadius: 20,
+              padding: 18,
+              marginBottom: 20,
             }}>
               {/* Pickup */}
-              <div style={{ display: 'flex', alignItems: 'flex-start', gap: 10, marginBottom: 14 }}>
-                <LocationIcon style={{ color: '#2E9EBF', fontSize: 18, marginTop: 2, flexShrink: 0 }} />
+              <div style={{ display: 'flex', alignItems: 'flex-start', gap: 12 }}>
+                <LocationIcon style={{ color: '#2E9EBF', fontSize: 20, marginTop: 1, flexShrink: 0 }} />
                 <div>
-                  <p style={{ color: '#9ca3af', margin: 0, fontSize: 11, textTransform: 'uppercase', letterSpacing: '0.08em' }}>Pickup</p>
-                  <p style={{ color: 'white', margin: 0, fontWeight: 600, fontSize: 14 }}>{request.pickupLocation}</p>
+                  <p style={{ color: '#9ca3af', margin: 0, fontSize: 10, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.08em' }}>Pickup</p>
+                  <p style={{ color: 'white', margin: '2px 0 0', fontWeight: 600, fontSize: 14, lineHeight: 1.4 }}>{request.pickupLocation}</p>
                 </div>
               </div>
 
-              {/* Divider with arrow */}
-              <div style={{ display: 'flex', alignItems: 'center', marginLeft: 9, marginBottom: 14, gap: 8 }}>
-                <div style={{ width: 2, height: 20, background: '#333', borderRadius: 1 }} />
-                <ArrowIcon style={{ color: '#555', fontSize: 16, rotate: '90deg' }} />
+              {/* Divider connector */}
+              <div style={{ display: 'flex', alignItems: 'center', marginLeft: 9, marginY: 6, gap: 12 }}>
+                <div style={{ 
+                  width: 2, 
+                  height: 24, 
+                  background: 'linear-gradient(to bottom, #2E9EBF, #f59e0b)', 
+                  opacity: 0.4,
+                  borderRadius: 1 
+                }} />
               </div>
 
               {/* Dropoff */}
-              <div style={{ display: 'flex', alignItems: 'flex-start', gap: 10 }}>
-                <LocationIcon style={{ color: '#f59e0b', fontSize: 18, marginTop: 2, flexShrink: 0 }} />
+              <div style={{ display: 'flex', alignItems: 'flex-start', gap: 12 }}>
+                <LocationIcon style={{ color: '#f59e0b', fontSize: 20, marginTop: 1, flexShrink: 0 }} />
                 <div>
-                  <p style={{ color: '#9ca3af', margin: 0, fontSize: 11, textTransform: 'uppercase', letterSpacing: '0.08em' }}>Dropoff</p>
-                  <p style={{ color: 'white', margin: 0, fontWeight: 600, fontSize: 14 }}>{request.dropoffLocation}</p>
+                  <p style={{ color: '#9ca3af', margin: 0, fontSize: 10, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.08em' }}>Dropoff</p>
+                  <p style={{ color: 'white', margin: '2px 0 0', fontWeight: 600, fontSize: 14, lineHeight: 1.4 }}>{request.dropoffLocation}</p>
                 </div>
               </div>
             </div>
 
             {/* Fare & distance */}
-            <div style={{ display: 'flex', gap: 12, marginBottom: 20 }}>
+            <div style={{ display: 'flex', gap: 14, marginBottom: 24 }}>
               <div style={{
                 flex: 1,
                 background: ACCENT_ALPHA(0.08),
                 border: `1px solid ${ACCENT_ALPHA(0.2)}`,
-                borderRadius: 12,
-                padding: '10px 14px',
-                display: 'flex', alignItems: 'center', gap: 8,
+                borderRadius: 16,
+                padding: '12px 16px',
+                display: 'flex', alignItems: 'center', gap: 10,
               }}>
-                <MoneyIcon style={{ color: RIDER_ACCENT, fontSize: 18 }} />
+                <MoneyIcon style={{ color: RIDER_ACCENT, fontSize: 20 }} />
                 <div>
-                  <p style={{ color: '#9ca3af', margin: 0, fontSize: 11 }}>Fare</p>
-                  <p style={{ color: RIDER_ACCENT, margin: 0, fontWeight: 700, fontSize: 15 }}>
+                  <p style={{ color: '#9ca3af', margin: 0, fontSize: 11, fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.02em' }}>Fare</p>
+                  <p style={{ color: RIDER_ACCENT, margin: '2px 0 0', fontWeight: 800, fontSize: 17, fontFamily: 'monospace' }}>
                     Rs. {request.fareEstimate.toLocaleString()}
                   </p>
                 </div>
@@ -196,14 +209,14 @@ export default function RideRequestSheet({
                 flex: 1,
                 background: 'rgba(46,158,191,0.08)',
                 border: '1px solid rgba(46,158,191,0.2)',
-                borderRadius: 12,
-                padding: '10px 14px',
-                display: 'flex', alignItems: 'center', gap: 8,
+                borderRadius: 16,
+                padding: '12px 16px',
+                display: 'flex', alignItems: 'center', gap: 10,
               }}>
-                <BikeIcon style={{ color: '#2E9EBF', fontSize: 18 }} />
+                <BikeIcon style={{ color: '#2E9EBF', fontSize: 20 }} />
                 <div>
-                  <p style={{ color: '#9ca3af', margin: 0, fontSize: 11 }}>Distance</p>
-                  <p style={{ color: '#2E9EBF', margin: 0, fontWeight: 700, fontSize: 15 }}>
+                  <p style={{ color: '#9ca3af', margin: 0, fontSize: 11, fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.02em' }}>Distance</p>
+                  <p style={{ color: '#2E9EBF', margin: '2px 0 0', fontWeight: 800, fontSize: 17, fontFamily: 'monospace' }}>
                     {request.distanceKm.toFixed(1)} km
                   </p>
                 </div>
@@ -211,48 +224,50 @@ export default function RideRequestSheet({
             </div>
 
             {/* Action buttons */}
-            <div style={{ display: 'flex', gap: 12 }}>
-              <button
+            <div style={{ display: 'flex', gap: 14 }}>
+              <motion.button
+                whileHover={{ scale: 1.02, borderColor: '#ef4444', color: '#ef4444', background: 'rgba(239, 68, 68, 0.05)' }}
+                whileTap={{ scale: 0.98 }}
                 onClick={onDecline}
                 disabled={isAccepting}
                 style={{
                   flex: 1,
-                  padding: '14px',
-                  borderRadius: 14,
-                  border: '1px solid #333',
-                  background: 'transparent',
+                  padding: '15px',
+                  borderRadius: 16,
+                  border: '1px solid rgba(255,255,255,0.08)',
+                  background: 'rgba(255,255,255,0.02)',
                   color: '#9ca3af',
-                  fontWeight: 600,
+                  fontWeight: 700,
                   fontSize: 15,
                   cursor: 'pointer',
                   transition: 'all 0.2s ease',
                 }}
-                onMouseEnter={(e) => { (e.target as HTMLButtonElement).style.borderColor = '#ef4444'; (e.target as HTMLButtonElement).style.color = '#ef4444'; }}
-                onMouseLeave={(e) => { (e.target as HTMLButtonElement).style.borderColor = '#333'; (e.target as HTMLButtonElement).style.color = '#9ca3af'; }}
               >
                 Decline
-              </button>
-              <button
+              </motion.button>
+              <motion.button
+                whileHover={{ scale: 1.02, boxShadow: `0 8px 25px ${ACCENT_ALPHA(0.5)}` }}
+                whileTap={{ scale: 0.98 }}
                 onClick={onAccept}
                 disabled={isAccepting}
                 style={{
                   flex: 2,
-                  padding: '14px',
-                  borderRadius: 14,
+                  padding: '15px',
+                  borderRadius: 16,
                   border: 'none',
                   background: isAccepting
                     ? ACCENT_ALPHA(0.4)
                     : `linear-gradient(135deg, ${RIDER_ACCENT}, #059669)`,
                   color: 'white',
-                  fontWeight: 700,
+                  fontWeight: 800,
                   fontSize: 15,
                   cursor: isAccepting ? 'not-allowed' : 'pointer',
-                  boxShadow: isAccepting ? 'none' : `0 4px 20px ${ACCENT_ALPHA(0.4)}`,
+                  boxShadow: isAccepting ? 'none' : `0 4px 20px ${ACCENT_ALPHA(0.3)}`,
                   transition: 'all 0.2s ease',
                 }}
               >
-                {isAccepting ? 'Accepting...' : '✓ Accept Ride'}
-              </button>
+                {isAccepting ? 'Accepting...' : 'Accept Ride'}
+              </motion.button>
             </div>
           </div>
         </Drawer.Content>

@@ -1,6 +1,12 @@
 import { useState } from 'react';
 import { RidesApi } from '../../../api/Ridesapi';
 import type { ServiceType } from './Ridestypes';
+import { motion } from 'framer-motion';
+import {
+  CheckCircle as CheckIcon,
+  Star as StarIcon,
+  Home as HomeIcon,
+} from '@mui/icons-material';
 
 interface Props {
   rideId: string;
@@ -12,9 +18,9 @@ interface Props {
 }
 
 const SERVICE_LABEL: Record<ServiceType, string> = {
-  PersonalRide: 'Personal ride',
-  FoodDelivery: 'Food delivery',
-  GroceryPickup: 'Grocery pickup',
+  PersonalRide: 'Personal Ride',
+  FoodDelivery: 'Food Delivery',
+  GroceryPickup: 'Grocery Pickup',
 };
 
 export function CompletedScreen({
@@ -40,125 +46,215 @@ export function CompletedScreen({
   }
 
   const receiptRows = [
-    { label: 'Service', value: SERVICE_LABEL[serviceType] },
-    { label: 'Rider', value: riderName },
+    { label: 'Service Type', value: SERVICE_LABEL[serviceType] },
+    { label: 'Rider Name', value: riderName },
     { label: 'Distance', value: `${distanceKm.toFixed(2)} km` },
   ];
 
   return (
     <div
       className="flex items-center justify-center min-h-screen p-4 animate-fadeIn"
-      style={{ background: '#0b0b0b' }}
+      style={{
+        background: 'radial-gradient(circle at 50% 50%, #111827 0%, #030712 100%)',
+        fontFamily: 'system-ui, sans-serif',
+      }}
     >
-      {/* POPUP CARD */}
+      {/* Decorative Orbs */}
       <div
-        className="w-full max-w-lg rounded-3xl px-6 py-6 animate-slideUp"
         style={{
-          background: 'rgba(18,18,18,0.96)',
-          backdropFilter: 'blur(24px)',
-          border: '1px solid rgba(255,255,255,0.08)',
-          boxShadow: '0 25px 80px rgba(0,0,0,0.6)',
+          position: 'absolute',
+          top: '20%',
+          right: '15%',
+          width: '320px',
+          height: '320px',
+          background: 'radial-gradient(circle, rgba(16, 185, 129, 0.1) 0%, transparent 70%)',
+          borderRadius: '50%',
+          filter: 'blur(50px)',
+          pointerEvents: 'none',
+        }}
+      />
+      <div
+        style={{
+          position: 'absolute',
+          bottom: '20%',
+          left: '10%',
+          width: '380px',
+          height: '380px',
+          background: 'radial-gradient(circle, rgba(46, 158, 191, 0.08) 0%, transparent 70%)',
+          borderRadius: '50%',
+          filter: 'blur(60px)',
+          pointerEvents: 'none',
+        }}
+      />
+
+      {/* POPUP CARD */}
+      <motion.div
+        initial={{ y: 30, opacity: 0, scale: 0.96 }}
+        animate={{ y: 0, opacity: 1, scale: 1 }}
+        transition={{ type: 'spring', stiffness: 260, damping: 26 }}
+        style={{
+          width: '100%',
+          maxWidth: '500px',
+          borderRadius: 28,
+          padding: '36px 28px',
+          background: 'rgba(17, 17, 17, 0.75)',
+          backdropFilter: 'blur(30px)',
+          WebkitBackdropFilter: 'blur(30px)',
+          border: '1px solid rgba(255, 255, 255, 0.08)',
+          boxShadow: '0 30px 90px rgba(0, 0, 0, 0.65), inset 0 1px 0 rgba(255, 255, 255, 0.05)',
+          zIndex: 10,
         }}
       >
         {/* HEADER */}
-        <div className="text-center mb-5">
-          <div className="text-[18px] font-semibold text-white">
-            Ride completed 🎉
-          </div>
-          <div className="text-[12px] text-white/50 mt-1">
-            Trip saved successfully
-          </div>
+        <div style={{ textAlign: 'center', marginBottom: 28 }}>
+          <h2 style={{ color: 'white', margin: '0 0 6px', fontWeight: 800, fontSize: 22, letterSpacing: '-0.02em' }}>
+            Ride Completed
+          </h2>
+          <p style={{ color: '#9ca3af', margin: 0, fontSize: 13.5, fontWeight: 500 }}>
+            Your trip has been saved successfully
+          </p>
         </div>
 
         {/* SUCCESS ICON */}
-        <div className="flex justify-center mb-5">
-          <div
-            className="w-16 h-16 rounded-full flex items-center justify-center text-[24px]"
+        <div style={{ display: 'flex', justifyContent: 'center', marginBottom: 28 }}>
+          <motion.div
+            initial={{ scale: 0.5, opacity: 0 }}
+            animate={{ scale: 1, opacity: 1 }}
+            transition={{ type: 'spring', stiffness: 200, delay: 0.15 }}
             style={{
-              background: 'rgba(99,195,74,0.12)',
-              border: '1px solid rgba(99,195,74,0.3)',
-              color: '#63c34a',
+              width: 72,
+              height: 72,
+              borderRadius: '50%',
+              background: 'rgba(16, 185, 129, 0.1)',
+              border: '2px solid rgba(16, 185, 129, 0.4)',
+              color: '#10b981',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              boxShadow: '0 0 25px rgba(16, 185, 129, 0.25)',
             }}
           >
-            ✓
-          </div>
+            <CheckIcon style={{ fontSize: 36 }} />
+          </motion.div>
         </div>
 
         {/* RECEIPT */}
         <div
-          className="rounded-2xl p-4 mb-5"
           style={{
-            background: 'rgba(255,255,255,0.03)',
-            border: '1px solid rgba(255,255,255,0.08)',
+            borderRadius: 24,
+            padding: '20px 20px',
+            marginBottom: 28,
+            background: 'rgba(255, 255, 255, 0.02)',
+            border: '1px solid rgba(255, 255, 255, 0.06)',
+            boxShadow: 'inset 0 1px 0 rgba(255, 255, 255, 0.02)',
           }}
         >
           {receiptRows.map((row) => (
             <div
               key={row.label}
-              className="flex justify-between py-2 border-b border-white/10"
+              style={{
+                display: 'flex',
+                justifyContent: 'space-between',
+                padding: '12px 0',
+                borderBottom: '1px solid rgba(255, 255, 255, 0.08)',
+              }}
             >
-              <span className="text-[13px] text-white/50">
-                {row.label}
-              </span>
-              <span className="text-[13px] text-white/80">
-                {row.value}
-              </span>
+              <span style={{ fontSize: 13.5, color: '#9ca3af', fontWeight: 500 }}>{row.label}</span>
+              <span style={{ fontSize: 13.5, color: '#f3f4f6', fontWeight: 700 }}>{row.value}</span>
             </div>
           ))}
 
-          <div className="flex justify-between pt-3">
-            <span className="text-[14px] font-medium">
-              Total paid
-            </span>
-            <span className="text-[20px] font-semibold text-green-400">
-              Rs. {finalFare.toFixed(2)}
+          <div style={{ display: 'flex', justifySelf: 'stretch', justifyContent: 'space-between', paddingTop: 16 }}>
+            <span style={{ fontSize: 14.5, color: '#f3f4f6', fontWeight: 600 }}>Total Paid</span>
+            <span
+              style={{
+                fontSize: 22,
+                fontWeight: 800,
+                color: '#10b981',
+                fontFamily: 'monospace',
+                letterSpacing: '-0.02em',
+              }}
+            >
+              Rs. {finalFare.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
             </span>
           </div>
         </div>
 
         {/* RATING */}
-        <div className="mb-5 text-center">
-          <div className="text-[13px] text-white/60 mb-3">
-            Rate your rider
-          </div>
+        <div style={{ textAlign: 'center', marginBottom: 32 }}>
+          <p
+            style={{
+              color: '#d1d5db',
+              margin: '0 0 14px',
+              fontSize: 13.5,
+              fontWeight: 600,
+              letterSpacing: '0.01em',
+            }}
+          >
+            Rate your Rider
+          </p>
 
-          <div className="flex justify-center gap-2">
+          <div style={{ display: 'flex', justifyContent: 'center', gap: 10 }}>
             {[1, 2, 3, 4, 5].map((n) => (
-              <button
+              <motion.button
                 key={n}
                 onClick={() => handleRate(n)}
                 onMouseEnter={() => !submitted && setHovered(n)}
                 onMouseLeave={() => setHovered(0)}
                 disabled={submitted}
-                className="text-[26px] transition-transform hover:scale-110"
+                whileHover={!submitted ? { scale: 1.25 } : {}}
+                whileTap={!submitted ? { scale: 0.9 } : {}}
                 style={{
-                  color:
-                    n <= (hovered || rating)
-                      ? '#efab3a'
-                      : 'rgba(255,255,255,0.3)',
+                  background: 'none',
+                  border: 'none',
+                  padding: 0,
+                  cursor: submitted ? 'default' : 'pointer',
+                  transition: 'color 0.2s ease',
+                  color: n <= (hovered || rating) ? '#f59e0b' : 'rgba(255, 255, 255, 0.15)',
                 }}
               >
-                ★
-              </button>
+                <StarIcon style={{ fontSize: 32 }} />
+              </motion.button>
             ))}
           </div>
 
           {submitted && (
-            <div className="text-[12px] text-white/50 mt-2">
-              Thanks for your feedback
-            </div>
+            <motion.p
+              initial={{ opacity: 0, y: 5 }}
+              animate={{ opacity: 1, y: 0 }}
+              style={{ color: '#10b981', margin: '12px 0 0', fontSize: 13, fontWeight: 600 }}
+            >
+              Thank you for your feedback!
+            </motion.p>
           )}
         </div>
 
         {/* BUTTON */}
-        <button
+        <motion.button
+          whileHover={{ scale: 1.015, boxShadow: '0 8px 25px rgba(16, 185, 129, 0.4)' }}
+          whileTap={{ scale: 0.985 }}
           onClick={onDone}
-          className="w-full py-3 rounded-xl font-medium text-black"
-          style={{ background: '#63c34a' }}
+          style={{
+            width: '100%',
+            padding: '16px',
+            borderRadius: 16,
+            border: 'none',
+            background: 'linear-gradient(135deg, #10b981, #059669)',
+            color: 'white',
+            fontWeight: 800,
+            fontSize: 15,
+            cursor: 'pointer',
+            boxShadow: '0 4px 20px rgba(16, 185, 129, 0.3)',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            gap: 8,
+          }}
         >
-          Back to home
-        </button>
-      </div>
+          <HomeIcon style={{ fontSize: 18 }} />
+          Back to Home
+        </motion.button>
+      </motion.div>
     </div>
   );
 }
