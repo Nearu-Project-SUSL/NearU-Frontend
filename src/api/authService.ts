@@ -155,7 +155,10 @@ const authService = {
         password: data.password,
         mobileNumber: data.phone,
         address: data.address,
-        role: 'Business'
+        role: 'Business',
+        businessName: data.businessName,  
+        businessType: data.businessType,   
+        ownerName: data.ownerName          
     });
     
     // Extract from ApiResponse wrapper

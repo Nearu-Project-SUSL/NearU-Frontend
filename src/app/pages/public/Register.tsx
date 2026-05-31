@@ -158,22 +158,24 @@ export default function Register() {
       toast.error('Passwords do not match!');
       return;
     }
-    
+
+    // Map frontend display values to backend expected values
+    const businessTypeMap: Record<string, string> = {
+      'Food Vendor':    'Food',
+      'Accommodation':  'Accommodation',
+      'Custom Gifts':   'CustomGifts'
+    };
+
     setIsLoading(true);
     try {
-      await authService.registerBusiness(businessForm);
-      const loginResponse = await authService.login({ email: businessForm.email, password: businessForm.password });
-      
-      setAuth({
-        user: loginResponse.user,
-        accessToken: loginResponse.accessToken,
-        refreshToken: loginResponse.refreshToken,
+      await authService.registerBusiness({
+        ...businessForm,
+        businessType: businessTypeMap[businessForm.businessType] ?? businessForm.businessType
       });
-      localStorage.setItem('accessToken', loginResponse.accessToken);
-      localStorage.setItem('userId', loginResponse.user.id);
-      
-      toast.success('Registration and login successful!');
-      navigate('/business-owner-home');
+
+      // Business owners need admin approval first
+      toast.success('Application submitted! Awaiting admin approval.');
+      navigate('/login');  
     } catch (error: any) {
       const errorMessage = error.response?.data?.message || 'Registration failed.';
       toast.error(errorMessage);
