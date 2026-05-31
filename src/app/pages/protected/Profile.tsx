@@ -20,6 +20,11 @@ import {
   IconButton,
   useTheme,
   Fade,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogContentText,
+  DialogActions,
 } from '@mui/material';
 import {
   Person as UserIcon,
@@ -65,6 +70,13 @@ export default function Profile() {
     city: '',
     dateOfBirth: ''
   });
+
+  // Account deletion states
+  const [openDeleteModal, setOpenDeleteModal] = useState(false);
+  const [deletePhrase, setDeletePhrase] = useState('');
+  const [deletePassword, setDeletePassword] = useState('');
+  const [deletingAccount, setDeletingAccount] = useState(false);
+  const [deleteCountdown, setDeleteCountdown] = useState(3);
 
   const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -167,6 +179,42 @@ export default function Profile() {
     // because setAuth() is called inside this effect.
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [userId, isGuest]);
+
+  // Handle account deletion countdown
+  useEffect(() => {
+    let timer: NodeJS.Timeout;
+    if (openDeleteModal && deleteCountdown > 0) {
+      timer = setTimeout(() => setDeleteCountdown(prev => prev - 1), 1000);
+    }
+    return () => clearTimeout(timer);
+  }, [openDeleteModal, deleteCountdown]);
+
+  const handleDeleteAccount = async () => {
+    if (isGuest) return;
+    if (deletePhrase !== 'DELETE') {
+      toast.error('Please type the phrase "DELETE" exactly to confirm.');
+      return;
+    }
+    if (!deletePassword) {
+      toast.error('Password is required.');
+      return;
+    }
+
+    setDeletingAccount(true);
+    try {
+      await userService.deleteUserAccount(userId, deletePassword);
+      toast.success('Your account has been permanently deleted.');
+      
+      // Perform clean logout & redirection
+      setAuth({ user: null, accessToken: null, refreshToken: null });
+      localStorage.removeItem('accessToken');
+      navigate('/login');
+    } catch (error: any) {
+      toast.error(error.response?.data?.message || 'Failed to delete account. Please check your password.');
+    } finally {
+      setDeletingAccount(false);
+    }
+  };
 
   const handleLogout = async () => {
     try {
@@ -537,6 +585,46 @@ export default function Profile() {
                         </ListItem>
                       </List>
                     </Paper>
+
+                    {/* Danger Zone (only for non-guest users) */}
+                    {!isGuest && (
+                      <Paper 
+                        sx={{ 
+                          ...glassStyles, 
+                          mt: 4, 
+                          p: 3, 
+                          border: '1px solid rgba(239, 68, 68, 0.3)',
+                          background: isDark ? 'rgba(239, 68, 68, 0.03)' : 'rgba(239, 68, 68, 0.015)'
+                        }}
+                      >
+                        <Typography variant="h6" sx={{ color: '#ef4444', fontWeight: 800, mb: 1, display: 'flex', alignItems: 'center', gap: 1 }}>
+                          Danger Zone
+                        </Typography>
+                        <Typography variant="body2" sx={{ color: 'text.secondary', mb: 2.5 }}>
+                          Permanently delete your NearU profile and all associated ride records, posted jobs, and history.
+                        </Typography>
+                        <Button
+                          variant="outlined"
+                          color="error"
+                          onClick={() => {
+                            setOpenDeleteModal(true);
+                            setDeleteCountdown(3);
+                          }}
+                          sx={{ 
+                            borderRadius: '2rem', 
+                            fontWeight: 'bold', 
+                            textTransform: 'none',
+                            borderColor: 'rgba(239, 68, 68, 0.4)',
+                            '&:hover': {
+                              bgcolor: 'rgba(239, 68, 68, 0.08)',
+                              borderColor: '#ef4444'
+                            }
+                          }}
+                        >
+                          Delete Account
+                        </Button>
+                      </Paper>
+                    )}
                   </Grid>
 
                   {/* Right Column: Profile Details Form */}
@@ -675,6 +763,107 @@ export default function Profile() {
                   </Grid>
                 </Grid>
               </Box>
+
+              {/* Account Deletion Confirmation Dialog */}
+              <Dialog
+                open={openDeleteModal}
+                onClose={() => {
+                  if (!deletingAccount) {
+                    setOpenDeleteModal(false);
+                    setDeletePhrase('');
+                    setDeletePassword('');
+                  }
+                }}
+                PaperProps={{
+                  sx: {
+                    bgcolor: isDark ? 'rgba(30, 30, 30, 0.95)' : 'rgba(255, 255, 255, 0.98)',
+                    backdropFilter: 'blur(20px)',
+                    border: '1px solid rgba(239, 68, 68, 0.3)',
+                    borderRadius: '1.5rem',
+                    p: 2,
+                  }
+                }}
+              >
+                <DialogTitle sx={{ fontWeight: 800, color: '#ef4444', pb: 1 }}>
+                  Delete Your NearU Account?
+                </DialogTitle>
+                
+                <DialogContent>
+                  <DialogContentText sx={{ color: 'text.primary', mb: 3 }}>
+                    This action is <strong>irreversible</strong>. It will permanently purge all personal information, your posted jobs, active lists, and ride records from NearU.
+                  </DialogContentText>
+                  
+                  <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2.5 }}>
+                    {/* Phrase Input */}
+                    <TextField
+                      fullWidth
+                      size="small"
+                      label='Type "DELETE" to confirm'
+                      value={deletePhrase}
+                      onChange={(e) => setDeletePhrase(e.target.value)}
+                      disabled={deletingAccount}
+                      error={deletePhrase.length > 0 && deletePhrase !== 'DELETE'}
+                      helperText={deletePhrase.length > 0 && deletePhrase !== 'DELETE' ? 'Phrase must match exactly' : ''}
+                      InputProps={{ sx: { borderRadius: '0.75rem' } }}
+                    />
+                    
+                    {/* Password verification */}
+                    <TextField
+                      fullWidth
+                      size="small"
+                      type="password"
+                      label="Enter your password to verify identity"
+                      value={deletePassword}
+                      onChange={(e) => setDeletePassword(e.target.value)}
+                      disabled={deletingAccount}
+                      InputProps={{ sx: { borderRadius: '0.75rem' } }}
+                    />
+                  </Box>
+                </DialogContent>
+                
+                <DialogActions sx={{ px: 3, pb: 2, gap: 1.5 }}>
+                  <Button 
+                    variant="outlined" 
+                    onClick={() => {
+                      setOpenDeleteModal(false);
+                      setDeletePhrase('');
+                      setDeletePassword('');
+                    }}
+                    disabled={deletingAccount}
+                    sx={{ borderRadius: '2rem', textTransform: 'none', px: 3, fontWeight: 'bold' }}
+                  >
+                    Cancel
+                  </Button>
+                  
+                  <Button
+                    variant="contained"
+                    color="error"
+                    onClick={handleDeleteAccount}
+                    disabled={
+                      deletingAccount || 
+                      deletePhrase !== 'DELETE' || 
+                      !deletePassword || 
+                      deleteCountdown > 0
+                    }
+                    sx={{ 
+                      borderRadius: '2rem', 
+                      textTransform: 'none', 
+                      px: 3.5, 
+                      fontWeight: 'bold',
+                      bgcolor: '#ef4444',
+                      '&:hover': { bgcolor: '#dc2626' }
+                    }}
+                  >
+                    {deletingAccount ? (
+                      <CircularProgress size={20} color="inherit" />
+                    ) : deleteCountdown > 0 ? (
+                      `Confirm (${deleteCountdown}s)`
+                    ) : (
+                      'Delete Permanently'
+                    )}
+                  </Button>
+                </DialogActions>
+              </Dialog>
             </Fade>
           </Container>
         </PageLayout>
