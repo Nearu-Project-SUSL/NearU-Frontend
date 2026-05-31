@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-const API_BASE = 'http://localhost:5059/api';
+const API_BASE = import.meta.env.VITE_API_BASE_URL || 'https://api.nearusab.me/api';
 
 const getAuthHeader = () => ({
   headers:{
