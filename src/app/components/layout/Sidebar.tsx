@@ -32,6 +32,8 @@ import {
   Close as CloseIcon,
   Menu as MenuIcon,
   Person as UserIcon,
+  AdminPanelSettings as AdminIcon,
+  Storefront as StoreIcon,
 } from '@mui/icons-material';
 
 interface SidebarProps {
@@ -59,8 +61,15 @@ export function Sidebar({ activeSection }: SidebarProps) {
   const textMuted = theme.palette.text.secondary;
   const textPrimary = theme.palette.text.primary;
 
+  const isAdmin = auth?.user?.roles?.some((role: string) => ['Admin', 'SuperAdmin'].includes(role));
+  const isRider = auth?.user?.roles?.some((role: string) => ['Rider'].includes(role));
+  const isBusinessOwner = auth?.user?.roles?.some((role: string) => ['BusinessOwner', 'Business'].includes(role));
+
   const navItems = [
     { icon: HomeIcon,          label: 'Home',             id: 'home',          path: '/home' },
+    ...(isAdmin ? [{ icon: AdminIcon, label: 'Admin Console', id: 'admin', path: '/admin-home' }] : []),
+    ...(isRider ? [{ icon: BikeIcon, label: 'Rider Console', id: 'rider', path: '/rider-home' }] : []),
+    ...(isBusinessOwner ? [{ icon: StoreIcon, label: 'Business Console', id: 'business', path: '/business-owner-home' }] : []),
     { icon: FoodIcon,          label: 'Food',             id: 'food',          path: '/food' },
     { icon: TransportIcon,     label: 'Transport',        id: 'transport',     path: '/transport' },
     { icon: BikeIcon,          label: 'Rides',            id: 'rides',         path: '/rides' },
@@ -162,7 +171,7 @@ export function Sidebar({ activeSection }: SidebarProps) {
                     <ListItemIcon
                       sx={{
                         minWidth: 0,
-                        mr: expanded ? 1.5 : 'auto',
+                        mr: expanded ? 1.5 : 0,
                         color: 'inherit',
                         transition: 'margin 0.28s ease',
                       }}
@@ -198,7 +207,7 @@ export function Sidebar({ activeSection }: SidebarProps) {
             onClick={() => { if (isMobileOpen) toggleMobileSidebar(); }}
             sx={{
               py: 1.25,
-              px: expanded ? 2 : 1.25,
+              px: expanded ? 1.75 : 1.25,
               borderRadius: '11px',
               border: `1px solid ${accentAlpha(0.15)}`,
               bgcolor: accentAlpha(0.04),
