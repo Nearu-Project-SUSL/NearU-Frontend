@@ -247,8 +247,9 @@ export default function RiderProfile() {
                   </List>
                 </Paper>
             </Grid>
+          </Grid>
 
-            {/* Account Deletion Confirmation Dialog */}
+          {/* Account Deletion Confirmation Dialog */}
             <Dialog
               open={openDeleteModal}
               onClose={() => {
