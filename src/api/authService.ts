@@ -34,8 +34,6 @@ export interface RegisterBusinessData {
   businessType: string;
   address: string;
   description: string;
-  registrationNumber: string;
-  taxId?: string;
 }
 
 export interface RegisterRiderData {
