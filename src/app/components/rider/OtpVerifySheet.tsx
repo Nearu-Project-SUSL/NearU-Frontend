@@ -8,6 +8,7 @@ import { Drawer } from 'vaul';
 import { OTPInput, OTPInputContext } from 'input-otp';
 import { useContext } from 'react';
 import { Key as KeyIcon } from '@mui/icons-material';
+import { motion } from 'framer-motion';
 
 interface OtpVerifySheetProps {
   onVerify: (otp: string) => void;
@@ -31,21 +32,22 @@ function Slot({ index }: { index: number }) {
       style={{
         width: 60,
         height: 68,
-        borderRadius: 14,
+        borderRadius: 16,
         border: isActive
           ? `2px solid ${RIDER_ACCENT}`
           : char
-          ? `1px solid ${ACCENT_ALPHA(0.5)}`
-          : '1px solid #333',
-        background: isActive ? ACCENT_ALPHA(0.08) : '#1e1e1e',
+          ? `1px solid ${ACCENT_ALPHA(0.4)}`
+          : '1px solid rgba(255,255,255,0.08)',
+        background: isActive ? ACCENT_ALPHA(0.08) : 'rgba(255, 255, 255, 0.02)',
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center',
         fontSize: 28,
-        fontWeight: 700,
-        color: char ? 'white' : '#444',
+        fontWeight: 800,
+        color: char ? 'white' : 'rgba(255,255,255,0.2)',
         transition: 'all 0.15s ease',
-        boxShadow: isActive ? `0 0 0 3px ${ACCENT_ALPHA(0.15)}` : 'none',
+        boxShadow: isActive ? `0 0 15px ${ACCENT_ALPHA(0.35)}` : 'none',
+        fontFamily: 'monospace',
       }}
     >
       {char ?? (isActive ? (
@@ -88,16 +90,18 @@ export default function OtpVerifySheet({ onVerify, error, isVerifying = false }:
             zIndex: 1400,
             borderTopLeftRadius: 28,
             borderTopRightRadius: 28,
-            background: '#161616',
-            border: `1px solid ${ACCENT_ALPHA(0.3)}`,
+            background: 'rgba(20, 20, 20, 0.95)',
+            backdropFilter: 'blur(24px)',
+            WebkitBackdropFilter: 'blur(24px)',
+            border: `1px solid ${ACCENT_ALPHA(0.25)}`,
             borderBottom: 'none',
             outline: 'none',
-            padding: '20px 24px 40px',
+            padding: '20px 24px 44px',
           }}
         >
           {/* Handle */}
           <div style={{ display: 'flex', justifyContent: 'center', marginBottom: 24 }}>
-            <div style={{ width: 40, height: 4, background: '#333', borderRadius: 2 }} />
+            <div style={{ width: 44, height: 4, background: 'rgba(255,255,255,0.12)', borderRadius: 2 }} />
           </div>
 
           {/* Icon + Title */}
@@ -105,25 +109,26 @@ export default function OtpVerifySheet({ onVerify, error, isVerifying = false }:
             <div style={{
               width: 56, height: 56,
               background: ACCENT_ALPHA(0.12),
-              border: `1px solid ${ACCENT_ALPHA(0.3)}`,
+              border: `1px solid ${ACCENT_ALPHA(0.35)}`,
               borderRadius: 16,
               display: 'inline-flex',
               alignItems: 'center',
               justifyContent: 'center',
-              marginBottom: 12,
+              marginBottom: 14,
+              boxShadow: `0 0 20px ${ACCENT_ALPHA(0.15)}`,
             }}>
-              <KeyIcon style={{ color: RIDER_ACCENT, fontSize: 28 }} />
+              <KeyIcon style={{ color: RIDER_ACCENT, fontSize: 26 }} />
             </div>
-            <h2 style={{ color: 'white', margin: '0 0 6px', fontWeight: 700, fontSize: 20 }}>
+            <h2 style={{ color: 'white', margin: '0 0 6px', fontWeight: 800, fontSize: 20, letterSpacing: '-0.01em' }}>
               Enter Passenger OTP
             </h2>
-            <p style={{ color: '#9ca3af', margin: 0, fontSize: 14 }}>
+            <p style={{ color: '#9ca3af', margin: 0, fontSize: 13, fontWeight: 500 }}>
               Ask the student for the 4-digit code to start the ride
             </p>
           </div>
 
           {/* OTP Input */}
-          <div style={{ display: 'flex', justifyContent: 'center', marginBottom: 20 }}>
+          <div style={{ display: 'flex', justifyContent: 'center', marginBottom: 24 }}>
             <OTPInput
               maxLength={OTP_LENGTH}
               value={otp}
@@ -142,39 +147,41 @@ export default function OtpVerifySheet({ onVerify, error, isVerifying = false }:
           {/* Error message */}
           {error && (
             <div style={{
-              background: 'rgba(239,68,68,0.1)',
-              border: '1px solid rgba(239,68,68,0.3)',
-              borderRadius: 10,
-              padding: '10px 14px',
-              marginBottom: 16,
+              background: 'rgba(239,68,68,0.08)',
+              border: '1px solid rgba(239,68,68,0.25)',
+              borderRadius: 12,
+              padding: '12px 14px',
+              marginBottom: 20,
               textAlign: 'center',
             }}>
-              <p style={{ color: '#ef4444', margin: 0, fontSize: 13, fontWeight: 500 }}>{error}</p>
+              <p style={{ color: '#ef4444', margin: 0, fontSize: 13, fontWeight: 600 }}>{error}</p>
             </div>
           )}
 
           {/* Submit button */}
-          <button
+          <motion.button
+            whileHover={otp.length === OTP_LENGTH && !isVerifying ? { scale: 1.02, boxShadow: `0 10px 30px ${ACCENT_ALPHA(0.5)}` } : {}}
+            whileTap={otp.length === OTP_LENGTH && !isVerifying ? { scale: 0.98 } : {}}
             onClick={handleManualSubmit}
             disabled={otp.length < OTP_LENGTH || isVerifying}
             style={{
               width: '100%',
-              padding: '15px',
+              padding: '16px',
               borderRadius: 16,
               border: 'none',
               background: otp.length < OTP_LENGTH || isVerifying
                 ? ACCENT_ALPHA(0.3)
                 : `linear-gradient(135deg, ${RIDER_ACCENT}, #059669)`,
               color: 'white',
-              fontWeight: 700,
+              fontWeight: 800,
               fontSize: 16,
               cursor: otp.length < OTP_LENGTH || isVerifying ? 'not-allowed' : 'pointer',
-              boxShadow: otp.length >= OTP_LENGTH ? `0 4px 20px ${ACCENT_ALPHA(0.4)}` : 'none',
-              transition: 'all 0.2s ease',
+              boxShadow: otp.length >= OTP_LENGTH ? `0 4px 20px ${ACCENT_ALPHA(0.35)}` : 'none',
+              transition: 'box-shadow 0.25s ease',
             }}
           >
-            {isVerifying ? 'Verifying...' : 'Start Ride →'}
-          </button>
+            {isVerifying ? 'Verifying...' : 'Start Ride'}
+          </motion.button>
 
           <style>{`@keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0; } }`}</style>
         </Drawer.Content>
