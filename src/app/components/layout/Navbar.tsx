@@ -21,7 +21,6 @@ import {
 import {
   Notifications as BellIcon,
   Person as UserIcon,
-  Work as WorkIcon,
   Menu as MenuIcon,
   WbSunny as SunIcon,
   NightlightRound as MoonIcon,
@@ -32,6 +31,15 @@ export default function Navbar() {
   const { isExpanded, toggleMobileSidebar } = useSidebar();
   const { isDark, toggleTheme } = useNearUTheme();
   const theme = useTheme();
+
+  const getHomePath = () => {
+    if (!auth?.user || !auth.user.roles || auth.user.roles.length === 0) return '/';
+    const role = auth.user.roles[0];
+    if (role === 'Admin') return '/admin-home';
+    if (role === 'BusinessOwner') return '/business-owner-home';
+    if (role === 'Rider') return '/rider-home';
+    return '/home';
+  };
 
   const accent = theme.palette.primary.main;          // #2E9EBF
   const accentAlpha = (a: number) => `rgba(46, 158, 191, ${a})`;
@@ -68,34 +76,44 @@ export default function Navbar() {
           </IconButton>
 
           <Box
+            component={Link}
+            to={getHomePath()}
             sx={{
-              width: 34,
-              height: 34,
-              bgcolor: accent,
-              backgroundImage: `linear-gradient(135deg, ${accentAlpha(0.8)} 0%, ${accent} 60%, #008e76 100%)`,
-              borderRadius: '10px',
               display: 'flex',
               alignItems: 'center',
-              justifyContent: 'center',
-              boxShadow: `0 0 14px ${accentAlpha(0.35)}`,
-              flexShrink: 0,
+              gap: 1.5,
+              textDecoration: 'none',
+              cursor: 'pointer',
+              '&:hover': {
+                opacity: 0.85,
+              },
             }}
           >
-            <WorkIcon sx={{ color: '#111111', fontSize: 18 }} />
+            <Box
+              component="img"
+              src="/NearU Logo.svg"
+              alt="NearU Logo"
+              sx={{
+                width: 44,
+                height: 44,
+                objectFit: 'contain',
+                flexShrink: 0,
+              }}
+            />
+            <Typography
+              sx={{
+                color: accent,
+                fontWeight: 800,
+                fontStyle: 'italic',
+                fontSize: '1.15rem',
+                letterSpacing: '-0.02em',
+                lineHeight: 1,
+                display: { xs: 'none', sm: 'block' },
+              }}
+            >
+              NearU
+            </Typography>
           </Box>
-          <Typography
-            sx={{
-              color: accent,
-              fontWeight: 800,
-              fontStyle: 'italic',
-              fontSize: '1.15rem',
-              letterSpacing: '-0.02em',
-              lineHeight: 1,
-              display: { xs: 'none', sm: 'block' },
-            }}
-          >
-            NearU
-          </Typography>
         </Box>
 
         <Box sx={{ flex: 1 }} />

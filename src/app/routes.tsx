@@ -143,6 +143,13 @@ export const router = createBrowserRouter([
         path: "/gifts/:id",
         Component: GiftShopDetailPage,
       },
+    ]
+  },
+
+  // Protected Routes - Requires Student Role
+  {
+    element: <ProtectedRoute allowedRoles={["Student"]} />,
+    children: [
       {
         path: "/rides",
         Component: Rides,
