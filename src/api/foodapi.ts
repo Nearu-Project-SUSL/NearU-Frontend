@@ -1,7 +1,9 @@
 import axios from "./axios";
+import { axiosPrivate } from "./axios";
 
 export interface ShopResponse{
   id: string;
+  ownerId:string | null;
   name: string;
   description: string | null;
   address: string | null;
@@ -112,7 +114,7 @@ export async function updateMenuItem(
 }
 
 export async function deleteShop(shopId: string): Promise<void> {
-  await axios.delete(`/foodshops/${shopId}`);
+  await axiosPrivate.delete(`/foodshops/${shopId}`);
 }
 
 export async function updateShop(
@@ -134,7 +136,7 @@ export async function updateShop(
   if (data.category) formData.append('category', data.category);
   if (data.photo) formData.append('photo', data.photo);
 
-  const response = await axios.put<ShopResponse>(`/foodshops/${shopId}`, formData);
+  const response = await axiosPrivate.put<ShopResponse>(`/foodshops/${shopId}`, formData);
   return response.data;
 }
 

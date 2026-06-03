@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import type { ServiceType } from './Ridestypes';
 import { RidesApi } from '../../../api/Ridesapi';
+import { useLeafletCss } from '../../hooks/useLeafletCss';
 import {
   Box,
   Typography,
@@ -76,6 +77,7 @@ function MapRecenter({ center }: { center: [number, number] }) {
 }
 
 export function RequestRideScreen({ onRideCreated }: Props) {
+  useLeafletCss();
   const [service,       setService]       = useState<ServiceType>('PersonalRide');
   const [pickupLabel,   setPickupLabel]   = useState('');
   const [dropoffLabel,  setDropoffLabel]  = useState('');
