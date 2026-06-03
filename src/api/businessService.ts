@@ -1,4 +1,3 @@
-// businessService.ts — rewrite to use axiosPrivate
 import { axiosPrivate } from './axios';
 
 export interface BusinessStatus {
