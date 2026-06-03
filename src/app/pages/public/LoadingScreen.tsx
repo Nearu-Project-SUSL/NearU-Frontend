@@ -70,9 +70,9 @@ export default function LoadingScreen({ isSplashScreen = false }: { isSplashScre
 
           {/* Logo */}
           <div className="relative w-48 h-48 flex items-center justify-center">
-            <div className="w-32 h-32 rounded-3xl flex items-center justify-center shadow-2xl animate-pulse"
+            <div className="w-32 h-32 rounded-3xl flex items-center justify-center shadow-2xl animate-pulse p-6"
               style={{ background: 'linear-gradient(135deg, #2E9EBF, #1a7a9a)', boxShadow: '0 0 60px rgba(46,158,191,0.5)' }}>
-              <span className="text-6xl">🎓</span>
+              <img src="/NearU Logo.svg" alt="NearU Logo" className="w-full h-full object-contain" />
             </div>
           </div>
         </div>

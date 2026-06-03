@@ -21,7 +21,6 @@ import {
 import {
   Notifications as BellIcon,
   Person as UserIcon,
-  Work as WorkIcon,
   Menu as MenuIcon,
   WbSunny as SunIcon,
   NightlightRound as MoonIcon,
@@ -68,21 +67,16 @@ export default function Navbar() {
           </IconButton>
 
           <Box
+            component="img"
+            src="/NearU Logo.svg"
+            alt="NearU Logo"
             sx={{
-              width: 34,
-              height: 34,
-              bgcolor: accent,
-              backgroundImage: `linear-gradient(135deg, ${accentAlpha(0.8)} 0%, ${accent} 60%, #008e76 100%)`,
-              borderRadius: '10px',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              boxShadow: `0 0 14px ${accentAlpha(0.35)}`,
+              width: 44,
+              height: 44,
+              objectFit: 'contain',
               flexShrink: 0,
             }}
-          >
-            <WorkIcon sx={{ color: '#111111', fontSize: 18 }} />
-          </Box>
+          />
           <Typography
             sx={{
               color: accent,

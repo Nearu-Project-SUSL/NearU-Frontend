@@ -43,7 +43,6 @@ import {
   ArrowForward as ArrowRightIcon,
   Visibility as EyeIcon,
   VisibilityOff as EyeOffIcon,
-  School as GraduationCapIcon,
   Store as StoreIcon
 } from '@mui/icons-material';
 
@@ -224,9 +223,11 @@ export default function Register() {
       {/* Top Navigation */}
       <nav className="relative z-20 flex items-center justify-between px-8 lg:px-12 py-6 bg-black/30 backdrop-blur-sm border-b border-blue-400/20">
         <Link to="/" className="flex items-center gap-3 group">
-          <div className="w-12 h-12 bg-gradient-to-br from-blue-400 to-blue-600 rounded-xl flex items-center justify-center shadow-lg shadow-blue-400/30 group-hover:scale-110 transition-transform duration-300">
-            <span className="text-black text-2xl">🎓</span>
-          </div>
+          <img
+            src="/NearU Logo.svg"
+            alt="NearU Logo"
+            className="w-16 h-16 object-contain group-hover:scale-110 transition-transform duration-300"
+          />
           <span className="text-white text-2xl">NearU</span>
         </Link>
         <div className="flex items-center gap-4">
@@ -267,8 +268,8 @@ export default function Register() {
               <div className="relative z-10 flex items-center justify-center">
                 <div className="relative w-64 h-64 bg-gradient-to-br from-gray-800 to-black rounded-3xl border-2 border-blue-400/30 shadow-2xl shadow-blue-400/20 p-8">
                   {/* Center circle */}
-                  <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-20 h-20 bg-gradient-to-br from-blue-400 to-blue-600 rounded-full flex items-center justify-center shadow-lg animate-pulse">
-                    <GraduationCapIcon sx={{ fontSize: 40, color: 'black' }} />
+                  <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-24 h-24 bg-gradient-to-br from-blue-400 to-blue-600 rounded-full flex items-center justify-center shadow-lg animate-pulse p-3">
+                    <img src="/NearU Logo.svg" alt="NearU Logo" className="w-full h-full object-contain" />
                   </div>
 
                   {/* Orbiting icons */}
