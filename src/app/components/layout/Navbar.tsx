@@ -3,6 +3,7 @@ import { Link } from 'react-router';
 import useAuth from '../../hooks/useAuth';
 import { useSidebar } from '../../context/SidebarContext';
 import { useNearUTheme } from '../../context/ThemeContext';
+import { getHomePathForRoles } from '../../utils/roleUtils';
 
 // MUI Components
 import {
@@ -33,12 +34,7 @@ export default function Navbar() {
   const theme = useTheme();
 
   const getHomePath = () => {
-    if (!auth?.user || !auth.user.roles || auth.user.roles.length === 0) return '/';
-    const role = auth.user.roles[0];
-    if (role === 'Admin') return '/admin-home';
-    if (role === 'BusinessOwner') return '/business-owner-home';
-    if (role === 'Rider') return '/rider-home';
-    return '/home';
+    return getHomePathForRoles(auth?.user?.roles);
   };
 
   const accent = theme.palette.primary.main;          // #2E9EBF

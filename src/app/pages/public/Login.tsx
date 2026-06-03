@@ -5,6 +5,7 @@ import authService from '../../../api/authService';
 import useAuth from '../../hooks/useAuth';
 import { validateEmail, validateRequired } from '../../utils/validation';
 import { useGoogleLogin } from '@react-oauth/google';
+import { getHomePathForRoles } from '../../utils/roleUtils';
 
 // MUI Components
 import { 
@@ -41,16 +42,8 @@ export default function Login() {
 
   useEffect(() => {
     if (auth?.user) {
-      const userRole = auth.user.roles[0];
-      if (userRole === 'Admin') {
-        navigate('/admin-home', { replace: true });
-      } else if (userRole === 'BusinessOwner') {
-        navigate('/business-owner-home', { replace: true });
-      } else if (userRole === 'Rider') {
-        navigate('/rider-home', { replace: true });
-      } else {
-        navigate('/home', { replace: true });
-      }
+      const homePath = getHomePathForRoles(auth.user.roles);
+      navigate(homePath, { replace: true });
     }
   }, [auth, navigate]);
 
@@ -68,16 +61,8 @@ export default function Login() {
         
         toast.success('Login successful!');
         
-        const userRole = response.user.roles[0];
-        if (userRole === 'Admin') {
-          navigate('/admin-home');
-        } else if (userRole === 'BusinessOwner') {
-          navigate('/business-owner-home');
-        } else if (userRole === 'Rider') {
-          navigate('/rider-home');
-        } else {
-          navigate('/home');
-        }
+        const homePath = getHomePathForRoles(response.user.roles);
+        navigate(homePath);
       } catch (error: any) {
         toast.error(error.response?.data?.message || 'Google login failed');
       } finally {
@@ -114,16 +99,8 @@ export default function Login() {
       
       toast.success('Login successful!');
       
-      const userRole = response.user.roles[0];
-      if (userRole === 'Admin') {
-        navigate('/admin-home');
-      } else if (userRole === 'BusinessOwner') {
-        navigate('/business-owner-home');
-      } else if (userRole === 'Rider') {
-        navigate('/rider-home');
-      } else {
-        navigate('/home');
-      }
+      const homePath = getHomePathForRoles(response.user.roles);
+      navigate(homePath);
     } catch (error: any) {
       const errorMessage = error.response?.data?.message || 'Login failed. Please check your credentials.';
       toast.error(errorMessage);
