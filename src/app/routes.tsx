@@ -35,8 +35,9 @@ const Accommodation = Loadable(lazy(() => import("./pages/public/Accommodation")
 const AccommodationDetail = Loadable(lazy(() => import("./pages/public/AccommodationDetail")));
 const Gifts = Loadable(lazy(() => import("./pages/protected/Gifts")));
 const GiftShopDetailPage = Loadable(lazy(() => import("./pages/protected/GiftShopDetail")));
+const DealsPage = Loadable(lazy(() => import("./pages/protected/Deals")));
+const AdminDealsPage = Loadable(lazy(() => import("./pages/protected/AdminDeals")));
 const Rides = Loadable(lazy(() => import("./pages/protected/Ridespage")));
-
 
 // ── Role-specific Pages (lazy) ────────────────────────────────────────────────
 const AdminHome = Loadable(lazy(() => import("./pages/protected/AdminHome")));
@@ -151,6 +152,10 @@ export const router = createBrowserRouter([
     element: <ProtectedRoute allowedRoles={["Student"]} />,
     children: [
       {
+        path: "/deals",
+        Component: DealsPage,
+      },
+      {
         path: "/rides",
         Component: Rides,
       },
@@ -165,12 +170,16 @@ export const router = createBrowserRouter([
         path: "/admin-home",
         Component: AdminHome,
       },
+      {
+        path: "/admin/deals",
+        Component: AdminDealsPage,
+      },
     ]
   },
 
   // Protected Routes - Requires BusinessOwner Role
   {
-    element: <ProtectedRoute allowedRoles={["BusinessOwner"]} />,
+    element: <ProtectedRoute allowedRoles={["BusinessOwner", "Business"]} />,
     children: [
       {
         path: "/business-owner-home",
