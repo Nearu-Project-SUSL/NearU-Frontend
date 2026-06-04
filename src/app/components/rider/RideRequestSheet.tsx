@@ -167,7 +167,7 @@ export default function RideRequestSheet({
               </div>
 
               {/* Divider connector */}
-              <div style={{ display: 'flex', alignItems: 'center', marginLeft: 9, marginY: 6, gap: 12 }}>
+              <div style={{ display: 'flex', alignItems: 'center', marginLeft: 9, marginTop: 6, marginBottom: 6, gap: 12 }}>
                 <div style={{ 
                   width: 2, 
                   height: 24, 

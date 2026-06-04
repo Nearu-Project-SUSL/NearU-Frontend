@@ -19,6 +19,7 @@ export interface FareEstimate {
   estimatedFare : number;
   baseFare: number;
   ratePerKm: number;
+  estimatedDurationSeconds?: number;
 }
 
 export interface RideSummary{
