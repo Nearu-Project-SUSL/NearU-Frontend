@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
-import * as signalR from '@microsoft/signalr';
+
 
 import type {
   RideScreen,
@@ -254,127 +254,64 @@ export default function RidesPage() {
 
   const [ride, setRide] = useState<ActiveRide | null>(null);
 
-  const hubRef = useRef<signalR.HubConnection | null>(null);
 
-  // Connect SignalR once a ride is active
 
+  // HTTP Short Polling for Ride State and Location
   useEffect(() => {
     if (!ride?.rideId) return;
 
-    const baseUrl = import.meta.env.VITE_API_BASE_URL || 'https://api.nearusab.me/api';
-    const hubBaseUrl = baseUrl.replace(/\/api\/?$/, '');
-    const hubUrl = `${hubBaseUrl}/hubs/rides`;
+    const intervalId = setInterval(async () => {
+      try {
+        // Poll Ride State
+        const res = await RidesApi.getActiveRide();
+        if (res.success && res.data) {
+          const activeRide = res.data;
+          if (activeRide.rideId !== ride.rideId) return;
 
-    const conn = new signalR.HubConnectionBuilder()
-      .withUrl(hubUrl, {
-        accessTokenFactory: () =>
-          localStorage.getItem('auth_accessToken') ?? '',
-      })
-      .withAutomaticReconnect()
-      .configureLogging(signalR.LogLevel.Warning)
-      .build();
-
-    hubRef.current = conn;
-
-    // Ride state changes
-
-    conn.on(
-      'RideStateChanged',
-      (data: { rideId: string; status: string }) => {
-        if (data.rideId !== ride.rideId) return;
-
-        switch (data.status) {
-          case 'Accepted':
-            setScreen('accepted');
-            break;
-
-          case 'Arrived':
-            break;
-
-          case 'InProgress':
-            setScreen('in-progress');
-            break;
-
-          case 'CompletedByRider':
-            setScreen('confirm-complete');
-            break;
-
-          case 'Completed':
-            setScreen('completed');
-            break;
-
-          case 'Cancelled':
-          case 'Expired':
-          case 'OTPLocked':
-            reset();
-            break;
+          switch (activeRide.status) {
+            case 'Accepted':
+              if (screen !== 'accepted') {
+                setScreen('accepted');
+                setRide(r => r ? { ...r, otpExpiresAt: activeRide.otpExpiresAt } : r);
+              }
+              break;
+            case 'InProgress':
+              if (screen !== 'in-progress') setScreen('in-progress');
+              break;
+            case 'CompletedByRider':
+              if (screen !== 'confirm-complete') setScreen('confirm-complete');
+              break;
+            case 'Completed':
+              if (screen !== 'completed') setScreen('completed');
+              break;
+            case 'Cancelled':
+            case 'Expired':
+            case 'OTPLocked':
+              reset();
+              break;
+          }
         }
+
+        // Poll Location if tracking rider
+        if (screen === 'accepted' || screen === 'in-progress') {
+          const locRes = await RidesApi.getLocation(ride.rideId);
+          if (locRes.success && locRes.data) {
+            setRide(r => r ? { 
+              ...r, 
+              latitude: locRes.data.latitude, 
+              longitude: locRes.data.longitude, 
+              distanceToPickupKm: locRes.data.distanceToPickupKm 
+            } : r);
+          }
+        }
+      } catch (error) {
+        console.error('Error polling ride status', error);
       }
-    );
+    }, 3000); // Poll every 3 seconds
 
-    // OTP issued
-
-    conn.on(
-      'OtpIssued',
-      (data: {
-        rideId: string;
-        otp: string;
-        otpExpiresAt: string;
-        riderName?: string;
-        riderVehicle?: string;
-        riderRating?: number;
-      }) => {
-        if (data.rideId !== ride.rideId) return;
-
-        setRide(r =>
-          r
-            ? {
-                ...r,
-                otp: data.otp,
-                otpExpiresAt: data.otpExpiresAt,
-                riderName: data.riderName,
-                riderVehicle: data.riderVehicle,
-                riderRating: data.riderRating,
-              }
-            : r
-        );
-      }
-    );
-    
-    // Live location updates
-    
-    conn.on(
-      'LocationUpdated',
-      (data: {
-        rideId: string;
-        latitude: number;
-        longitude: number;
-        distanceToPickupKm?: number;
-      }) => {
-        if (data.rideId !== ride.rideId) return;
-        
-        setRide(r =>
-          r
-            ? {
-                ...r,
-                latitude: data.latitude,
-                longitude: data.longitude,
-                distanceToPickupKm: data.distanceToPickupKm,
-              }
-            : r
-        );
-      }
-    );
-
-    conn.start().catch(console.error);
-
-    return () => {
-      conn.stop();
-      hubRef.current = null;
-    };
-
+    return () => clearInterval(intervalId);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [ride?.rideId]);
+  }, [ride?.rideId, screen]);
 
   function reset() {
     setRide(null);
