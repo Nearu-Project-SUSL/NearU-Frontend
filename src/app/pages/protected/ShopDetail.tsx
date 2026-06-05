@@ -276,27 +276,23 @@ export default function ShopDetailPage() {
                           )}
                         </Box>
 
-                        {menuItems.length > 0 && (
-                          <Grid container spacing={2.5} sx={{ mb: 4 }}>
-                            {menuItems.map((item) => (
-                              <Grid size={{ xs: 12, sm: 6 }}>
-                                <MenuItemCard
-                                  item={{
-                                    id: item.id,
-                                    foodShopId: item.foodShopId,
-                                    name: item.name,
-                                    description: item.description ?? '',
-                                    price: item.price,
-                                    photoUrl: item.photoUrl ?? '',
-                                  }}
-                                  onClick={(menuItem) => setSelectedItem(item)}
-                                  onEdit={(menuItem) => setItemToEdit(menuItem)}
-                                  onDelete={(menuItem) => setItemToDelete(menuItem)}
-                                />
-                              </Grid>
-                            ))}
+                        {menuItems.map((item) => (
+                          <Grid size={{ xs: 12, sm: 6 }} key={item.id}>
+                            <MenuItemCard
+                              item={{
+                                id: item.id,
+                                foodShopId: item.foodShopId,
+                                name: item.name,
+                                description: item.description ?? '',
+                                price: item.price,
+                                photoUrl: item.photoUrl ?? '',
+                              }}
+                              onClick={() => setSelectedItem(item)}
+                              onEdit={canManage ? (menuItem) => setItemToEdit(menuItem) : undefined}
+                              onDelete={canManage ? (menuItem) => setItemToDelete(menuItem) : undefined}
+                            />
                           </Grid>
-                        )}
+                        ))}
                       </Box>
                     </Grid>
 
@@ -373,12 +369,7 @@ export default function ShopDetailPage() {
                         </Stack>
                       </Box>
                     </Grid>
-                  </Grid>
-                  
-                
-
-                  
-                
+                  </Grid>               
                 </Box>
           </PageLayout>
         </Box>

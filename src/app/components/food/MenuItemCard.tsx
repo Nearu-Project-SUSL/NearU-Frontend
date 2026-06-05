@@ -21,8 +21,8 @@ export interface MenuItem {
 interface MenuItemCardProps {
   item: MenuItem;
   onClick: (item: MenuItem) => void;
-  onDelete: (item: MenuItem) => void;
-  onEdit: (item: MenuItem) => void;
+  onDelete?: (item: MenuItem) => void;
+  onEdit?: (item: MenuItem) => void;
 }
 
 export default function MenuItemCard({ item, onClick, onDelete, onEdit }: MenuItemCardProps) {
@@ -133,47 +133,41 @@ export default function MenuItemCard({ item, onClick, onDelete, onEdit }: MenuIt
           '@media (hover:none)': {opacity:1}, //always show on touch devices
         }}>
 
-          <IconButton
-            size='small'
-            onClick={(e) => {
-              e.stopPropagation(); //prevent card from clicking
-              onEdit(item);
-            }}
-            sx={{
-              width: 28,
-              height: 28,
-              bgcolor: 'rgba(59,130,246,0.15)',
-              border: '1px solid rgba(59,130,246,0.3)',
-              color: '#60a5fa',
-              '&:hover': {
-                bgcolor: 'rgba(59,130,246,0.3)',
-              },
-            }}
-            >
-              <EditIcon sx={{fontSize:14}} />
+          {(onEdit || onDelete) && (
+            <Box sx={{ display: 'flex', gap: 0.5 }}>
+              {onEdit && (
+                <IconButton
+                  size="small"
+                  onClick={(e) => { e.stopPropagation(); onEdit(item); }}
+                  sx={{
+                    width: 28, height: 28,
+                    bgcolor: 'rgba(59,130,246,0.15)',
+                    border: '1px solid rgba(59,130,246,0.3)',
+                    color: '#60a5fa',
+                    '&:hover': { bgcolor: 'rgba(59,130,246,0.3)' },
+                  }}
+                >
+                  <EditIcon sx={{ fontSize: 14 }} />
+                </IconButton>
+              )}
 
-            </IconButton>
-
-            <IconButton
-              size='small'
-              onClick={(e) => {
-                e.stopPropagation();
-                onDelete(item)
-              }}
-              sx={{
-                width: 28,
-                height: 28,
-                bgcolor: 'rgba(239,68,68,0.15)',
-                border: '1px solid rgba(239,68,68,0.3)',
-                color: '#f87171',
-                '&:hover': {
-                  bgcolor: 'rgba(239,68,68,0.3)',
-                },
-              }}
-              > 
-                <DeleteIcon sx={{fontSize:14}} />
-
-              </IconButton>
+              {onDelete && (
+                <IconButton
+                  size="small"
+                  onClick={(e) => { e.stopPropagation(); onDelete(item); }}
+                  sx={{
+                    width: 28, height: 28,
+                    bgcolor: 'rgba(239,68,68,0.15)',
+                    border: '1px solid rgba(239,68,68,0.3)',
+                    color: '#f87171',
+                    '&:hover': { bgcolor: 'rgba(239,68,68,0.3)' },
+                  }}
+                >
+                  <DeleteIcon sx={{ fontSize: 14 }} />
+                </IconButton>
+              )}
+            </Box>
+          )}
         </Box>
     </Box>
 
