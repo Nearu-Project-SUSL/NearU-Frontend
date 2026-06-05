@@ -205,8 +205,10 @@ export default function RiderHome() {
       // JoinRideChannel is handled automatically by useRideHub watching activeRide
       toast.success('Ride accepted! Navigate to pickup.', { icon: '🗺️' });
     },
-    onError: () => {
-      toast.error('Failed to accept ride. It may have been taken.');
+    onError: (error: any) => {
+      console.error('Accept ride error:', error);
+      const serverMsg = error.response?.data?.message || error.response?.data?.error || error.response?.data?.title;
+      toast.error(serverMsg || 'Failed to accept ride. It may have been taken.');
       clearPendingRequest();
     },
   });
