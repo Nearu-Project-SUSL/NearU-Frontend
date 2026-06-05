@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
-
+import * as signalR from '@microsoft/signalr';
+import { useNotificationStore } from '../../store/notificationStore';
 
 import type {
   RideScreen,
@@ -255,6 +256,9 @@ export default function RidesPage() {
   const [ride, setRide] = useState<ActiveRide | null>(null);
 
 
+  const addNotification = useNotificationStore((s) => s.addNotification);
+
+  // Connect SignalR once a ride is active
 
   // HTTP Short Polling for Ride State and Location
   useEffect(() => {
