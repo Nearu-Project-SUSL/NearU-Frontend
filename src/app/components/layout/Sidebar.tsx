@@ -64,6 +64,7 @@ export function Sidebar({ activeSection }: SidebarProps) {
   const isAdmin = auth?.user?.roles?.some((role: string) => ['Admin', 'SuperAdmin'].includes(role));
   const isRider = auth?.user?.roles?.some((role: string) => ['Rider'].includes(role));
   const isBusinessOwner = auth?.user?.roles?.some((role: string) => ['BusinessOwner', 'Business'].includes(role));
+  const isStudent = auth?.user?.roles?.some((role: string) => ['Student'].includes(role)) || (!isAdmin && !isRider && !isBusinessOwner);
 
   const navItems = [
     { icon: HomeIcon,          label: 'Home',             id: 'home',          path: '/home' },
@@ -72,7 +73,7 @@ export function Sidebar({ activeSection }: SidebarProps) {
     ...(isBusinessOwner ? [{ icon: StoreIcon, label: 'Business Console', id: 'business', path: '/business-owner-home' }] : []),
     { icon: FoodIcon,          label: 'Food',             id: 'food',          path: '/food' },
     { icon: TransportIcon,     label: 'Transport',        id: 'transport',     path: '/transport' },
-    { icon: BikeIcon,          label: 'Rides',            id: 'rides',         path: '/rides' },
+    ...(isStudent ? [{ icon: BikeIcon,          label: 'Rides',            id: 'rides',         path: '/rides' }] : []),
     { icon: JobsIcon,          label: 'Jobs',             id: 'jobs',          path: '/jobs' },
     { icon: AccommodationIcon, label: 'Accommodation',    id: 'accommodation', path: '/accommodation' },
     { icon: GiftIcon,          label: 'Gifts',     id: 'gifts',         path: '/gifts' },
@@ -171,7 +172,7 @@ export function Sidebar({ activeSection }: SidebarProps) {
                     <ListItemIcon
                       sx={{
                         minWidth: 0,
-                        mr: expanded ? 1.5 : 'auto',
+                        mr: expanded ? 1.5 : 0,
                         color: 'inherit',
                         transition: 'margin 0.28s ease',
                       }}
@@ -207,7 +208,7 @@ export function Sidebar({ activeSection }: SidebarProps) {
             onClick={() => { if (isMobileOpen) toggleMobileSidebar(); }}
             sx={{
               py: 1.25,
-              px: expanded ? 2 : 1.25,
+              px: expanded ? 1.75 : 1.25,
               borderRadius: '11px',
               border: `1px solid ${accentAlpha(0.15)}`,
               bgcolor: accentAlpha(0.04),

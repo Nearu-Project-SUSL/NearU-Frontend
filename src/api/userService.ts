@@ -48,6 +48,10 @@ const userService = {
             },
         });
         return response.data.data;
+    },
+
+    deleteUserAccount: async (userId: string, password: string): Promise<void> => {
+        await axiosPrivate.delete(`/User/${userId}`, { data: { password } });
     }
 };
 

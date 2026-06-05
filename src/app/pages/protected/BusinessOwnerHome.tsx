@@ -9,7 +9,7 @@ export default function BusinessOwnerHome() {
 
   return (
     <Box sx={{ display: 'flex', minHeight: '100vh', bgcolor: 'background.default' }}>
-      <Sidebar activeSection="home" />
+      <Sidebar activeSection="business" />
       <Box sx={{ flexGrow: 1, display: 'flex', flexDirection: 'column' }}>
         <Navbar />
         <PageLayout>
