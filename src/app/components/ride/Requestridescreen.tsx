@@ -179,7 +179,7 @@ export function RequestRideScreen({ onRideCreated }: Props) {
       setDistanceKm(distanceKm);
       setEstimatedFare(estimatedFare);
       setEstimatedMinutes(
-        estimatedDurationSeconds > 0
+        estimatedDurationSeconds !== undefined && estimatedDurationSeconds > 0
           ? Math.ceil(estimatedDurationSeconds / 60)
           : null
       );
