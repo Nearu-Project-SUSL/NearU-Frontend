@@ -85,7 +85,6 @@ export default function MenuItemCard({ item, onClick, onDelete, onEdit }: MenuIt
               display: 'flex',
               flexDirection: 'column',
               justifyContent: 'space-between',
-              // add right padding so action buttons don't overlap text
               pr: { xs: 7, sm: 8 },
             }}
           >

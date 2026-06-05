@@ -31,6 +31,7 @@ import { type MenuItemResponse } from '../../../api/foodapi';
 import { addMenuItem } from '../../../api/foodapi';
 import { useFoodShop, useMenuItems } from '../../hooks/useFoodShop';
 import { useQueryClient } from '@tanstack/react-query';
+import useAuth from '../../hooks/useAuth';
 
 
 
@@ -50,6 +51,12 @@ export default function ShopDetailPage() {
 
   const [itemToEdit, setItemToEdit] = useState<MenuItem | null>(null);
   const [itemToDelete, setItemToDelete] = useState<MenuItem | null>(null);
+
+  const {auth} = useAuth();
+  const currentUserId = auth?.user?.id;
+  const isOwner = shop?.ownerId === currentUserId;
+  const isAdmin = auth?.user?.roles?.includes('Admin');
+  const canManage = isOwner || isAdmin;
 
   if (shopLoading || menuLoading) {
     return (
@@ -241,16 +248,7 @@ export default function ShopDetailPage() {
                     <Grid size={{xs:12, md:8}}>
                       {/*menu section*/}
                       <Box>
-                        <Box
-                          sx={{
-                            display: 'flex',
-                            alignItems: 'center',
-                            justifyContent: 'space-between',
-                            gap: 2,
-                            mb: 4,
-                            flexWrap: 'wrap',
-                          }}
-                        >
+                        <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 2, mb: 4, flexWrap: 'wrap' }}>
                           <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
                             <MenuIcon sx={{ color: '#2E9EBF', fontSize: 24 }} />
                             <Typography variant="h6" sx={{ color: '#fff', fontWeight: 700 }}>
@@ -258,21 +256,24 @@ export default function ShopDetailPage() {
                             </Typography>
                           </Box>
 
-                          <Box
-                            component="button"
-                            onClick={() => setOpenAddItem(true)}
-                            style={{
-                              background: '#2E9EBF',
-                              color: '#fff',
-                              border: 'none',
-                              borderRadius: '999px',
-                              padding: '10px 18px',
-                              fontWeight: 700,
-                              cursor: 'pointer',
-                            }}
-                          >
-                            Add Menu Item
-                          </Box>
+                          {/* Only show Add Menu Item to owner or admin */}
+                          {canManage && (
+                            <Box
+                              component="button"
+                              onClick={() => setOpenAddItem(true)}
+                              style={{
+                                background: '#2E9EBF',
+                                color: '#fff',
+                                border: 'none',
+                                borderRadius: '999px',
+                                padding: '10px 18px',
+                                fontWeight: 700,
+                                cursor: 'pointer',
+                              }}
+                            >
+                              Add Menu Item
+                            </Box>
+                          )}
                         </Box>
 
                         {menuItems.length > 0 && (
