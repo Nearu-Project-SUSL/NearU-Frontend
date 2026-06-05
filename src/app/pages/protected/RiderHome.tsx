@@ -498,9 +498,9 @@ export default function RiderHome() {
               {/* Stats row */}
               <Box sx={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 2, mb: 4 }}>
                 {[
-                  { icon: <BikeIcon />, label: 'Total Rides', value: stats?.totalRides?.toString() ?? '—', color: RIDER_ACCENT, glow: 'rgba(16, 185, 129, 0.1)' },
-                  { icon: <EarningsIcon />, label: "Today's Earnings", value: stats ? `Rs. ${stats.todayEarnings.toLocaleString()}` : '—', color: '#f59e0b', glow: 'rgba(245, 158, 11, 0.1)' },
-                  { icon: <StarIcon />, label: 'Rating', value: stats ? `${stats.rating.toFixed(1)}` : '—', color: '#a78bfa', glow: 'rgba(168, 85, 247, 0.1)' },
+                  { icon: <BikeIcon />, label: 'Total Rides', value: stats?.totalRides != null ? stats.totalRides.toString() : '—', color: RIDER_ACCENT, glow: 'rgba(16, 185, 129, 0.1)' },
+                  { icon: <EarningsIcon />, label: "Today's Earnings", value: stats?.todayEarnings != null ? `Rs. ${stats.todayEarnings.toLocaleString()}` : '—', color: '#f59e0b', glow: 'rgba(245, 158, 11, 0.1)' },
+                  { icon: <StarIcon />, label: 'Rating', value: stats?.rating != null ? stats.rating.toFixed(1) : '—', color: '#a78bfa', glow: 'rgba(168, 85, 247, 0.1)' },
                 ].map((stat, i) => (
                   <motion.div
                     key={i}
