@@ -20,8 +20,9 @@ export interface RideRequest {
   dropoffLocation: string;
   dropoffLat: number;
   dropoffLng: number;
-  fareEstimate: number;
-  distanceKm: number;
+  fareEstimate?: number;   // may be absent from SignalR broadcast
+  distanceKm?: number;     // may be absent from SignalR broadcast
+  serviceType?: string;
   createdAt: string;
 }
 

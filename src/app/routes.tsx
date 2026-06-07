@@ -27,14 +27,17 @@ const CreateJob = Loadable(lazy(() => import("./pages/protected/CreateJob")));
 const UpdateJob = Loadable(lazy(() => import("./pages/protected/UpdateJob")));
 const MyJobs = Loadable(lazy(() => import("./pages/protected/MyJobs")));
 const Profile = Loadable(lazy(() => import("./pages/protected/Profile")));
+const TransportSelection = Loadable(lazy(() => import("./pages/protected/transport/TransportSelection")));
+const Transport = Loadable(lazy(() => import("./pages/protected/transport/Transport")));
 const FoodPage = Loadable(lazy(() => import("./pages/protected/Food")));
 const ShopDetailPage = Loadable(lazy(() => import("./pages/protected/ShopDetail")));
 const Accommodation = Loadable(lazy(() => import("./pages/public/Accommodation")));
 const AccommodationDetail = Loadable(lazy(() => import("./pages/public/AccommodationDetail")));
 const Gifts = Loadable(lazy(() => import("./pages/protected/Gifts")));
 const GiftShopDetailPage = Loadable(lazy(() => import("./pages/protected/GiftShopDetail")));
+const DealsPage = Loadable(lazy(() => import("./pages/protected/Deals")));
+const AdminDealsPage = Loadable(lazy(() => import("./pages/protected/AdminDeals")));
 const Rides = Loadable(lazy(() => import("./pages/protected/Ridespage")));
-
 
 // ── Role-specific Pages (lazy) ────────────────────────────────────────────────
 const AdminHome = Loadable(lazy(() => import("./pages/protected/AdminHome")));
@@ -106,6 +109,26 @@ export const router = createBrowserRouter([
         Component: FoodPage,
       },
       {
+        path: "/transport",
+        Component: TransportSelection,
+      },
+      {
+        path: "/transport/bus",
+        Component: Transport,
+      },
+      {
+        path: "/transport/train",
+        Component: Transport,
+      },
+      {
+        path: "/transport/tuk",
+        Component: Transport,
+      },
+      {
+        path: "/transport/all",
+        Component: Transport,
+      },
+      {
         path: "/accommodation",
         Component: Accommodation,
       },
@@ -120,6 +143,17 @@ export const router = createBrowserRouter([
       {
         path: "/gifts/:id",
         Component: GiftShopDetailPage,
+      },
+    ]
+  },
+
+  // Protected Routes - Requires Student Role
+  {
+    element: <ProtectedRoute allowedRoles={["Student"]} />,
+    children: [
+      {
+        path: "/deals",
+        Component: DealsPage,
       },
       {
         path: "/rides",
@@ -136,12 +170,16 @@ export const router = createBrowserRouter([
         path: "/admin-home",
         Component: AdminHome,
       },
+      {
+        path: "/admin/deals",
+        Component: AdminDealsPage,
+      },
     ]
   },
 
   // Protected Routes - Requires BusinessOwner Role
   {
-    element: <ProtectedRoute allowedRoles={["BusinessOwner"]} />,
+    element: <ProtectedRoute allowedRoles={["BusinessOwner", "Business"]} />,
     children: [
       {
         path: "/business-owner-home",

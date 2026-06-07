@@ -26,7 +26,6 @@ import {
   ArrowBack as ArrowLeftIcon,
   Send as SendIcon,
   Shield as ShieldCheckIcon,
-  School as GraduationCapIcon,
   VpnKey as VpnKeyIcon,
   Security as SecurityIcon,
   Restore as RestoreIcon,
@@ -183,9 +182,11 @@ export default function ForgotPassword() {
       {/* Top Navigation */}
       <nav className="relative z-20 flex items-center justify-between px-8 lg:px-12 py-6 bg-black/30 backdrop-blur-sm border-b border-blue-400/20">
         <Link to="/" className="flex items-center gap-3 group">
-          <div className="w-12 h-12 bg-gradient-to-br from-blue-400 to-blue-600 rounded-xl flex items-center justify-center shadow-lg shadow-blue-400/30 group-hover:scale-110 transition-transform duration-300">
-            <span className="text-black text-2xl">🎓</span>
-          </div>
+          <img
+            src="/NearU Logo.svg"
+            alt="NearU Logo"
+            className="w-16 h-16 object-contain group-hover:scale-110 transition-transform duration-300"
+          />
           <span className="text-white text-2xl">NearU</span>
         </Link>
         <div className="flex items-center gap-4">

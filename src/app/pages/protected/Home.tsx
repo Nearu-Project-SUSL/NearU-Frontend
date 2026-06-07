@@ -4,8 +4,9 @@ import { Sidebar } from '../../components/layout/Sidebar';
 import Navbar from '../../components/layout/Navbar';
 import useAuth from '../../hooks/useAuth';
 import { useNearUTheme } from '../../context/ThemeContext';
-import axios from '../../../api/axios'; 
-import { axiosPrivate } from '../../../api/axios'; 
+import { useApprovedDeals } from '../../hooks/useDeals';
+import axios from '../../../api/axios';
+import { axiosPrivate } from '../../../api/axios';
 
 import {
   Box,
@@ -124,32 +125,12 @@ const services = [
   },
 ];
 
-const hotDeals = [
-  {
-    id: 'deal1',
-    image: '/food_deal.png',
-    title: '50% Off on First Food Order',
-    description: 'Get amazing discounts on your first order from any restaurant. Limited time offer!',
-    badge: '50% OFF',
-    badgeColor: '#ef4444',
-  },
-  {
-    id: 'deal2',
-    image: '/ride_deal.png',
-    title: 'Free Ride Credits',
-    description: 'Earn free ride credits worth Rs. 500 when you refer a friend to NearU Rides.',
-    badge: 'FREE Rs. 500',
-    badgeColor: '#ef4444',
-  },
-  {
-    id: 'deal3',
-    image: '/accommodation_deal.png',
-    title: 'Student Housing Special',
-    description: 'Find the perfect accommodation with exclusive student discounts and verified listings.',
-    badge: '30% OFF',
-    badgeColor: '#ef4444',
-  },
-];
+const defaultDealImageByType: Record<string, string> = {
+  Food: '/food_deal.png',
+  Gift: '/gift_service.png',
+  Accommodation: '/accommodation_deal.png',
+  Other: '/offer_service.png',
+};
 
 const testimonials = [
   {
@@ -296,8 +277,17 @@ function ServiceCard({ service, index }: { service: typeof services[0], index: n
   );
 }
 
+interface HomeDealCardProps {
+  id: string;
+  image: string;
+  title: string;
+  description: string;
+  badge: string;
+  badgeColor: string;
+}
+
 // ─── Deal Card Component ──────────────────────────────────────────────────────
-function DealCard({ deal, index }: { deal: typeof hotDeals[0], index: number }) {
+function DealCard({ deal, index, onViewAll }: { deal: HomeDealCardProps, index: number, onViewAll?: () => void }) {
   const [hovered, setHovered] = useState(false);
   const theme = useTheme();
   const accent = theme.palette.primary.main;
@@ -338,6 +328,7 @@ function DealCard({ deal, index }: { deal: typeof hotDeals[0], index: number }) 
             fullWidth
             variant="contained"
             color="primary"
+            onClick={onViewAll}
             sx={{
               fontWeight: 700,
               borderRadius: '12px',
@@ -581,14 +572,17 @@ function ShareModal({
 // ─── Home Page ────────────────────────────────────────────────────────────────
 export default function Home() {
   const { auth } = useAuth();
+  const navigate = useNavigate();
   const [visible, setVisible] = useState(false);
   const theme = useTheme();
   const { isDark } = useNearUTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('md'));
   const [showAllServices, setShowAllServices] = useState(false);
-  const navigate = useNavigate();
-
-
+  const { data: approvedDeals = [], isLoading: dealsLoading } = useApprovedDeals();
+  const accent = theme.palette.primary.main;
+  const accentAlpha = (a: number) => `rgba(46, 158, 191, ${a})`;
+  const { scrollRef: servicesRef, scroll: scrollServices } = useHorizontalScroll();
+  const { scrollRef: dealsRef, scroll: scrollDeals } = useHorizontalScroll();
 
   //testimonial state
   const [testimonials, setTestimonials] = useState<Testimonial[]>([]);
@@ -598,14 +592,21 @@ export default function Home() {
   const [snackbar, setSnackbar] = useState<{ open: boolean; message: string; severity: 'success' | 'error' }>({ open: false, message: '', severity: 'success' });
   const autoRotateRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
-  const { scrollRef: servicesRef, scroll: scrollServices } = useHorizontalScroll();
-  const { scrollRef: dealsRef, scroll: scrollDeals } = useHorizontalScroll();
-  const { scrollRef: testRef, scroll: scrollTest } = useHorizontalScroll();
+  const homeDeals: HomeDealCardProps[] = approvedDeals.map((d) => ({
+    id: d.id,
+    image: d.imageUrl || defaultDealImageByType[d.shopType] || '/offer_service.png',
+    title: d.title,
+    description: d.description,
+    badge: d.badgeText,
+    badgeColor: d.badgeColor || '#ef4444',
+  }));
+
 
   const CARDS_PER_PAGE = 3;
   const totalPages = Math.ceil(testimonials.length / CARDS_PER_PAGE);
   const visibleTestimonials = testimonials.slice(currentPage * CARDS_PER_PAGE, currentPage * CARDS_PER_PAGE + CARDS_PER_PAGE);
   
+
   useEffect(() => {
     const t = setTimeout(() => setVisible(true), 100);
     return () => clearTimeout(t);
@@ -800,9 +801,17 @@ export default function Home() {
                     '& > *': { scrollSnapAlign: { xs: 'none', md: 'start' } }
                   }}
                 >
-                  {hotDeals.map((deal, i) => (
+                  {dealsLoading && (
+                    <Typography sx={{ color: 'text.secondary', px: 2 }}>Loading deals...</Typography>
+                  )}
+                  {!dealsLoading && homeDeals.length === 0 && (
+                    <Typography sx={{ color: 'text.secondary', px: 2 }}>
+                      No live deals yet. Check back soon or visit Deals & Offers.
+                    </Typography>
+                  )}
+                  {homeDeals.map((deal, i) => (
                     <Box key={deal.id} sx={{ width: { xs: '100%', md: 'auto' } }}>
-                      <DealCard deal={deal} index={i} />
+                      <DealCard deal={deal} index={i} onViewAll={() => navigate('/deals')} />
                     </Box>
                   ))}
                 </Box>

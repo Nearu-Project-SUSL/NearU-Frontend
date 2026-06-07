@@ -1,5 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react';
 import * as signalR from '@microsoft/signalr';
+import { useNotificationStore } from '../../store/notificationStore';
 
 import {
   Box,
@@ -311,6 +312,8 @@ export default function RidesPage() {
 
   const hubRef = useRef<signalR.HubConnection | null>(null);
 
+  const addNotification = useNotificationStore((s) => s.addNotification);
+
   // Connect SignalR once a ride is active
 
   useEffect(() => {
@@ -337,6 +340,29 @@ export default function RidesPage() {
       'RideStateChanged',
       (data: { rideId: string; status: string }) => {
         if (data.rideId !== ride.rideId) return;
+
+        // Push every status change to the notification bell
+        const STATUS_BELL: Record<string, { title: string; message: string }> = {
+          Accepted:            { title: '🛵 Rider Accepted',            message: 'Your rider is on the way to pick you up.' },
+          RiderEnRoute:        { title: '🛵 Rider En Route',            message: 'Your rider is heading to your pickup point.' },
+          RiderArrived:        { title: '📍 Rider Arrived!',            message: 'Your rider is waiting at the pickup point.' },
+          InProgress:          { title: '🚦 Ride Started',             message: 'You are on your way. Enjoy your ride!' },
+          CompletedByRider:    { title: '✅ Trip Done — Confirm?',     message: 'Your rider marked the trip complete. Please confirm.' },
+          PendingConfirmation: { title: '⏳ Awaiting Confirmation',    message: 'Please open the app to confirm the trip.' },
+          Completed:           { title: '🎉 Ride Completed!',          message: 'Hope you had a great ride! Thank you for using NearU.' },
+          Cancelled:           { title: '❌ Ride Cancelled',           message: 'The ride has been cancelled.' },
+          Expired:             { title: '⏰ Ride Expired',             message: 'No rider accepted your request. Please try again.' },
+        };
+        const bellData = STATUS_BELL[data.status];
+        if (bellData) {
+          addNotification({
+            type: 'ride',
+            title: bellData.title,
+            message: bellData.message,
+            route: '/rides',
+            rideId: data.rideId,
+          });
+        }
 
         switch (data.status) {
           case 'Accepted':

@@ -1,22 +1,12 @@
 import { useEffect, useState } from 'react';
 import { RidesApi } from '../../../api/Ridesapi';
-import {
-  Box,
-  Typography,
-  Paper,
-  Button,
-  Stack,
-  Chip,
-  Stepper,
-  Step,
-  StepLabel,
-  StepContent,
-  CircularProgress,
-  alpha,
-} from '@mui/material';
+import { motion } from 'framer-motion';
 import {
   Check as CheckIcon,
-  Search as SearchIcon,
+  Close as CancelIcon,
+  Radar as RadarIcon,
+  DirectionsBike as BikeIcon,
+  NavigateNext as NextIcon,
 } from '@mui/icons-material';
 
 interface Props {
@@ -27,23 +17,23 @@ interface Props {
 
 const STEPS = [
   {
-    label: 'Request submitted',
-    description: 'Broadcasted to nearby riders',
+    label: 'Request Submitted',
+    sub: 'Broadcasted to nearby riders',
     state: 'done',
   },
   {
-    label: 'Rider accepts',
-    description: 'Waiting for a rider to pick up your request',
+    label: 'Rider Accepting',
+    sub: 'Waiting for a rider to pick up your request',
     state: 'active',
   },
   {
-    label: 'Rider verifies OTP',
-    description: 'You will receive an OTP once accepted',
+    label: 'Rider Verifies OTP',
+    sub: 'You will receive an OTP once accepted',
     state: 'pending',
   },
   {
-    label: 'Ride in progress',
-    description: 'Track your rider live on the map',
+    label: 'Ride in Progress',
+    sub: 'Track your rider live on the map',
     state: 'pending',
   },
 ];
@@ -75,203 +65,399 @@ export function PendingRideScreen({ rideId, onAccepted, onCancel }: Props) {
   const activeStep = 1;
 
   return (
-    <Box
-      sx={{
-        display: 'flex',
-        flexDirection: 'column',
-        minHeight: '100vh',
-        alignItems: 'center',
-        justifyContent: 'center',
-        p: 2,
-        bgcolor: '#0b0b0b',
-        color: 'var(--text-primary)',
-        animation: 'fadeIn 0.5s ease-out',
-        position: 'relative',
+    <div
+      className="flex flex-col min-h-screen items-center justify-center p-4 animate-fadeIn"
+      style={{
+        background: 'radial-gradient(circle at 50% 50%, #111827 0%, #030712 100%)',
+        color: '#f9fafb',
+        fontFamily: 'system-ui, sans-serif',
       }}
     >
-      {/* TOP STATUS */}
-      <Box sx={{ position: 'absolute', top: 20, display: 'flex', justifyContent: 'center', width: '100%' }}>
-        <Chip
-          label={`Finding a rider${dots}`}
-          sx={{
-            bgcolor: alpha('#efab3a', 0.12),
-            color: '#efab3a',
-            fontWeight: 500,
-            fontSize: '12px',
+      {/* Background Decorative Orbs */}
+      <div
+        style={{
+          position: 'absolute',
+          top: '20%',
+          left: '15%',
+          width: '350px',
+          height: '350px',
+          background: 'radial-gradient(circle, rgba(46, 158, 191, 0.15) 0%, transparent 70%)',
+          borderRadius: '50%',
+          filter: 'blur(50px)',
+          pointerEvents: 'none',
+        }}
+      />
+      <div
+        style={{
+          position: 'absolute',
+          bottom: '15%',
+          right: '10%',
+          width: '400px',
+          height: '400px',
+          background: 'radial-gradient(circle, rgba(16, 185, 129, 0.08) 0%, transparent 70%)',
+          borderRadius: '50%',
+          filter: 'blur(60px)',
+          pointerEvents: 'none',
+        }}
+      />
+
+      {/* TOP STATUS BADGE */}
+      <motion.div
+        initial={{ y: -20, opacity: 0 }}
+        animate={{ y: 0, opacity: 1 }}
+        style={{
+          position: 'absolute',
+          top: 24,
+          display: 'flex',
+          justifyContent: 'center',
+          width: '100%',
+        }}
+      >
+        <div
+          style={{
+            padding: '6px 16px',
+            borderRadius: 30,
+            background: 'rgba(245, 158, 11, 0.08)',
+            border: '1px solid rgba(245, 158, 11, 0.25)',
+            color: '#f59e0b',
+            fontSize: 12.5,
+            fontWeight: 600,
+            letterSpacing: '0.02em',
+            boxShadow: '0 4px 15px rgba(245, 158, 11, 0.15)',
+            display: 'flex',
+            alignItems: 'center',
+            gap: 8,
           }}
-        />
-      </Box>
+        >
+          <RadarIcon
+            style={{
+              fontSize: 15,
+              animation: 'spin 4s linear infinite',
+            }}
+          />
+          Finding a rider{dots}
+        </div>
+      </motion.div>
 
       {/* MAIN POPUP */}
-      <Paper
-        elevation={24}
-        sx={{
+      <motion.div
+        initial={{ y: 30, opacity: 0, scale: 0.96 }}
+        animate={{ y: 0, opacity: 1, scale: 1 }}
+        transition={{ type: 'spring', stiffness: 260, damping: 26 }}
+        style={{
           width: '100%',
-          maxWidth: 550,
-          borderRadius: 5,
-          p: 4,
-          bgcolor: alpha('#121212', 0.96),
-          backdropFilter: 'blur(24px)',
-          border: '1px solid',
-          borderColor: alpha('#fff', 0.08),
-          boxShadow: '0 25px 80px rgba(0,0,0,0.6)',
-          animation: 'slideUp 0.5s ease-out',
+          maxWidth: '520px',
+          borderRadius: 28,
+          padding: '32px 28px',
+          background: 'rgba(17, 17, 17, 0.75)',
+          backdropFilter: 'blur(30px)',
+          WebkitBackdropFilter: 'blur(30px)',
+          border: '1px solid rgba(255, 255, 255, 0.08)',
+          boxShadow: '0 30px 90px rgba(0, 0, 0, 0.65), inset 0 1px 0 rgba(255, 255, 255, 0.05)',
+          zIndex: 10,
         }}
       >
         {/* TITLE */}
-        <Box sx={{ textAlign: 'center', mb: 3 }}>
-          <Typography variant="h6" sx={{ fontWeight: 600 }}>
-            Waiting for a rider
-          </Typography>
-          <Typography variant="caption" sx={{ color: alpha('#fff', 0.5), mt: 0.5 }}>
-            We’re matching you with the nearest available rider
-          </Typography>
-        </Box>
+        <div style={{ textAlign: 'center', marginBottom: 28 }}>
+          <h2 style={{ color: 'white', margin: '0 0 6px', fontWeight: 800, fontSize: 22, letterSpacing: '-0.02em' }}>
+            Waiting for a Rider
+          </h2>
+          <p style={{ color: '#9ca3af', margin: 0, fontSize: 13.5, fontWeight: 500, lineHeight: 1.4 }}>
+            We're matching you with the nearest available NearU partner
+          </p>
+        </div>
 
-        {/* STATUS CARD */}
-        <Box
-          sx={{
-            borderRadius: 4,
-            p: 3,
-            mb: 3,
+        {/* HIGH-TECH PULSING FINDER WIDGET */}
+        <div
+          style={{
+            background: 'rgba(255, 255, 255, 0.02)',
+            border: '1px solid rgba(255, 255, 255, 0.05)',
+            borderRadius: 24,
+            padding: '30px 20px',
+            marginBottom: 24,
             display: 'flex',
             flexDirection: 'column',
             alignItems: 'center',
-            bgcolor: alpha('#fff', 0.04),
-            border: '1px solid',
-            borderColor: alpha('#fff', 0.06),
+            justifyContent: 'center',
+            position: 'relative',
+            overflow: 'hidden',
           }}
         >
-          <Box
-             sx={{
-               width: 12,
-               height: 12,
-               borderRadius: '50%',
-               mb: 1.5,
-               bgcolor: 'var(--nearu-accent)',
-               boxShadow: `0 0 10px var(--nearu-accent)`,
-               animation: 'pulse 1.5s infinite',
-             }}
-          />
-          <Typography variant="body2" sx={{ color: alpha('#fff', 0.6), textAlign: 'center' }}>
+          {/* Radar Circles */}
+          <div style={{ position: 'relative', width: 80, height: 80, marginBottom: 16 }}>
+            <motion.div
+              animate={{ scale: [1, 2.2], opacity: [0.6, 0] }}
+              transition={{ repeat: Infinity, duration: 2, ease: 'easeOut' }}
+              style={{
+                position: 'absolute',
+                inset: 0,
+                borderRadius: '50%',
+                border: '1.5px solid rgba(46, 158, 191, 0.35)',
+              }}
+            />
+            <motion.div
+              animate={{ scale: [1, 1.6], opacity: [0.8, 0] }}
+              transition={{ repeat: Infinity, duration: 2, delay: 0.6, ease: 'easeOut' }}
+              style={{
+                position: 'absolute',
+                inset: 0,
+                borderRadius: '50%',
+                border: '1.5px solid rgba(46, 158, 191, 0.2)',
+              }}
+            />
+            {/* Core Radar Icon */}
+            <div
+              style={{
+                position: 'absolute',
+                inset: 12,
+                borderRadius: '50%',
+                background: 'linear-gradient(135deg, #2E9EBF, #1c6d85)',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                boxShadow: '0 0 20px rgba(46, 158, 191, 0.4)',
+              }}
+            >
+              <RadarIcon style={{ color: 'white', fontSize: 28, animation: 'spin 3s linear infinite' }} />
+            </div>
+          </div>
+
+          <span
+            style={{
+              color: '#d1d5db',
+              fontSize: 13,
+              fontWeight: 600,
+              letterSpacing: '0.01em',
+              display: 'flex',
+              alignItems: 'center',
+              gap: 4,
+            }}
+          >
             Searching nearby riders{dots}
           </Typography>
         </Box>
 
-        {/* PROGRESS STEPS */}
-        <Box
-          sx={{
-            borderRadius: 4,
-            p: 3,
-            mb: 3,
-            border: '1px solid',
-            bgcolor: alpha('#fff', 0.03),
-            borderColor: alpha('#fff', 0.08),
+        {/* PROGRESS STEPS - SLEEK TIMELINE */}
+        <div
+          style={{
+            background: 'rgba(255, 255, 255, 0.01)',
+            border: '1px solid rgba(255, 255, 255, 0.05)',
+            borderRadius: 24,
+            padding: '24px 20px',
+            marginBottom: 24,
           }}
         >
-          <Typography variant="caption" sx={{ textTransform: 'uppercase', letterSpacing: 2, mb: 2, color: alpha('#fff', 0.5) }}>
-            Ride progress
-          </Typography>
+          <p
+            style={{
+              color: 'rgba(255, 255, 255, 0.4)',
+              margin: '0 0 16px',
+              fontSize: 10,
+              fontWeight: 700,
+              textTransform: 'uppercase',
+              letterSpacing: '0.1em',
+            }}
+          >
+            Ride Progress
+          </p>
 
-          <Stepper activeStep={activeStep} orientation="vertical" sx={{ 
-            '& .MuiStepConnector-line': { borderColor: alpha('#fff', 0.1) },
-          }}>
-            {STEPS.map((step, index) => (
-              <Step key={step.label} active={index <= activeStep} completed={index < activeStep}>
-                <StepLabel
-                  StepIconComponent={({ active, completed }) => (
-                    <Box
-                      sx={{
-                        width: 28,
-                        height: 28,
-                        borderRadius: '50%',
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                        fontSize: 12,
-                        border: '1px solid',
-                        bgcolor: completed ? alpha('#63c34a', 0.15) : active ? alpha('#2e9ebf', 0.15) : alpha('#fff', 0.03),
-                        color: completed ? '#63c34a' : active ? '#2e9ebf' : alpha('#fff', 0.4),
-                        borderColor: completed ? alpha('#63c34a', 0.3) : active ? '#2e9ebf' : alpha('#fff', 0.08),
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 20, position: 'relative' }}>
+            {/* Vertical timeline line */}
+            <div
+              style={{
+                position: 'absolute',
+                left: 14,
+                top: 14,
+                bottom: 14,
+                width: 2,
+                background: 'rgba(255,255,255,0.06)',
+                zIndex: 0,
+              }}
+            />
+            {/* Active connection line overlay */}
+            <div
+              style={{
+                position: 'absolute',
+                left: 14,
+                top: 14,
+                height: '25%', // Active step height overlay
+                width: 2,
+                background: 'linear-gradient(to bottom, #10b981, #2E9EBF)',
+                zIndex: 0,
+              }}
+            />
+
+            {STEPS.map((step, i) => {
+              const isDone = step.state === 'done';
+              const isActive = step.state === 'active';
+              return (
+                <div key={i} style={{ display: 'flex', gap: 16, alignItems: 'flex-start', zIndex: 1 }}>
+                  {/* Timeline Badge */}
+                  <div
+                    style={{
+                      width: 30,
+                      height: 30,
+                      borderRadius: '50%',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      fontSize: 12,
+                      fontWeight: 800,
+                      flexShrink: 0,
+                      transition: 'all 0.3s ease',
+                      border: isDone
+                        ? '1px solid rgba(16, 185, 129, 0.4)'
+                        : isActive
+                        ? '1px solid #2E9EBF'
+                        : '1px solid rgba(255, 255, 255, 0.08)',
+                      background: isDone
+                        ? 'rgba(16, 185, 129, 0.12)'
+                        : isActive
+                        ? 'rgba(46, 158, 191, 0.15)'
+                        : 'rgba(255, 255, 255, 0.02)',
+                      color: isDone ? '#10b981' : isActive ? '#2E9EBF' : 'rgba(255, 255, 255, 0.35)',
+                      boxShadow: isDone
+                        ? '0 0 10px rgba(16, 185, 129, 0.15)'
+                        : isActive
+                        ? '0 0 12px rgba(46, 158, 191, 0.25)'
+                        : 'none',
+                    }}
+                  >
+                    {isDone ? (
+                      <CheckIcon style={{ fontSize: 14 }} />
+                    ) : isActive ? (
+                      <motion.div
+                        animate={{ scale: [0.9, 1.1, 0.9] }}
+                        transition={{ repeat: Infinity, duration: 1.6 }}
+                      >
+                        {i + 1}
+                      </motion.div>
+                    ) : (
+                      i + 1
+                    )}
+                  </div>
+
+                  {/* Texts */}
+                  <div style={{ flex: 1 }}>
+                    <p
+                      style={{
+                        margin: 0,
+                        fontWeight: 700,
+                        fontSize: 14.5,
+                        color: isDone || isActive ? '#f3f4f6' : 'rgba(255, 255, 255, 0.4)',
+                        letterSpacing: '-0.01em',
                       }}
                     >
-                      {completed ? <CheckIcon sx={{ fontSize: 14 }} /> : index + 1}
-                    </Box>
-                  )}
-                >
-                  <Typography variant="body2" sx={{ fontWeight: 500, color: index <= activeStep ? 'white' : alpha('#fff', 0.4) }}>
-                    {step.label}
-                  </Typography>
-                  <Typography variant="caption" sx={{ color: alpha('#fff', 0.4) }}>
-                    {step.description}
-                  </Typography>
-                </StepLabel>
-              </Step>
-            ))}
-          </Stepper>
-        </Box>
+                      {step.label}
+                    </p>
+                    <p
+                      style={{
+                        margin: '2px 0 0',
+                        fontSize: 12.5,
+                        color: isDone || isActive ? '#9ca3af' : 'rgba(255, 255, 255, 0.25)',
+                        lineHeight: 1.35,
+                      }}
+                    >
+                      {step.sub}
+                    </p>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        </div>
 
         {/* RIDER ID */}
-        <Box
-          sx={{
-            borderRadius: 3,
-            px: 2,
-            py: 1,
-            mb: 3,
-            fontSize: '12px',
-            bgcolor: alpha('#fff', 0.03),
-            border: '1px solid',
-            borderColor: alpha('#fff', 0.06),
-            color: alpha('#fff', 0.6),
+        <div
+          style={{
+            borderRadius: 16,
+            padding: '10px 16px',
+            fontSize: 12.5,
+            marginBottom: 20,
+            background: 'rgba(255, 255, 255, 0.02)',
+            border: '1px solid rgba(255, 255, 255, 0.05)',
+            color: 'rgba(255, 255, 255, 0.5)',
+            display: 'flex',
+            justifyContent: 'space-between',
+            alignItems: 'center',
           }}
         >
-          Ride ID:{" "}
-          <Box component="span" sx={{ color: 'var(--nearu-accent)', fontFamily: 'monospace' }}>
-            {rideId.slice(0, 8)}…
-          </Box>
-        </Box>
+          <span>Ride Identifier</span>
+          <span style={{ color: '#2E9EBF', fontFamily: 'monospace', fontWeight: 700 }}>
+            {rideId.slice(0, 8).toUpperCase()}…
+          </span>
+        </div>
 
         {/* ACTIONS */}
-        <Stack spacing={2}>
-          <Button
-            fullWidth
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+          <motion.button
+            whileHover={{ scale: 1.015, background: 'rgba(239, 68, 68, 0.15)' }}
+            whileTap={{ scale: 0.985 }}
             onClick={handleCancel}
             disabled={cancelling}
-            variant="outlined"
-            sx={{
-              py: 1.5,
-              borderRadius: 3,
-              fontSize: '14px',
-              fontWeight: 500,
-              color: '#e84c6e',
-              borderColor: alpha('#e84c6e', 0.25),
-              bgcolor: alpha('#e84c6e', 0.12),
-              '&:hover': {
-                bgcolor: alpha('#e84c6e', 0.2),
-                borderColor: alpha('#e84c6e', 0.4),
-              },
-              textTransform: 'none',
+            style={{
+              width: '100%',
+              padding: '14px',
+              borderRadius: 16,
+              background: 'rgba(239, 68, 68, 0.08)',
+              border: '1px solid rgba(239, 68, 68, 0.25)',
+              color: '#ef4444',
+              fontWeight: 700,
+              fontSize: 14.5,
+              cursor: cancelling ? 'not-allowed' : 'pointer',
+              transition: 'all 0.2s ease',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              gap: 8,
             }}
           >
-            {cancelling ? <CircularProgress size={20} color="inherit" /> : 'Cancel request'}
-          </Button>
+            <CancelIcon style={{ fontSize: 16 }} />
+            {cancelling ? 'Cancelling...' : 'Cancel Request'}
+          </motion.button>
 
-          {/* DEV ONLY */}
-          <Button
-            fullWidth
-            variant="text"
+          {/* DEV ONLY — elegant, minimal subtle control */}
+          <button
             onClick={() => onAccepted(new Date(Date.now() + 10 * 60 * 1000).toISOString())}
-            sx={{
-              fontSize: '13px',
-              color: alpha('#fff', 0.4),
-              textTransform: 'none',
-              '&:hover': { bgcolor: alpha('#fff', 0.05) }
+            style={{
+              width: '100%',
+              padding: '10px',
+              borderRadius: 12,
+              background: 'transparent',
+              border: '1px dashed rgba(255, 255, 255, 0.1)',
+              color: 'rgba(255, 255, 255, 0.3)',
+              fontSize: 11.5,
+              fontWeight: 500,
+              cursor: 'pointer',
+              marginTop: 6,
+              transition: 'all 0.2s ease',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              gap: 6,
+            }}
+            onMouseOver={e => {
+              e.currentTarget.style.color = '#10b981';
+              e.currentTarget.style.borderColor = 'rgba(16, 185, 129, 0.3)';
+            }}
+            onMouseOut={e => {
+              e.currentTarget.style.color = 'rgba(255, 255, 255, 0.3)';
+              e.currentTarget.style.borderColor = 'rgba(255, 255, 255, 0.1)';
             }}
           >
-            [Dev] Simulate rider accepted →
-          </Button>
-        </Stack>
-      </Paper>
-    </Box>
+            <BikeIcon style={{ fontSize: 14 }} />
+            <span>[Developer Mode] Simulate Rider Accept</span>
+            <NextIcon style={{ fontSize: 14 }} />
+          </button>
+        </div>
+      </motion.div>
+
+      {/* Global CSS for spinner animation */}
+      <style>{`
+        @keyframes spin {
+          0% { transform: rotate(0deg); }
+          100% { transform: rotate(360deg); }
+        }
+      `}</style>
+    </div>
   );
-}
+}

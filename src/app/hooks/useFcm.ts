@@ -21,16 +21,29 @@ import { getToken, onMessage, deleteToken } from 'firebase/messaging';
 import { toast } from 'sonner';
 import { getFirebaseMessaging, getFirebaseConfig } from '../services/firebaseService';
 import riderService from '../../api/riderService';
+import { useNotificationStore } from '../store/notificationStore';
+import type { NotificationType } from '../store/notificationStore';
 
 const VAPID_KEY = import.meta.env.VITE_FIREBASE_VAPID_KEY as string;
 
-// Notification routing: FCM data payload → in-app navigation path
+// Notification routing: FCM data payload action → in-app navigation path
 const ACTION_ROUTES: Record<string, string> = {
   new_ride_request: '/rider',
   ride_accepted:    '/rides',
   ride_update:      '/rides',
   ride_cancelled:   '/rides',
   ride_confirmed:   '/rides',
+  ride_status_update: '/rides',
+};
+
+// Map FCM action → NotificationType for the store
+const ACTION_TYPE_MAP: Record<string, NotificationType> = {
+  new_ride_request:   'ride',
+  ride_accepted:      'ride',
+  ride_update:        'ride',
+  ride_cancelled:     'ride',
+  ride_confirmed:     'ride',
+  ride_status_update: 'ride',
 };
 
 interface UseFcmOptions {
@@ -41,6 +54,7 @@ interface UseFcmOptions {
 export function useFcm({ enabled }: UseFcmOptions) {
   const tokenRef = useRef<string | null>(null);
   const unsubscribeRef = useRef<(() => void) | null>(null);
+  const { addNotification } = useNotificationStore();
 
   // ─── Send config to service worker ─────────────────────────────────────────
   const sendConfigToSw = useCallback(async (sw: ServiceWorker) => {
@@ -151,17 +165,29 @@ export function useFcm({ enabled }: UseFcmOptions) {
           const data = payload.data ?? {};
           const action = data.action ?? '';
           const route = ACTION_ROUTES[action];
+          const notifType: NotificationType =
+            ACTION_TYPE_MAP[action] ?? 'general';
 
           console.info('[FCM] Foreground message:', payload);
 
-          // Show as a rich toast with optional navigation
+          // Add to the notification bell store (persisted history)
+          addNotification({
+            type: notifType,
+            title: title ?? 'NearU',
+            message: body ?? '',
+            route,
+            rideId: data.rideId,
+          });
+
+          // Also show as a rich toast with optional navigation
           toast(title ?? 'NearU', {
             description: body,
             duration: 8000,
-            icon: action === 'new_ride_request' ? '🛵' :
-                  action === 'ride_accepted'    ? '✅' :
-                  action === 'ride_confirmed'   ? '🎉' :
-                  action === 'ride_cancelled'   ? '❌' : '🔔',
+            icon: action === 'new_ride_request'   ? '🛵' :
+                  action === 'ride_accepted'      ? '✅' :
+                  action === 'ride_confirmed'     ? '🎉' :
+                  action === 'ride_cancelled'     ? '❌' :
+                  action === 'ride_status_update' ? '🔔' : '🔔',
             action: route
               ? {
                   label: 'View',

@@ -1,3 +1,4 @@
+import { useNavigate } from 'react-router';
 import { useState, useEffect, useCallback } from 'react';
 import { PageLayout } from '../../components/layout/PageLayout';
 import { Sidebar } from '../../components/layout/Sidebar';
@@ -37,17 +38,20 @@ import {
   CheckCircleOutline as ActiveIcon,
   People as UsersIcon,
   OnlinePrediction as OnlineIcon,
-  Search as SearchIcon
+  Search as SearchIcon,
+  Store as StoreIcon
 } from '@mui/icons-material';
 import useAuth from '../../hooks/useAuth';
 import Navbar from '../../components/layout/Navbar';
-import adminService, { AdminStats, AdminRider } from '../../../api/adminService';
+import adminService, { AdminStats, AdminRider, AdminBusiness } from '../../../api/adminService';
 import { rideHub } from '../../services/rideHubService';
 import { toast } from 'sonner';
 import { useNearUTheme } from '../../context/ThemeContext';
 
+
 export default function AdminHome() {
   const { auth } = useAuth();
+  const navigate = useNavigate();
   const { isDark } = useNearUTheme();
   const theme = useTheme();
   
@@ -58,7 +62,13 @@ export default function AdminHome() {
   const [actionInProgress, setActionInProgress] = useState<string | null>(null);
   const [currentTab, setCurrentTab] = useState<string>('All');
   const [searchTerm, setSearchTerm] = useState('');
-  
+
+  const [businesses, setBusinesses]               = useState<AdminBusiness[]>([]);
+  const [loadingBusinesses, setLoadingBusinesses] = useState(true);
+  const [businessTab, setBusinessTab]             = useState<string>('All');
+  const [businessSearch, setBusinessSearch]       = useState('');
+  const [businessAction, setBusinessAction]       = useState<string | null>(null);
+
   const accent = theme.palette.primary.main;
   const accentAlpha = (a: number) => `rgba(46, 158, 191, ${a})`;
 
@@ -92,13 +102,34 @@ export default function AdminHome() {
     }
   }, []);
 
+  // Fetch Business Applications
+  const fetchBusinesses = useCallback(async (statusFilter?: string) => {
+    setLoadingBusinesses(true);
+    try {
+      const apiFilter = statusFilter === 'All' ? undefined : statusFilter;
+      const data = await adminService.getBusinessApplications(apiFilter, 1, 50);
+      setBusinesses(data.applications || []);
+    } catch (error) {
+      toast.error('Failed to load business applications.');
+    } finally {
+      setLoadingBusinesses(false);
+    }
+  }, []);
+
   // Refresh All Data
   const refreshAll = useCallback(() => {
     fetchStats();
     fetchRiders(currentTab);
-  }, [fetchStats, fetchRiders, currentTab]);
+    fetchBusinesses(businessTab);
+  }, [fetchStats, fetchRiders , fetchBusinesses,currentTab, businessTab]);
 
   // Handle Tab Change
+  useEffect(() => {
+    refreshAll();
+    fetchBusinesses('All');  // ← add
+  }, []);
+
+  // Handle Rider Tab Change
   const handleTabChange = (_event: React.SyntheticEvent, newValue: string) => {
     setCurrentTab(newValue);
     fetchRiders(newValue);
@@ -141,6 +172,28 @@ export default function AdminHome() {
       toast.error(errorMsg, { id: toastId });
     } finally {
       setActionInProgress(null);
+    }
+  };
+
+
+  // Approve or Reject a business application
+  const handleBusinessAction = async (id: string, action: 'approve' | 'reject') => {
+    setBusinessAction(id);
+    const toastId = toast.loading(`${action === 'approve' ? 'Approving' : 'Rejecting'} application...`);
+    try {
+      if (action === 'approve') {
+        await adminService.approveBusiness(id);
+        toast.success('Business application approved!', { id: toastId });
+      } else {
+        await adminService.rejectBusiness(id, 'Rejected by admin');
+        toast.success('Business application rejected.', { id: toastId });
+      }
+      fetchBusinesses(businessTab);
+      fetchStats();
+    } catch (error: any) {
+      toast.error(error.response?.data?.message || `Failed to ${action}.`, { id: toastId });
+    } finally {
+      setBusinessAction(null);
     }
   };
 
@@ -200,6 +253,12 @@ export default function AdminHome() {
     rider.email?.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
+  const filteredBusinesses = businesses.filter(b =>
+    b.businessName?.toLowerCase().includes(businessSearch.toLowerCase()) ||
+    b.ownerEmail?.toLowerCase().includes(businessSearch.toLowerCase()) ||
+    b.ownerName?.toLowerCase().includes(businessSearch.toLowerCase())
+  );
+
   // Common glassmorphism styles
   const glassStyles = {
     bgcolor: isDark ? 'rgba(30, 30, 30, 0.6)' : 'rgba(255, 255, 255, 0.8)',
@@ -212,7 +271,7 @@ export default function AdminHome() {
 
   return (
     <Box sx={{ display: 'flex', minHeight: '100vh', bgcolor: 'background.default' }}>
-      <Sidebar activeSection="home" />
+      <Sidebar activeSection="admin" />
       <Box sx={{ flexGrow: 1, display: 'flex', flexDirection: 'column' }}>
         <Navbar />
         <PageLayout>
@@ -220,7 +279,7 @@ export default function AdminHome() {
             
             {/* Upper Header Welcome banner */}
             <Fade in timeout={800}>
-              <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 4 }}>
+              <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 4, flexDirection: { xs: 'column', sm: 'row' }, gap: 2 }}>
                 <Box>
                   <Typography variant="h4" sx={{ fontWeight: 800, color: 'text.primary', mb: 0.5 }}>
                     NearU Command Center
@@ -229,21 +288,39 @@ export default function AdminHome() {
                     Welcome back, <span style={{ color: accent, fontWeight: 700 }}>{auth?.user?.username || 'Admin'}</span>. Real-time platform management.
                   </Typography>
                 </Box>
-                <Tooltip title="Force Refresh Dashboard">
-                  <IconButton 
-                    onClick={refreshAll} 
-                    disabled={loadingStats || loadingRiders}
+                <Box sx={{ display: 'flex', gap: 2, alignItems: 'center' }}>
+                  <Button
+                    variant="contained"
+                    onClick={() => navigate('/admin/deals')}
                     sx={{ 
-                      bgcolor: accentAlpha(0.1), 
-                      color: accent,
-                      border: `1px solid ${accentAlpha(0.2)}`,
-                      p: 1.5,
-                      '&:hover': { bgcolor: accentAlpha(0.2) } 
+                      fontWeight: 700, 
+                      borderRadius: '12px', 
+                      bgcolor: '#ef4444', 
+                      color: '#fff',
+                      textTransform: 'none',
+                      px: 3,
+                      py: 1.2,
+                      '&:hover': { bgcolor: '#dc2626' }
                     }}
                   >
-                    {loadingStats || loadingRiders ? <CircularProgress size={24} color="inherit" /> : <RefreshIcon />}
-                  </IconButton>
-                </Tooltip>
+                    Review Deals & Offers
+                  </Button>
+                  <Tooltip title="Force Refresh Dashboard">
+                    <IconButton 
+                      onClick={refreshAll} 
+                      disabled={loadingStats || loadingRiders}
+                      sx={{ 
+                        bgcolor: accentAlpha(0.1), 
+                        color: accent,
+                        border: `1px solid ${accentAlpha(0.2)}`,
+                        p: 1.5,
+                        '&:hover': { bgcolor: accentAlpha(0.2) } 
+                      }}
+                    >
+                      {loadingStats || loadingRiders ? <CircularProgress size={24} color="inherit" /> : <RefreshIcon />}
+                    </IconButton>
+                  </Tooltip>
+                </Box>
               </Box>
             </Fade>
 
@@ -534,6 +611,196 @@ export default function AdminHome() {
                                     {actionInProgress === rider.riderId ? <CircularProgress size={20} color="inherit" /> : <SuspendIcon />}
                                   </IconButton>
                                 </Tooltip>
+                              )}
+                            </Box>
+                          </TableCell>
+                        </TableRow>
+                      ))
+                    )}
+                  </TableBody>
+                </Table>
+              </TableContainer>
+            </Paper>
+
+            {/* ── Business Applications Panel ───────────────────────── */}
+            <Paper sx={{ ...glassStyles, p: 4, mt: 4 }}>
+              <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 3, flexDirection: { xs: 'column', md: 'row' }, gap: 3 }}>
+                <Box>
+                  <Typography variant="h5" sx={{ fontWeight: 800, color: 'text.primary' }}>
+                    Business Applications
+                  </Typography>
+                  <Typography variant="body2" sx={{ color: 'text.secondary' }}>
+                    Review and approve business owner registrations.
+                  </Typography>
+                </Box>
+                <Box sx={{ display: 'flex', gap: 2.5, alignItems: 'center', flexDirection: { xs: 'column', sm: 'row' }, width: { xs: '100%', md: 'auto' } }}>
+                  <TextField
+                    placeholder="Search name or email..."
+                    size="small"
+                    value={businessSearch}
+                    onChange={(e) => setBusinessSearch(e.target.value)}
+                    InputProps={{
+                      startAdornment: (
+                        <InputAdornment position="start">
+                          <SearchIcon sx={{ color: 'text.secondary', fontSize: 20 }} />
+                        </InputAdornment>
+                      ),
+                    }}
+                    sx={{
+                      width: { xs: '100%', sm: 220 },
+                      '& .MuiOutlinedInput-root': {
+                        borderRadius: '0.8rem',
+                        bgcolor: isDark ? 'rgba(255,255,255,0.03)' : 'rgba(0,0,0,0.02)',
+                        '& fieldset': { borderColor: accentAlpha(0.2) },
+                        '&:hover fieldset': { borderColor: accentAlpha(0.4) },
+                        '&.Mui-focused fieldset': { borderColor: accent }
+                      }
+                    }}
+                  />
+                  <Tabs
+                    value={businessTab}
+                    onChange={(_e, val) => { setBusinessTab(val); fetchBusinesses(val); }}
+                    variant="scrollable"
+                    scrollButtons="auto"
+                    sx={{
+                      '& .MuiTabs-indicator': { bgcolor: accent },
+                      '& .MuiTab-root': { color: 'text.secondary', fontWeight: 600 },
+                      '& .MuiTab-root.Mui-selected': { color: accent }
+                    }}
+                  >
+                    {['All', 'Pending', 'Approved', 'Rejected'].map(tab => (
+                      <Tab key={tab} label={tab} value={tab} />
+                    ))}
+                  </Tabs>
+                </Box>
+              </Box>
+
+              <TableContainer sx={{ border: `1px solid ${accentAlpha(0.1)}`, borderRadius: '1rem', overflow: 'hidden' }}>
+                <Table>
+                  <TableHead sx={{ bgcolor: isDark ? 'rgba(0,0,0,0.3)' : 'rgba(0,0,0,0.02)' }}>
+                    <TableRow>
+                      <TableCell sx={{ fontWeight: 700 }}>Business Info</TableCell>
+                      <TableCell sx={{ fontWeight: 700 }}>Owner</TableCell>
+                      <TableCell sx={{ fontWeight: 700 }}>Type</TableCell>
+                      <TableCell sx={{ fontWeight: 700 }}>Contact</TableCell>
+                      <TableCell sx={{ fontWeight: 700 }}>Status</TableCell>
+                      <TableCell sx={{ fontWeight: 700 }} align="center">Actions</TableCell>
+                    </TableRow>
+                  </TableHead>
+                  <TableBody>
+                    {loadingBusinesses ? (
+                      <TableRow>
+                        <TableCell colSpan={6} align="center" sx={{ py: 6 }}>
+                          <CircularProgress sx={{ color: accent }} />
+                          <Typography variant="body2" sx={{ color: 'text.secondary', mt: 2 }}>
+                            Loading business applications...
+                          </Typography>
+                        </TableCell>
+                      </TableRow>
+                    ) : filteredBusinesses.length === 0 ? (
+                      <TableRow>
+                        <TableCell colSpan={6} align="center" sx={{ py: 8 }}>
+                          <StoreIcon sx={{ fontSize: 48, color: 'text.disabled', mb: 2 }} />
+                          <Typography variant="h6" sx={{ color: 'text.primary', fontWeight: 700 }}>
+                            No Business Applications
+                          </Typography>
+                          <Typography variant="body2" sx={{ color: 'text.secondary' }}>
+                            {businessSearch
+                              ? `No results match "${businessSearch}"`
+                              : `No applications matching "${businessTab}" at this time.`}
+                          </Typography>
+                        </TableCell>
+                      </TableRow>
+                    ) : (
+                      filteredBusinesses.map((biz) => (
+                        <TableRow
+                          key={biz.id}
+                          sx={{
+                            '&:hover': { bgcolor: isDark ? 'rgba(255,255,255,0.02)' : 'rgba(0,0,0,0.01)' },
+                            transition: 'all 0.2s'
+                          }}
+                        >
+                          <TableCell>
+                            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
+                              <Avatar sx={{ bgcolor: accentAlpha(0.1), color: accent }}>
+                                <StoreIcon />
+                              </Avatar>
+                              <Box>
+                                <Typography sx={{ fontWeight: 700, color: 'text.primary' }}>{biz.businessName}</Typography>
+                                <Typography variant="caption" sx={{ color: 'text.secondary' }}>
+                                  ID: {biz.id.substring(0, 8)}...
+                                </Typography>
+                              </Box>
+                            </Box>
+                          </TableCell>
+                          <TableCell>
+                            <Typography sx={{ fontWeight: 600, color: 'text.primary' }}>{biz.ownerName}</Typography>
+                            <Typography variant="caption" sx={{ color: 'text.secondary' }}>{biz.ownerEmail}</Typography>
+                          </TableCell>
+                          <TableCell>
+                            <Chip
+                              label={biz.businessType}
+                              size="small"
+                              sx={{
+                                fontWeight: 600,
+                                bgcolor: accentAlpha(0.08),
+                                color: accent,
+                                border: `1px solid ${accentAlpha(0.3)}`
+                              }}
+                            />
+                          </TableCell>
+                          <TableCell sx={{ color: 'text.secondary' }}>{biz.phone || '—'}</TableCell>
+                          <TableCell>
+                            <Chip
+                              label={biz.status}
+                              size="small"
+                              sx={{
+                                fontWeight: 700,
+                                bgcolor:
+                                  biz.status === 'Approved' ? 'rgba(16,185,129,0.1)' :
+                                  biz.status === 'Pending'  ? 'rgba(245,158,11,0.1)' :
+                                                              'rgba(239,68,68,0.1)',
+                                color:
+                                  biz.status === 'Approved' ? '#10b981' :
+                                  biz.status === 'Pending'  ? '#f59e0b' : '#ef4444',
+                                border: '1px solid currentColor'
+                              }}
+                            />
+                          </TableCell>
+                          <TableCell align="center">
+                            <Box sx={{ display: 'flex', justifyContent: 'center', gap: 1 }}>
+                              {biz.status === 'Pending' && (
+                                <>
+                                  <Tooltip title="Approve Application">
+                                    <IconButton
+                                      color="success"
+                                      disabled={businessAction !== null}
+                                      onClick={() => handleBusinessAction(biz.id, 'approve')}
+                                      sx={{ bgcolor: 'rgba(16,185,129,0.08)', '&:hover': { bgcolor: 'rgba(16,185,129,0.15)' } }}
+                                    >
+                                      {businessAction === biz.id
+                                        ? <CircularProgress size={20} color="inherit" />
+                                        : <CheckIcon />}
+                                    </IconButton>
+                                  </Tooltip>
+                                  <Tooltip title="Reject Application">
+                                    <IconButton
+                                      color="error"
+                                      disabled={businessAction !== null}
+                                      onClick={() => handleBusinessAction(biz.id, 'reject')}
+                                      sx={{ bgcolor: 'rgba(239,68,68,0.08)', '&:hover': { bgcolor: 'rgba(239,68,68,0.15)' } }}
+                                    >
+                                      {businessAction === biz.id
+                                        ? <CircularProgress size={20} color="inherit" />
+                                        : <RejectIcon />}
+                                    </IconButton>
+                                  </Tooltip>
+                                </>
+                              )}
+                              {biz.status !== 'Pending' && (
+                                <Typography variant="caption" sx={{ color: 'text.disabled' }}>
+                                  {biz.status === 'Approved' ? '✓ Done' : '✗ Rejected'}
+                                </Typography>
                               )}
                             </Box>
                           </TableCell>

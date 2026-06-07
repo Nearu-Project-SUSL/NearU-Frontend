@@ -74,6 +74,7 @@ export default function MenuItemCard({ item, onClick, onDelete, onEdit }: MenuIt
                 transition: 'transform 0.4s ease',
                 transform: hovered ? 'scale(1.08)' : 'scale(1)',
               }}
+              loading="lazy"
             />
           </Box>
 
