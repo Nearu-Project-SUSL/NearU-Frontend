@@ -234,8 +234,8 @@ export function PendingRideScreen({ rideId, onAccepted, onCancel }: Props) {
             }}
           >
             Searching nearby riders{dots}
-          </Typography>
-        </Box>
+          </span>
+        </div>
 
         {/* PROGRESS STEPS - SLEEK TIMELINE */}
         <div
@@ -414,40 +414,6 @@ export function PendingRideScreen({ rideId, onAccepted, onCancel }: Props) {
             <CancelIcon style={{ fontSize: 16 }} />
             {cancelling ? 'Cancelling...' : 'Cancel Request'}
           </motion.button>
-
-          {/* DEV ONLY — elegant, minimal subtle control */}
-          <button
-            onClick={() => onAccepted(new Date(Date.now() + 10 * 60 * 1000).toISOString())}
-            style={{
-              width: '100%',
-              padding: '10px',
-              borderRadius: 12,
-              background: 'transparent',
-              border: '1px dashed rgba(255, 255, 255, 0.1)',
-              color: 'rgba(255, 255, 255, 0.3)',
-              fontSize: 11.5,
-              fontWeight: 500,
-              cursor: 'pointer',
-              marginTop: 6,
-              transition: 'all 0.2s ease',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              gap: 6,
-            }}
-            onMouseOver={e => {
-              e.currentTarget.style.color = '#10b981';
-              e.currentTarget.style.borderColor = 'rgba(16, 185, 129, 0.3)';
-            }}
-            onMouseOut={e => {
-              e.currentTarget.style.color = 'rgba(255, 255, 255, 0.3)';
-              e.currentTarget.style.borderColor = 'rgba(255, 255, 255, 0.1)';
-            }}
-          >
-            <BikeIcon style={{ fontSize: 14 }} />
-            <span>[Developer Mode] Simulate Rider Accept</span>
-            <NextIcon style={{ fontSize: 14 }} />
-          </button>
         </div>
       </motion.div>
 

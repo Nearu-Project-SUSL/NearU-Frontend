@@ -175,8 +175,8 @@ export function InProgressRideScreen({
 
           <span style={{ color: '#d1d5db', fontSize: 13.5, fontWeight: 600, textAlign: 'center' }}>
             Navigating to your destination
-          </Typography>
-        </Box>
+          </span>
+        </div>
 
         {/* RIDER PROFILE CARD */}
         <div
@@ -208,20 +208,20 @@ export function InProgressRideScreen({
             }}
           >
             {initials}
-          </Avatar>
+          </div>
 
           <div style={{ flex: 1 }}>
             <div style={{ color: '#f3f4f6', fontWeight: 800, fontSize: 15.5, letterSpacing: '-0.01em' }}>
               {riderName}
-            </Typography>
+            </div>
 
             {riderVehicle && (
               <div style={{ color: '#9ca3af', fontSize: 13, fontWeight: 500, marginTop: 2 }}>
                 {riderVehicle}
-              </Typography>
+              </div>
             )}
-          </Box>
-        </Paper>
+          </div>
+        </div>
 
         {/* TRIP INFO - SLEEK RECEIPT */}
         <div
@@ -250,8 +250,8 @@ export function InProgressRideScreen({
             </div>
             <span style={{ fontSize: 14, color: '#f3f4f6', fontWeight: 700 }}>
               {dropoffLabel}
-            </Typography>
-          </Box>
+            </span>
+          </div>
 
           {/* Fare */}
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', paddingTop: 16 }}>
@@ -295,38 +295,7 @@ export function InProgressRideScreen({
           </span>
         </div>
 
-        {/* DEV BUTTON - subtle dotted plate */}
-        <button
-          onClick={onRiderCompleted}
-          style={{
-            width: '100%',
-            padding: '10px',
-            borderRadius: 12,
-            background: 'transparent',
-            border: '1px dashed rgba(255, 255, 255, 0.1)',
-            color: 'rgba(255, 255, 255, 0.3)',
-            fontSize: 11.5,
-            fontWeight: 500,
-            cursor: 'pointer',
-            transition: 'all 0.2s ease',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            gap: 6,
-          }}
-          onMouseOver={e => {
-            e.currentTarget.style.color = '#10b981';
-            e.currentTarget.style.borderColor = 'rgba(16, 185, 129, 0.3)';
-          }}
-          onMouseOut={e => {
-            e.currentTarget.style.color = 'rgba(255, 255, 255, 0.3)';
-            e.currentTarget.style.borderColor = 'rgba(255, 255, 255, 0.1)';
-          }}
-        >
-          <BikeIcon style={{ fontSize: 14 }} />
-          <span>[Developer Mode] Simulate Rider Complete</span>
-          <NextIcon style={{ fontSize: 14 }} />
-        </button>
+       
       </motion.div>
     </div>
   );
