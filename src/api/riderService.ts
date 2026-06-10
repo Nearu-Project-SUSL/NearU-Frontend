@@ -124,12 +124,31 @@ const getNearbyRequests = async (
 // ─── Ride Lifecycle (Rider-side) ──────────────────────────────────────────────
 
 /**
+ * Helper to map backend DTO (which may be wrapped in an ApiResponse) to ActiveRide.
+ */
+function mapSummaryToActiveRide(dto: any): ActiveRide {
+  return {
+    id             : dto.rideId       ?? dto.id ?? '',
+    studentName    : dto.studentId    ?? 'Student',
+    pickupLocation : `${dto.pickupLatitude ?? 0}, ${dto.pickupLongitude ?? 0}`,
+    pickupLat      : dto.pickupLatitude  ?? 0,
+    pickupLng      : dto.pickupLongitude ?? 0,
+    dropoffLocation: `${dto.dropoffLatitude ?? 0}, ${dto.dropoffLongitude ?? 0}`,
+    dropoffLat     : dto.dropoffLatitude  ?? 0,
+    dropoffLng     : dto.dropoffLongitude ?? 0,
+    fareEstimate   : dto.estimatedFare    ?? 0,
+    status         : (dto.status as RideStatus) ?? 'EN_ROUTE_PICKUP',
+  };
+}
+
+/**
  * Accept a pending ride request.
  * POST /accept  (baseURL already includes /api)
  */
 const acceptRide = async (rideId: string): Promise<ActiveRide> => {
-  const response = await axiosPrivate.post<ActiveRide>('/accept', { rideId });
-  return response.data;
+  const response = await axiosPrivate.post<any>('/accept', { rideId });
+  const dto = response.data?.data ?? response.data;
+  return mapSummaryToActiveRide(dto);
 };
 
 /**
@@ -179,8 +198,11 @@ const sendHeartbeat = async (rideId: string, coords: LocationCoords): Promise<vo
  */
 const getActiveRide = async (): Promise<ActiveRide | null> => {
   try {
-    const response = await axiosPrivate.get<ActiveRide>('/rides/active');
-    return response.status === 204 ? null : response.data;
+    const response = await axiosPrivate.get<any>('/rides/active');
+    if (response.status === 204 || !response.data) return null;
+    const dto = response.data?.data ?? response.data;
+    if (!dto) return null;
+    return mapSummaryToActiveRide(dto);
   } catch {
     return null;
   }
