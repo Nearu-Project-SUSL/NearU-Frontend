@@ -27,15 +27,15 @@ export interface RideRequest {
 }
 
 export interface ActiveRide {
-  id: string;
+  id: string;              // mapped from RideSummaryDto.rideId
   studentName: string;
   pickupLocation: string;
-  pickupLat: number;
-  pickupLng: number;
+  pickupLat: number;       // mapped from pickupLatitude
+  pickupLng: number;       // mapped from pickupLongitude
   dropoffLocation: string;
-  dropoffLat: number;
-  dropoffLng: number;
-  fareEstimate: number;
+  dropoffLat: number;      // mapped from dropoffLatitude
+  dropoffLng: number;      // mapped from dropoffLongitude
+  fareEstimate: number;    // mapped from estimatedFare
   status: RideStatus;
 }
 
@@ -121,7 +121,27 @@ const getNearbyRequests = async (
   return response.data;
 };
 
-// ─── Ride Lifecycle (Rider-side) ──────────────────────────────────────────────
+/**
+ * Map a raw RideSummaryDto from the backend into the frontend ActiveRide shape.
+ * Backend sends camelCase JSON: { rideId, pickupLatitude, estimatedFare, ... }
+ * Frontend ActiveRide uses: { id, pickupLat, fareEstimate, ... }
+ */
+function mapSummaryToActiveRide(dto: any): ActiveRide {
+  return {
+    id             : dto.rideId       ?? dto.id ?? '',
+    studentName    : dto.studentId    ?? 'Student',   // backend doesn't send studentName in summary
+    pickupLocation : `${dto.pickupLatitude ?? 0}, ${dto.pickupLongitude ?? 0}`,
+    pickupLat      : dto.pickupLatitude  ?? 0,
+    pickupLng      : dto.pickupLongitude ?? 0,
+    dropoffLocation: `${dto.dropoffLatitude ?? 0}, ${dto.dropoffLongitude ?? 0}`,
+    dropoffLat     : dto.dropoffLatitude  ?? 0,
+    dropoffLng     : dto.dropoffLongitude ?? 0,
+    fareEstimate   : dto.estimatedFare    ?? 0,
+    status         : (dto.status as RideStatus) ?? 'EN_ROUTE_PICKUP',
+  };
+}
+
+// ─── Ride Lifecycle (Rider-side) ──────────────────────────────────────────────────────
 
 /**
  * Helper to map backend DTO (which may be wrapped in an ApiResponse) to ActiveRide.
@@ -144,6 +164,7 @@ function mapSummaryToActiveRide(dto: any): ActiveRide {
 /**
  * Accept a pending ride request.
  * POST /accept  (baseURL already includes /api)
+ * Returns an ActiveRide mapped from ApiResponse<RideSummaryDto>.
  */
 const acceptRide = async (rideId: string): Promise<ActiveRide> => {
   const response = await axiosPrivate.post<any>('/accept', { rideId });
