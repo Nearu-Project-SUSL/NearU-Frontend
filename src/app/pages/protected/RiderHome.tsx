@@ -205,8 +205,10 @@ export default function RiderHome() {
       // JoinRideChannel is handled automatically by useRideHub watching activeRide
       toast.success('Ride accepted! Navigate to pickup.', { icon: '🗺️' });
     },
-    onError: () => {
-      toast.error('Failed to accept ride. It may have been taken.');
+    onError: (error: any) => {
+      console.error('Accept ride error:', error);
+      const serverMsg = error.response?.data?.message || error.response?.data?.error || error.response?.data?.title;
+      toast.error(serverMsg || 'Failed to accept ride. It may have been taken.');
       clearPendingRequest();
     },
   });
@@ -244,12 +246,19 @@ export default function RiderHome() {
 
   // ─── Handlers ──────────────────────────────────────────────────────────────
   const handleToggleOnline = useCallback(() => {
+    if (approvalStatus !== 'Approved') {
+      toast.error('Your rider account is pending approval by an admin. You cannot go online yet.', { duration: 5000 });
+      return;
+    }
+
     if (permissionState === 'denied' && !isOnline) {
       toast.error('Please enable location access to go online.', { duration: 5000 });
       return;
     }
-    toggleOnlineMutation.mutate(!isOnline);
-  }, [isOnline, permissionState, toggleOnlineMutation]);
+    
+    const nextStatus = !isOnline;
+    toggleOnlineMutation.mutate(nextStatus);
+  }, [permissionState, isOnline, toggleOnlineMutation, approvalStatus]);
 
   const handleDeclineRequest = useCallback(() => {
     clearPendingRequest();
