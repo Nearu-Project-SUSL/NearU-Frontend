@@ -49,9 +49,11 @@ const ACTION_TYPE_MAP: Record<string, NotificationType> = {
 interface UseFcmOptions {
   /** Only initialise when the user is logged in */
   enabled: boolean;
+  /** User roles to filter notifications */
+  roles?: string[];
 }
 
-export function useFcm({ enabled }: UseFcmOptions) {
+export function useFcm({ enabled, roles = [] }: UseFcmOptions) {
   const tokenRef = useRef<string | null>(null);
   const unsubscribeRef = useRef<(() => void) | null>(null);
   const { addNotification } = useNotificationStore();
@@ -164,6 +166,13 @@ export function useFcm({ enabled }: UseFcmOptions) {
           const { title, body } = payload.notification ?? {};
           const data = payload.data ?? {};
           const action = data.action ?? '';
+          
+          // Filter out 'new_ride_request' if the current user is not a Rider
+          if (action === 'new_ride_request' && !roles.includes('Rider')) {
+            console.info('[FCM] Ignored foreground new_ride_request because user is not a Rider.');
+            return;
+          }
+
           const route = ACTION_ROUTES[action];
           const notifType: NotificationType =
             ACTION_TYPE_MAP[action] ?? 'general';
