@@ -31,6 +31,7 @@ export function AcceptedRideScreen({
   distanceToPickupKm,
   onRideStarted,
 }: Props) {
+  const [currentOtp, setCurrentOtp] = useState(otp);
   const [currentExpiry, setCurrentExpiry] = useState(otpExpiresAt);
   const [refreshing, setRefreshing] = useState(false);
 
@@ -41,16 +42,14 @@ export function AcceptedRideScreen({
     .slice(0, 2)
     .toUpperCase();
 
-  const otpDigits = otp?.split('') ?? [];
+  const otpDigits = currentOtp?.split('') ?? [];
 
   async function handleRefresh() {
     setRefreshing(true);
-    try {
+     try {
       const res = await RidesApi.refreshOtp(rideId);
-
-      if (res.data.otpExpiresAt) {
-        setCurrentExpiry(res.data.otpExpiresAt);
-      }
+      if (res.data.otp) setCurrentOtp(res.data.otp);          
+      if (res.data.otpExpiresAt) setCurrentExpiry(res.data.otpExpiresAt);
     } catch {
       // ignore
     } finally {
