@@ -246,12 +246,19 @@ export default function RiderHome() {
 
   // ─── Handlers ──────────────────────────────────────────────────────────────
   const handleToggleOnline = useCallback(() => {
+    if (approvalStatus !== 'Approved') {
+      toast.error('Your rider account is pending approval by an admin. You cannot go online yet.', { duration: 5000 });
+      return;
+    }
+
     if (permissionState === 'denied' && !isOnline) {
       toast.error('Please enable location access to go online.', { duration: 5000 });
       return;
     }
-    toggleOnlineMutation.mutate(!isOnline);
-  }, [isOnline, permissionState, toggleOnlineMutation]);
+    
+    const nextStatus = !isOnline;
+    toggleOnlineMutation.mutate(nextStatus);
+  }, [permissionState, isOnline, toggleOnlineMutation, approvalStatus]);
 
   const handleDeclineRequest = useCallback(() => {
     clearPendingRequest();
