@@ -132,29 +132,7 @@ const defaultDealImageByType: Record<string, string> = {
   Other: '/offer_service.png',
 };
 
-const testimonials = [
-  {
-    id: 't1',
-    name: 'Thimira',
-    time: '2 days ago',
-    image: 'https://i.pravatar.cc/150?img=11',
-    text: 'NearU has completely transformed my university life! The food delivery is super fast and the student discounts are amazing. Highly recommended for all students!',
-  },
-  {
-    id: 't2',
-    name: 'Uvindu',
-    time: '1 week ago',
-    image: 'https://i.pravatar.cc/150?img=12',
-    text: "Love the ride-sharing feature! It's so convenient for getting to campus and back. The drivers are friendly and the app is really easy to use. Great service overall!",
-  },
-  {
-    id: 't3',
-    name: 'Manjari',
-    time: '3 weeks ago',
-    image: 'https://i.pravatar.cc/150?img=5',
-    text: 'Found my perfect accommodation through NearU Bodims. The verified listings gave me peace of mind and the booking process was seamless. Thank you NearU!',
-  },
-];
+
 
 function timeAgo(dateStr: string): string{
   const diff = Date.now() - new Date(dateStr).getTime();

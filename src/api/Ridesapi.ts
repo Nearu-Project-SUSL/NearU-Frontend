@@ -1,6 +1,7 @@
 import { axiosPrivate } from './axios'; 
 import type { ApiResponse, FareEstimate, RideSummary, ServiceType } from '../app/components/ride/Ridestypes';
 
+
 export const RidesApi = {
   getEstimate: (pickupLat: number, pickupLng: number, dropoffLat: number, dropoffLng: number) =>
     axiosPrivate
