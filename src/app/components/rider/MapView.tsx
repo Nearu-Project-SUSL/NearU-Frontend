@@ -7,7 +7,7 @@
 import { useEffect, useRef } from 'react';
 import { MapContainer, TileLayer, Marker, Polyline, useMap } from 'react-leaflet';
 import L from 'leaflet';
-import 'leaflet/dist/leaflet.css';
+import { useLeafletCss } from '../../hooks/useLeafletCss';
 import type { LocationCoords } from '../../../api/riderService';
 
 // ─── Fix Leaflet default marker icon paths broken by Vite bundling ─────────
@@ -77,6 +77,7 @@ export default function MapView({
   dropoffCoords,
   height = '100%',
 }: MapViewProps) {
+  useLeafletCss();
   // Default center: Sabaragamuwa University of Sri Lanka (adjust if needed)
   const defaultCenter: [number, number] = [6.6775, 80.9007];
 

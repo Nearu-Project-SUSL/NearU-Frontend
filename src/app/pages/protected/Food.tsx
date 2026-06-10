@@ -3,6 +3,7 @@ import { useFoodShops } from "../../hooks/useFoodShop";
 import Navbar from "../../components/layout/Navbar";
 import { Sidebar } from "../../components/layout/Sidebar";
 import { PageLayout } from "../../components/layout/PageLayout";
+import useAuth from "../../hooks/useAuth";
 
 import {
   Box,
@@ -39,6 +40,9 @@ export default function FoodPage(){
   const [searchQuery, setSearchQuery] = useState('');
 
   const [currentPage, setCurrentPage] = useState(1);
+
+  const {auth} = useAuth();
+  const currentUserId = auth?.user?.id;
 
   const {data, isLoading, error} = useFoodShops({   //pas params to hook from there to API
     page: currentPage,
@@ -360,8 +364,8 @@ export default function FoodPage(){
                     <ShopCard 
                     key={shop.id} 
                     shop={shop}
-                    onEdit={(s) => setShopToEdit(s)}
-                    onDelete={(s) => setShopToDelete(s)}
+                    onEdit={shop.ownerId === currentUserId ? (s) => setShopToEdit(s) : undefined}
+                    onDelete={shop.ownerId === currentUserId ? (s) => setShopToDelete(s) : undefined}
                     />
                   ))}
                 </Box>

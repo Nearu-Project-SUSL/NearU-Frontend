@@ -25,16 +25,23 @@ export function useGeolocation(enabled: boolean = true) {
   });
 
   const handleSuccess = useCallback((position: GeolocationPosition) => {
-    setState((prev) => ({
-      ...prev,
-      coords: {
-        latitude: position.coords.latitude,
-        longitude: position.coords.longitude,
-      },
-      error: null,
-      permissionState: 'granted',
-      isTracking: true,
-    }));
+    setState((prev) => {
+      const lat = position.coords.latitude;
+      const lng = position.coords.longitude;
+      if (prev.coords && prev.coords.latitude === lat && prev.coords.longitude === lng) {
+        return prev;
+      }
+      return {
+        ...prev,
+        coords: {
+          latitude: lat,
+          longitude: lng,
+        },
+        error: null,
+        permissionState: 'granted',
+        isTracking: true,
+      };
+    });
   }, []);
 
   const handleError = useCallback((error: GeolocationPositionError) => {
