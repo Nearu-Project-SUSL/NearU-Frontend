@@ -462,6 +462,28 @@ export default function RidesPage() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [ride?.rideId]);
 
+  useEffect(() => {
+    if (screen !== 'accepted' || ride?.otp) return;
+
+    const interval = setInterval(async () => {
+      try {
+        const res = await RidesApi.getActiveRide();
+        if (res.data?.otp) {
+          setRide(r => r ? { 
+            ...r, 
+            otp: res.data.otp, 
+            otpExpiresAt: res.data.otpExpiresAt 
+          } : r);
+          clearInterval(interval);
+        }
+      } catch {
+        // ignore
+      }
+    }, 2000);
+
+    return () => clearInterval(interval);
+  }, [screen, ride?.otp]);
+
   function reset() {
     setRide(null);
     setScreen('request');
