@@ -5,6 +5,7 @@ import authService from '../../../api/authService';
 import useAuth from '../../hooks/useAuth';
 import { validateEmail, validateRequired } from '../../utils/validation';
 import { useGoogleLogin } from '@react-oauth/google';
+import { getHomePathForRoles } from '../../utils/roleUtils';
 
 // MUI Components
 import { 
@@ -24,7 +25,6 @@ import {
   Lock as LockIcon,
   Visibility as EyeIcon,
   VisibilityOff as EyeOffIcon,
-  School as GraduationCapIcon,
   DirectionsBike as BikeIcon,
   Store as StoreIcon,
   Google as GoogleIcon,
@@ -42,16 +42,8 @@ export default function Login() {
 
   useEffect(() => {
     if (auth?.user) {
-      const userRole = auth.user.roles[0];
-      if (userRole === 'Admin') {
-        navigate('/admin-home', { replace: true });
-      } else if (userRole === 'BusinessOwner') {
-        navigate('/business-owner-home', { replace: true });
-      } else if (userRole === 'Rider') {
-        navigate('/rider-home', { replace: true });
-      } else {
-        navigate('/home', { replace: true });
-      }
+      const homePath = getHomePathForRoles(auth.user.roles);
+      navigate(homePath, { replace: true });
     }
   }, [auth, navigate]);
 
@@ -69,16 +61,8 @@ export default function Login() {
         
         toast.success('Login successful!');
         
-        const userRole = response.user.roles[0];
-        if (userRole === 'Admin') {
-          navigate('/admin-home');
-        } else if (userRole === 'BusinessOwner') {
-          navigate('/business-owner-home');
-        } else if (userRole === 'Rider') {
-          navigate('/rider-home');
-        } else {
-          navigate('/home');
-        }
+        const homePath = getHomePathForRoles(response.user.roles);
+        navigate(homePath);
       } catch (error: any) {
         toast.error(error.response?.data?.message || 'Google login failed');
       } finally {
@@ -115,16 +99,8 @@ export default function Login() {
       
       toast.success('Login successful!');
       
-      const userRole = response.user.roles[0];
-      if (userRole === 'Admin') {
-        navigate('/admin-home');
-      } else if (userRole === 'BusinessOwner') {
-        navigate('/business-owner-home');
-      } else if (userRole === 'Rider') {
-        navigate('/rider-home');
-      } else {
-        navigate('/home');
-      }
+      const homePath = getHomePathForRoles(response.user.roles);
+      navigate(homePath);
     } catch (error: any) {
       const errorMessage = error.response?.data?.message || 'Login failed. Please check your credentials.';
       toast.error(errorMessage);
@@ -149,9 +125,11 @@ export default function Login() {
       {/* Top Navigation */}
       <nav className="relative z-20 flex items-center justify-between px-8 lg:px-12 py-6 bg-black/30 backdrop-blur-sm border-b border-blue-400/20">
         <Link to="/" className="flex items-center gap-3 group">
-          <div className="w-12 h-12 bg-gradient-to-br from-blue-400 to-blue-600 rounded-xl flex items-center justify-center shadow-lg shadow-blue-400/30 group-hover:scale-110 transition-transform duration-300">
-            <span className="text-black text-2xl">🎓</span>
-          </div>
+          <img
+            src="/NearU Logo.svg"
+            alt="NearU Logo"
+            className="w-16 h-16 object-contain group-hover:scale-110 transition-transform duration-300"
+          />
           <span className="text-white text-2xl">NearU</span>
         </Link>
         <div className="flex items-center gap-4">
@@ -192,8 +170,8 @@ export default function Login() {
               <div className="relative z-10 flex items-center justify-center">
                 <div className="relative w-64 h-64 bg-gradient-to-br from-gray-800 to-black rounded-3xl border-2 border-blue-400/30 shadow-2xl shadow-blue-400/20 p-8">
                   {/* Center circle */}
-                  <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-20 h-20 bg-gradient-to-br from-blue-400 to-blue-600 rounded-full flex items-center justify-center shadow-lg animate-pulse">
-                    <GraduationCapIcon sx={{ fontSize: 40, color: 'black' }} />
+                  <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-24 h-24 bg-gradient-to-br from-blue-400 to-blue-600 rounded-full flex items-center justify-center shadow-lg animate-pulse p-3">
+                    <img src="/NearU Logo.svg" alt="NearU Logo" className="w-full h-full object-contain" />
                   </div>
 
                   {/* Orbiting icons */}

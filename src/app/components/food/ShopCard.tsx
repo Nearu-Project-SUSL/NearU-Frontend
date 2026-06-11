@@ -57,6 +57,7 @@ export default function ShopCard({ shop, onEdit, onDelete }: ShopCardProps) {
               src={shop.photoUrl || 'https://placehold.co/400x300/2E9EBF/FFFFFF?text=No+Image'}
               alt={shop.name}
               sx={{ width: '100%', height: '100%', objectFit: 'cover' }}
+              loading="lazy"
             />
             <Box
               sx={{
@@ -69,12 +70,73 @@ export default function ShopCard({ shop, onEdit, onDelete }: ShopCardProps) {
 
           {/* card body */}
           <Box sx={{ p: 2.5 }}>
-            <Typography
-              variant="h6"
-              sx={{ color: 'text.primary', fontWeight: 700, mb: 0.5, fontSize: '1.1rem' }}
+            <Box
+              sx={{
+                display: 'flex',
+                justifyContent: 'space-between',
+                alignItems: 'center',
+                mb: 0.5,
+              }}
             >
-              {shop.name}
-            </Typography>
+              <Typography
+                variant="h6"
+                sx={{
+                  color: 'text.primary',
+                  fontWeight: 700,
+                  fontSize: '1.1rem',
+                  overflow: 'hidden',
+                  textOverflow: 'ellipsis',
+                  whiteSpace: 'nowrap',
+                }}
+              >
+                {shop.name}
+              </Typography>
+
+              {/* ACTION BUTTONS */}
+              {(onEdit || onDelete) && (
+                <Box sx={{ display: 'flex', gap: 0.5 }}>
+                  {onEdit && (
+                    <IconButton
+                      size="small"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        onEdit(shop);
+                      }}
+                      sx={{
+                        width: 28,
+                        height: 28,
+                        bgcolor: accentAlpha(0.2),
+                        border: `1px solid ${accentAlpha(0.4)}`,
+                        color: accent,
+                        '&:hover': { bgcolor: accentAlpha(0.4) },
+                      }}
+                    >
+                      <EditIcon sx={{ fontSize: 14 }} />
+                    </IconButton>
+                  )}
+
+                  {onDelete && (
+                    <IconButton
+                      size="small"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        onDelete(shop);
+                      }}
+                      sx={{
+                        width: 28,
+                        height: 28,
+                        bgcolor: 'rgba(239,68,68,0.2)',
+                        border: '1px solid rgba(239,68,68,0.4)',
+                        color: '#ef4444',
+                        '&:hover': { bgcolor: 'rgba(239,68,68,0.4)' },
+                      }}
+                    >
+                      <DeleteIcon sx={{ fontSize: 14 }} />
+                    </IconButton>
+                  )}
+                </Box>
+              )}
+            </Box>
 
             <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
               <LocationIcon sx={{ fontSize: 14, color: 'text.secondary' }} />
@@ -122,55 +184,6 @@ export default function ShopCard({ shop, onEdit, onDelete }: ShopCardProps) {
           </Box>
         </CardActionArea>
       </Card>
-
-      {/* action buttons */}
-      {(onEdit || onDelete) && (
-        <Box
-          sx={{
-            position: 'absolute',
-            top: 10,
-            right: 10,
-            display: 'flex',
-            gap: 0.5,
-            opacity: hovered ? 1 : 0,
-            transition: 'opacity 0.2s ease',
-            '@media (hover: none)': { opacity: 1 },
-          }}
-        >
-          {onEdit && (
-            <IconButton
-              size="small"
-              onClick={(e) => { e.stopPropagation(); onEdit(shop); }}
-              sx={{
-                width: 30, height: 30,
-                bgcolor: accentAlpha(0.2),
-                border: `1px solid ${accentAlpha(0.4)}`,
-                color: accent,
-                backdropFilter: 'blur(8px)',
-                '&:hover': { bgcolor: accentAlpha(0.4) },
-              }}
-            >
-              <EditIcon sx={{ fontSize: 14 }} />
-            </IconButton>
-          )}
-          {onDelete && (
-            <IconButton
-              size="small"
-              onClick={(e) => { e.stopPropagation(); onDelete(shop); }}
-              sx={{
-                width: 30, height: 30,
-                bgcolor: 'rgba(239,68,68,0.2)',
-                border: '1px solid rgba(239,68,68,0.4)',
-                color: '#ef4444',
-                backdropFilter: 'blur(8px)',
-                '&:hover': { bgcolor: 'rgba(239,68,68,0.4)' },
-              }}
-            >
-              <DeleteIcon sx={{ fontSize: 14 }} />
-            </IconButton>
-          )}
-        </Box>
-      )}
     </Box>
   );
 }
