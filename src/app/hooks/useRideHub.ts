@@ -14,9 +14,10 @@
 import { useEffect, useRef, useCallback } from 'react';
 import { toast } from 'sonner';
 import { rideHub } from '../services/rideHubService';
+import type { NewRidePayload } from '../services/rideHubService';
 import { useRiderStore } from '../store/riderStore';
 import { useNotificationStore } from '../store/notificationStore';
-import type { RideStatus } from '../../api/riderService';
+import type { RideRequest, RideStatus } from '../../api/riderService';
 
 interface UseRideHubOptions {
   /** JWT access token — connect only when this is available */
@@ -51,21 +52,43 @@ export function useRideHub({ accessToken, enabled = true }: UseRideHubOptions) {
       try {
         rideHub.setCallbacks({
           // ── Incoming ride request broadcast to OnlineRiders group ─────────
-          onRideRequest: (request) => {
+          onRideRequest: (payload: NewRidePayload) => {
             if (!mounted) return;
-            // Only surface the request if we are idle
+
+            // Map the SignalR broadcast shape → RideRequest (store shape)
+            // Backend sends: rideId, estimatedFare, distanceKm, serviceType, pickupLat/Lng, dropoffLat/Lng
+            // Store expects: id, fareEstimate, distanceKm, etc.
+            const request: RideRequest = {
+              id             : payload.rideId,
+              studentName    : 'Student',                         // not in broadcast
+              pickupLocation : `${payload.pickupLat ?? 0}, ${payload.pickupLng ?? 0}`,
+              pickupLat      : payload.pickupLat  ?? 0,
+              pickupLng      : payload.pickupLng  ?? 0,
+              dropoffLocation: `${payload.dropoffLat ?? 0}, ${payload.dropoffLng ?? 0}`,
+              dropoffLat     : payload.dropoffLat ?? 0,
+              dropoffLng     : payload.dropoffLng ?? 0,
+              fareEstimate   : payload.estimatedFare,
+              distanceKm     : payload.distanceKm,
+              serviceType    : payload.serviceType,
+              createdAt      : payload.createdAtUtc ?? new Date().toISOString(),
+            };
+
+            // Only surface the sheet when the rider is idle
             const { rideStatus: currentStatus } = useRiderStore.getState();
             if (currentStatus === 'ONLINE_IDLE') {
               setIncomingRequest(request);
             }
-            // Always add to notification bell so riders see it even if busy
+
+            // Always push to notification bell
             const { addNotification: addNotif } = useNotificationStore.getState();
             addNotif({
-              type: 'ride',
-              title: 'New Ride Request 🛵',
-              message: `A new ${(request as any).serviceType ?? ''} ride request is nearby.`,
-              route: '/rider',
-              rideId: (request as any).rideId ?? (request as any).id,
+              type   : 'ride',
+              title  : '🛵 New Ride Request',
+              message: payload.serviceType
+                ? `New ${payload.serviceType} ride request nearby.`
+                : 'A new ride request is nearby.',
+              route  : '/rider-home',
+              rideId : payload.rideId,
             });
           },
 

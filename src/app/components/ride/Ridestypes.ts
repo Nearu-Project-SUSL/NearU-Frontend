@@ -36,6 +36,7 @@ export interface RideSummary{
   dropoffLongitude: number;
   createdAt: string;
   otpExpiresAt?: string;
+  otp?:string;
 }
 
 export interface RideLocationResponse {

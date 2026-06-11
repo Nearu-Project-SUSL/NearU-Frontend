@@ -13,11 +13,11 @@ interface Props {
   riderVehicle?: string;
   estimatedFare: number;
   dropoffLabel?: string;
-  onRiderCompleted:()=> void;
+  onRiderCompleted: () => void;
 }
 
 export function InProgressRideScreen({
-  riderName    = 'Your rider',
+  riderName = 'Your rider',
   riderVehicle,
   estimatedFare,
   dropoffLabel = 'Drop-off point',
@@ -214,6 +214,7 @@ export function InProgressRideScreen({
             <div style={{ color: '#f3f4f6', fontWeight: 800, fontSize: 15.5, letterSpacing: '-0.01em' }}>
               {riderName}
             </div>
+
             {riderVehicle && (
               <div style={{ color: '#9ca3af', fontSize: 13, fontWeight: 500, marginTop: 2 }}>
                 {riderVehicle}
@@ -294,38 +295,7 @@ export function InProgressRideScreen({
           </span>
         </div>
 
-        {/* DEV BUTTON - subtle dotted plate */}
-        <button
-          onClick={onRiderCompleted}
-          style={{
-            width: '100%',
-            padding: '10px',
-            borderRadius: 12,
-            background: 'transparent',
-            border: '1px dashed rgba(255, 255, 255, 0.1)',
-            color: 'rgba(255, 255, 255, 0.3)',
-            fontSize: 11.5,
-            fontWeight: 500,
-            cursor: 'pointer',
-            transition: 'all 0.2s ease',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            gap: 6,
-          }}
-          onMouseOver={e => {
-            e.currentTarget.style.color = '#10b981';
-            e.currentTarget.style.borderColor = 'rgba(16, 185, 129, 0.3)';
-          }}
-          onMouseOut={e => {
-            e.currentTarget.style.color = 'rgba(255, 255, 255, 0.3)';
-            e.currentTarget.style.borderColor = 'rgba(255, 255, 255, 0.1)';
-          }}
-        >
-          <BikeIcon style={{ fontSize: 14 }} />
-          <span>[Developer Mode] Simulate Rider Complete</span>
-          <NextIcon style={{ fontSize: 14 }} />
-        </button>
+       
       </motion.div>
     </div>
   );

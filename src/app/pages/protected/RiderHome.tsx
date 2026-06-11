@@ -205,8 +205,10 @@ export default function RiderHome() {
       // JoinRideChannel is handled automatically by useRideHub watching activeRide
       toast.success('Ride accepted! Navigate to pickup.', { icon: '🗺️' });
     },
-    onError: () => {
-      toast.error('Failed to accept ride. It may have been taken.');
+    onError: (error: any) => {
+      console.error('Accept ride error:', error);
+      const serverMsg = error.response?.data?.message || error.response?.data?.error || error.response?.data?.title;
+      toast.error(serverMsg || 'Failed to accept ride. It may have been taken.');
       clearPendingRequest();
     },
   });
@@ -244,12 +246,19 @@ export default function RiderHome() {
 
   // ─── Handlers ──────────────────────────────────────────────────────────────
   const handleToggleOnline = useCallback(() => {
+    if (approvalStatus !== 'Approved') {
+      toast.error('Your rider account is pending approval by an admin. You cannot go online yet.', { duration: 5000 });
+      return;
+    }
+
     if (permissionState === 'denied' && !isOnline) {
       toast.error('Please enable location access to go online.', { duration: 5000 });
       return;
     }
-    toggleOnlineMutation.mutate(!isOnline);
-  }, [isOnline, permissionState, toggleOnlineMutation]);
+    
+    const nextStatus = !isOnline;
+    toggleOnlineMutation.mutate(nextStatus);
+  }, [permissionState, isOnline, toggleOnlineMutation, approvalStatus]);
 
   const handleDeclineRequest = useCallback(() => {
     clearPendingRequest();
@@ -498,9 +507,9 @@ export default function RiderHome() {
               {/* Stats row */}
               <Box sx={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 2, mb: 4 }}>
                 {[
-                  { icon: <BikeIcon />, label: 'Total Rides', value: stats?.totalRides?.toString() ?? '—', color: RIDER_ACCENT, glow: 'rgba(16, 185, 129, 0.1)' },
-                  { icon: <EarningsIcon />, label: "Today's Earnings", value: stats ? `Rs. ${stats.todayEarnings.toLocaleString()}` : '—', color: '#f59e0b', glow: 'rgba(245, 158, 11, 0.1)' },
-                  { icon: <StarIcon />, label: 'Rating', value: stats ? `${stats.rating.toFixed(1)}` : '—', color: '#a78bfa', glow: 'rgba(168, 85, 247, 0.1)' },
+                  { icon: <BikeIcon />, label: 'Total Rides', value: stats?.totalRides != null ? stats.totalRides.toString() : '—', color: RIDER_ACCENT, glow: 'rgba(16, 185, 129, 0.1)' },
+                  { icon: <EarningsIcon />, label: "Today's Earnings", value: stats?.todayEarnings != null ? `Rs. ${stats.todayEarnings.toLocaleString()}` : '—', color: '#f59e0b', glow: 'rgba(245, 158, 11, 0.1)' },
+                  { icon: <StarIcon />, label: 'Rating', value: stats?.rating != null ? stats.rating.toFixed(1) : '—', color: '#a78bfa', glow: 'rgba(168, 85, 247, 0.1)' },
                 ].map((stat, i) => (
                   <motion.div
                     key={i}

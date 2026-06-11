@@ -112,7 +112,10 @@ function AuthProviderInner({ children, auth, setAuth }: {
 
   // Initialise FCM for any logged-in user (Students, Riders, etc.)
   // cleanupFcm() is called on logout to remove the device token from the backend
-  const { cleanupFcm } = useFcm({ enabled: isLoggedIn && isAuthReady });
+  const { cleanupFcm } = useFcm({ 
+    enabled: isLoggedIn && isAuthReady,
+    roles: auth.user?.roles || []
+  });
 
   // ── Proactive startup refresh ─────────────────────────────────────────────
   // Runs once on mount. If there is an active session in localStorage but
