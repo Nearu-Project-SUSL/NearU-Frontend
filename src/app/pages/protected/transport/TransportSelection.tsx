@@ -3,8 +3,7 @@ import { Sidebar } from '../../../components/layout/Sidebar';
 import { PageLayout } from '../../../components/layout/PageLayout';
 import { Bus, Train, Bike, ArrowRight } from 'lucide-react';
 import { Link, useNavigate } from 'react-router';
-import { NotificationDropdown } from '../../../components/layout/NotificationDropdown';
-const userAvatar = "";
+import Navbar from '../../../components/layout/Navbar';
 
 export default function TransportSelection() {
   const navigate = useNavigate();
@@ -64,38 +63,7 @@ export default function TransportSelection() {
 
       {/* Main Content */}
       <PageLayout>
-        {/* Header */}
-        <header className="sticky top-0 z-30 bg-black/95 backdrop-blur-2xl border-b-2 border-[#2e9ebf]/20 shadow-2xl shadow-[#2e9ebf]/5">
-          <div className="flex items-center justify-between px-8 lg:px-12 py-5">
-            <div className="flex items-center gap-6">
-              <div className="relative group cursor-pointer">
-                <div className="absolute inset-0 bg-gradient-to-br from-[#2e9ebf] to-[#2e9ebf] rounded-2xl blur-lg opacity-50 group-hover:opacity-100 transition-opacity animate-pulse"></div>
-                <div className="relative w-14 h-14 bg-gradient-to-br from-[#2e9ebf] to-[#2e9ebf] rounded-2xl flex items-center justify-center shadow-xl shadow-[#2e9ebf]/30 group-hover:scale-110 transition-transform duration-300">
-                  <span className="text-3xl">🚗</span>
-                </div>
-              </div>
-              <div>
-                <h1 className="text-2xl text-white">Transport Hub</h1>
-                <p className="text-[#2e9ebf]/70 text-sm">Your journey starts here</p>
-              </div>
-            </div>
-
-            <div className="flex items-center gap-4">
-              <NotificationDropdown />
-              
-              <Link to="/profile" className="relative group">
-                <div className="absolute inset-0 bg-gradient-to-br from-[#2e9ebf] to-[#2e9ebf] rounded-xl blur-md opacity-50 group-hover:opacity-100 transition-opacity duration-300"></div>
-                <div className="relative w-12 h-12 rounded-xl overflow-hidden border-2 border-[#2e9ebf]/50 group-hover:border-[#2e9ebf] transition-all group-hover:scale-110 duration-300">
-                  <img 
-                    src={userAvatar}
-                    alt="Profile"
-                    className="w-full h-full object-cover"
-                  />
-                </div>
-              </Link>
-            </div>
-          </div>
-        </header>
+        <Navbar />
 
         {/* Main Content Area */}
         <section className="px-8 lg:px-12 py-16 relative">

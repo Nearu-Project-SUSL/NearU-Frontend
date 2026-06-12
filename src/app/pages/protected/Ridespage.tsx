@@ -308,7 +308,7 @@ export default function RidesPage() {
             } : r);
           }
         }
-      } catch (error) {
+      } catch (error: any) {
         console.error('Error polling ride status', error);
       }
     }, 3000); // Poll every 3 seconds
@@ -320,8 +320,6 @@ export default function RidesPage() {
   function reset() {
     setRide(null);
     setScreen('request');
-
-    hubRef.current?.stop();
   }
 
   function handleRideCreated(

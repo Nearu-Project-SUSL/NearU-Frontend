@@ -3,8 +3,7 @@ import { Sidebar } from '../../../components/layout/Sidebar';
 import { PageLayout } from '../../../components/layout/PageLayout';
 import { MapPin, Star, Phone, ArrowLeft, X } from 'lucide-react';
 import { Link } from 'react-router';
-import { NotificationDropdown } from '../../../components/layout/NotificationDropdown';
-const userAvatar = "";
+import Navbar from '../../../components/layout/Navbar';
 
 interface TukDriver {
   id: string;
@@ -140,49 +139,21 @@ export default function TukRiders() {
 
       {/* Main Content */}
       <PageLayout>
-        {/* Header */}
-        <header className="sticky top-0 z-30 bg-black/95 backdrop-blur-2xl border-b-2 border-[#2e9ebf]/20 shadow-2xl shadow-[#2e9ebf]/5">
-          <div className="flex items-center justify-between px-8 lg:px-12 py-5">
-            <div className="flex items-center gap-6">
-              <Link 
-                to="/transport"
-                className="w-12 h-12 bg-[#2e9ebf]/10 hover:bg-[#2e9ebf]/20 rounded-xl flex items-center justify-center transition-all hover:scale-110 duration-300 border border-[#2e9ebf]/20 group"
-              >
-                <ArrowLeft className="w-5 h-5 text-[#2e9ebf] group-hover:-translate-x-1 transition-transform duration-300" />
-              </Link>
-
-              <div className="relative group cursor-pointer">
-                <div className="absolute inset-0 bg-gradient-to-br from-[#2e9ebf] to-[#2e9ebf] rounded-2xl blur-lg opacity-50 group-hover:opacity-100 transition-opacity animate-pulse"></div>
-                <div className="relative w-14 h-14 bg-gradient-to-br from-[#2e9ebf] to-[#2e9ebf] rounded-2xl flex items-center justify-center shadow-xl shadow-[#2e9ebf]/30 group-hover:scale-110 transition-transform duration-300">
-                  <span className="text-3xl">🛺</span>
-                </div>
-              </div>
-              <div>
-                <h1 className="text-2xl text-white">Tuk Riders</h1>
-                <p className="text-[#2e9ebf]/70 text-sm">Quick rides around campus</p>
-              </div>
-            </div>
-
-            <div className="flex items-center gap-4">
-              <NotificationDropdown />
-              
-              <Link to="/profile" className="relative group">
-                <div className="absolute inset-0 bg-gradient-to-br from-[#2e9ebf] to-[#2e9ebf] rounded-xl blur-md opacity-50 group-hover:opacity-100 transition-opacity duration-300"></div>
-                <div className="relative w-12 h-12 rounded-xl overflow-hidden border-2 border-[#2e9ebf]/50 group-hover:border-[#2e9ebf] transition-all group-hover:scale-110 duration-300">
-                  <img 
-                    src={userAvatar}
-                    alt="Profile"
-                    className="w-full h-full object-cover"
-                  />
-                </div>
-              </Link>
-            </div>
-          </div>
-        </header>
+        <Navbar />
 
         {/* Main Content Area */}
         <section className="px-8 lg:px-12 py-16 relative">
           <div className="max-w-7xl mx-auto">
+            {/* Back Button */}
+            <div className="mb-6">
+              <Link 
+                to="/transport"
+                className="inline-flex items-center gap-2 text-sm text-[#2e9ebf] hover:text-[#2e9ebf]/80 transition-colors"
+              >
+                <ArrowLeft className="w-4 h-4" />
+                Back to Transport Hub
+              </Link>
+            </div>
             {/* Hero Section */}
             <div className="mb-12 animate-fadeIn">
               <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-6">

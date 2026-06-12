@@ -221,7 +221,7 @@ export default function Profile() {
       if (auth.refreshToken && !isGuest) {
         await authService.logout(auth.refreshToken);
       }
-    } catch (error) {
+    } catch (error: any) {
       console.error('Logout failed on the backend:', error);
     } finally {
       setAuth({ user: null, accessToken: null, refreshToken: null });
