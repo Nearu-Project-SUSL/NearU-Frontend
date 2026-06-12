@@ -10,7 +10,6 @@ import { motion } from 'framer-motion';
 import type { RideRequest } from '../../../api/riderService';
 import {
   LocationOn as LocationIcon,
-  TrendingFlat as ArrowIcon,
   AccessTime as ClockIcon,
   DirectionsBike as BikeIcon,
   AttachMoney as MoneyIcon,
@@ -132,7 +131,11 @@ export default function RideRequestSheet({
                 </div>
                 <div>
                   <p style={{ color: 'white', fontWeight: 800, margin: 0, fontSize: 17, letterSpacing: '-0.01em' }}>New Ride Request</p>
-                  <p style={{ color: '#9ca3af', margin: '2px 0 0', fontSize: 13, fontWeight: 500 }}>from {request.studentName}</p>
+                  <p style={{ color: '#9ca3af', margin: '2px 0 0', fontSize: 13, fontWeight: 500 }}>
+                    {request.studentName && request.studentName !== 'Student'
+                      ? `from ${request.studentName}`
+                      : 'from a nearby student'}
+                  </p>
                 </div>
               </div>
 
@@ -201,7 +204,7 @@ export default function RideRequestSheet({
                 <div>
                   <p style={{ color: '#9ca3af', margin: 0, fontSize: 11, fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.02em' }}>Fare</p>
                   <p style={{ color: RIDER_ACCENT, margin: '2px 0 0', fontWeight: 800, fontSize: 17, fontFamily: 'monospace' }}>
-                    Rs. {request.fareEstimate.toLocaleString()}
+                    {request.fareEstimate != null ? `Rs. ${request.fareEstimate.toLocaleString()}` : 'N/A'}
                   </p>
                 </div>
               </div>
@@ -217,7 +220,7 @@ export default function RideRequestSheet({
                 <div>
                   <p style={{ color: '#9ca3af', margin: 0, fontSize: 11, fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.02em' }}>Distance</p>
                   <p style={{ color: '#2E9EBF', margin: '2px 0 0', fontWeight: 800, fontSize: 17, fontFamily: 'monospace' }}>
-                    {request.distanceKm.toFixed(1)} km
+                    {request.distanceKm != null ? `${request.distanceKm.toFixed(1)} km` : 'N/A'}
                   </p>
                 </div>
               </div>

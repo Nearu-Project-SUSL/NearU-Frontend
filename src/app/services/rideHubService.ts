@@ -50,9 +50,27 @@ export type LocationPayload = {
   timestamp: string;
 };
 
+/**
+ * Exact shape of the `NewRideAvailable` SignalR broadcast from the backend.
+ * This is DIFFERENT from the HTTP `RideRequest` (which has displayName fields).
+ * Backend payload: { rideId, serviceType, pickupLat, pickupLng, dropoffLat, dropoffLng,
+ *                    estimatedFare, distanceKm, createdAtUtc }
+ */
+export type NewRidePayload = {
+  rideId       : string;
+  serviceType? : string;
+  pickupLat?   : number;
+  pickupLng?   : number;
+  dropoffLat?  : number;
+  dropoffLng?  : number;
+  estimatedFare?: number;
+  distanceKm?  : number;
+  createdAtUtc?: string;
+};
+
 export type HubEventCallbacks = {
   /** Fired when the server broadcasts a new ride request to the OnlineRiders group */
-  onRideRequest?: (request: RideRequest) => void;
+  onRideRequest?: (request: NewRidePayload) => void;
   /**
    * Fired on every server-pushed state transition for a ride.
    * status values mirror RideRequestStatus enum:
