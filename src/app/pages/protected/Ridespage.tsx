@@ -310,12 +310,12 @@ export default function RidesPage() {
 
   const [ride, setRide] = useState<ActiveRide | null>(null);
 
+  const hubRef = useRef<signalR.HubConnection | null>(null);
 
   const addNotification = useNotificationStore((s) => s.addNotification);
 
   // Connect SignalR once a ride is active
 
-  // HTTP Short Polling for Ride State and Location
   useEffect(() => {
     if (!ride?.rideId) return;
 
@@ -338,7 +338,7 @@ export default function RidesPage() {
 
     conn.on(
       'RideStateChanged',
-      (data: { rideId: string; status: string; otp?: string; otpExpiresAt?: string  }) => {
+      (data: { rideId: string; status: string; otp?: string; otpExpiresAt?: string }) => {
         if (data.rideId !== ride.rideId) return;
 
         // Push every status change to the notification bell
@@ -367,12 +367,12 @@ export default function RidesPage() {
         switch (data.status) {
           case 'Accepted':
             setRide(r => r ? {
-            ...r,
-            otp: data.otp,
-            otpExpiresAt: data.otpExpiresAt,
-          } : r);
-          setScreen('accepted');
-          break;
+              ...r,
+              otp: data.otp,
+              otpExpiresAt: data.otpExpiresAt,
+            } : r);
+            setScreen('accepted');
+            break;
 
           case 'Arrived':
             break;
@@ -395,18 +395,76 @@ export default function RidesPage() {
             reset();
             break;
         }
-      } catch (error: any) {
-        console.error('Error polling ride status', error);
       }
-    }, 3000); // Poll every 3 seconds
+    );
 
-    return () => clearInterval(intervalId);
+    // OTP issued
+
+    conn.on(
+      'OtpIssued',
+      (data: {
+        rideId: string;
+        otp: string;
+        otpExpiresAt: string;
+        riderName?: string;
+        riderVehicle?: string;
+        riderRating?: number;
+      }) => {
+        if (data.rideId !== ride.rideId) return;
+
+        setRide(r =>
+          r
+            ? {
+                ...r,
+                otp: data.otp,
+                otpExpiresAt: data.otpExpiresAt,
+                riderName: data.riderName,
+                riderVehicle: data.riderVehicle,
+                riderRating: data.riderRating,
+              }
+            : r
+        );
+      }
+    );
+
+    // Live location updates
+
+    conn.on(
+      'LocationUpdated',
+      (data: {
+        rideId: string;
+        latitude: number;
+        longitude: number;
+        distanceToPickupKm?: number;
+      }) => {
+        if (data.rideId !== ride.rideId) return;
+
+        setRide(r =>
+          r
+            ? {
+                ...r,
+                latitude: data.latitude,
+                longitude: data.longitude,
+                distanceToPickupKm: data.distanceToPickupKm,
+              }
+            : r
+        );
+      }
+    );
+
+    conn.start().catch(console.error);
+
+    return () => {
+      conn.stop();
+      hubRef.current = null;
+    };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [ride?.rideId, screen]);
+  }, [ride?.rideId]);
 
   function reset() {
     setRide(null);
     setScreen('request');
+    hubRef.current?.stop();
   }
 
   function handleRideCreated(
