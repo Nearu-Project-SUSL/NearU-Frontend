@@ -43,13 +43,4 @@ export const RidesApi = {
       .post<ApiResponse<object>>(`/rides/history/${rideId}/rate`, { rating })
       .then(r => r.data),
 
-  getActiveRide: () =>
-    axiosPrivate
-      .get<ApiResponse<RideSummary>>('/rides/active')
-      .then(r => r.data),
-
-  getLocation: (rideId: string) =>
-    axiosPrivate
-      .get<ApiResponse<{ latitude: number; longitude: number; distanceToPickupKm?: number }>>(`/location/${rideId}`)
-      .then(r => r.data),
 };
