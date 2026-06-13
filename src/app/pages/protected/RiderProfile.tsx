@@ -95,7 +95,7 @@ export default function RiderProfile() {
       if (auth.refreshToken) {
         await authService.logout(auth.refreshToken);
       }
-    } catch (error) {
+    } catch (error: any) {
       console.error('Logout failed on the backend:', error);
     } finally {
       setAuth({ user: null, accessToken: null, refreshToken: null });

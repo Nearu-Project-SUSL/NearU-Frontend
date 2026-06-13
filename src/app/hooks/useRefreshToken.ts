@@ -23,7 +23,7 @@ const useRefreshToken = () => {
             });
             
             return tokenData.accessToken;
-        } catch (error) {
+        } catch (error: any) {
             // Handle refresh logic failure (e.g. redirect to login)
             console.error("Failed to refresh token", error);
             throw error;
