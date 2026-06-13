@@ -14,8 +14,10 @@
 import { useEffect, useRef, useCallback } from 'react';
 import { toast } from 'sonner';
 import { rideHub } from '../services/rideHubService';
+import type { NewRidePayload } from '../services/rideHubService';
 import { useRiderStore } from '../store/riderStore';
-import type { RideStatus } from '../../api/riderService';
+import { useNotificationStore } from '../store/notificationStore';
+import type { RideRequest, RideStatus } from '../../api/riderService';
 
 interface UseRideHubOptions {
   /** JWT access token — connect only when this is available */
@@ -35,6 +37,8 @@ export function useRideHub({ accessToken, enabled = true }: UseRideHubOptions) {
     finishRide,
   } = useRiderStore();
 
+  const { addNotification } = useNotificationStore();
+
   const prevRideStatusRef = useRef<RideStatus>(rideStatus);
   const prevActiveRideIdRef = useRef<string | null>(activeRide?.id ?? null);
 
@@ -48,36 +52,80 @@ export function useRideHub({ accessToken, enabled = true }: UseRideHubOptions) {
       try {
         rideHub.setCallbacks({
           // ── Incoming ride request broadcast to OnlineRiders group ─────────
-          onRideRequest: (request) => {
+          onRideRequest: (payload: NewRidePayload) => {
             if (!mounted) return;
-            // Only surface the request if we are idle
+
+            // Map the SignalR broadcast shape → RideRequest (store shape)
+            // Backend sends: rideId, estimatedFare, distanceKm, serviceType, pickupLat/Lng, dropoffLat/Lng
+            // Store expects: id, fareEstimate, distanceKm, etc.
+            const request: RideRequest = {
+              id             : payload.rideId,
+              studentName    : 'Student',                         // not in broadcast
+              pickupLocation : `${payload.pickupLat ?? 0}, ${payload.pickupLng ?? 0}`,
+              pickupLat      : payload.pickupLat  ?? 0,
+              pickupLng      : payload.pickupLng  ?? 0,
+              dropoffLocation: `${payload.dropoffLat ?? 0}, ${payload.dropoffLng ?? 0}`,
+              dropoffLat     : payload.dropoffLat ?? 0,
+              dropoffLng     : payload.dropoffLng ?? 0,
+              fareEstimate   : payload.estimatedFare,
+              distanceKm     : payload.distanceKm,
+              serviceType    : payload.serviceType,
+              createdAt      : payload.createdAtUtc ?? new Date().toISOString(),
+            };
+
+            // Only surface the sheet when the rider is idle
             const { rideStatus: currentStatus } = useRiderStore.getState();
             if (currentStatus === 'ONLINE_IDLE') {
               setIncomingRequest(request);
             }
+
+            // Always push to notification bell
+            const { addNotification: addNotif } = useNotificationStore.getState();
+            addNotif({
+              type   : 'ride',
+              title  : '🛵 New Ride Request',
+              message: payload.serviceType
+                ? `New ${payload.serviceType} ride request nearby.`
+                : 'A new ride request is nearby.',
+              route  : '/rider-home',
+              rideId : payload.rideId,
+            });
           },
 
           // ── Unified state machine update from server ───────────────────────
-          // Maps backend RideRequestStatus enum strings to frontend state.
-          //   Pending             → (initial, no client action needed)
-          //   Accepted            → EN_ROUTE_PICKUP   (rider accepted)
-          //   RiderEnRoute        → EN_ROUTE_PICKUP   (synonym, same state)
-          //   RiderArrived        → ARRIVED_WAITING   (rider at pickup)
-          //   InProgress          → RIDE_IN_PROGRESS  (OTP verified, trip started)
-          //   PendingConfirmation → COMPLETING        (rider marked done, waiting for student)
-          //   Completed           → finish ride       (student confirmed)
-          //   Cancelled           → finish ride       (cancelled by student)
           onRideStateChanged: (payload) => {
             if (!mounted) return;
             console.info('[RideHub] State changed:', payload.status, payload);
 
             const { rideStatus: cur } = useRiderStore.getState();
+            const { addNotification: addNotif } = useNotificationStore.getState();
+
+            // Map status to a human-readable notification message
+            const STATUS_MESSAGES: Record<string, { title: string; message: string }> = {
+              Accepted:           { title: 'Rider Accepted 🛵', message: 'Your rider is on the way to pick you up.' },
+              RiderEnRoute:       { title: 'Rider En Route 🛵', message: 'Your rider is heading to your pickup location.' },
+              RiderArrived:       { title: 'Rider Arrived 📍', message: 'Your rider is waiting at the pickup point.' },
+              InProgress:         { title: 'Ride Started 🚦', message: 'Your ride is now in progress!' },
+              CompletedByRider:   { title: 'Trip Complete — Confirm? ✅', message: 'Your rider marked the trip done. Please confirm in the app.' },
+              Completed:          { title: 'Ride Completed 🎉', message: 'Your ride has been completed successfully!' },
+              Cancelled:          { title: 'Ride Cancelled ❌', message: 'The ride has been cancelled.' },
+              PendingConfirmation:{ title: 'Awaiting Confirmation ⏳', message: 'Waiting for the student to confirm the trip is complete.' },
+            };
+
+            const notifData = STATUS_MESSAGES[payload.status];
+            if (notifData) {
+              addNotif({
+                type: 'ride',
+                title: notifData.title,
+                message: notifData.message,
+                route: '/rides',
+                rideId: payload.rideId,
+              });
+            }
 
             switch (payload.status) {
               case 'Accepted':
               case 'RiderEnRoute':
-                // Ride acceptance is driven by HTTP (acceptRide mutation returns the ride object).
-                // This event is a confirmation — no further state action needed here.
                 break;
 
               case 'RiderArrived':
@@ -93,6 +141,7 @@ export function useRideHub({ accessToken, enabled = true }: UseRideHubOptions) {
                 break;
 
               case 'PendingConfirmation':
+              case 'CompletedByRider':
                 if (cur === 'RIDE_IN_PROGRESS') {
                   setCompleting();
                 }

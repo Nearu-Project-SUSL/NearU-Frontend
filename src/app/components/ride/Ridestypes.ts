@@ -19,6 +19,7 @@ export interface FareEstimate {
   estimatedFare : number;
   baseFare: number;
   ratePerKm: number;
+  estimatedDurationSeconds?: number;
 }
 
 export interface RideSummary{
@@ -35,6 +36,7 @@ export interface RideSummary{
   dropoffLongitude: number;
   createdAt: string;
   otpExpiresAt?: string;
+  otp?:string;
 }
 
 export interface RideLocationResponse {
