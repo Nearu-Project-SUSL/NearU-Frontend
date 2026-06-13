@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router';
 import useAuth from '../../hooks/useAuth';
+import { getHomePathForRoles } from '../../utils/roleUtils';
 
 export default function LoadingScreen({ isSplashScreen = false }: { isSplashScreen?: boolean }) {
   const navigate = useNavigate();
@@ -16,16 +17,8 @@ export default function LoadingScreen({ isSplashScreen = false }: { isSplashScre
           clearInterval(interval);
           setTimeout(() => {
             if (auth?.user) {
-              const userRole = auth.user.roles[0];
-              if (userRole === 'Admin') {
-                navigate('/admin-home');
-              } else if (userRole === 'BusinessOwner') {
-                navigate('/business-owner-home');
-              } else if (userRole === 'Rider') {
-                navigate('/rider-home');
-              } else {
-                navigate('/home');
-              }
+              const homePath = getHomePathForRoles(auth.user.roles);
+              navigate(homePath);
             } else {
               navigate('/login');
             }
@@ -70,9 +63,9 @@ export default function LoadingScreen({ isSplashScreen = false }: { isSplashScre
 
           {/* Logo */}
           <div className="relative w-48 h-48 flex items-center justify-center">
-            <div className="w-32 h-32 rounded-3xl flex items-center justify-center shadow-2xl animate-pulse"
+            <div className="w-32 h-32 rounded-3xl flex items-center justify-center shadow-2xl animate-pulse p-6"
               style={{ background: 'linear-gradient(135deg, #2E9EBF, #1a7a9a)', boxShadow: '0 0 60px rgba(46,158,191,0.5)' }}>
-              <span className="text-6xl">🎓</span>
+              <img src="/NearU Logo.svg" alt="NearU Logo" className="w-full h-full object-contain" />
             </div>
           </div>
         </div>

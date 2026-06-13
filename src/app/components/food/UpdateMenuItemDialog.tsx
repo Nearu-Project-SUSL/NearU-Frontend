@@ -28,11 +28,11 @@ const inputStyles = {
     borderRadius: '12px',
     bgcolor: 'rgba(255,255,255,0.03)',
     '& fieldset': { borderColor: 'rgba(255,255,255,0.1)' },
-    '&:hover fieldset': { borderColor: 'rgba(250,204,21,0.4)' },
-    '&.Mui-focused fieldset': { borderColor: '#facc15' },
+    '&:hover fieldset': { borderColor: 'rgba(46,158,191,0.4)' },
+    '&.Mui-focused fieldset': { borderColor: '#2E9EBF' },
   },
   '& .MuiInputLabel-root': { color: 'rgba(255,255,255,0.4)' },
-  '& .MuiInputLabel-root.Mui-focused': { color: '#facc15' },
+  '& .MuiInputLabel-root.Mui-focused': { color: '#2E9EBF' },
 };
 
 export default function UpdateMenuItemDialog({ item, onClose, onSubmit }: UpdateMenuItemDialogProps) {
@@ -177,7 +177,7 @@ export default function UpdateMenuItemDialog({ item, onClose, onSubmit }: Update
                   '&:hover': { bgcolor: 'rgba(0,0,0,0.6)' },
                 }}
               >
-                <CameraIcon sx={{ color: '#facc15', fontSize: 32, mb: 1 }} />
+                <CameraIcon sx={{ color: '#2E9EBF', fontSize: 32, mb: 1 }} />
                 <Typography variant="caption" sx={{ color: 'rgba(255,255,255,0.7)' }}>
                   {photoPreview ? 'Change photo' : 'Click to change photo'}
                 </Typography>
@@ -272,13 +272,13 @@ export default function UpdateMenuItemDialog({ item, onClose, onSubmit }: Update
                 onClick={handleSubmit}
                 disabled={loading}
                 sx={{
-                  bgcolor: '#facc15',
-                  color: '#000',
+                  bgcolor: '#2E9EBF',
+                  color: '#fff',
                   fontWeight: 700,
                   borderRadius: '12px',
                   textTransform: 'none',
-                  '&:hover': { bgcolor: '#eab308' },
-                  '&.Mui-disabled': { bgcolor: 'rgba(250,204,21,0.3)' },
+                  '&:hover': { bgcolor: '#1a7a9a' },
+                  '&.Mui-disabled': { bgcolor: 'rgba(46,158,191,0.3)' },
                 }}
               >
                 {loading ? 'Saving...' : 'Save Changes'}

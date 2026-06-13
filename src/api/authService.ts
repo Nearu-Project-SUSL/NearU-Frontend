@@ -34,8 +34,6 @@ export interface RegisterBusinessData {
   businessType: string;
   address: string;
   description: string;
-  registrationNumber: string;
-  taxId?: string;
 }
 
 export interface RegisterRiderData {
@@ -99,7 +97,7 @@ const authService = {
         id: apiData.userId,
         username: apiData.username,
         email: apiData.email,
-        roles: apiData.role ? [apiData.role] : [],
+        roles: apiData.role ? [apiData.role === 'Business' ? 'BusinessOwner' : apiData.role] : [],
         profilePictureUrl: apiData.profilePictureUrl || apiData.profilePicture || undefined
       }
     };
@@ -119,7 +117,7 @@ const authService = {
         id: apiData.userId,
         username: apiData.username,
         email: apiData.email,
-        roles: apiData.role ? [apiData.role] : [],
+        roles: apiData.role ? [apiData.role === 'Business' ? 'BusinessOwner' : apiData.role] : [],
         profilePictureUrl: apiData.profilePictureUrl || apiData.profilePicture || undefined
       }
     };
@@ -136,7 +134,8 @@ const authService = {
         year: data.year,
         address: data.address,
         city: data.city,
-        dateOfBirth: data.dateOfBirth
+        dateOfBirth: data.dateOfBirth,
+        role: 'Student'
     });
     
     // Extract from ApiResponse wrapper
@@ -153,7 +152,11 @@ const authService = {
         email: data.email,
         password: data.password,
         mobileNumber: data.phone,
-        address: data.address
+        address: data.address,
+        role: 'Business',
+        businessName: data.businessName,  
+        businessType: data.businessType,   
+        ownerName: data.ownerName          
     });
     
     // Extract from ApiResponse wrapper
@@ -170,7 +173,8 @@ const authService = {
         email: data.email,
         password: data.password,
         mobileNumber: data.phone,
-        address: data.address
+        address: data.address,
+        role: 'Rider'
     });
     
     // Extract from ApiResponse wrapper

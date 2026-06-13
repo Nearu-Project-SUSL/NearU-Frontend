@@ -43,7 +43,6 @@ import {
   ArrowForward as ArrowRightIcon,
   Visibility as EyeIcon,
   VisibilityOff as EyeOffIcon,
-  School as GraduationCapIcon,
   Store as StoreIcon
 } from '@mui/icons-material';
 
@@ -87,8 +86,6 @@ export default function Register() {
     businessType: 'Food Vendor',
     address: '',
     description: '',
-    registrationNumber: '',
-    taxId: ''
   });
 
   // Rider form state
@@ -109,7 +106,7 @@ export default function Register() {
 
   const faculties = ['Computing', 'Engineering', 'Management', 'Social Sciences', 'Applied Sciences'];
   const years = ['1st Year', '2nd Year', '3rd Year', '4th Year'];
-  const businessTypes = ['Food Vendor', 'Accommodation', 'Transport', 'Retail Shop', 'Services'];
+  const businessTypes = ['Food Vendor', 'Accommodation', 'Custom Gifts'];
   const vehicleTypes = ['Tuk Tuk', 'Motorcycle', 'Bicycle', 'Car'];
 
   const steps = ['Basic Info', 'Personal Details', 'Additional Info'];
@@ -152,31 +149,28 @@ export default function Register() {
     }
   };
 
+  const businessTypeMap: Record<string, string> = {
+    'Food Vendor':   'Food',
+    'Accommodation': 'Accommodation',
+    'Custom Gifts':  'CustomGifts'
+  };
+
   const handleBusinessSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (businessForm.password !== businessForm.confirmPassword) {
       toast.error('Passwords do not match!');
       return;
     }
-    
     setIsLoading(true);
     try {
-      await authService.registerBusiness(businessForm);
-      const loginResponse = await authService.login({ email: businessForm.email, password: businessForm.password });
-      
-      setAuth({
-        user: loginResponse.user,
-        accessToken: loginResponse.accessToken,
-        refreshToken: loginResponse.refreshToken,
+      await authService.registerBusiness({
+        ...businessForm,
+        businessType: businessTypeMap[businessForm.businessType] ?? businessForm.businessType
       });
-      localStorage.setItem('accessToken', loginResponse.accessToken);
-      localStorage.setItem('userId', loginResponse.user.id);
-      
-      toast.success('Registration and login successful!');
-      navigate('/business-owner-home');
+      toast.success('Application submitted! Awaiting admin approval.');
+      navigate('/login');
     } catch (error: any) {
-      const errorMessage = error.response?.data?.message || 'Registration failed.';
-      toast.error(errorMessage);
+      toast.error(error.response?.data?.message || 'Registration failed.');
     } finally {
       setIsLoading(false);
     }
@@ -224,9 +218,11 @@ export default function Register() {
       {/* Top Navigation */}
       <nav className="relative z-20 flex items-center justify-between px-8 lg:px-12 py-6 bg-black/30 backdrop-blur-sm border-b border-blue-400/20">
         <Link to="/" className="flex items-center gap-3 group">
-          <div className="w-12 h-12 bg-gradient-to-br from-blue-400 to-blue-600 rounded-xl flex items-center justify-center shadow-lg shadow-blue-400/30 group-hover:scale-110 transition-transform duration-300">
-            <span className="text-black text-2xl">🎓</span>
-          </div>
+          <img
+            src="/NearU Logo.svg"
+            alt="NearU Logo"
+            className="w-16 h-16 object-contain group-hover:scale-110 transition-transform duration-300"
+          />
           <span className="text-white text-2xl">NearU</span>
         </Link>
         <div className="flex items-center gap-4">
@@ -267,8 +263,8 @@ export default function Register() {
               <div className="relative z-10 flex items-center justify-center">
                 <div className="relative w-64 h-64 bg-gradient-to-br from-gray-800 to-black rounded-3xl border-2 border-blue-400/30 shadow-2xl shadow-blue-400/20 p-8">
                   {/* Center circle */}
-                  <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-20 h-20 bg-gradient-to-br from-blue-400 to-blue-600 rounded-full flex items-center justify-center shadow-lg animate-pulse">
-                    <GraduationCapIcon sx={{ fontSize: 40, color: 'black' }} />
+                  <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-24 h-24 bg-gradient-to-br from-blue-400 to-blue-600 rounded-full flex items-center justify-center shadow-lg animate-pulse p-3">
+                    <img src="/NearU Logo.svg" alt="NearU Logo" className="w-full h-full object-contain" />
                   </div>
 
                   {/* Orbiting icons */}
@@ -608,64 +604,91 @@ export default function Register() {
                 </Box>
               )}
 
-              {/* Business Registration */}
               {userType === 'business' && (
                 <Box className="animate-fadeIn">
-                  <form onSubmit={handleBusinessSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '1rem', maxHeight: '400px', overflowY: 'auto', paddingRight: '8px' }} className="custom-scrollbar">
+                  <form onSubmit={handleBusinessSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
                     <Grid container spacing={2}>
                       <Grid size={{ xs: 6 }}>
-                        <TextField fullWidth label="Business Name" required value={businessForm.businessName} onChange={(e) => setBusinessForm({...businessForm, businessName: e.target.value})} />
+                        <TextField fullWidth label="Business Name" required
+                          value={businessForm.businessName}
+                          onChange={(e) => setBusinessForm({...businessForm, businessName: e.target.value})} />
                       </Grid>
                       <Grid size={{ xs: 6 }}>
-                        <TextField fullWidth label="Owner Name" required value={businessForm.ownerName} onChange={(e) => setBusinessForm({...businessForm, ownerName: e.target.value})} />
+                        <TextField fullWidth label="Owner Name" required
+                          value={businessForm.ownerName}
+                          onChange={(e) => setBusinessForm({...businessForm, ownerName: e.target.value})} />
                       </Grid>
                     </Grid>
+
                     <Grid container spacing={2}>
                       <Grid size={{ xs: 6 }}>
-                        <TextField fullWidth label="Email" type="email" required value={businessForm.email} onChange={(e) => setBusinessForm({...businessForm, email: e.target.value})} />
+                        <TextField fullWidth label="Email" type="email" required
+                          value={businessForm.email}
+                          onChange={(e) => setBusinessForm({...businessForm, email: e.target.value})} />
                       </Grid>
                       <Grid size={{ xs: 6 }}>
-                        <TextField fullWidth label="Phone" type="tel" required value={businessForm.phone} onChange={(e) => setBusinessForm({...businessForm, phone: e.target.value})} />
+                        <TextField fullWidth label="Phone" type="tel" required
+                          value={businessForm.phone}
+                          onChange={(e) => setBusinessForm({...businessForm, phone: e.target.value})} />
                       </Grid>
                     </Grid>
+
                     <Grid container spacing={2}>
                       <Grid size={{ xs: 6 }}>
-                        <TextField fullWidth label="Password" type={showPassword ? "text" : "password"} required value={businessForm.password} onChange={(e) => setBusinessForm({...businessForm, password: e.target.value})} />
+                        <TextField fullWidth label="Password" type={showPassword ? 'text' : 'password'} required
+                          value={businessForm.password}
+                          onChange={(e) => setBusinessForm({...businessForm, password: e.target.value})}
+                          slotProps={{ input: { endAdornment: (
+                            <InputAdornment position="end">
+                              <IconButton onClick={() => setShowPassword(!showPassword)} edge="end" sx={{ color: 'gray' }}>
+                                {showPassword ? <EyeOffIcon /> : <EyeIcon />}
+                              </IconButton>
+                            </InputAdornment>
+                          )}}} />
                       </Grid>
                       <Grid size={{ xs: 6 }}>
-                        <TextField fullWidth label="Confirm" type={showConfirmPassword ? "text" : "password"} required value={businessForm.confirmPassword} onChange={(e) => setBusinessForm({...businessForm, confirmPassword: e.target.value})} />
+                        <TextField fullWidth label="Confirm Password" type={showConfirmPassword ? 'text' : 'password'} required
+                          value={businessForm.confirmPassword}
+                          onChange={(e) => setBusinessForm({...businessForm, confirmPassword: e.target.value})}
+                          slotProps={{ input: { endAdornment: (
+                            <InputAdornment position="end">
+                              <IconButton onClick={() => setShowConfirmPassword(!showConfirmPassword)} edge="end" sx={{ color: 'gray' }}>
+                                {showConfirmPassword ? <EyeOffIcon /> : <EyeIcon />}
+                              </IconButton>
+                            </InputAdornment>
+                          )}}} />
                       </Grid>
                     </Grid>
+
                     <FormControl fullWidth>
                       <InputLabel>Business Type</InputLabel>
-                      <Select value={businessForm.businessType} label="Business Type" onChange={(e) => setBusinessForm({...businessForm, businessType: e.target.value})} required>
-                        {businessTypes.map(type => (
+                      <Select value={businessForm.businessType} label="Business Type"
+                        onChange={(e) => setBusinessForm({...businessForm, businessType: e.target.value})} required>
+                        {['Food Vendor', 'Accommodation', 'Custom Gifts'].map(type => (
                           <MenuItem key={type} value={type}>{type}</MenuItem>
                         ))}
                       </Select>
                     </FormControl>
-                    <TextField fullWidth label="Address" multiline rows={2} required value={businessForm.address} onChange={(e) => setBusinessForm({...businessForm, address: e.target.value})} />
-                    <TextField fullWidth label="Description" multiline rows={2} required value={businessForm.description} onChange={(e) => setBusinessForm({...businessForm, description: e.target.value})} />
-                    <Grid container spacing={2}>
-                      <Grid size={{ xs: 6 }}>
-                        <TextField fullWidth label="Registration No." required value={businessForm.registrationNumber} onChange={(e) => setBusinessForm({...businessForm, registrationNumber: e.target.value})} />
-                      </Grid>
-                      <Grid size={{ xs: 6 }}>
-                        <TextField fullWidth label="Tax ID" value={businessForm.taxId} onChange={(e) => setBusinessForm({...businessForm, taxId: e.target.value})} />
-                      </Grid>
-                    </Grid>
-                    <Paper sx={{ p: 2, bgcolor: 'rgba(46, 158, 191, 0.05)', border: '1px solid rgba(46, 158, 191, 0.2)' }}>
+
+                    <TextField fullWidth label="Address" multiline rows={2} required
+                      value={businessForm.address}
+                      onChange={(e) => setBusinessForm({...businessForm, address: e.target.value})} />
+
+                    <Paper sx={{ p: 2, bgcolor: 'rgba(46,158,191,0.05)', border: '1px solid rgba(46,158,191,0.2)', borderRadius: '0.75rem' }}>
                       <Typography variant="caption" sx={{ color: '#2E9EBF' }}>
-                        Note: Your application will be reviewed by our admin team.
+                        📋 Your application will be reviewed by our admin team before you can access your dashboard.
                       </Typography>
                     </Paper>
-                    <Button fullWidth variant="contained" type="submit" disabled={isLoading} endIcon={isLoading ? undefined : <ArrowRightIcon />} startIcon={isLoading ? <CircularProgress size={20} color="inherit" /> : null} sx={{ mt: 2, bgcolor: '#2E9EBF', color: 'black', '&:hover': { bgcolor: '#1a7a9a' } }}>
-                      {isLoading ? 'Processing...' : 'Submit for Review'}
+
+                    <Button fullWidth variant="contained" type="submit" disabled={isLoading}
+                      startIcon={isLoading ? <CircularProgress size={20} color="inherit" /> : null}
+                      endIcon={isLoading ? null : <ArrowRightIcon />}
+                      sx={{ mt: 1, bgcolor: '#2E9EBF', color: 'black', fontWeight: 700, borderRadius: '0.75rem', '&:hover': { bgcolor: '#1a7a9a' } }}>
+                      {isLoading ? 'Submitting...' : 'Submit for Review'}
                     </Button>
                   </form>
                 </Box>
               )}
-
               {/* Rider Registration */}
               {userType === 'rider' && (
                 <Box className="animate-fadeIn">

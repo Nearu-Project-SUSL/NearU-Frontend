@@ -31,6 +31,7 @@ import { type MenuItemResponse } from '../../../api/foodapi';
 import { addMenuItem } from '../../../api/foodapi';
 import { useFoodShop, useMenuItems } from '../../hooks/useFoodShop';
 import { useQueryClient } from '@tanstack/react-query';
+import useAuth from '../../hooks/useAuth';
 
 
 
@@ -51,6 +52,12 @@ export default function ShopDetailPage() {
   const [itemToEdit, setItemToEdit] = useState<MenuItem | null>(null);
   const [itemToDelete, setItemToDelete] = useState<MenuItem | null>(null);
 
+  const {auth} = useAuth();
+  const currentUserId = auth?.user?.id;
+  const isOwner = shop?.ownerId === currentUserId;
+  const isAdmin = auth?.user?.roles?.includes('Admin');
+  const canManage = isOwner || isAdmin;
+
   if (shopLoading || menuLoading) {
     return (
       <Box sx={{ display: 'flex', justifyContent: 'center', mt: 10 }}>
@@ -68,7 +75,7 @@ export default function ShopDetailPage() {
             <Typography variant="h5" sx={{ color: '#fff', mb: 2 }}>
               Shop not found
             </Typography>
-            <IconButton onClick={() => navigate('/food')} sx={{ color: '#facc15' }}>
+            <IconButton onClick={() => navigate('/food')} sx={{ color: '#2E9EBF' }}>
               <BackIcon />
             </IconButton>
           </Box>
@@ -241,61 +248,51 @@ export default function ShopDetailPage() {
                     <Grid size={{xs:12, md:8}}>
                       {/*menu section*/}
                       <Box>
-                        <Box
-                          sx={{
-                            display: 'flex',
-                            alignItems: 'center',
-                            justifyContent: 'space-between',
-                            gap: 2,
-                            mb: 4,
-                            flexWrap: 'wrap',
-                          }}
-                        >
+                        <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 2, mb: 4, flexWrap: 'wrap' }}>
                           <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
-                            <MenuIcon sx={{ color: '#facc15', fontSize: 24 }} />
+                            <MenuIcon sx={{ color: '#2E9EBF', fontSize: 24 }} />
                             <Typography variant="h6" sx={{ color: '#fff', fontWeight: 700 }}>
                               Menu
                             </Typography>
                           </Box>
 
-                          <Box
-                            component="button"
-                            onClick={() => setOpenAddItem(true)}
-                            style={{
-                              background: '#facc15',
-                              color: '#111',
-                              border: 'none',
-                              borderRadius: '999px',
-                              padding: '10px 18px',
-                              fontWeight: 700,
-                              cursor: 'pointer',
-                            }}
-                          >
-                            Add Menu Item
-                          </Box>
+                          {/* Only show Add Menu Item to owner or admin */}
+                          {canManage && (
+                            <Box
+                              component="button"
+                              onClick={() => setOpenAddItem(true)}
+                              style={{
+                                background: '#2E9EBF',
+                                color: '#fff',
+                                border: 'none',
+                                borderRadius: '999px',
+                                padding: '10px 18px',
+                                fontWeight: 700,
+                                cursor: 'pointer',
+                              }}
+                            >
+                              Add Menu Item
+                            </Box>
+                          )}
                         </Box>
 
-                        {menuItems.length > 0 && (
-                          <Grid container spacing={2.5} sx={{ mb: 4 }}>
-                            {menuItems.map((item) => (
-                              <Grid size={{ xs: 12, sm: 6 }}>
-                                <MenuItemCard
-                                  item={{
-                                    id: item.id,
-                                    foodShopId: item.foodShopId,
-                                    name: item.name,
-                                    description: item.description ?? '',
-                                    price: item.price,
-                                    photoUrl: item.photoUrl ?? '',
-                                  }}
-                                  onClick={(menuItem) => setSelectedItem(item)}
-                                  onEdit={(menuItem) => setItemToEdit(menuItem)}
-                                  onDelete={(menuItem) => setItemToDelete(menuItem)}
-                                />
-                              </Grid>
-                            ))}
+                        {menuItems.map((item) => (
+                          <Grid size={{ xs: 12, sm: 6 }} key={item.id}>
+                            <MenuItemCard
+                              item={{
+                                id: item.id,
+                                foodShopId: item.foodShopId,
+                                name: item.name,
+                                description: item.description ?? '',
+                                price: item.price,
+                                photoUrl: item.photoUrl ?? '',
+                              }}
+                              onClick={() => setSelectedItem(item)}
+                              onEdit={canManage ? (menuItem) => setItemToEdit(menuItem) : undefined}
+                              onDelete={canManage ? (menuItem) => setItemToDelete(menuItem) : undefined}
+                            />
                           </Grid>
-                        )}
+                        ))}
                       </Box>
                     </Grid>
 
@@ -372,12 +369,7 @@ export default function ShopDetailPage() {
                         </Stack>
                       </Box>
                     </Grid>
-                  </Grid>
-                  
-                
-
-                  
-                
+                  </Grid>               
                 </Box>
           </PageLayout>
         </Box>

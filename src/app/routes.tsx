@@ -5,6 +5,24 @@ import { createBrowserRouter } from "react-router";
 import LoadingScreen from "./pages/public/LoadingScreen";
 import ProtectedRoute from "./routing/ProtectedRoute";
 
+// Helper to retry dynamic imports when a chunk fails to load (e.g. after redeployment)
+const lazyWithRetry = (componentImport: () => Promise<any>) => {
+  return lazy(async () => {
+    try {
+      return await componentImport();
+    } catch (error) {
+      console.error("Failed to load chunk. Reloading page to fetch latest assets...", error);
+      const lastReload = sessionStorage.getItem('last-chunk-reload');
+      const now = Date.now();
+      if (!lastReload || now - parseInt(lastReload, 10) > 10000) {
+        sessionStorage.setItem('last-chunk-reload', now.toString());
+        window.location.reload();
+      }
+      throw error;
+    }
+  });
+};
+
 // Helper for wrapping lazy pages in Suspense
 const Loadable = (Component: any) => (props: any) => (
   <Suspense fallback={<LoadingScreen />}>
@@ -13,37 +31,43 @@ const Loadable = (Component: any) => (props: any) => (
 );
 
 // ── Public Pages (lazy) ───────────────────────────────────────────────────────
-const Login = Loadable(lazy(() => import("./pages/public/Login")));
-const Register = Loadable(lazy(() => import("./pages/public/Register")));
-const ForgotPassword = Loadable(lazy(() => import("./pages/public/ForgotPassword")));
-const ResetPassword = Loadable(lazy(() => import("./pages/public/ResetPassword")));
-const Unauthorized = Loadable(lazy(() => import("./pages/public/Unauthorized")));
+const Login = Loadable(lazyWithRetry(() => import("./pages/public/Login")));
+const Register = Loadable(lazyWithRetry(() => import("./pages/public/Register")));
+const ForgotPassword = Loadable(lazyWithRetry(() => import("./pages/public/ForgotPassword")));
+const ResetPassword = Loadable(lazyWithRetry(() => import("./pages/public/ResetPassword")));
+const Unauthorized = Loadable(lazyWithRetry(() => import("./pages/public/Unauthorized")));
+const LandingPage = Loadable(lazyWithRetry(() => import("./pages/public/LandingPage")));
 
 // ── Protected Pages (lazy) ────────────────────────────────────────────────────
-const Home = Loadable(lazy(() => import("./pages/protected/Home")));
-const Jobs = Loadable(lazy(() => import("./pages/protected/Jobs")));
-const CreateJob = Loadable(lazy(() => import("./pages/protected/CreateJob")));
-const UpdateJob = Loadable(lazy(() => import("./pages/protected/UpdateJob")));
-const MyJobs = Loadable(lazy(() => import("./pages/protected/MyJobs")));
-const Profile = Loadable(lazy(() => import("./pages/protected/Profile")));
-const FoodPage = Loadable(lazy(() => import("./pages/protected/Food")));
-const ShopDetailPage = Loadable(lazy(() => import("./pages/protected/ShopDetail")));
-const Accommodation = Loadable(lazy(() => import("./pages/public/Accommodation")));
-const AccommodationDetail = Loadable(lazy(() => import("./pages/public/AccommodationDetail")));
-const Gifts = Loadable(lazy(() => import("./pages/protected/Gifts")));
-const GiftShopDetailPage = Loadable(lazy(() => import("./pages/protected/GiftShopDetail")));
+const Home = Loadable(lazyWithRetry(() => import("./pages/protected/Home")));
+const Jobs = Loadable(lazyWithRetry(() => import("./pages/protected/Jobs")));
+const CreateJob = Loadable(lazyWithRetry(() => import("./pages/protected/CreateJob")));
+const UpdateJob = Loadable(lazyWithRetry(() => import("./pages/protected/UpdateJob")));
+const MyJobs = Loadable(lazyWithRetry(() => import("./pages/protected/MyJobs")));
+const Profile = Loadable(lazyWithRetry(() => import("./pages/protected/Profile")));
+const TransportSelection = Loadable(lazyWithRetry(() => import("./pages/protected/transport/TransportSelection")));
+const Transport = Loadable(lazyWithRetry(() => import("./pages/protected/transport/Transport")));
+const FoodPage = Loadable(lazyWithRetry(() => import("./pages/protected/Food")));
+const ShopDetailPage = Loadable(lazyWithRetry(() => import("./pages/protected/ShopDetail")));
+const Accommodation = Loadable(lazyWithRetry(() => import("./pages/public/Accommodation")));
+const AccommodationDetail = Loadable(lazyWithRetry(() => import("./pages/public/AccommodationDetail")));
+const Gifts = Loadable(lazyWithRetry(() => import("./pages/protected/Gifts")));
+const GiftShopDetailPage = Loadable(lazyWithRetry(() => import("./pages/protected/GiftShopDetail")));
+const DealsPage = Loadable(lazyWithRetry(() => import("./pages/protected/Deals")));
+const AdminDealsPage = Loadable(lazyWithRetry(() => import("./pages/protected/AdminDeals")));
+const Rides = Loadable(lazyWithRetry(() => import("./pages/protected/Ridespage")));
 
 // ── Role-specific Pages (lazy) ────────────────────────────────────────────────
-const AdminHome = Loadable(lazy(() => import("./pages/protected/AdminHome")));
-const BusinessOwnerHome = Loadable(lazy(() => import("./pages/protected/BusinessOwnerHome")));
-const RiderHome = Loadable(lazy(() => import("./pages/protected/RiderHome")));
-const RiderProfile = Loadable(lazy(() => import("./pages/protected/RiderProfile")));
+const AdminHome = Loadable(lazyWithRetry(() => import("./pages/protected/AdminHome")));
+const BusinessOwnerHome = Loadable(lazyWithRetry(() => import("./pages/protected/BusinessOwnerHome")));
+const RiderHome = Loadable(lazyWithRetry(() => import("./pages/protected/RiderHome")));
+const RiderProfile = Loadable(lazyWithRetry(() => import("./pages/protected/RiderProfile")));
 
 export const router = createBrowserRouter([
   // Public Routes - Accessible to anyone
   {
     path: "/",
-    element: <LoadingScreen isSplashScreen={true} />,
+    Component: LandingPage,
   },
   {
     path: "/register",
@@ -103,6 +127,26 @@ export const router = createBrowserRouter([
         Component: FoodPage,
       },
       {
+        path: "/transport",
+        Component: TransportSelection,
+      },
+      {
+        path: "/transport/bus",
+        Component: Transport,
+      },
+      {
+        path: "/transport/train",
+        Component: Transport,
+      },
+      {
+        path: "/transport/tuk",
+        Component: Transport,
+      },
+      {
+        path: "/transport/all",
+        Component: Transport,
+      },
+      {
         path: "/accommodation",
         Component: Accommodation,
       },
@@ -121,6 +165,21 @@ export const router = createBrowserRouter([
     ]
   },
 
+  // Protected Routes - Requires Student Role
+  {
+    element: <ProtectedRoute allowedRoles={["Student"]} />,
+    children: [
+      {
+        path: "/deals",
+        Component: DealsPage,
+      },
+      {
+        path: "/rides",
+        Component: Rides,
+      },
+    ]
+  },
+
   // Protected Routes - Requires Admin Role
   {
     element: <ProtectedRoute allowedRoles={["Admin", "SuperAdmin"]} />,
@@ -129,12 +188,16 @@ export const router = createBrowserRouter([
         path: "/admin-home",
         Component: AdminHome,
       },
+      {
+        path: "/admin/deals",
+        Component: AdminDealsPage,
+      },
     ]
   },
 
   // Protected Routes - Requires BusinessOwner Role
   {
-    element: <ProtectedRoute allowedRoles={["BusinessOwner"]} />,
+    element: <ProtectedRoute allowedRoles={["BusinessOwner", "Business"]} />,
     children: [
       {
         path: "/business-owner-home",

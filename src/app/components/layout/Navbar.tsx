@@ -1,8 +1,11 @@
-
+import { useState, useRef, useEffect } from 'react';
 import { Link } from 'react-router';
 import useAuth from '../../hooks/useAuth';
 import { useSidebar } from '../../context/SidebarContext';
 import { useNearUTheme } from '../../context/ThemeContext';
+import { getHomePathForRoles } from '../../utils/roleUtils';
+import { NotificationPanel } from './NotificationDropdown';
+import { useNotificationStore } from '../../store/notificationStore';
 
 // MUI Components
 import {
@@ -21,7 +24,6 @@ import {
 import {
   Notifications as BellIcon,
   Person as UserIcon,
-  Work as WorkIcon,
   Menu as MenuIcon,
   WbSunny as SunIcon,
   NightlightRound as MoonIcon,
@@ -29,12 +31,32 @@ import {
 
 export default function Navbar() {
   const { auth } = useAuth();
-  const { isExpanded, toggleMobileSidebar } = useSidebar();
+  const { toggleMobileSidebar } = useSidebar();
   const { isDark, toggleTheme } = useNearUTheme();
   const theme = useTheme();
 
-  const accent = theme.palette.primary.main;          // #2E9EBF
-  const accentAlpha = (a: number) => `rgba(46, 158, 191, ${a})`;
+  // Live unread count from global notification store
+  const unreadCount = useNotificationStore((s) => s.unreadCount());
+
+  // Notification panel open/close
+  const [notifOpen, setNotifOpen] = useState(false);
+  const notifRef  = useRef<HTMLDivElement>(null);
+
+  // Close on outside click
+  useEffect(() => {
+    if (!notifOpen) return;
+    const handler = (e: MouseEvent) => {
+      if (notifRef.current && !notifRef.current.contains(e.target as Node)) {
+        setNotifOpen(false);
+      }
+    };
+    document.addEventListener('mousedown', handler);
+    return () => document.removeEventListener('mousedown', handler);
+  }, [notifOpen]);
+
+  const getHomePath  = () => getHomePathForRoles(auth?.user?.roles);
+  const accent       = theme.palette.primary.main;
+  const accentAlpha  = (a: number) => `rgba(46, 158, 191, ${a})`;
 
   return (
     <AppBar
@@ -48,59 +70,45 @@ export default function Navbar() {
         boxShadow: isDark ? '0 8px 32px rgba(0, 0, 0, 0.4)' : '0 4px 20px rgba(0,0,0,0.08)',
         zIndex: 10,
         transition: 'background-color 0.25s ease, box-shadow 0.25s ease',
+        overflow: 'visible',
       }}
     >
-      <Toolbar sx={{ px: { xs: 2, sm: 3 }, minHeight: '64px !important', gap: 2 }}>
+      <Toolbar sx={{ px: { xs: 2, sm: 3 }, minHeight: '64px !important', gap: 2, overflow: 'visible' }}>
 
-        {/* Left: Logo wordmark */}
+        {/* ── Left: Logo ──────────────────────────────────────────────────── */}
         <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5, flexShrink: 0 }}>
-          {/* Hamburger Menu (Mobile Only) */}
           <IconButton
             onClick={toggleMobileSidebar}
             edge="start"
-            sx={{
-              display: { xs: 'flex', md: 'none' },
-              color: theme.palette.text.secondary,
-              mr: 1,
-            }}
+            sx={{ display: { xs: 'flex', md: 'none' }, color: theme.palette.text.secondary, mr: 1 }}
           >
             <MenuIcon />
           </IconButton>
 
           <Box
+            component={Link}
+            to={getHomePath()}
             sx={{
-              width: 34,
-              height: 34,
-              bgcolor: accent,
-              backgroundImage: `linear-gradient(135deg, ${accentAlpha(0.8)} 0%, ${accent} 60%, #008e76 100%)`,
-              borderRadius: '10px',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              boxShadow: `0 0 14px ${accentAlpha(0.35)}`,
-              flexShrink: 0,
+              display: 'flex', alignItems: 'center', gap: 1.5,
+              textDecoration: 'none', cursor: 'pointer',
+              '&:hover': { opacity: 0.85 },
             }}
           >
-            <WorkIcon sx={{ color: '#111111', fontSize: 18 }} />
-          </Box>
-          <Typography
-            sx={{
-              color: accent,
-              fontWeight: 800,
-              fontStyle: 'italic',
-              fontSize: '1.15rem',
-              letterSpacing: '-0.02em',
-              lineHeight: 1,
+            <Box component="img" src="/NearU Logo.svg" alt="NearU Logo"
+              sx={{ width: 44, height: 44, objectFit: 'contain', flexShrink: 0 }} />
+            <Typography sx={{
+              color: accent, fontWeight: 800, fontStyle: 'italic',
+              fontSize: '1.15rem', letterSpacing: '-0.02em', lineHeight: 1,
               display: { xs: 'none', sm: 'block' },
-            }}
-          >
-            NearU
-          </Typography>
+            }}>
+              NearU
+            </Typography>
+          </Box>
         </Box>
 
         <Box sx={{ flex: 1 }} />
 
-        {/* Right: Actions */}
+        {/* ── Right: Actions ──────────────────────────────────────────────── */}
         <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5, flexShrink: 0 }}>
 
           {/* Theme Toggle */}
@@ -110,8 +118,7 @@ export default function Navbar() {
               id="theme-toggle-btn"
               aria-label="Toggle theme"
               sx={{
-                color: theme.palette.text.secondary,
-                borderRadius: '10px',
+                color: theme.palette.text.secondary, borderRadius: '10px',
                 transition: 'color 0.2s ease',
                 '&:hover': { color: accent, bgcolor: accentAlpha(0.08) },
               }}
@@ -120,32 +127,57 @@ export default function Navbar() {
             </IconButton>
           </Tooltip>
 
-          {/* Notifications */}
-          <Tooltip title="Notifications">
-            <IconButton
-              sx={{
-                color: theme.palette.text.secondary,
-                borderRadius: '10px',
-                '&:hover': { color: accent, bgcolor: accentAlpha(0.08) },
-              }}
-            >
-              <Badge
-                badgeContent={3}
+          {/* ── Notifications ─────────────────────────────────────────────
+              Positioned wrapper holds both the MUI bell button AND the
+              floating NotificationPanel so click-outside detection works
+              reliably with a single ref.
+          ──────────────────────────────────────────────────────────────── */}
+          <Box ref={notifRef} sx={{ position: 'relative', display: 'inline-flex' }}>
+            <Tooltip title="Notifications">
+              <IconButton
+                id="navbar-notification-btn"
+                aria-label="Toggle notifications"
+                onClick={() => setNotifOpen((o) => !o)}
                 sx={{
-                  '& .MuiBadge-badge': {
-                    bgcolor: accent,
-                    color: '#111111',
-                    fontSize: '0.6rem',
-                    fontWeight: 800,
-                    minWidth: 17,
-                    height: 17,
-                  },
+                  color: notifOpen ? accent : theme.palette.text.secondary,
+                  borderRadius: '10px',
+                  bgcolor: notifOpen ? accentAlpha(0.08) : 'transparent',
+                  '&:hover': { color: accent, bgcolor: accentAlpha(0.08) },
+                  transition: 'all 0.2s ease',
                 }}
               >
-                <BellIcon sx={{ fontSize: 21 }} />
-              </Badge>
-            </IconButton>
-          </Tooltip>
+                <Badge
+                  badgeContent={unreadCount}
+                  max={99}
+                  invisible={unreadCount === 0}
+                  sx={{
+                    '& .MuiBadge-badge': {
+                      bgcolor: '#ef4444',
+                      color: '#fff',
+                      fontSize: '0.6rem',
+                      fontWeight: 800,
+                      minWidth: 17,
+                      height: 17,
+                    },
+                  }}
+                >
+                  <BellIcon sx={{ fontSize: 21 }} />
+                </Badge>
+              </IconButton>
+            </Tooltip>
+
+            {/* Floating panel — rendered inside the same ref box */}
+            {notifOpen && (
+              <Box sx={{
+                position: 'absolute',
+                top: 'calc(100% + 8px)',
+                right: 0,
+                zIndex: 9999,
+              }}>
+                <NotificationPanel onClose={() => setNotifOpen(false)} />
+              </Box>
+            )}
+          </Box>
 
           {/* Profile */}
           <Tooltip title="Profile">
@@ -157,13 +189,10 @@ export default function Navbar() {
               <Avatar
                 src={auth?.user?.profilePictureUrl}
                 sx={{
-                  width: 34,
-                  height: 34,
+                  width: 34, height: 34,
                   bgcolor: accentAlpha(0.15),
                   border: `1.5px solid ${accentAlpha(0.4)}`,
-                  color: accent,
-                  fontWeight: 700,
-                  fontSize: '0.85rem',
+                  color: accent, fontWeight: 700, fontSize: '0.85rem',
                 }}
               >
                 {!auth?.user?.profilePictureUrl && <UserIcon sx={{ fontSize: 18 }} />}
