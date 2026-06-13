@@ -14,8 +14,8 @@ const ProtectedRoute = ({ allowedRoles }: ProtectedRouteProps) => {
     return <Navigate to="/login" state={{ from: location }} replace />;
   }
 
-  // If a specific role is required and the user doesn't have it
-  if (allowedRoles && !auth.user.roles.some((role) => allowedRoles.includes(role))) {
+  // // If a specific role is required and the user doesn't have it
+  if (allowedRoles && !auth?.user?.roles?.some((role: string) => allowedRoles.includes(role))) {
     return <Navigate to="/unauthorized" state={{ from: location }} replace />;
   }
 

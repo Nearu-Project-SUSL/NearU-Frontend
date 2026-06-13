@@ -42,4 +42,5 @@ export const RidesApi = {
     axiosPrivate
       .post<ApiResponse<object>>(`/rides/history/${rideId}/rate`, { rating })
       .then(r => r.data),
+
 };
