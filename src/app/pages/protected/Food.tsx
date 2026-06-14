@@ -44,6 +44,8 @@ export default function FoodPage(){
   const [activeCategory, setActiveCategory] = useState('All');
   const [searchQuery, setSearchQuery] = useState('');
 
+  const [profileModalOpen, setProfileModalOpen] = useState(false);
+
   const [currentPage, setCurrentPage] = useState(1);
 
   const {auth} = useAuth();
@@ -177,22 +179,51 @@ export default function FoodPage(){
                 <Paper 
                   sx={{ 
                     p: { xs: 3, md: 5 }, 
-                    display: 'flex', 
-                    flexDirection: 'column',
-                    bgcolor: 'rgba(255,255,255,0.03)',
+                    display: 'flex',
+                    flexDirection: { xs: 'column', sm: 'row' },
+                    alignItems: { xs: 'flex-start', sm: 'center' },
+                    justifyContent: 'space-between',
+                    gap: 2,
+                    bgcolor: 'rgba(59, 130, 246, 0.05)',
                     border: '1px solid rgba(59, 130, 246, 0.2)',
                     borderRadius: '1.5rem',
                     backdropFilter: 'blur(10px)'
                   }}
                 >
-                  <Typography variant="h3" sx={{ color: '#3b82f6', fontWeight: 'bold', mb: 2 }}>
-                    Welcome, {auth?.user?.username || 'Owner'}!
-                  </Typography>
-                  <Typography variant="h6" sx={{ color: '#9ca3af', mb: 4 }}>
-                    You are logged in as a Business Owner.
-                  </Typography>
+                  <Box>
+                    <Typography variant="h3" sx={{ color: '#3b82f6', fontWeight: 'bold', mb: 2 }}>
+                      Welcome, {auth?.user?.username || 'Owner'}!
+                    </Typography>
+                    <Typography variant="h6" sx={{ color: '#9ca3af' }}>
+                      You are logged in as a Business Owner.
+                    </Typography>
+                  </Box>
+
+                  <Button
+                    variant="contained"
+                    onClick={() => setProfileModalOpen(true)}
+                    sx={{
+                      bgcolor: '#2E9EBF',
+                      color: 'black',
+                      fontWeight: 700,
+                      borderRadius: '0.75rem',
+                      px: 4,
+                      whiteSpace: 'nowrap',
+                      '&:hover': { bgcolor: '#1a7a9a' }
+                    }}
+                  >
+                    Complete Your Profile
+                  </Button>
                 </Paper>
               </Container>
+
+              <BusinessProfileSetupModal
+                open={profileModalOpen}
+                onClose={() => setProfileModalOpen(false)}
+                onCompleted={() => {
+                  setProfileModalOpen(false);
+                }}
+              />
 
               {/* hero section  */}
               <Box
