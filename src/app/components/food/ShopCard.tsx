@@ -57,6 +57,7 @@ export default function ShopCard({ shop, onEdit, onDelete }: ShopCardProps) {
               src={shop.photoUrl || 'https://placehold.co/400x300/2E9EBF/FFFFFF?text=No+Image'}
               alt={shop.name}
               sx={{ width: '100%', height: '100%', objectFit: 'cover' }}
+              loading="lazy"
             />
             <Box
               sx={{

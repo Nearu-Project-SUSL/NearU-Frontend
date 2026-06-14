@@ -51,6 +51,11 @@ import {
   WifiOff as OfflineIcon,
   HourglassEmpty as PendingIcon,
   Block as BlockIcon,
+  NotificationsActive as RequestIcon,
+  Map as MapIcon,
+  PinDrop as ArriveIcon,
+  OfflinePin as CompleteIcon,
+  Timer as TimerIcon,
 } from '@mui/icons-material';
 
 // ─── Constants ────────────────────────────────────────────────────────────────
@@ -200,8 +205,10 @@ export default function RiderHome() {
       // JoinRideChannel is handled automatically by useRideHub watching activeRide
       toast.success('Ride accepted! Navigate to pickup.', { icon: '🗺️' });
     },
-    onError: () => {
-      toast.error('Failed to accept ride. It may have been taken.');
+    onError: (error: any) => {
+      console.error('Accept ride error:', error);
+      const serverMsg = error.response?.data?.message || error.response?.data?.error || error.response?.data?.title;
+      toast.error(serverMsg || 'Failed to accept ride. It may have been taken.');
       clearPendingRequest();
     },
   });
@@ -239,12 +246,19 @@ export default function RiderHome() {
 
   // ─── Handlers ──────────────────────────────────────────────────────────────
   const handleToggleOnline = useCallback(() => {
+    if (approvalStatus !== 'Approved') {
+      toast.error('Your rider account is pending approval by an admin. You cannot go online yet.', { duration: 5000 });
+      return;
+    }
+
     if (permissionState === 'denied' && !isOnline) {
       toast.error('Please enable location access to go online.', { duration: 5000 });
       return;
     }
-    toggleOnlineMutation.mutate(!isOnline);
-  }, [isOnline, permissionState, toggleOnlineMutation]);
+    
+    const nextStatus = !isOnline;
+    toggleOnlineMutation.mutate(nextStatus);
+  }, [permissionState, isOnline, toggleOnlineMutation, approvalStatus]);
 
   const handleDeclineRequest = useCallback(() => {
     clearPendingRequest();
@@ -292,7 +306,16 @@ export default function RiderHome() {
           <Sidebar activeSection="rider" />
           <Box sx={{ flexGrow: 1, display: 'flex', flexDirection: 'column' }}>
             <Navbar />
-            <Box sx={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', p: 3 }}>
+            <Box sx={{ 
+              flex: 1, 
+              display: 'flex', 
+              alignItems: 'center', 
+              justifyContent: 'center', 
+              p: 3,
+              background: theme.palette.mode === 'dark'
+                ? 'radial-gradient(ellipse at 50% 50%, rgba(245,158,11,0.04) 0%, transparent 70%)'
+                : 'radial-gradient(ellipse at 50% 50%, rgba(245,158,11,0.02) 0%, transparent 70%)',
+            }}>
               <motion.div
                 initial={{ opacity: 0, y: 30 }}
                 animate={{ opacity: 1, y: 0 }}
@@ -300,17 +323,28 @@ export default function RiderHome() {
                 style={{ maxWidth: 420, width: '100%', textAlign: 'center' }}
               >
                 <Box sx={{
-                  p: 4, borderRadius: '24px',
-                  background: theme.palette.mode === 'dark'
-                    ? 'linear-gradient(145deg, rgba(245,158,11,0.08), rgba(245,158,11,0.02))'
-                    : 'white',
-                  border: '1px solid rgba(245,158,11,0.25)',
-                  boxShadow: '0 20px 60px rgba(245,158,11,0.08)',
+                  p: 4,
+                  borderRadius: '1.75rem',
+                  backdropFilter: 'blur(20px)',
+                  background: theme.palette.mode === 'dark' ? 'rgba(30, 30, 30, 0.6)' : 'rgba(255, 255, 255, 0.8)',
+                  border: '1px solid rgba(245, 158, 11, 0.25)',
+                  boxShadow: theme.palette.mode === 'dark' 
+                    ? '0 20px 60px rgba(0, 0, 0, 0.4), 0 0 40px rgba(245, 158, 11, 0.05)'
+                    : '0 20px 60px rgba(245, 158, 11, 0.05)',
+                  position: 'relative',
+                  overflow: 'hidden',
+                  '&::before': {
+                    content: '""',
+                    position: 'absolute',
+                    top: 0, right: 0, width: 100, height: 100,
+                    background: 'radial-gradient(circle, rgba(245,158,11,0.1) 0%, transparent 70%)',
+                    borderRadius: '50%',
+                  }
                 }}>
                   <motion.div
                     animate={{ rotate: [0, 10, -10, 0] }}
                     transition={{ duration: 2, repeat: Infinity, ease: 'easeInOut' }}
-                    style={{ marginBottom: 20 }}
+                    style={{ marginBottom: 20, position: 'relative', zIndex: 1 }}
                   >
                     <div style={{
                       width: 84, height: 84,
@@ -320,24 +354,32 @@ export default function RiderHome() {
                       display: 'inline-flex',
                       alignItems: 'center',
                       justifyContent: 'center',
+                      boxShadow: '0 0 20px rgba(245,158,11,0.2)',
                     }}>
                       <PendingIcon style={{ color: '#f59e0b', fontSize: 42 }} />
                     </div>
                   </motion.div>
-                  <Typography variant="h5" sx={{ color: 'text.primary', fontWeight: 800, mb: 1 }}>
+                  <Typography variant="h5" sx={{ color: 'text.primary', fontWeight: 800, mb: 1, position: 'relative', zIndex: 1 }}>
                     Application Under Review
                   </Typography>
-                  <Typography variant="body1" sx={{ color: 'text.secondary', mb: 2 }}>
+                  <Typography variant="body1" sx={{ color: 'text.secondary', mb: 3, fontSize: '0.925rem', lineHeight: 1.5, position: 'relative', zIndex: 1 }}>
                     Your rider application is pending admin approval. You'll be able to go online once approved.
                     Please check back later.
                   </Typography>
                   <Box sx={{
-                    p: 1.5, borderRadius: 2,
+                    p: 1.5, 
+                    borderRadius: '0.75rem',
                     background: 'rgba(245,158,11,0.08)',
                     border: '1px solid rgba(245,158,11,0.2)',
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    gap: 1,
+                    position: 'relative',
+                    zIndex: 1,
                   }}>
-                    <Typography variant="caption" sx={{ color: '#f59e0b' }}>
-                      ⏳ Status: <strong>Pending Approval</strong>
+                    <TimerIcon style={{ color: '#f59e0b', fontSize: 16 }} />
+                    <Typography variant="caption" sx={{ color: '#f59e0b', fontWeight: 700 }}>
+                      Status: Pending Approval
                     </Typography>
                   </Box>
                 </Box>
@@ -350,12 +392,22 @@ export default function RiderHome() {
 
     // ── Rejected / Suspended ──────────────────────────────────────────────
     if (approvalStatus === 'Rejected' || approvalStatus === 'Suspended') {
+      const isSuspended = approvalStatus === 'Suspended';
       return (
         <Box sx={{ display: 'flex', minHeight: '100vh', bgcolor: 'background.default' }}>
           <Sidebar activeSection="rider" />
           <Box sx={{ flexGrow: 1, display: 'flex', flexDirection: 'column' }}>
             <Navbar />
-            <Box sx={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', p: 3 }}>
+            <Box sx={{ 
+              flex: 1, 
+              display: 'flex', 
+              alignItems: 'center', 
+              justifyContent: 'center', 
+              p: 3,
+              background: theme.palette.mode === 'dark'
+                ? 'radial-gradient(ellipse at 50% 50%, rgba(239,68,68,0.03) 0%, transparent 70%)'
+                : 'radial-gradient(ellipse at 50% 50%, rgba(239,68,68,0.01) 0%, transparent 70%)',
+            }}>
               <motion.div
                 initial={{ opacity: 0, y: 30 }}
                 animate={{ opacity: 1, y: 0 }}
@@ -363,12 +415,23 @@ export default function RiderHome() {
                 style={{ maxWidth: 420, width: '100%', textAlign: 'center' }}
               >
                 <Box sx={{
-                  p: 4, borderRadius: '24px',
-                  background: theme.palette.mode === 'dark'
-                    ? 'linear-gradient(145deg, rgba(239,68,68,0.08), rgba(239,68,68,0.02))'
-                    : 'white',
+                  p: 4,
+                  borderRadius: '1.75rem',
+                  backdropFilter: 'blur(20px)',
+                  background: theme.palette.mode === 'dark' ? 'rgba(30, 30, 30, 0.6)' : 'rgba(255, 255, 255, 0.8)',
                   border: '1px solid rgba(239,68,68,0.25)',
-                  boxShadow: '0 20px 60px rgba(239,68,68,0.08)',
+                  boxShadow: theme.palette.mode === 'dark' 
+                    ? '0 20px 60px rgba(0, 0, 0, 0.4), 0 0 40px rgba(239, 68, 68, 0.05)'
+                    : '0 20px 60px rgba(239, 68, 68, 0.05)',
+                  position: 'relative',
+                  overflow: 'hidden',
+                  '&::before': {
+                    content: '""',
+                    position: 'absolute',
+                    top: 0, right: 0, width: 100, height: 100,
+                    background: 'radial-gradient(circle, rgba(239,68,68,0.08) 0%, transparent 70%)',
+                    borderRadius: '50%',
+                  }
                 }}>
                   <div style={{
                     width: 84, height: 84,
@@ -379,24 +442,34 @@ export default function RiderHome() {
                     alignItems: 'center',
                     justifyContent: 'center',
                     margin: '0 auto 20px',
+                    boxShadow: '0 0 20px rgba(239,68,68,0.2)',
+                    position: 'relative',
+                    zIndex: 1,
                   }}>
                     <BlockIcon style={{ color: '#ef4444', fontSize: 42 }} />
                   </div>
-                  <Typography variant="h5" sx={{ color: 'text.primary', fontWeight: 800, mb: 1 }}>
+                  <Typography variant="h5" sx={{ color: 'text.primary', fontWeight: 800, mb: 1, position: 'relative', zIndex: 1 }}>
                     Account {approvalStatus}
                   </Typography>
-                  <Typography variant="body1" sx={{ color: 'text.secondary', mb: 2 }}>
-                    {approvalStatus === 'Suspended'
+                  <Typography variant="body1" sx={{ color: 'text.secondary', mb: 3, fontSize: '0.925rem', lineHeight: 1.5, position: 'relative', zIndex: 1 }}>
+                    {isSuspended
                       ? 'Your rider account has been suspended. Please contact support for assistance.'
                       : 'Your rider application was not approved. Please contact support if you believe this is an error.'}
                   </Typography>
                   <Box sx={{
-                    p: 1.5, borderRadius: 2,
+                    p: 1.5,
+                    borderRadius: '0.75rem',
                     background: 'rgba(239,68,68,0.08)',
                     border: '1px solid rgba(239,68,68,0.2)',
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    gap: 1,
+                    position: 'relative',
+                    zIndex: 1,
                   }}>
-                    <Typography variant="caption" sx={{ color: '#ef4444' }}>
-                      Status: <strong>{approvalStatus}</strong>
+                    <BlockIcon style={{ color: '#ef4444', fontSize: 16 }} />
+                    <Typography variant="caption" sx={{ color: '#ef4444', fontWeight: 700 }}>
+                      Status: {approvalStatus}
                     </Typography>
                   </Box>
                 </Box>
@@ -421,7 +494,7 @@ export default function RiderHome() {
               justifyContent: 'center',
               p: 3,
               background: theme.palette.mode === 'dark'
-                ? 'radial-gradient(ellipse at 50% 80%, rgba(16,185,129,0.06) 0%, transparent 65%)'
+                ? 'radial-gradient(ellipse at 50% 80%, rgba(16,185,129,0.08) 0%, transparent 65%)'
                 : 'radial-gradient(ellipse at 50% 80%, rgba(16,185,129,0.04) 0%, transparent 65%)',
             }}
           >
@@ -434,26 +507,38 @@ export default function RiderHome() {
               {/* Stats row */}
               <Box sx={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 2, mb: 4 }}>
                 {[
-                  { icon: <BikeIcon />, label: 'Total Rides', value: stats?.totalRides?.toString() ?? '—', color: RIDER_ACCENT },
-                  { icon: <EarningsIcon />, label: "Today's Earnings", value: stats ? `Rs. ${stats.todayEarnings.toLocaleString()}` : '—', color: '#f59e0b' },
-                  { icon: <StarIcon />, label: 'Rating', value: stats ? `${stats.rating.toFixed(1)} ★` : '—', color: '#a78bfa' },
+                  { icon: <BikeIcon />, label: 'Total Rides', value: stats?.totalRides != null ? stats.totalRides.toString() : '—', color: RIDER_ACCENT, glow: 'rgba(16, 185, 129, 0.1)' },
+                  { icon: <EarningsIcon />, label: "Today's Earnings", value: stats?.todayEarnings != null ? `Rs. ${stats.todayEarnings.toLocaleString()}` : '—', color: '#f59e0b', glow: 'rgba(245, 158, 11, 0.1)' },
+                  { icon: <StarIcon />, label: 'Rating', value: stats?.rating != null ? stats.rating.toFixed(1) : '—', color: '#a78bfa', glow: 'rgba(168, 85, 247, 0.1)' },
                 ].map((stat, i) => (
                   <motion.div
                     key={i}
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: i * 0.1 + 0.2 }}
+                    whileHover={{ 
+                      scale: 1.05, 
+                      boxShadow: `0 8px 32px ${stat.glow}`,
+                      borderColor: stat.color
+                    }}
+                    transition={{ delay: i * 0.1 + 0.2, type: 'spring', stiffness: 300, damping: 20 }}
                     style={{
-                      background: theme.palette.mode === 'dark' ? 'rgba(255,255,255,0.03)' : '#fff',
-                      border: `1px solid ${theme.palette.mode === 'dark' ? 'rgba(255,255,255,0.07)' : '#e5e7eb'}`,
-                      borderRadius: 18,
-                      padding: '16px 14px',
+                      background: theme.palette.mode === 'dark' 
+                        ? 'linear-gradient(145deg, rgba(255,255,255,0.03), rgba(255,255,255,0.01))' 
+                        : 'rgba(255, 255, 255, 0.7)',
+                      backdropFilter: 'blur(12px)',
+                      border: `1px solid ${theme.palette.mode === 'dark' ? 'rgba(255,255,255,0.07)' : 'rgba(0,0,0,0.06)'}`,
+                      borderRadius: 20,
+                      padding: '18px 14px',
                       textAlign: 'center',
+                      cursor: 'default',
+                      transition: 'border-color 0.25s ease',
                     }}
                   >
-                    <div style={{ color: stat.color, marginBottom: 6 }}>{stat.icon}</div>
-                    <p style={{ color: stat.color, fontWeight: 800, fontSize: 18, margin: '0 0 4px' }}>{stat.value}</p>
-                    <p style={{ color: '#9ca3af', fontSize: 11, margin: 0, lineHeight: 1.3 }}>{stat.label}</p>
+                    <div style={{ color: stat.color, marginBottom: 8, display: 'flex', justifyContent: 'center' }}>{stat.icon}</div>
+                    <p style={{ color: theme.palette.text.primary, fontWeight: 900, fontSize: 18, margin: '0 0 4px', letterSpacing: '-0.02em', fontFamily: 'monospace' }}>
+                      {stat.value}{stat.label === 'Rating' && stat.value !== '—' && <span style={{ fontSize: 13, color: '#f59e0b', marginLeft: 2 }}>★</span>}
+                    </p>
+                    <p style={{ color: '#9ca3af', fontSize: 11, fontWeight: 600, margin: 0, lineHeight: 1.3, textTransform: 'uppercase', letterSpacing: '0.04em' }}>{stat.label}</p>
                   </motion.div>
                 ))}
               </Box>
@@ -462,45 +547,73 @@ export default function RiderHome() {
               <Box
                 sx={{
                   p: 4,
-                  borderRadius: '24px',
+                  borderRadius: '2rem',
+                  backdropFilter: 'blur(24px)',
                   background: theme.palette.mode === 'dark'
-                    ? `linear-gradient(145deg, rgba(16,185,129,0.08), rgba(16,185,129,0.02))`
-                    : 'white',
-                  border: `1px solid ${ACCENT_ALPHA(0.2)}`,
+                    ? `linear-gradient(145deg, rgba(16,185,129,0.06), rgba(16,185,129,0.01))`
+                    : 'rgba(255, 255, 255, 0.85)',
+                  border: `1px solid ${theme.palette.mode === 'dark' ? 'rgba(16, 185, 129, 0.2)' : 'rgba(16, 185, 129, 0.15)'}`,
                   textAlign: 'center',
-                  boxShadow: `0 20px 60px ${ACCENT_ALPHA(0.08)}`,
+                  boxShadow: theme.palette.mode === 'dark'
+                    ? `0 30px 70px rgba(0,0,0,0.5), 0 0 50px ${ACCENT_ALPHA(0.04)}`
+                    : `0 30px 70px ${ACCENT_ALPHA(0.04)}`,
+                  position: 'relative',
+                  overflow: 'hidden',
+                  '&::before': {
+                    content: '""',
+                    position: 'absolute',
+                    top: 0, right: 0, width: 140, height: 140,
+                    background: `radial-gradient(circle, ${ACCENT_ALPHA(0.08)} 0%, transparent 70%)`,
+                    borderRadius: '50%',
+                    zIndex: 0
+                  }
                 }}
               >
                 {/* Animated bike icon */}
                 <motion.div
                   animate={{ y: [0, -8, 0] }}
                   transition={{ duration: 3, repeat: Infinity, ease: 'easeInOut' }}
-                  style={{ marginBottom: 20 }}
+                  style={{ marginBottom: 20, position: 'relative', zIndex: 1 }}
                 >
                   <div style={{
-                    width: 84, height: 84,
+                    width: 88, height: 88,
                     background: ACCENT_ALPHA(0.12),
-                    border: `2px solid ${ACCENT_ALPHA(0.3)}`,
+                    border: `2px solid ${ACCENT_ALPHA(0.35)}`,
                     borderRadius: '50%',
                     display: 'inline-flex',
                     alignItems: 'center',
                     justifyContent: 'center',
+                    boxShadow: `0 0 25px ${ACCENT_ALPHA(0.2)}`,
                   }}>
-                    <BikeIcon style={{ color: RIDER_ACCENT, fontSize: 42 }} />
+                    <BikeIcon style={{ color: RIDER_ACCENT, fontSize: 44 }} />
                   </div>
                 </motion.div>
 
-                <Typography variant="h4" sx={{ color: 'text.primary', fontWeight: 800, mb: 1 }}>
-                  Welcome back, {userName}! 👋
+                <Typography variant="h4" sx={{ color: 'text.primary', fontWeight: 900, mb: 1.5, letterSpacing: '-0.02em', position: 'relative', zIndex: 1 }}>
+                  Welcome back, {userName}!
                 </Typography>
-                <Typography variant="body1" sx={{ color: 'text.secondary', mb: 1 }}>
-                  You're currently <strong style={{ color: '#ef4444' }}>offline</strong>.
-                  Toggle the switch below to start accepting ride requests.
+                <Typography variant="body1" sx={{ color: 'text.secondary', mb: 2, fontSize: '0.975rem', lineHeight: 1.5, position: 'relative', zIndex: 1 }}>
+                  You are currently <span style={{ 
+                    display: 'inline-flex', 
+                    alignItems: 'center', 
+                    padding: '2px 10px', 
+                    borderRadius: '20px', 
+                    background: 'rgba(239, 68, 68, 0.12)', 
+                    border: '1px solid rgba(239, 68, 68, 0.25)', 
+                    color: '#ef4444', 
+                    fontWeight: 700, 
+                    fontSize: '11px',
+                    textTransform: 'uppercase',
+                    letterSpacing: '0.05em',
+                    verticalAlign: 'middle',
+                    marginLeft: '4px',
+                    marginRight: '4px',
+                  }}>offline</span>. Go online to accept ride requests.
                 </Typography>
 
                 {/* Hub status (only shown if disconnected) */}
                 {hubBadge && (
-                  <Box sx={{ display: 'flex', justifyContent: 'center', mb: 2 }}>
+                  <Box sx={{ display: 'flex', justifyContent: 'center', mb: 3, position: 'relative', zIndex: 1 }}>
                     {hubBadge}
                   </Box>
                 )}
@@ -509,44 +622,49 @@ export default function RiderHome() {
 
                 {/* Go Online button */}
                 <motion.button
-                  whileHover={{ scale: 1.03 }}
-                  whileTap={{ scale: 0.97 }}
+                  whileHover={{ scale: 1.02, boxShadow: `0 12px 40px ${ACCENT_ALPHA(0.6)}` }}
+                  whileTap={{ scale: 0.98 }}
                   onClick={handleToggleOnline}
                   disabled={toggleOnlineMutation.isPending}
                   style={{
                     padding: '18px 48px',
-                    borderRadius: 20,
+                    borderRadius: 18,
                     border: 'none',
                     background: toggleOnlineMutation.isPending
                       ? ACCENT_ALPHA(0.4)
                       : `linear-gradient(135deg, ${RIDER_ACCENT} 0%, #059669 100%)`,
                     color: 'white',
                     fontWeight: 800,
-                    fontSize: 17,
+                    fontSize: 16,
                     cursor: toggleOnlineMutation.isPending ? 'not-allowed' : 'pointer',
-                    boxShadow: `0 8px 32px ${ACCENT_ALPHA(0.5)}`,
+                    boxShadow: `0 8px 30px ${ACCENT_ALPHA(0.4)}`,
                     display: 'inline-flex',
                     alignItems: 'center',
                     gap: 10,
-                    transition: 'all 0.2s ease',
+                    transition: 'box-shadow 0.25s ease',
                     width: '100%',
                     justifyContent: 'center',
+                    position: 'relative',
+                    zIndex: 1,
                   }}
                 >
-                  <PowerIcon style={{ fontSize: 22 }} />
+                  <PowerIcon style={{ fontSize: 20 }} />
                   {toggleOnlineMutation.isPending ? 'Going Online...' : 'Go Online'}
                 </motion.button>
 
                 {/* Location permission warning */}
                 {permissionState === 'denied' && (
                   <Box sx={{
-                    mt: 2, p: 1.5,
-                    borderRadius: 2,
+                    mt: 3, p: 2,
+                    borderRadius: '0.75rem',
                     background: 'rgba(239,68,68,0.08)',
                     border: '1px solid rgba(239,68,68,0.2)',
+                    position: 'relative',
+                    zIndex: 1,
                   }}>
-                    <Typography variant="caption" sx={{ color: '#ef4444' }}>
-                      ⚠️ Location permission required. Please enable it in your browser settings to go online.
+                    <Typography variant="caption" sx={{ color: '#ef4444', fontWeight: 600, display: 'flex', alignItems: 'center', gap: 1, justifyContent: 'center' }}>
+                      <BlockIcon sx={{ fontSize: 16 }} />
+                      Location permission required. Enable settings to go online.
                     </Typography>
                   </Box>
                 )}
@@ -586,32 +704,52 @@ export default function RiderHome() {
             initial={{ opacity: 0, y: -10 }}
             animate={{ opacity: 1, y: 0 }}
             style={{
-              display: 'flex', alignItems: 'center', gap: 8,
+              display: 'flex', alignItems: 'center', gap: 10,
               background: 'rgba(14,14,14,0.92)',
-              backdropFilter: 'blur(14px)',
-              WebkitBackdropFilter: 'blur(14px)',
+              backdropFilter: 'blur(20px)',
+              WebkitBackdropFilter: 'blur(20px)',
               border: `1px solid ${ACCENT_ALPHA(0.3)}`,
               borderRadius: 14,
-              padding: '8px 14px',
+              padding: '10px 16px',
+              boxShadow: '0 8px 32px rgba(0, 0, 0, 0.4)',
             }}
           >
             {/* Live pulse */}
             <div style={{ position: 'relative', width: 10, height: 10, flexShrink: 0 }}>
-              <div style={{ width: 10, height: 10, borderRadius: '50%', background: RIDER_ACCENT }} />
+              <div style={{ 
+                width: 10, height: 10, 
+                borderRadius: '50%', 
+                background: rideStatus === 'RIDE_REQUESTED' ? '#ef4444' : rideStatus === 'ARRIVED_WAITING' ? '#f59e0b' : RIDER_ACCENT 
+              }} />
               <motion.div
                 animate={{ scale: [1, 2.5, 1], opacity: [0.8, 0, 0.8] }}
                 transition={{ duration: 1.5, repeat: Infinity }}
-                style={{ position: 'absolute', inset: 0, borderRadius: '50%', background: RIDER_ACCENT }}
+                style={{ 
+                  position: 'absolute', inset: 0, borderRadius: '50%', 
+                  background: rideStatus === 'RIDE_REQUESTED' ? '#ef4444' : rideStatus === 'ARRIVED_WAITING' ? '#f59e0b' : RIDER_ACCENT 
+                }}
               />
             </div>
-            <SignalIcon style={{ color: RIDER_ACCENT, fontSize: 15 }} />
-            <span style={{ color: 'white', fontWeight: 700, fontSize: 13 }}>
-              {rideStatus === 'ONLINE_IDLE' ? 'Looking for rides...' :
-               rideStatus === 'RIDE_REQUESTED' ? '🔔 Incoming request!' :
-               rideStatus === 'EN_ROUTE_PICKUP' ? '🗺️ En route to pickup' :
-               rideStatus === 'ARRIVED_WAITING' ? '📍 Waiting for OTP' :
-               rideStatus === 'RIDE_IN_PROGRESS' ? '🛵 Ride in progress' :
-               '⏳ Completing ride...'}
+            {rideStatus === 'ONLINE_IDLE' && <SignalIcon style={{ color: RIDER_ACCENT, fontSize: 16 }} />}
+            {rideStatus === 'RIDE_REQUESTED' && <RequestIcon style={{ color: '#ef4444', fontSize: 16 }} />}
+            {rideStatus === 'EN_ROUTE_PICKUP' && <MapIcon style={{ color: '#2E9EBF', fontSize: 16 }} />}
+            {rideStatus === 'ARRIVED_WAITING' && <TimerIcon style={{ color: '#f59e0b', fontSize: 16 }} />}
+            {rideStatus === 'RIDE_IN_PROGRESS' && <BikeIcon style={{ color: RIDER_ACCENT, fontSize: 16 }} />}
+            {rideStatus === 'COMPLETING' && <CompleteIcon style={{ color: RIDER_ACCENT, fontSize: 16 }} />}
+
+            <span style={{ 
+              color: 'white', 
+              fontWeight: 800, 
+              fontSize: '11px',
+              textTransform: 'uppercase',
+              letterSpacing: '0.06em',
+            }}>
+              {rideStatus === 'ONLINE_IDLE' ? 'Online • Looking for rides' :
+               rideStatus === 'RIDE_REQUESTED' ? 'Incoming request' :
+               rideStatus === 'EN_ROUTE_PICKUP' ? 'En route to pickup' :
+               rideStatus === 'ARRIVED_WAITING' ? 'Waiting for OTP' :
+               rideStatus === 'RIDE_IN_PROGRESS' ? 'Trip in progress' :
+               'Completing ride'}
             </span>
           </motion.div>
 

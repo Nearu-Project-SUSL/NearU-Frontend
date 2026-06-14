@@ -1217,9 +1217,11 @@ export default function LandingPage() {
       <header className="sticky top-0 z-40 border-b border-white/5 bg-black/40 backdrop-blur-2xl">
         <nav className="mx-auto flex max-w-7xl items-center justify-between px-6 py-5 md:px-10">
           <Link to="/" className="flex items-center gap-3 group">
-            <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-gradient-to-br from-[#2E9EBF] to-sky-500 shadow-[0_0_24px_rgba(46,158,191,0.65)] group-hover:scale-105 transition-transform">
-              <span className="text-xl">🎓</span>
-            </div>
+            <img
+              src="/NearU Logo.svg"
+              alt="NearU Logo"
+              className="h-16 w-16 object-contain group-hover:scale-105 transition-transform"
+            />
             <span className="text-2xl font-black tracking-tight text-white">
               Near<span className="bg-gradient-to-r from-sky-400 to-[#2E9EBF] bg-clip-text text-transparent">U</span>
             </span>

@@ -1,13 +1,23 @@
+import { motion } from 'framer-motion';
+import {
+  DirectionsBike as BikeIcon,
+  Flag as FlagIcon,
+  AttachMoney as MoneyIcon,
+  HourglassEmpty as HourglassIcon,
+  Shield as ShieldIcon,
+  NavigateNext as NextIcon,
+} from '@mui/icons-material';
+
 interface Props {
   riderName?: string;
   riderVehicle?: string;
   estimatedFare: number;
   dropoffLabel?: string;
-  onRiderCompleted:()=> void;
+  onRiderCompleted: () => void;
 }
 
 export function InProgressRideScreen({
-  riderName    = 'Your rider',
+  riderName = 'Your rider',
   riderVehicle,
   estimatedFare,
   dropoffLabel = 'Drop-off point',
@@ -24,150 +34,269 @@ export function InProgressRideScreen({
     <div
       className="flex flex-col min-h-screen items-center justify-center p-4 animate-fadeIn"
       style={{
-        background: '#0b0b0b',
-        color: 'var(--text-primary)',
+        background: 'radial-gradient(circle at 50% 50%, #111827 0%, #030712 100%)',
+        color: '#f9fafb',
+        fontFamily: 'system-ui, sans-serif',
       }}
     >
-      {/* TOP STATUS */}
-      <div className="absolute top-5 left-0 right-0 flex justify-center">
-        <div
-          className="px-3 py-1 rounded-full text-[12px] font-medium"
-          style={{
-            background: 'rgba(99,195,74,0.12)',
-            color: '#63c34a',
-          }}
-        >
-          ● Ride in progress
-        </div>
-      </div>
-
-      {/* MAIN CARD */}
+      {/* Background Decorative Orbs */}
       <div
-        className="w-full max-w-xl rounded-3xl px-6 py-6 animate-slideUp"
         style={{
-          background: 'rgba(18,18,18,0.96)',
-          backdropFilter: 'blur(24px)',
-          border: '1px solid rgba(255,255,255,0.08)',
-          boxShadow: '0 25px 80px rgba(0,0,0,0.6)',
+          position: 'absolute',
+          top: '20%',
+          left: '10%',
+          width: '360px',
+          height: '360px',
+          background: 'radial-gradient(circle, rgba(16, 185, 129, 0.12) 0%, transparent 70%)',
+          borderRadius: '50%',
+          filter: 'blur(55px)',
+          pointerEvents: 'none',
+        }}
+      />
+      <div
+        style={{
+          position: 'absolute',
+          bottom: '25%',
+          right: '15%',
+          width: '320px',
+          height: '320px',
+          background: 'radial-gradient(circle, rgba(46, 158, 191, 0.08) 0%, transparent 70%)',
+          borderRadius: '50%',
+          filter: 'blur(50px)',
+          pointerEvents: 'none',
+        }}
+      />
+
+      {/* TOP STATUS */}
+      <motion.div
+        initial={{ y: -20, opacity: 0 }}
+        animate={{ y: 0, opacity: 1 }}
+        style={{
+          position: 'absolute',
+          top: 24,
+          display: 'flex',
+          justifyContent: 'center',
+          width: '100%',
         }}
       >
-
-        {/* TITLE */}
-        <div className="text-center mb-5">
-          <h2 className="text-[18px] font-semibold">
-            Your trip is ongoing
-          </h2>
-          <p className="text-[12px] text-white/50 mt-1">
-            Live tracking active
-          </p>
-        </div>
-
-        {/* LIVE STATUS CARD (replaces map box) */}
         <div
-          className="rounded-2xl p-5 mb-5 flex flex-col items-center justify-center"
           style={{
-            background: 'rgba(255,255,255,0.04)',
-            border: '1px solid rgba(255,255,255,0.06)',
+            padding: '6px 16px',
+            borderRadius: 30,
+            background: 'rgba(16, 185, 129, 0.08)',
+            border: '1px solid rgba(16, 185, 129, 0.25)',
+            color: '#10b981',
+            fontSize: 12.5,
+            fontWeight: 600,
+            letterSpacing: '0.02em',
+            boxShadow: '0 4px 15px rgba(16, 185, 129, 0.15)',
+            display: 'flex',
+            alignItems: 'center',
+            gap: 6,
           }}
         >
           <div
-            className="w-3 h-3 rounded-full mb-3"
             style={{
-              background: 'var(--nearu-accent)',
-              boxShadow: '0 0 0 8px var(--nearu-accent-subtle)',
+              width: 8,
+              height: 8,
+              borderRadius: '50%',
+              background: '#10b981',
+              boxShadow: '0 0 6px #10b981',
             }}
           />
+          Ride In Progress
+        </div>
+      </motion.div>
 
-          <span className="text-[13px] text-white/60 text-center">
+      {/* MAIN CARD */}
+      <motion.div
+        initial={{ y: 30, opacity: 0, scale: 0.96 }}
+        animate={{ y: 0, opacity: 1, scale: 1 }}
+        transition={{ type: 'spring', stiffness: 260, damping: 26 }}
+        style={{
+          width: '100%',
+          maxWidth: '520px',
+          borderRadius: 28,
+          padding: '32px 28px',
+          background: 'rgba(17, 17, 17, 0.75)',
+          backdropFilter: 'blur(30px)',
+          WebkitBackdropFilter: 'blur(30px)',
+          border: '1px solid rgba(255, 255, 255, 0.08)',
+          boxShadow: '0 30px 90px rgba(0, 0, 0, 0.65), inset 0 1px 0 rgba(255, 255, 255, 0.05)',
+          zIndex: 10,
+        }}
+      >
+        {/* TITLE */}
+        <div style={{ textAlign: 'center', marginBottom: 28 }}>
+          <h2 style={{ color: 'white', margin: '0 0 6px', fontWeight: 800, fontSize: 22, letterSpacing: '-0.02em' }}>
+            Your Trip is Ongoing
+          </h2>
+          <p style={{ color: '#9ca3af', margin: 0, fontSize: 13.5, fontWeight: 500 }}>
+            Live tracking and route navigation active
+          </p>
+        </div>
+
+        {/* LIVE STATUS CARD */}
+        <div
+          style={{
+            background: 'rgba(255, 255, 255, 0.02)',
+            border: '1px solid rgba(255, 255, 255, 0.05)',
+            borderRadius: 24,
+            padding: '24px 20px',
+            marginBottom: 24,
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
+            justifyContent: 'center',
+          }}
+        >
+          {/* Animated pulsing orb */}
+          <div style={{ position: 'relative', width: 14, height: 14, marginBottom: 12 }}>
+            <div
+              style={{
+                width: 14,
+                height: 14,
+                borderRadius: '50%',
+                background: '#10b981',
+                boxShadow: '0 0 10px rgba(16, 185, 129, 0.5)',
+              }}
+            />
+            <motion.div
+              animate={{ scale: [1, 2.2, 1], opacity: [0.6, 0, 0.6] }}
+              transition={{ repeat: Infinity, duration: 1.8, ease: 'easeInOut' }}
+              style={{
+                position: 'absolute',
+                inset: 0,
+                borderRadius: '50%',
+                background: '#10b981',
+              }}
+            />
+          </div>
+
+          <span style={{ color: '#d1d5db', fontSize: 13.5, fontWeight: 600, textAlign: 'center' }}>
             Navigating to your destination
           </span>
         </div>
 
-        {/* RIDER CARD */}
+        {/* RIDER PROFILE CARD */}
         <div
-          className="flex items-center gap-3.5 rounded-2xl px-4 py-3 mb-5"
           style={{
-            background: 'rgba(255,255,255,0.03)',
-            border: '1px solid rgba(255,255,255,0.08)',
+            display: 'flex',
+            alignItems: 'center',
+            gap: 16,
+            borderRadius: 24,
+            padding: '16px 20px',
+            marginBottom: 24,
+            background: 'rgba(255, 255, 255, 0.01)',
+            border: '1px solid rgba(255, 255, 255, 0.05)',
           }}
         >
           <div
-            className="w-11 h-11 rounded-full flex items-center justify-center font-medium"
             style={{
-              background: 'var(--nearu-accent-subtle)',
-              border: '1px solid var(--nearu-accent)',
-              color: 'var(--nearu-accent)',
+              width: 50,
+              height: 50,
+              borderRadius: '50%',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              fontWeight: 800,
+              fontSize: 16,
+              background: 'rgba(16, 185, 129, 0.1)',
+              border: '1.5px solid rgba(16, 185, 129, 0.35)',
+              color: '#10b981',
+              boxShadow: '0 4px 15px rgba(16, 185, 129, 0.1)',
             }}
           >
             {initials}
           </div>
 
-          <div className="flex-1">
-            <div className="text-[15px] font-medium">
+          <div style={{ flex: 1 }}>
+            <div style={{ color: '#f3f4f6', fontWeight: 800, fontSize: 15.5, letterSpacing: '-0.01em' }}>
               {riderName}
             </div>
+
             {riderVehicle && (
-              <div className="text-[12px] text-white/50">
+              <div style={{ color: '#9ca3af', fontSize: 13, fontWeight: 500, marginTop: 2 }}>
                 {riderVehicle}
               </div>
             )}
           </div>
         </div>
 
-        {/* TRIP INFO */}
+        {/* TRIP INFO - SLEEK RECEIPT */}
         <div
-          className="rounded-2xl p-4 mb-5"
           style={{
-            background: 'rgba(255,255,255,0.03)',
-            border: '1px solid rgba(255,255,255,0.08)',
+            borderRadius: 24,
+            padding: '22px 20px',
+            marginBottom: 24,
+            background: 'rgba(255, 255, 255, 0.02)',
+            border: '1px solid rgba(255, 255, 255, 0.06)',
+            boxShadow: 'inset 0 1px 0 rgba(255, 255, 255, 0.02)',
           }}
         >
-          <div className="flex justify-between py-2 border-b border-white/10">
-            <span className="text-[13px] text-white/50">
-              Destination
-            </span>
-            <span className="text-[13px] text-white/80 font-medium">
+          {/* Destination */}
+          <div
+            style={{
+              display: 'flex',
+              justifyContent: 'space-between',
+              alignItems: 'center',
+              paddingBottom: 16,
+              borderBottom: '1px solid rgba(255, 255, 255, 0.08)',
+            }}
+          >
+            <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+              <FlagIcon style={{ color: '#ef4444', fontSize: 16 }} />
+              <span style={{ fontSize: 13.5, color: '#9ca3af', fontWeight: 500 }}>Destination</span>
+            </div>
+            <span style={{ fontSize: 14, color: '#f3f4f6', fontWeight: 700 }}>
               {dropoffLabel}
             </span>
           </div>
 
-          <div className="flex justify-between pt-3">
-            <span className="text-[14px] font-medium">
-              Estimated fare
-            </span>
-            <span className="text-[20px] font-semibold text-green-400">
-              Rs. {estimatedFare.toFixed(2)}
+          {/* Fare */}
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', paddingTop: 16 }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+              <MoneyIcon style={{ color: '#10b981', fontSize: 16 }} />
+              <span style={{ fontSize: 14, color: '#f3f4f6', fontWeight: 600 }}>Estimated Fare</span>
+            </div>
+            <span
+              style={{
+                fontSize: 22,
+                fontWeight: 800,
+                color: '#10b981',
+                fontFamily: 'monospace',
+                letterSpacing: '-0.02em',
+              }}
+            >
+              Rs. {estimatedFare.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
             </span>
           </div>
         </div>
 
-        {/* LIVE STATUS */}
+        {/* TRIP SECURITY */}
         <div
-          className="rounded-xl px-3.5 py-3 text-[13px] mb-4"
           style={{
-            background: 'rgba(255,255,255,0.03)',
-            border: '1px solid rgba(255,255,255,0.08)',
-            color: 'rgba(255,255,255,0.55)',
+            borderRadius: 18,
+            padding: '14px 18px',
+            fontSize: 12.5,
+            marginBottom: 20,
+            background: 'rgba(255, 255, 255, 0.02)',
+            border: '1px solid rgba(255, 255, 255, 0.05)',
+            color: '#9ca3af',
+            display: 'flex',
+            alignItems: 'flex-start',
+            gap: 12,
+            lineHeight: 1.45,
           }}
         >
-          Waiting for rider to complete the trip…
+          <ShieldIcon style={{ color: '#2E9EBF', fontSize: 16, marginTop: 2, flexShrink: 0 }} />
+          <span>
+            Safe ride active. In-app navigation is monitored by NearU control center for passenger and rider security.
+          </span>
         </div>
 
-        {/* DEV ONLY — remove before production */}
-        {/* In production this screen changes automatically via SignalR when rider presses complete */}
-        <button
-          onClick={onRiderCompleted}
-          className="w-full py-3 rounded-[10px] text-[13px] font-medium border
-                    active:scale-[0.98] transition-all"
-          style={{
-            background:  'rgba(99,195,74,0.08)',
-            borderColor: 'rgba(99,195,74,0.2)',
-            color:       '#63c34a',
-          }}>
-          [Dev] Simulate rider completed →
-        </button>
-
-      </div>
+       
+      </motion.div>
     </div>
   );
 }
