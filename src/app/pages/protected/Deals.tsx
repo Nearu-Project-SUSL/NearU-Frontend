@@ -16,6 +16,7 @@ import Navbar from "../../components/layout/Navbar";
 import DealFormDialog from "../../components/deal/DealFormDialog";
 import { useCreateDeal, useApprovedDeals } from "../../hooks/useDeals";
 import type { DealResponseDto } from "../../../api/services/dealsApi";
+import useAuth from "../../hooks/useAuth";
 
 function statusColor(status: string) {
   if (status === "Approved") return "#34d399";
@@ -55,10 +56,13 @@ function DealListCard({ deal }: { deal: DealResponseDto }) {
 }
 
 export default function Deals() {
+  const { auth } = useAuth();
   const [formOpen, setFormOpen] = useState(false);
   
   const { data: approvedDeals = [], isLoading: loadingApproved } = useApprovedDeals();
   const createDealMutation = useCreateDeal();
+
+  const isBusinessOrAdmin = auth?.user?.roles?.includes("BusinessOwner") || auth?.user?.roles?.includes("Admin");
 
   const handleSubmit = async (formData: FormData) => {
     try {
@@ -90,14 +94,16 @@ export default function Deals() {
                 </Typography>
               </Box>
             </Box>
-            <Button
-              variant="contained"
-              startIcon={<AddIcon />}
-              onClick={() => setFormOpen(true)}
-              sx={{ fontWeight: 700, borderRadius: "12px", color: "#111" }}
-            >
-              Submit Deal
-            </Button>
+            {isBusinessOrAdmin && (
+              <Button
+                variant="contained"
+                startIcon={<AddIcon />}
+                onClick={() => setFormOpen(true)}
+                sx={{ fontWeight: 700, borderRadius: "12px", color: "#111" }}
+              >
+                Submit Deal
+              </Button>
+            )}
           </Stack>
 
           <Typography variant="h6" sx={{ color: "#2E9EBF", fontWeight: 700, mb: 2 }}>
