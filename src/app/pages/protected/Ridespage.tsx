@@ -338,7 +338,7 @@ export default function RidesPage() {
 
     conn.on(
       'RideStateChanged',
-      (data: { rideId: string; status: string }) => {
+      (data: { rideId: string; status: string; otp?: string; otpExpiresAt?: string }) => {
         if (data.rideId !== ride.rideId) return;
 
         // Push every status change to the notification bell
@@ -366,6 +366,11 @@ export default function RidesPage() {
 
         switch (data.status) {
           case 'Accepted':
+            setRide(r => r ? {
+              ...r,
+              otp: data.otp,
+              otpExpiresAt: data.otpExpiresAt,
+            } : r);
             setScreen('accepted');
             break;
 
@@ -421,9 +426,9 @@ export default function RidesPage() {
         );
       }
     );
-    
+
     // Live location updates
-    
+
     conn.on(
       'LocationUpdated',
       (data: {
@@ -433,7 +438,7 @@ export default function RidesPage() {
         distanceToPickupKm?: number;
       }) => {
         if (data.rideId !== ride.rideId) return;
-        
+
         setRide(r =>
           r
             ? {
@@ -453,14 +458,12 @@ export default function RidesPage() {
       conn.stop();
       hubRef.current = null;
     };
-
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [ride?.rideId]);
 
   function reset() {
     setRide(null);
     setScreen('request');
-
     hubRef.current?.stop();
   }
 
@@ -497,11 +500,10 @@ export default function RidesPage() {
         <RideLayout>
           <PendingRideScreen
             rideId={ride!.rideId}
-            onAccepted={expiry => {
+            onAccepted={(expiry) => {         
               setRide(r =>
-                r ? { ...r, otpExpiresAt: expiry } : r
+                r ? { ...r, otpExpiresAt: expiry} : r  
               );
-
               setScreen('accepted');
             }}
             onCancel={reset}
@@ -550,12 +552,12 @@ export default function RidesPage() {
       return (
         <RideLayout>
           <CompletedScreen
-            fare={ride?.estimatedFare ?? 0}
-            onDone={(rating, feedback) => {
-              // You could call an API here to save feedback
-              console.log('Feedback:', rating, feedback);
-              reset();
-            }}
+            rideId={ride!.rideId}
+            serviceType={ride?.serviceType ?? 'PersonalRide'}
+            riderName={ride?.riderName}
+            distanceKm={ride?.distanceKm ?? 0}
+            finalFare={ride?.estimatedFare ?? 0}
+            onDone={reset}
           />
         </RideLayout>
       );

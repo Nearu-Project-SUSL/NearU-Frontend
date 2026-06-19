@@ -32,6 +32,7 @@ import { useAccommodations } from "../../hooks/useAccommodation";
 import { createAccommodation } from "../../../api/accommodationService";
 import AddAccommodationDialog, { AddAccommodationFormData } from "../../components/accommodation/AddAccommodationDialog";
 import { useTheme } from "@mui/material";
+import useAuth from "../../hooks/useAuth";
 
 
 const accommodationTypes = ["All", "Boarding", "Annex", "Apartment"] as const;
@@ -275,6 +276,9 @@ export default function Accommodation() {
 
     const queryClient = useQueryClient();
     const { data: accommodations = [], isLoading: loading, error } = useAccommodations();
+    const { auth } = useAuth();
+    
+    const canAddAccommodation = auth?.user?.roles?.includes('Admin') || auth?.user?.roles?.includes('Business');
 
     useEffect(() => {
         const t = setTimeout(() => {
@@ -359,21 +363,23 @@ export default function Accommodation() {
                                         Verified, student-friendly places near your campus. Browse by type, budget, and amenities.
                                     </Typography>
                                 </Box>
-                                <Button
-                                    variant="contained"
-                                    startIcon={<AddIcon />}
-                                    onClick={() => setOpenAddDialog(true)}
-                                    sx={{
-                                        backgroundColor: accent,
-                                        color: '#fff',
-                                        fontWeight: 800,
-                                        borderRadius: 2,
-                                        textTransform: "none",
-                                        "&:hover": { backgroundColor: '#1a7a9a' },
-                                    }}
-                                >
-                                    Add Place
-                                </Button>
+                                {canAddAccommodation && (
+                                    <Button
+                                        variant="contained"
+                                        startIcon={<AddIcon />}
+                                        onClick={() => setOpenAddDialog(true)}
+                                        sx={{
+                                            backgroundColor: accent,
+                                            color: '#fff',
+                                            fontWeight: 800,
+                                            borderRadius: 2,
+                                            textTransform: "none",
+                                            "&:hover": { backgroundColor: '#1a7a9a' },
+                                        }}
+                                    >
+                                        Add Place
+                                    </Button>
+                                )}
                             </Box>
                         </Fade>
 

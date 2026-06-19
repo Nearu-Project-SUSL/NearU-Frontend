@@ -5,8 +5,7 @@
  */
 import { useState } from 'react';
 import { Drawer } from 'vaul';
-import { OTPInput, OTPInputContext } from 'input-otp';
-import { useContext } from 'react';
+import { OTPInput } from 'input-otp';
 import { Key as KeyIcon } from '@mui/icons-material';
 import { motion } from 'framer-motion';
 
@@ -21,9 +20,7 @@ const ACCENT_ALPHA = (a: number) => `rgba(16, 185, 129, ${a})`;
 const OTP_LENGTH = 4;
 
 // ─── Slot component for input-otp ──────────────────────────────────────────
-function Slot({ index }: { index: number }) {
-  const { slots } = useContext(OTPInputContext);
-  const slot = slots[index];
+function Slot({ slot }: { slot: { char: string | null; isActive: boolean } }) {
   const isActive = slot?.isActive ?? false;
   const char = slot?.char ?? null;
 
@@ -136,8 +133,8 @@ export default function OtpVerifySheet({ onVerify, error, isVerifying = false }:
               onComplete={handleComplete}
               render={({ slots }) => (
                 <div style={{ display: 'flex', gap: 12 }}>
-                  {slots.map((_, i) => (
-                    <Slot key={i} index={i} />
+                  {slots.map((slot, i) => (
+                    <Slot key={i} slot={slot} />
                   ))}
                 </div>
               )}
