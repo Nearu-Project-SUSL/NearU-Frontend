@@ -37,6 +37,7 @@ const ForgotPassword = Loadable(lazyWithRetry(() => import("./pages/public/Forgo
 const ResetPassword = Loadable(lazyWithRetry(() => import("./pages/public/ResetPassword")));
 const Unauthorized = Loadable(lazyWithRetry(() => import("./pages/public/Unauthorized")));
 const LandingPage = Loadable(lazyWithRetry(() => import("./pages/public/LandingPage")));
+const LegalHub = Loadable(lazyWithRetry(() => import("./pages/public/LegalHub")));
 
 // ── Protected Pages (lazy) ────────────────────────────────────────────────────
 const Home = Loadable(lazyWithRetry(() => import("./pages/protected/Home")));
@@ -88,6 +89,14 @@ export const router = createBrowserRouter([
   {
     path: "/unauthorized",
     Component: Unauthorized,
+  },
+  {
+    path: "/privacy-policy",
+    Component: LegalHub,
+  },
+  {
+    path: "/terms-and-conditions",
+    Component: LegalHub,
   },
 
   // Protected Routes - Requires Authentication (Any Role)
