@@ -334,7 +334,7 @@ function TestimonialCard({ t, index }: { t:  Testimonial, index: number }) {
       <Card
         elevation={0}
         sx={{
-          width: { xs: '100%', md: 320 },
+          width: { xs: '100%'},
           minWidth: { xs: 240, md: 320 },
           bgcolor: 'var(--bg-surface)',
           borderRadius: '20px',
