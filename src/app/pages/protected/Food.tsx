@@ -50,6 +50,8 @@ export default function FoodPage(){
 
   const {auth} = useAuth();
   const currentUserId = auth?.user?.id;
+  console.log('auth user:', auth?.user);
+  console.log('roles:', auth?.user?.roles);
 
   const {data, isLoading, error} = useFoodShops({   //pas params to hook from there to API
     page: currentPage,
@@ -156,6 +158,7 @@ export default function FoodPage(){
   const accent = theme.palette.primary.main;
   const accentAlpha = (a: number) => `rgba(46, 158, 191, ${a})`;
 
+
   return (
     <Box
       sx={{
@@ -174,48 +177,49 @@ export default function FoodPage(){
         <Box sx={{ flex: 1, overflowY: 'auto', overflowX: 'hidden' }}>
           <Box sx={{px: { xs: 2, md: 4 }, py: { xs: 4, md: 5 }, pb:8, maxWidth:1400, mx:'auto' }}>
 
-              {/* Buiness owner welcome */}
-              <Container sx={{ mt: 0, mb: 4 }}>
-                <Paper 
-                  sx={{ 
-                    p: { xs: 3, md: 5 }, 
-                    display: 'flex',
-                    flexDirection: { xs: 'column', sm: 'row' },
-                    alignItems: { xs: 'flex-start', sm: 'center' },
-                    justifyContent: 'space-between',
-                    gap: 2,
-                    bgcolor: 'rgba(59, 130, 246, 0.05)',
-                    border: '1px solid rgba(59, 130, 246, 0.2)',
-                    borderRadius: '1.5rem',
-                    backdropFilter: 'blur(10px)'
-                  }}
-                >
-                  <Box>
-                    <Typography variant="h3" sx={{ color: '#3b82f6', fontWeight: 'bold', mb: 2 }}>
-                      Welcome, {auth?.user?.username || 'Owner'}!
-                    </Typography>
-                    <Typography variant="h6" sx={{ color: '#9ca3af' }}>
-                      You are logged in as a Business Owner.
-                    </Typography>
-                  </Box>
-
-                  <Button
-                    variant="contained"
-                    onClick={() => setProfileModalOpen(true)}
-                    sx={{
-                      bgcolor: '#2E9EBF',
-                      color: 'black',
-                      fontWeight: 700,
-                      borderRadius: '0.75rem',
-                      px: 4,
-                      whiteSpace: 'nowrap',
-                      '&:hover': { bgcolor: '#1a7a9a' }
+              {auth?.user?.roles?.includes('BusinessOwner') && (
+                <Container sx={{ mt: 0, mb: 4 }}>
+                  <Paper 
+                    sx={{ 
+                      p: { xs: 3, md: 5 }, 
+                      display: 'flex',
+                      flexDirection: { xs: 'column', sm: 'row' },
+                      alignItems: { xs: 'flex-start', sm: 'center' },
+                      justifyContent: 'space-between',
+                      gap: 2,
+                      bgcolor: 'rgba(59, 130, 246, 0.05)',
+                      border: '1px solid rgba(59, 130, 246, 0.2)',
+                      borderRadius: '1.5rem',
+                      backdropFilter: 'blur(10px)'
                     }}
                   >
-                    Complete Your Profile
-                  </Button>
-                </Paper>
-              </Container>
+                    <Box>
+                      <Typography variant="h3" sx={{ color: '#3b82f6', fontWeight: 'bold', mb: 2 }}>
+                        Welcome, {auth?.user?.username || 'Owner'}!
+                      </Typography>
+                      <Typography variant="h6" sx={{ color: '#9ca3af' }}>
+                        You are logged in as a Business Owner.
+                      </Typography>
+                    </Box>
+
+                    <Button
+                      variant="contained"
+                      onClick={() => setProfileModalOpen(true)}
+                      sx={{
+                        bgcolor: '#2E9EBF',
+                        color: 'black',
+                        fontWeight: 700,
+                        borderRadius: '0.75rem',
+                        px: 4,
+                        whiteSpace: 'nowrap',
+                        '&:hover': { bgcolor: '#1a7a9a' }
+                      }}
+                    >
+                      Complete Your Profile
+                    </Button>
+                  </Paper>
+                </Container>
+              )}
 
               <BusinessProfileSetupModal
                 open={profileModalOpen}
