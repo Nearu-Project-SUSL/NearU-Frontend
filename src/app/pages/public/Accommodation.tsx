@@ -10,7 +10,6 @@ import {
     Chip,
     Grid,
     InputAdornment,
-    Skeleton,
     Stack,
     TextField,
     Typography,
@@ -22,8 +21,8 @@ import SearchIcon from "@mui/icons-material/Search";
 import PlaceIcon from "@mui/icons-material/Place";
 import StarIcon from "@mui/icons-material/Star";
 import HotelIcon from "@mui/icons-material/Hotel";
-import CloseIcon from "@mui/icons-material/Close";
 import BedIcon from "@mui/icons-material/KingBed";
+import CloseIcon from "@mui/icons-material/Close";
 import AutoAwesomeIcon from "@mui/icons-material/AutoAwesome";
 import AddIcon from "@mui/icons-material/Add";
 import { Sidebar } from "../../components/layout/Sidebar";
@@ -32,7 +31,9 @@ import { useAccommodations } from "../../hooks/useAccommodation";
 import { createAccommodation } from "../../../api/accommodationService";
 import AddAccommodationDialog, { AddAccommodationFormData } from "../../components/accommodation/AddAccommodationDialog";
 import { useTheme } from "@mui/material";
-
+import useAuth from "../../hooks/useAuth";
+import type { Accommodation } from "../data/accommodations";
+import { motion, AnimatePresence } from "motion/react";
 
 const accommodationTypes = ["All", "Boarding", "Annex", "Apartment"] as const;
 
@@ -42,36 +43,62 @@ function LazyImage({ src, alt, height }: { src: string; alt: string; height: num
     const [error, setError] = useState(false);
 
     return (
-        <Box sx={{ position: "relative", height, overflow: "hidden", bgcolor: "action.hover", borderRadius: "16px 16px 0 0" }}>
-            {!loaded && !error && (
-                <Skeleton
-                    variant="rectangular"
-                    width="100%"
-                    height={height}
-                    animation="wave"
-                    sx={{ bgcolor: "rgba(255,255,255,0.05)", position: "absolute", inset: 0 }}
+        <Box sx={{ position: "relative", height, overflow: "hidden", bgcolor: "rgba(255, 255, 255, 0.02)", borderRadius: "16px 16px 0 0" }}>
+            <AnimatePresence>
+                {!loaded && !error && (
+                    <Box
+                        component={motion.div}
+                        initial={{ opacity: 1 }}
+                        exit={{ opacity: 0 }}
+                        sx={{
+                            position: "absolute",
+                            inset: 0,
+                            bgcolor: "rgba(10, 10, 20, 0.5)",
+                            backdropFilter: "blur(12px)",
+                            display: "flex",
+                            alignItems: "center",
+                            justifyContent: "center",
+                            zIndex: 1,
+                            overflow: "hidden",
+                            "&::after": {
+                                content: '""',
+                                position: "absolute",
+                                top: 0,
+                                left: 0,
+                                right: 0,
+                                bottom: 0,
+                                background: "linear-gradient(90deg, transparent, rgba(255,255,255,0.03), transparent)",
+                                transform: "translateX(-100%)",
+                                animation: "shimmer 1.8s infinite"
+                            }
+                        }}
+                    >
+                        <HotelIcon sx={{ fontSize: 32, color: "rgba(255,255,255,0.15)", animation: "pulse 1.5s infinite ease-in-out" }} />
+                    </Box>
+                )}
+            </AnimatePresence>
+
+            {!error ? (
+                <Box
+                    component={motion.img}
+                    src={src}
+                    alt={alt}
+                    initial={{ opacity: 0, scale: 0.98 }}
+                    animate={{ opacity: loaded ? 1 : 0, scale: loaded ? 1 : 0.98 }}
+                    transition={{ duration: 0.4, ease: "easeOut" }}
+                    onLoad={() => setLoaded(true)}
+                    onError={() => setError(true)}
+                    sx={{
+                        width: "100%",
+                        height: "100%",
+                        objectFit: "cover",
+                        display: "block",
+                        transition: "transform 0.5s ease",
+                        "&:hover": { transform: "scale(1.05)" },
+                    }}
                 />
-            )}
-            <Box
-                component="img"
-                src={src}
-                alt={alt}
-                loading="lazy"
-                onLoad={() => setLoaded(true)}
-                onError={() => setError(true)}
-                sx={{
-                    width: "100%",
-                    height: "100%",
-                    objectFit: "cover",
-                    display: "block",
-                    opacity: loaded ? 1 : 0,
-                    transition: "opacity 0.4s ease, transform 0.5s ease",
-                    transform: loaded ? "scale(1)" : "scale(1.03)",
-                    "&:hover": { transform: "scale(1.05)" },
-                }}
-            />
-            {error && (
-                <Box sx={{ display: "flex", alignItems: "center", justifyContent: "center", height: "100%", bgcolor: "#111" }}>
+            ) : (
+                <Box sx={{ display: "flex", alignItems: "center", justifyContent: "center", height: "100%", bgcolor: "#0a0a14" }}>
                     <HotelIcon sx={{ fontSize: 48, color: "rgba(255,255,255,0.1)" }} />
                 </Box>
             )}
@@ -81,35 +108,46 @@ function LazyImage({ src, alt, height }: { src: string; alt: string; height: num
 
 // ─── Accommodation Card Skeleton ──────────────────────────────────────────────
 function AccommodationSkeleton() {
-    const theme = useTheme();
     return (
         <Card
             sx={{
                 borderRadius: "20px",
                 height: "100%",
-                backgroundColor: theme.palette.background.paper,
-                border: `1px solid ${theme.palette.divider}`,
+                backgroundColor: "var(--bg-surface)",
+                border: "1px solid var(--nearu-border)",
                 display: "flex",
                 flexDirection: "column",
                 overflow: "hidden",
+                position: "relative",
+                "&::after": {
+                    content: '""',
+                    position: "absolute",
+                    top: 0,
+                    left: 0,
+                    right: 0,
+                    bottom: 0,
+                    background: "linear-gradient(90deg, transparent, rgba(255,255,255,0.03), transparent)",
+                    transform: "translateX(-100%)",
+                    animation: "shimmer 1.8s infinite"
+                }
             }}
         >
-            <Skeleton variant="rectangular" height={220} animation="wave" sx={{ bgcolor: "rgba(255,255,255,0.05)" }} />
+            <Box sx={{ height: 220, bgcolor: "rgba(255,255,255,0.03)", animation: "pulse 1.5s infinite ease-in-out" }} />
             <CardContent>
                 <Stack spacing={1.5}>
-                    <Skeleton variant="text" width="70%" height={28} sx={{ bgcolor: "rgba(255,255,255,0.05)" }} />
-                    <Skeleton variant="text" width="50%" height={20} sx={{ bgcolor: "rgba(255,255,255,0.05)" }} />
-                    <Skeleton variant="text" width="40%" height={20} sx={{ bgcolor: "rgba(255,255,255,0.05)" }} />
+                    <Box sx={{ height: 28, width: "70%", bgcolor: "rgba(255,255,255,0.03)", borderRadius: "4px", animation: "pulse 1.5s infinite ease-in-out" }} />
+                    <Box sx={{ height: 20, width: "50%", bgcolor: "rgba(255,255,255,0.02)", borderRadius: "4px", animation: "pulse 1.5s infinite ease-in-out" }} />
+                    <Box sx={{ height: 20, width: "40%", bgcolor: "rgba(255,255,255,0.02)", borderRadius: "4px", animation: "pulse 1.5s infinite ease-in-out" }} />
                     <Stack direction="row" spacing={1}>
-                        <Skeleton variant="rounded" width={72} height={24} sx={{ bgcolor: "rgba(255,255,255,0.05)" }} />
-                        <Skeleton variant="rounded" width={72} height={24} sx={{ bgcolor: "rgba(255,255,255,0.05)" }} />
-                        <Skeleton variant="rounded" width={72} height={24} sx={{ bgcolor: "rgba(255,255,255,0.05)" }} />
+                        <Box sx={{ height: 24, width: 72, bgcolor: "rgba(255,255,255,0.03)", borderRadius: "10px", animation: "pulse 1.5s infinite ease-in-out" }} />
+                        <Box sx={{ height: 24, width: 72, bgcolor: "rgba(255,255,255,0.03)", borderRadius: "10px", animation: "pulse 1.5s infinite ease-in-out" }} />
+                        <Box sx={{ height: 24, width: 72, bgcolor: "rgba(255,255,255,0.03)", borderRadius: "10px", animation: "pulse 1.5s infinite ease-in-out" }} />
                     </Stack>
-                    <Skeleton variant="text" width="35%" height={28} sx={{ bgcolor: "rgba(255,255,255,0.05)" }} />
+                    <Box sx={{ height: 28, width: "35%", bgcolor: "rgba(255,255,255,0.03)", borderRadius: "4px", animation: "pulse 1.5s infinite ease-in-out" }} />
                 </Stack>
             </CardContent>
             <Box sx={{ px: 2, pb: 2, mt: "auto" }}>
-                <Skeleton variant="rounded" height={42} sx={{ bgcolor: "rgba(255,255,255,0.05)", borderRadius: "12px" }} />
+                <Box sx={{ height: 42, bgcolor: "rgba(255,255,255,0.03)", borderRadius: "12px", animation: "pulse 1.5s infinite ease-in-out" }} />
             </Box>
         </Card>
     );
@@ -138,8 +176,8 @@ function AccommodationCard({
                 sx={{
                     borderRadius: "20px",
                     height: "100%",
-                    backgroundColor: theme.palette.background.paper,
-                    border: `1px solid ${theme.palette.divider}`,
+                    backgroundColor: "var(--bg-surface)",
+                    border: "1px solid var(--nearu-border)",
                     display: "flex",
                     flexDirection: "column",
                     overflow: "hidden",
@@ -147,8 +185,8 @@ function AccommodationCard({
                     transform: hovered ? "translateY(-6px)" : "translateY(0)",
                     boxShadow: hovered ? "0 24px 48px rgba(0,0,0,0.3)" : "none",
                     "&:hover": {
-                        borderColor: accentAlpha(0.35),
-                        backgroundColor: accentAlpha(0.02),
+                        borderColor: "var(--nearu-accent)",
+                        backgroundColor: "var(--nearu-accent-subtle)",
                     },
                 }}
             >
@@ -275,6 +313,9 @@ export default function Accommodation() {
 
     const queryClient = useQueryClient();
     const { data: accommodations = [], isLoading: loading, error } = useAccommodations();
+    const { auth } = useAuth();
+    
+    const canAddAccommodation = auth?.user?.roles?.includes('Admin') || auth?.user?.roles?.includes('Business');
 
     useEffect(() => {
         const t = setTimeout(() => {
@@ -284,14 +325,14 @@ export default function Accommodation() {
     }, []);
 
     const filteredAccommodations = useMemo(() => {
-        return accommodations.filter((item) => {
+        return accommodations.filter((item: Accommodation) => {
             const matchesType = selectedType === "All" || item.type === selectedType;
             const q = query.trim().toLowerCase();
             const matchesQuery =
                 q.length === 0 ||
                 item.title.toLowerCase().includes(q) ||
                 item.location.toLowerCase().includes(q) ||
-                item.amenities.some((amenity) => amenity.toLowerCase().includes(q));
+                item.amenities.some((amenity: string) => amenity.toLowerCase().includes(q));
             return matchesType && matchesQuery;
         });
     }, [accommodations, query, selectedType]);
@@ -321,8 +362,8 @@ export default function Accommodation() {
                 display: "flex",
                 height: "100vh",
                 overflow: "hidden",
-                bgcolor: "background.default",
-                backgroundImage: `radial-gradient(circle at top right, ${accentAlpha(0.05)}, transparent 45%)`,
+                bgcolor: "var(--bg-base)",
+                backgroundImage: `radial-gradient(circle at top right, var(--nearu-accent-subtle) 0%, transparent 40%)`,
             }}
         >
             <Sidebar activeSection="accommodation" />
@@ -359,21 +400,23 @@ export default function Accommodation() {
                                         Verified, student-friendly places near your campus. Browse by type, budget, and amenities.
                                     </Typography>
                                 </Box>
-                                <Button
-                                    variant="contained"
-                                    startIcon={<AddIcon />}
-                                    onClick={() => setOpenAddDialog(true)}
-                                    sx={{
-                                        backgroundColor: accent,
-                                        color: '#fff',
-                                        fontWeight: 800,
-                                        borderRadius: 2,
-                                        textTransform: "none",
-                                        "&:hover": { backgroundColor: '#1a7a9a' },
-                                    }}
-                                >
-                                    Add Place
-                                </Button>
+                                {canAddAccommodation && (
+                                    <Button
+                                        variant="contained"
+                                        startIcon={<AddIcon />}
+                                        onClick={() => setOpenAddDialog(true)}
+                                        sx={{
+                                            backgroundColor: accent,
+                                            color: '#fff',
+                                            fontWeight: 800,
+                                            borderRadius: 2,
+                                            textTransform: "none",
+                                            "&:hover": { backgroundColor: '#1a7a9a' },
+                                        }}
+                                    >
+                                        Add Place
+                                    </Button>
+                                )}
                             </Box>
                         </Fade>
 
@@ -384,8 +427,8 @@ export default function Accommodation() {
                                     mb: 6,
                                     p: { xs: 2, md: 3 },
                                     borderRadius: "20px",
-                                    bgcolor: theme.palette.background.paper,
-                                    border: `1px solid ${accentAlpha(0.2)}`,
+                                    bgcolor: "var(--bg-surface)",
+                                    border: "1px solid var(--nearu-border)",
                                     backdropFilter: "blur(10px)",
                                 }}
                             >
@@ -397,14 +440,14 @@ export default function Accommodation() {
                                         placeholder="Search by place, area, or amenity..."
                                         sx={{
                                             "& .MuiOutlinedInput-root": {
-                                                color: theme.palette.text.primary,
+                                                color: "var(--text-primary)",
                                                 borderRadius: "12px",
-                                                bgcolor: accentAlpha(0.04),
-                                                "& fieldset": { borderColor: theme.palette.divider },
-                                                "&:hover fieldset": { borderColor: accentAlpha(0.5) },
-                                                "&.Mui-focused fieldset": { borderColor: accent, borderWidth: "1px" },
+                                                bgcolor: "rgba(255,255,255,0.02)",
+                                                "& fieldset": { borderColor: "var(--nearu-border)" },
+                                                "&:hover fieldset": { borderColor: "var(--nearu-accent)" },
+                                                "&.Mui-focused fieldset": { borderColor: "var(--nearu-accent)", borderWidth: "1px" },
                                             },
-                                            "& .MuiInputBase-input::placeholder": { color: theme.palette.text.secondary },
+                                            "& .MuiInputBase-input::placeholder": { color: "var(--text-secondary)" },
                                         }}
                                         InputProps={{
                                             startAdornment: (
@@ -435,14 +478,14 @@ export default function Accommodation() {
                                                     fontSize: "0.82rem",
                                                     borderRadius: "10px",
                                                     border: "1px solid",
-                                                    borderColor: selectedType === type ? accent : theme.palette.divider,
-                                                    backgroundColor: selectedType === type ? accent : accentAlpha(0.05),
-                                                    color: selectedType === type ? '#fff' : theme.palette.text.secondary,
+                                                    borderColor: selectedType === type ? "var(--nearu-accent)" : "var(--nearu-border)",
+                                                    backgroundColor: selectedType === type ? "var(--nearu-accent)" : "rgba(255,255,255,0.02)",
+                                                    color: selectedType === type ? '#fff' : "var(--text-secondary)",
                                                     transition: "all 0.2s ease",
                                                     "&:hover": {
-                                                        backgroundColor: selectedType === type ? accent : accentAlpha(0.1),
-                                                        borderColor: accent,
-                                                        color: selectedType === type ? '#fff' : accent,
+                                                        backgroundColor: selectedType === type ? "var(--nearu-accent)" : "var(--nearu-accent-subtle)",
+                                                        borderColor: "var(--nearu-accent)",
+                                                        color: selectedType === type ? '#fff' : "var(--nearu-accent)",
                                                     },
                                                 }}
                                             />
@@ -472,7 +515,7 @@ export default function Accommodation() {
                             </Grid>
                         ) : filteredAccommodations.length > 0 ? (
                             <Grid container spacing={{ xs: 2, sm: 2.5, md: 3 }}>
-                                {filteredAccommodations.map((item, index) => (
+                                {filteredAccommodations.map((item: Accommodation, index: number) => (
                                     <Grid size={{ xs: 12, sm: 6, xl: 4 }} key={item.id}>
                                         <AccommodationCard item={item} index={index} />
                                     </Grid>

@@ -1,6 +1,20 @@
-import { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import * as signalR from '@microsoft/signalr';
 import { useNotificationStore } from '../../store/notificationStore';
+
+import {
+  Box,
+  Typography,
+  Button,
+  Paper,
+  Chip,
+  Stack,
+  Container,
+  CircularProgress,
+} from '@mui/material';
+import {
+  CheckCircleOutline as CheckCircleIcon,
+} from '@mui/icons-material';
 
 import type {
   RideScreen,
@@ -37,7 +51,6 @@ function ConfirmCompleteScreen({
 
   async function handleConfirm() {
     setLoading(true);
-
     try {
       await RidesApi.studentConfirm(rideId);
     } catch {
@@ -48,143 +61,185 @@ function ConfirmCompleteScreen({
   }
 
   return (
-    <div
-      className="flex flex-col h-full animate-fadeIn"
-      style={{
-        background: 'var(--bg-base)',
+    <Box
+      sx={{
+        display: 'flex',
+        flexDirection: 'column',
+        height: '100%',
+        bgcolor: 'var(--bg-base)',
         color: 'var(--text-primary)',
+        animation: 'fadeIn 0.5s ease-out',
       }}
     >
       {/* Topbar */}
-      <div
-        className="sticky top-0 z-10 flex items-center justify-between px-5 py-3 border-b"
-        style={{
-          background: 'var(--bg-surface)',
+      <Box
+        sx={{
+          position: 'sticky',
+          top: 0,
+          zIndex: 10,
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+          px: 2.5,
+          py: 1.5,
+          borderBottom: '1px solid',
           borderColor: 'var(--nearu-border)',
+          bgcolor: 'var(--bg-surface)',
         }}
       >
-        <span
-          className="text-[17px] font-medium"
-          style={{ color: 'var(--text-primary)' }}
+        <Typography
+          variant="subtitle1"
+          sx={{ fontWeight: 500, color: 'var(--text-primary)' }}
         >
           Confirm completion
-        </span>
+        </Typography>
 
-        <span
-          className="text-[12px] font-medium px-2.5 py-1 rounded-full"
-          style={{
-            background: 'rgba(232,76,110,0.12)',
+        <Chip
+          label="Awaiting you"
+          size="small"
+          sx={{
+            bgcolor: 'rgba(232,76,110,0.12)',
             color: '#e84c6e',
+            fontWeight: 500,
+            fontSize: '12px',
           }}
-        >
-          Awaiting you
-        </span>
-      </div>
+        />
+      </Box>
 
       {/* Content */}
-      <div className="flex flex-1 items-center justify-center px-4 py-6">
-        <div
-          className="w-full max-w-md rounded-2xl p-6 border text-center animate-slideUp"
-          style={{
-            background: 'var(--bg-surface)',
+      <Box sx={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', px: 2, py: 3 }}>
+        <Paper
+          elevation={0}
+          sx={{
+            width: '100%',
+            maxWidth: 400,
+            borderRadius: 4,
+            p: 3,
+            border: '1px solid',
             borderColor: 'var(--nearu-border)',
+            textAlign: 'center',
+            bgcolor: 'var(--bg-surface)',
+            animation: 'slideUp 0.5s ease-out',
           }}
         >
-          <div className="text-[48px] mb-3 leading-none">🏁</div>
+          <Box sx={{ fontSize: 48, mb: 1.5, lineHeight: 1 }}>🏁</Box>
 
-          <h3
-            className="text-[20px] font-medium mb-2"
-            style={{ color: 'var(--text-primary)' }}
+          <Typography
+            variant="h6"
+            sx={{ fontWeight: 500, mb: 1, color: 'var(--text-primary)' }}
           >
             Did your ride complete?
-          </h3>
+          </Typography>
 
-          <p
-            className="text-[14px] leading-relaxed mb-5"
-            style={{ color: 'var(--text-secondary)' }}
+          <Typography
+            variant="body2"
+            sx={{ mb: 3, color: 'var(--text-secondary)', lineHeight: 1.6 }}
           >
             Your rider has marked this trip as complete.
             Please confirm to finalise and archive it.
-          </p>
+          </Typography>
 
           {/* Receipt */}
-          <div
-            className="rounded-xl p-3.5 mb-5 text-left border"
-            style={{
-              background: 'var(--bg-elevated)',
+          <Paper
+            elevation={0}
+            sx={{
+              borderRadius: 3,
+              p: 2,
+              mb: 3,
+              textAlign: 'left',
+              border: '1px solid',
               borderColor: 'var(--nearu-border)',
+              bgcolor: 'var(--bg-elevated)',
             }}
           >
-            <div
-              className="flex justify-between items-center py-1.5 border-b"
-              style={{ borderColor: 'var(--nearu-border)' }}
+            <Box
+              sx={{
+                display: 'flex',
+                justifyContent: 'space-between',
+                alignItems: 'center',
+                py: 1,
+                borderBottom: '1px solid',
+                borderColor: 'var(--nearu-border)',
+              }}
             >
-              <span
-                className="text-[13px]"
-                style={{ color: 'var(--text-secondary)' }}
-              >
+              <Typography variant="caption" sx={{ color: 'var(--text-secondary)' }}>
                 Ride ID
-              </span>
-
-              <span
-                className="text-[12px] font-medium"
-                style={{
+              </Typography>
+              <Typography
+                variant="caption"
+                sx={{
+                  fontWeight: 500,
                   color: 'var(--text-primary)',
                   fontFamily: 'monospace',
                 }}
               >
                 {rideId.slice(0, 8)}…
-              </span>
-            </div>
+              </Typography>
+            </Box>
 
-            <div className="flex justify-between items-center pt-1.5">
-              <span
-                className="text-[13px]"
-                style={{ color: 'var(--text-secondary)' }}
-              >
+            <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', pt: 1 }}>
+              <Typography variant="caption" sx={{ color: 'var(--text-secondary)' }}>
                 Total fare
-              </span>
-
-              <span
-                className="text-[18px] font-medium"
-                style={{ color: 'var(--nearu-accent)' }}
+              </Typography>
+              <Typography
+                variant="subtitle1"
+                sx={{ fontWeight: 600, color: 'var(--nearu-accent)' }}
               >
                 Rs. {estimatedFare.toFixed(2)}
-              </span>
-            </div>
-          </div>
+              </Typography>
+            </Box>
+          </Paper>
 
           {/* Actions */}
-          <div className="flex gap-2.5">
-            <button
+          <Stack direction="row" spacing={1.5}>
+            <Button
+              fullWidth
+              variant="outlined"
               onClick={onDenied}
               disabled={loading}
-              className="flex-1 py-3 rounded-[10px] text-[14px] font-medium border
-                         transition-opacity duration-150 active:scale-[0.98]
-                         disabled:opacity-50 disabled:cursor-not-allowed"
-              style={{
-                background: 'rgba(232,76,110,0.12)',
-                borderColor: 'rgba(232,76,110,0.25)',
+              sx={{
+                py: 1.5,
+                borderRadius: 2.5,
+                fontSize: '14px',
+                fontWeight: 500,
                 color: '#e84c6e',
+                borderColor: 'rgba(232,76,110,0.25)',
+                bgcolor: 'rgba(232,76,110,0.12)',
+                '&:hover': {
+                  bgcolor: 'rgba(232,76,110,0.2)',
+                  borderColor: 'rgba(232,76,110,0.4)',
+                },
+                textTransform: 'none',
               }}
             >
               No, still riding
-            </button>
+            </Button>
 
-            <button
+            <Button
+              fullWidth
+              variant="contained"
               onClick={handleConfirm}
               disabled={loading}
-              className="flex-1 py-3 rounded-[10px] text-[14px] font-medium text-white
-                         transition-opacity duration-150 active:scale-[0.98]
-                         disabled:opacity-50 disabled:cursor-not-allowed"
-              style={{ background: 'var(--nearu-accent)' }}
+              sx={{
+                py: 1.5,
+                borderRadius: 2.5,
+                fontSize: '14px',
+                fontWeight: 500,
+                color: 'white',
+                bgcolor: 'var(--nearu-accent)',
+                '&:hover': {
+                  bgcolor: 'var(--nearu-accent)',
+                  opacity: 0.9,
+                },
+                textTransform: 'none',
+              }}
             >
-              {loading ? 'Confirming…' : 'Yes, completed!'}
-            </button>
-          </div>
-        </div>
-      </div>
-    </div>
+              {loading ? <CircularProgress size={20} color="inherit" /> : 'Yes, completed!'}
+            </Button>
+          </Stack>
+        </Paper>
+      </Box>
+    </Box>
   );
 }
 
@@ -212,18 +267,18 @@ interface ActiveRide {
 
 function RideLayout({ children }: { children: React.ReactNode }) {
   return (
-    <div
-      style={{
+    <Box
+      sx={{
         display: 'flex',
         height: '100vh',
         overflow: 'hidden',
-        background: 'var(--bg-base)',
+        bgcolor: 'var(--bg-base)',
       }}
     >
       <Sidebar activeSection="rides" />
 
-      <div
-        style={{
+      <Box
+        sx={{
           flexGrow: 1,
           display: 'flex',
           flexDirection: 'column',
@@ -233,17 +288,17 @@ function RideLayout({ children }: { children: React.ReactNode }) {
       >
         <Navbar />
 
-        <div
-          style={{
+        <Box
+          sx={{
             flex: 1,
             overflowY: 'auto',
             overflowX: 'hidden',
           }}
         >
           {children}
-        </div>
-      </div>
-    </div>
+        </Box>
+      </Box>
+    </Box>
   );
 }
 
@@ -283,7 +338,7 @@ export default function RidesPage() {
 
     conn.on(
       'RideStateChanged',
-      (data: { rideId: string; status: string }) => {
+      (data: { rideId: string; status: string; otp?: string; otpExpiresAt?: string }) => {
         if (data.rideId !== ride.rideId) return;
 
         // Push every status change to the notification bell
@@ -311,6 +366,11 @@ export default function RidesPage() {
 
         switch (data.status) {
           case 'Accepted':
+            setRide(r => r ? {
+              ...r,
+              otp: data.otp,
+              otpExpiresAt: data.otpExpiresAt,
+            } : r);
             setScreen('accepted');
             break;
 
@@ -366,9 +426,9 @@ export default function RidesPage() {
         );
       }
     );
-    
+
     // Live location updates
-    
+
     conn.on(
       'LocationUpdated',
       (data: {
@@ -378,7 +438,7 @@ export default function RidesPage() {
         distanceToPickupKm?: number;
       }) => {
         if (data.rideId !== ride.rideId) return;
-        
+
         setRide(r =>
           r
             ? {
@@ -398,14 +458,34 @@ export default function RidesPage() {
       conn.stop();
       hubRef.current = null;
     };
-
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [ride?.rideId]);
+
+  useEffect(() => {
+    if (screen !== 'accepted' || ride?.otp) return;
+
+    const interval = setInterval(async () => {
+      try {
+        const res = await RidesApi.getActiveRide();
+        if (res.data?.otp) {
+          setRide(r => r ? { 
+            ...r, 
+            otp: res.data.otp, 
+            otpExpiresAt: res.data.otpExpiresAt 
+          } : r);
+          clearInterval(interval);
+        }
+      } catch {
+        // ignore
+      }
+    }, 2000);
+
+    return () => clearInterval(interval);
+  }, [screen, ride?.otp]);
 
   function reset() {
     setRide(null);
     setScreen('request');
-
     hubRef.current?.stop();
   }
 
@@ -442,11 +522,10 @@ export default function RidesPage() {
         <RideLayout>
           <PendingRideScreen
             rideId={ride!.rideId}
-            onAccepted={expiry => {
+            onAccepted={(expiry) => {         
               setRide(r =>
-                r ? { ...r, otpExpiresAt: expiry } : r
+                r ? { ...r, otpExpiresAt: expiry} : r  
               );
-
               setScreen('accepted');
             }}
             onCancel={reset}

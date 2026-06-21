@@ -149,7 +149,7 @@ function mapSummaryToActiveRide(dto: any): ActiveRide {
  * Returns an ActiveRide mapped from ApiResponse<RideSummaryDto>.
  */
 const acceptRide = async (rideId: string): Promise<ActiveRide> => {
-  const response = await axiosPrivate.post<{ success: boolean; data: any }>('/accept', { rideId });
+  const response = await axiosPrivate.post<any>('/accept', { rideId });
   const dto = response.data?.data ?? response.data;
   return mapSummaryToActiveRide(dto);
 };
@@ -201,9 +201,11 @@ const sendHeartbeat = async (rideId: string, coords: LocationCoords): Promise<vo
  */
 const getActiveRide = async (): Promise<ActiveRide | null> => {
   try {
-    const response = await axiosPrivate.get<{ success: boolean; data: any }>('/rides/active');
-    if (response.status === 204 || !response.data?.data) return null;
-    return mapSummaryToActiveRide(response.data.data);
+    const response = await axiosPrivate.get<any>('/rides/active');
+    if (response.status === 204 || !response.data) return null;
+    const dto = response.data?.data ?? response.data;
+    if (!dto) return null;
+    return mapSummaryToActiveRide(dto);
   } catch {
     return null;
   }

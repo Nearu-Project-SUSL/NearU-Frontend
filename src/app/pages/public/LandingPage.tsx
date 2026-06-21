@@ -1518,10 +1518,12 @@ export default function LandingPage() {
       <footer className="relative z-20 border-t border-white/5 bg-black/60 py-10 backdrop-blur-md">
         <div className="mx-auto max-w-7xl px-6 text-center text-xs text-slate-500 md:px-10 flex flex-col md:flex-row justify-between items-center gap-4">
           <p>© {new Date().getFullYear()} NearU Platform. Engineered for active university ecosystems.</p>
-          <div className="flex gap-6 font-semibold">
+          <div className="flex flex-wrap justify-center gap-6 font-semibold">
             <a href="#home" className="hover:text-white transition">Home</a>
             <a href="#services" className="hover:text-white transition">Services</a>
             <a href="#faqs" className="hover:text-white transition">FAQs</a>
+            <Link to="/privacy-policy" className="hover:text-white transition">Privacy Policy</Link>
+            <Link to="/terms-and-conditions" className="hover:text-white transition">Terms & Conditions</Link>
           </div>
         </div>
       </footer>

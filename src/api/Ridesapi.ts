@@ -1,6 +1,7 @@
 import { axiosPrivate } from './axios'; 
 import type { ApiResponse, FareEstimate, RideSummary, ServiceType } from '../app/components/ride/Ridestypes';
 
+
 export const RidesApi = {
   getEstimate: (pickupLat: number, pickupLng: number, dropoffLat: number, dropoffLng: number) =>
     axiosPrivate
@@ -37,8 +38,14 @@ export const RidesApi = {
       .post<ApiResponse<RideSummary>>('/cancel', { rideId })
       .then(r => r.data),
 
+  getActiveRide: () =>
+    axiosPrivate
+      .get<ApiResponse<any>>('/rides/active')
+      .then(r => r.data),
+
   rateRide: (rideId: string, rating: number) =>
     axiosPrivate
       .post<ApiResponse<object>>(`/rides/history/${rideId}/rate`, { rating })
       .then(r => r.data),
+
 };

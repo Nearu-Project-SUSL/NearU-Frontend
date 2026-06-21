@@ -3,8 +3,7 @@ import { Sidebar } from '../../../components/layout/Sidebar';
 import { PageLayout } from '../../../components/layout/PageLayout';
 import { MapPin, Star, Phone, ArrowLeft, X } from 'lucide-react';
 import { Link } from 'react-router';
-import { NotificationDropdown } from '../../../components/layout/NotificationDropdown';
-const userAvatar = "";
+import Navbar from '../../../components/layout/Navbar';
 
 interface TukDriver {
   id: string;
@@ -56,7 +55,7 @@ export default function TukRiders() {
       id: 'tk4',
       name: 'Kamal Silva',
       location: 'Faculty Junction',
-      vehicle: 'Yellow Tuk',
+      vehicle: 'Blue Tuk',
       vehicleNumber: 'PQR-5678',
       image: 'https://images.unsplash.com/photo-1742282302396-7d843909555c?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHx0dWslMjB0dWslMjB0aHJlZSUyMHdoZWVsZXIlMjBjb2xvcmZ1bHxlbnwxfHx8fDE3NzE1OTkxODB8MA&ixlib=rb-4.1.0&q=80&w=1080',
       rating: 4.6,
@@ -96,7 +95,7 @@ export default function TukRiders() {
       id: 'tk8',
       name: 'Chaminda Jayasinghe',
       location: 'Canteen Area',
-      vehicle: 'Yellow Tuk',
+      vehicle: 'Blue Tuk',
       vehicleNumber: 'RST-4567',
       image: 'https://images.unsplash.com/photo-1742282302396-7d843909555c?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHx0dWslMjB0dWslMjB0aHJlZSUyMHdoZWVsZXIlMjBjb2xvcmZ1bHxlbnwxfHx8fDE3NzE1OTkxODB8MA&ixlib=rb-4.1.0&q=80&w=1080',
       rating: 4.8,
@@ -122,83 +121,55 @@ export default function TukRiders() {
   return (
     <div className="min-h-screen w-full relative overflow-x-hidden bg-gradient-to-br from-gray-900 via-black to-gray-900">
       {/* Animated background */}
-      <div className="fixed inset-0 bg-gradient-to-br from-yellow-400/5 via-transparent to-yellow-600/5 animate-gradient pointer-events-none"></div>
+      <div className="fixed inset-0 bg-gradient-to-br from-[#2e9ebf]/5 via-transparent to-[#2e9ebf]/5 animate-gradient pointer-events-none"></div>
       
       {/* Animated pattern */}
       <div className="fixed inset-0 opacity-10 pointer-events-none" style={{
-        backgroundImage: `radial-gradient(circle at 2px 2px, rgba(250, 204, 21, 0.4) 1px, transparent 0)`,
+        backgroundImage: `radial-gradient(circle at 2px 2px, rgba(46, 158, 191, 0.4) 1px, transparent 0)`,
         backgroundSize: '40px 40px',
         animation: 'gridMove 30s linear infinite'
       }}></div>
 
       {/* Floating orbs */}
-      <div className="fixed top-1/4 right-1/4 w-96 h-96 bg-yellow-400/10 rounded-full blur-3xl animate-float pointer-events-none"></div>
-      <div className="fixed bottom-1/4 left-1/4 w-80 h-80 bg-amber-500/10 rounded-full blur-3xl animate-float pointer-events-none" style={{ animationDelay: '2s' }}></div>
+      <div className="fixed top-1/4 right-1/4 w-96 h-96 bg-[#2e9ebf]/10 rounded-full blur-3xl animate-float pointer-events-none"></div>
+      <div className="fixed bottom-1/4 left-1/4 w-80 h-80 bg-[#2e9ebf]/10 rounded-full blur-3xl animate-float pointer-events-none" style={{ animationDelay: '2s' }}></div>
 
       {/* Sidebar */}
       <Sidebar activeSection="transport" />
 
       {/* Main Content */}
       <PageLayout>
-        {/* Header */}
-        <header className="sticky top-0 z-30 bg-black/95 backdrop-blur-2xl border-b-2 border-yellow-400/20 shadow-2xl shadow-yellow-400/5">
-          <div className="flex items-center justify-between px-8 lg:px-12 py-5">
-            <div className="flex items-center gap-6">
-              <Link 
-                to="/transport"
-                className="w-12 h-12 bg-yellow-400/10 hover:bg-yellow-400/20 rounded-xl flex items-center justify-center transition-all hover:scale-110 duration-300 border border-yellow-400/20 group"
-              >
-                <ArrowLeft className="w-5 h-5 text-yellow-400 group-hover:-translate-x-1 transition-transform duration-300" />
-              </Link>
-
-              <div className="relative group cursor-pointer">
-                <div className="absolute inset-0 bg-gradient-to-br from-yellow-400 to-yellow-600 rounded-2xl blur-lg opacity-50 group-hover:opacity-100 transition-opacity animate-pulse"></div>
-                <div className="relative w-14 h-14 bg-gradient-to-br from-yellow-400 to-yellow-600 rounded-2xl flex items-center justify-center shadow-xl shadow-yellow-400/30 group-hover:scale-110 transition-transform duration-300">
-                  <span className="text-3xl">🛺</span>
-                </div>
-              </div>
-              <div>
-                <h1 className="text-2xl text-white">Tuk Riders</h1>
-                <p className="text-yellow-400/70 text-sm">Quick rides around campus</p>
-              </div>
-            </div>
-
-            <div className="flex items-center gap-4">
-              <NotificationDropdown />
-              
-              <Link to="/profile" className="relative group">
-                <div className="absolute inset-0 bg-gradient-to-br from-yellow-400 to-yellow-600 rounded-xl blur-md opacity-50 group-hover:opacity-100 transition-opacity duration-300"></div>
-                <div className="relative w-12 h-12 rounded-xl overflow-hidden border-2 border-yellow-400/50 group-hover:border-yellow-400 transition-all group-hover:scale-110 duration-300">
-                  <img 
-                    src={userAvatar}
-                    alt="Profile"
-                    className="w-full h-full object-cover"
-                  />
-                </div>
-              </Link>
-            </div>
-          </div>
-        </header>
+        <Navbar />
 
         {/* Main Content Area */}
         <section className="px-8 lg:px-12 py-16 relative">
           <div className="max-w-7xl mx-auto">
+            {/* Back Button */}
+            <div className="mb-6">
+              <Link 
+                to="/transport"
+                className="inline-flex items-center gap-2 text-sm text-[#2e9ebf] hover:text-[#2e9ebf]/80 transition-colors"
+              >
+                <ArrowLeft className="w-4 h-4" />
+                Back to Transport Hub
+              </Link>
+            </div>
             {/* Hero Section */}
             <div className="mb-12 animate-fadeIn">
               <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-6">
                 <div>
                   <h2 className="text-5xl text-white mb-3">
-                    Available <span className="text-yellow-400">Tuk Riders</span>
+                    Available <span className="text-[#2e9ebf]">Tuk Riders</span>
                   </h2>
                   <p className="text-xl text-gray-400 max-w-2xl">
                     Reliable and trusted tuk tuk drivers around campus and town. Call directly for quick rides.
                   </p>
                 </div>
                 
-                <div className="bg-gradient-to-br from-yellow-400/10 to-yellow-600/10 border-2 border-yellow-400/20 rounded-2xl p-6">
+                <div className="bg-gradient-to-br from-[#2e9ebf]/10 to-[#2e9ebf]/10 border-2 border-[#2e9ebf]/20 rounded-2xl p-6">
                   <div className="text-center">
                     <div className="text-4xl mb-2">🚦</div>
-                    <p className="text-yellow-400 text-lg font-medium">{tukDrivers.length} Drivers</p>
+                    <p className="text-[#2e9ebf] text-lg font-medium">{tukDrivers.length} Drivers</p>
                     <p className="text-gray-400 text-sm">Available Now</p>
                   </div>
                 </div>
@@ -206,7 +177,7 @@ export default function TukRiders() {
             </div>
 
             {/* Info Banner */}
-            <div className="mb-12 bg-gradient-to-r from-yellow-400/10 via-yellow-500/5 to-yellow-400/10 border-l-4 border-yellow-400 rounded-xl p-6 animate-slideUp">
+            <div className="mb-12 bg-gradient-to-r from-[#2e9ebf]/10 via-[#2e9ebf]/5 to-[#2e9ebf]/10 border-l-4 border-[#2e9ebf] rounded-xl p-6 animate-slideUp">
               <div className="flex items-start gap-4">
                 <div className="text-3xl">💡</div>
                 <div>
@@ -224,7 +195,7 @@ export default function TukRiders() {
               {tukDrivers.map((driver, index) => (
                 <div
                   key={driver.id}
-                  className="group bg-gradient-to-br from-gray-900/80 to-black/80 border-2 border-yellow-400/20 hover:border-yellow-400/40 rounded-2xl overflow-hidden transition-all duration-300 hover:scale-105 hover:shadow-2xl hover:shadow-yellow-500/10 animate-slideUp"
+                  className="group bg-gradient-to-br from-gray-900/80 to-black/80 border-2 border-[#2e9ebf]/20 hover:border-[#2e9ebf]/40 rounded-2xl overflow-hidden transition-all duration-300 hover:scale-105 hover:shadow-2xl hover:shadow-[#2e9ebf]/10 animate-slideUp"
                   style={{ animationDelay: `${index * 0.08}s` }}
                 >
                   {/* Tuk Image */}
@@ -237,9 +208,9 @@ export default function TukRiders() {
                     <div className="absolute inset-0 bg-gradient-to-t from-black via-black/60 to-transparent"></div>
                     
                     {/* Rating Badge */}
-                    <div className="absolute top-4 right-4 bg-black/80 backdrop-blur-sm px-3 py-2 rounded-xl border border-yellow-400/30">
+                    <div className="absolute top-4 right-4 bg-black/80 backdrop-blur-sm px-3 py-2 rounded-xl border border-[#2e9ebf]/30">
                       <div className="flex items-center gap-1">
-                        <Star className="w-4 h-4 text-yellow-400 fill-yellow-400" />
+                        <Star className="w-4 h-4 text-[#2e9ebf] fill-[#2e9ebf]" />
                         <span className="text-white font-medium">{driver.rating.toFixed(1)}</span>
                       </div>
                     </div>
@@ -247,23 +218,23 @@ export default function TukRiders() {
 
                   {/* Content */}
                   <div className="p-6">
-                    <h3 className="text-2xl text-white mb-2 group-hover:text-yellow-400 transition-colors duration-300">
+                    <h3 className="text-2xl text-white mb-2 group-hover:text-[#2e9ebf] transition-colors duration-300">
                       {driver.name}
                     </h3>
                     
                     <div className="space-y-2 mb-5">
                       <div className="flex items-center gap-2 text-gray-400">
-                        <MapPin className="w-4 h-4 text-yellow-400 flex-shrink-0" />
+                        <MapPin className="w-4 h-4 text-[#2e9ebf] flex-shrink-0" />
                         <span className="text-sm">{driver.location}</span>
                       </div>
-                      <p className="text-yellow-400/80 text-sm">
+                      <p className="text-[#2e9ebf]/80 text-sm">
                         {driver.vehicle} • {driver.vehicleNumber}
                       </p>
                     </div>
 
                     <button 
                       onClick={() => handleCallDriver(driver)}
-                      className="w-full py-3 bg-gradient-to-r from-green-600 to-green-700 hover:from-green-700 hover:to-green-800 text-white rounded-xl transition-all shadow-lg hover:shadow-xl flex items-center justify-center gap-2 group/btn"
+                      className="w-full py-3 bg-gradient-to-r from-[#2e9ebf] to-[#2e9ebf] hover:from-[#2e9ebf]/90 hover:to-[#2e9ebf]/90 text-white rounded-xl transition-all shadow-lg hover:shadow-xl flex items-center justify-center gap-2 group/btn"
                     >
                       <Phone className="w-5 h-5 group-hover/btn:rotate-12 transition-transform duration-300" />
                       <span className="font-medium">Call Now</span>
@@ -281,7 +252,7 @@ export default function TukRiders() {
                 <p className="text-gray-400 text-sm">All drivers are background-checked and verified by the university</p>
               </div>
               
-              <div className="bg-gradient-to-br from-yellow-400/10 to-yellow-600/10 border-2 border-yellow-400/20 rounded-2xl p-6 text-center">
+              <div className="bg-gradient-to-br from-[#2e9ebf]/10 to-[#2e9ebf]/10 border-2 border-[#2e9ebf]/20 rounded-2xl p-6 text-center">
                 <div className="text-4xl mb-3">📍</div>
                 <h4 className="text-xl text-white mb-2">Local Knowledge</h4>
                 <p className="text-gray-400 text-sm">Drivers know all the best routes around campus and town</p>
@@ -300,9 +271,9 @@ export default function TukRiders() {
       {/* Call Driver Modal */}
       {showCallModal && selectedDriver && (
         <div className="fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center z-50 px-4 animate-fadeIn">
-          <div className="bg-gradient-to-br from-gray-900 to-black border-2 border-yellow-400/30 rounded-2xl shadow-2xl shadow-yellow-500/20 w-full max-w-md overflow-hidden animate-slideUp">
+          <div className="bg-gradient-to-br from-gray-900 to-black border-2 border-[#2e9ebf]/30 rounded-2xl shadow-2xl shadow-[#2e9ebf]/20 w-full max-w-md overflow-hidden animate-slideUp">
             {/* Header */}
-            <div className="bg-gradient-to-r from-yellow-400 to-yellow-600 px-6 py-4 flex items-center justify-between">
+            <div className="bg-gradient-to-r from-[#2e9ebf] to-[#2e9ebf] px-6 py-4 flex items-center justify-between">
               <h3 className="text-xl font-bold text-black">Call Driver</h3>
               <button 
                 className="w-8 h-8 bg-black/20 hover:bg-black/30 rounded-lg flex items-center justify-center transition-colors" 
@@ -320,9 +291,9 @@ export default function TukRiders() {
                   <img 
                     src={selectedDriver.image}
                     alt={selectedDriver.name}
-                    className="w-20 h-20 object-cover rounded-xl border-2 border-yellow-400/50"
+                    className="w-20 h-20 object-cover rounded-xl border-2 border-[#2e9ebf]/50"
                   />
-                  <div className="absolute -top-2 -right-2 bg-yellow-400 text-black px-2 py-1 rounded-lg text-xs font-bold flex items-center gap-1">
+                  <div className="absolute -top-2 -right-2 bg-[#2e9ebf] text-black px-2 py-1 rounded-lg text-xs font-bold flex items-center gap-1">
                     <Star className="w-3 h-3 fill-black" />
                     {selectedDriver.rating.toFixed(1)}
                   </div>
@@ -331,24 +302,24 @@ export default function TukRiders() {
                 <div className="flex-1">
                   <h4 className="text-xl font-bold text-white mb-1">{selectedDriver.name}</h4>
                   <div className="flex items-center gap-2 text-gray-400 text-sm mb-1">
-                    <MapPin className="w-4 h-4 text-yellow-400" />
+                    <MapPin className="w-4 h-4 text-[#2e9ebf]" />
                     <span>{selectedDriver.location}</span>
                   </div>
-                  <p className="text-yellow-400/80 text-sm">
+                  <p className="text-[#2e9ebf]/80 text-sm">
                     {selectedDriver.vehicle} • {selectedDriver.vehicleNumber}
                   </p>
                 </div>
               </div>
 
               {/* Phone Number Display */}
-              <div className="bg-yellow-400/10 border border-yellow-400/20 rounded-xl p-4 mb-6">
+              <div className="bg-[#2e9ebf]/10 border border-[#2e9ebf]/20 rounded-xl p-4 mb-6">
                 <p className="text-gray-400 text-sm mb-1">Phone Number</p>
                 <p className="text-white text-xl font-mono">{selectedDriver.phone}</p>
               </div>
 
               {/* Call Button */}
               <button
-                className="w-full py-4 bg-gradient-to-r from-yellow-400 to-yellow-600 hover:from-yellow-500 hover:to-yellow-700 text-black shadow-xl shadow-yellow-500/40 rounded-xl flex items-center justify-center gap-3 text-lg font-bold transition-all hover:scale-105 duration-300"
+                className="w-full py-4 bg-gradient-to-r from-[#2e9ebf] to-[#2e9ebf] hover:from-[#2e9ebf] hover:to-[#2e9ebf] text-black shadow-xl shadow-[#2e9ebf]/40 rounded-xl flex items-center justify-center gap-3 text-lg font-bold transition-all hover:scale-105 duration-300"
                 onClick={() => {
                   window.open(`tel:${selectedDriver.phone}`, '_self');
                   setShowCallModal(false);
