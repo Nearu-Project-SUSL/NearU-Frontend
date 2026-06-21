@@ -1,5 +1,6 @@
 import ShopCard from "../../components/food/ShopCard";
 import { useFoodShops } from "../../hooks/useFoodShop";
+import { CardSkeleton } from "../../components/ui/Skeleton";
 import Navbar from "../../components/layout/Navbar";
 import { Sidebar } from "../../components/layout/Sidebar";
 import { PageLayout } from "../../components/layout/PageLayout";
@@ -73,13 +74,7 @@ export default function FoodPage(){
     setCurrentPage(1);
   }
 
-  if (isLoading) {
-    return (
-      <Box sx={{ display: 'flex', justifyContent: 'center', mt: 10 }}>
-        <Typography sx={{ color: '#fff' }}>Loading...</Typography>
-      </Box>
-    );
-  }
+
 
   if (error) {
     return (
@@ -406,7 +401,9 @@ export default function FoodPage(){
               </Box>
 
               {/* shop grid or empty state */}
-              {shops.length > 0 ? (
+              {isLoading ? (
+                <CardSkeleton count={6} />
+              ) : shops.length > 0 ? (
                 <Box
                   sx={{
                     display:'grid',
@@ -418,7 +415,7 @@ export default function FoodPage(){
                     gap:{xs:2, md:2.5},
                     px:{xs:2, md:0} // no side margin
                   }}>
-                  {shops.map((shop) => (
+                  {shops.map((shop: any) => (
                     <ShopCard 
                     key={shop.id} 
                     shop={shop}
