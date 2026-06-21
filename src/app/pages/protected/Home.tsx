@@ -184,6 +184,7 @@ interface HomeDealCardProps {
   badgeColor: string;
 }
 
+
 // ─── Home Page ────────────────────────────────────────────────────────────────
 export default function Home() {
   const { auth } = useAuth();
