@@ -106,22 +106,22 @@ function NotificationRow({
         </p>
         <div className="flex items-center justify-between">
           <span className="text-[10px] text-gray-600">{timeAgo(notif.createdAt)}</span>
-          <div className="flex gap-0.5 opacity-0 group-hover:opacity-100 transition-opacity">
+          <div className="flex gap-2 sm:gap-0.5 opacity-100 sm:opacity-0 group-hover:opacity-100 transition-opacity">
             {!notif.read && (
               <button title="Mark as read" onClick={(e) => { e.stopPropagation(); onRead(notif.id); }}
-                className="p-1.5 rounded-lg hover:bg-white/10">
-                <Check className="w-3 h-3" style={{ color: meta.accent }} />
+                className="p-2 sm:p-1.5 rounded-lg hover:bg-white/10 transition-colors">
+                <Check className="w-4 h-4 sm:w-3.5 sm:h-3.5" style={{ color: meta.accent }} />
               </button>
             )}
             {notif.route && (
               <button title="Open" onClick={(e) => { e.stopPropagation(); onNavigate(notif); }}
-                className="p-1.5 rounded-lg hover:bg-white/10">
-                <ChevronRight className="w-3 h-3 text-gray-400" />
+                className="p-2 sm:p-1.5 rounded-lg hover:bg-white/10 transition-colors">
+                <ChevronRight className="w-4 h-4 sm:w-3.5 sm:h-3.5 text-gray-400" />
               </button>
             )}
             <button title="Delete" onClick={(e) => { e.stopPropagation(); onDelete(notif.id); }}
-              className="p-1.5 rounded-lg hover:bg-red-500/20">
-              <Trash2 className="w-3 h-3 text-red-400" />
+              className="p-2 sm:p-1.5 rounded-lg hover:bg-red-500/20 transition-colors">
+              <Trash2 className="w-4 h-4 sm:w-3.5 sm:h-3.5 text-red-400" />
             </button>
           </div>
         </div>
@@ -157,7 +157,7 @@ export function NotificationPanel({ onClose }: { onClose?: () => void }) {
 
   return (
     <div
-      className="w-[380px] bg-[#0d0d0d]/97 backdrop-blur-2xl border border-white/10 rounded-2xl shadow-2xl shadow-black/70 overflow-hidden"
+      className="w-full max-w-md sm:w-[380px] bg-[#0d0d0d]/97 backdrop-blur-2xl border border-white/10 rounded-2xl shadow-2xl shadow-black/70 overflow-hidden flex flex-col"
       style={{ animation: 'notifSlideDown 0.18s cubic-bezier(0.16,1,0.3,1) both' }}
     >
       {/* Header */}
@@ -187,7 +187,7 @@ export function NotificationPanel({ onClose }: { onClose?: () => void }) {
       </div>
 
       {/* Notification list */}
-      <div className="max-h-[420px] overflow-y-auto notif-scroll">
+      <div className="max-h-[60vh] sm:max-h-[420px] overflow-y-auto notif-scroll flex-1">
         {notifications.length === 0 ? (
           <div className="flex flex-col items-center justify-center py-16 px-6 text-center gap-3">
             <div className="w-16 h-16 bg-white/[0.04] rounded-2xl flex items-center justify-center border border-white/[0.06]">
@@ -279,9 +279,16 @@ export function NotificationDropdown() {
       </button>
 
       {isOpen && (
-        <div className="absolute right-0 top-full mt-2 z-[9999]">
-          <NotificationPanel onClose={() => setIsOpen(false)} />
-        </div>
+        <>
+          {/* Backdrop for mobile */}
+          <div
+            className="fixed inset-0 bg-black/60 backdrop-blur-sm z-[9998] sm:hidden"
+            onClick={() => setIsOpen(false)}
+          />
+          <div className="fixed inset-x-4 bottom-4 top-auto sm:absolute sm:inset-auto sm:right-0 sm:top-full sm:mt-2 z-[9999] flex justify-center sm:justify-start animate-slideUp">
+            <NotificationPanel onClose={() => setIsOpen(false)} />
+          </div>
+        </>
       )}
     </div>
   );
