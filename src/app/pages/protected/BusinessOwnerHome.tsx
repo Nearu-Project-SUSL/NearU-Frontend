@@ -1,6 +1,7 @@
+import { useNavigate } from 'react-router';
 import { PageLayout } from '../../components/layout/PageLayout';
 import { Sidebar } from '../../components/layout/Sidebar';
-import { Container, Typography, Box, Paper, Grid } from '@mui/material';
+import { Container, Typography, Box, Paper, Grid, Button } from '@mui/material';
 import useAuth from '../../hooks/useAuth';
 import Navbar from '../../components/layout/Navbar';
 import {
@@ -25,6 +26,7 @@ const chartData = [
 
 export default function BusinessOwnerHome() {
   const { auth } = useAuth();
+  const navigate = useNavigate();
 
   return (
     <Box sx={{ display: 'flex', minHeight: '100vh', bgcolor: 'background.default' }}>
@@ -75,6 +77,26 @@ export default function BusinessOwnerHome() {
                   </Grid>
                 ))}
               </Grid>
+
+              {/* Quick Actions */}
+              <Box sx={{ mt: 4, display: 'flex', gap: 2, flexWrap: 'wrap' }}>
+                <Button
+                  variant="contained"
+                  onClick={() => navigate('/deals')}
+                  sx={{
+                    fontWeight: 700,
+                    borderRadius: '12px',
+                    bgcolor: '#2E9EBF',
+                    color: '#111',
+                    textTransform: 'none',
+                    px: 3,
+                    py: 1.5,
+                    '&:hover': { bgcolor: '#1a7a9a' }
+                  }}
+                >
+                  Manage Deals & Offers
+                </Button>
+              </Box>
 
               {/* Sales & Orders Performance Area Chart */}
               <Paper

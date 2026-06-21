@@ -171,6 +171,10 @@ export const router = createBrowserRouter([
         path: "/gifts/:id",
         Component: GiftShopDetailPage,
       },
+      {
+        path: "/deals",
+        Component: DealsPage,
+      },
     ]
   },
 
@@ -178,10 +182,6 @@ export const router = createBrowserRouter([
   {
     element: <ProtectedRoute allowedRoles={["Student"]} />,
     children: [
-      {
-        path: "/deals",
-        Component: DealsPage,
-      },
       {
         path: "/rides",
         Component: Rides,
