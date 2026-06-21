@@ -632,14 +632,6 @@ export default function Jobs() {
                 )}
               </Box>
 
-              <Box sx={{ mt: 10, p: 4, borderRadius: '32px', bgcolor: 'rgba(46, 158, 191, 0.03)', border: '1px dashed rgba(46, 158, 191, 0.2)', textAlign: 'center' }}>
-                 <Typography variant="h6" sx={{ color: 'text.primary', fontWeight: 700, mb: 1 }}>Don't see what you're looking for?</Typography>
-                 <Typography variant="body2" sx={{ color: 'text.secondary', mb: 3 }}>We update our job board daily. Check back tomorrow for more roles!</Typography>
-                 <Button variant="outlined" sx={{ color: '#2E9EBF', borderColor: 'rgba(46, 158, 191, 0.4)', borderRadius: '12px', px: 4, py: 1.2, fontWeight: 700, textTransform: 'none', '&:hover': { borderColor: '#2E9EBF', bgcolor: 'rgba(46, 158, 191, 0.08)' } }}>
-                    Set Job Alerts
-                 </Button>
-              </Box>
-
             </Box>
           </Box>
       </Box>
