@@ -66,6 +66,15 @@ export default function BusinessProfileSetupModal({ open, onClose, onCompleted }
   const handlePhotoChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
+
+    // Check size limit: 5MB (5 * 1024 * 1024 bytes)
+    const MAX_SIZE_BYTES = 5 * 1024 * 1024;
+    if (file.size > MAX_SIZE_BYTES) {
+      toast.error('Image size must be less than 5MB.');
+      e.target.value = ''; // Reset file input
+      return;
+    }
+
     setForm(prev => ({ ...prev, photo: file }));
     setPhotoPreview(URL.createObjectURL(file));
   };
@@ -279,7 +288,7 @@ export default function BusinessProfileSetupModal({ open, onClose, onCompleted }
                   ) : (
                     <>
                       <UploadIcon sx={{ color: '#2E9EBF' }} />
-                      <Typography sx={{ color: 'gray' }}>Upload shop photo <span style={{ color: '#2E9EBF' }}>(optional)</span></Typography>
+                      <Typography sx={{ color: 'gray' }}>Upload shop photo <span style={{ color: '#2E9EBF' }}>(optional, max 5MB)</span></Typography>
                     </>
                   )}
                 </Paper>

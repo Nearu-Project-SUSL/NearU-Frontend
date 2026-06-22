@@ -60,6 +60,16 @@ export default function AddMenuItem({
   ) => {
     const file = e.target.files?.[0] || null;
 
+    if (file) {
+      const MAX_SIZE_BYTES = 5 * 1024 * 1024;
+      if (file.size > MAX_SIZE_BYTES) {
+        setError("Image size must be less than 5MB");
+        e.target.value = "";
+        return;
+      }
+      setError("");
+    }
+
     setFormData((prev) => ({
       ...prev,
       photo: file ?? null,
@@ -143,7 +153,7 @@ export default function AddMenuItem({
             component="label"
             htmlFor="add-menu-item-photo"
           >
-            Upload Photo
+            {formData.photo ? "Change Photo" : "Upload Photo (max 5MB)"}
             <input
               id="add-menu-item-photo"
               type="file"
@@ -154,7 +164,7 @@ export default function AddMenuItem({
           </Button>
 
           {formData.photo && (
-            <span>{formData.photo.name}</span>
+            <span>{formData.photo.name} ({(formData.photo.size / (1024 * 1024)).toFixed(1)}MB)</span>
           )}
         
         </Stack>

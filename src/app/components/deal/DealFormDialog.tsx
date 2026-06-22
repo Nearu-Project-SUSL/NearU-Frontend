@@ -13,6 +13,7 @@ import {
 } from "@mui/material";
 import CloudUploadIcon from "@mui/icons-material/CloudUpload";
 import CloseIcon from "@mui/icons-material/Close";
+import { toast } from "sonner";
 
 const SHOP_TYPES = ["Food", "Gift", "Accommodation", "Other"];
 
@@ -33,6 +34,19 @@ export default function DealFormDialog({ open, onClose, onSubmit }: DealFormDial
   const [validTo, setValidTo] = useState("");
   const [image, setImage] = useState<File | null>(null);
   const [saving, setSaving] = useState(false);
+
+  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    const MAX_SIZE_BYTES = 5 * 1024 * 1024;
+    if (file.size > MAX_SIZE_BYTES) {
+      toast.error("Image size must be less than 5MB.");
+      e.target.value = "";
+      return;
+    }
+    setImage(file);
+  };
 
   useEffect(() => {
     if (open) {
@@ -169,8 +183,8 @@ export default function DealFormDialog({ open, onClose, onSubmit }: DealFormDial
               },
             }}
           >
-            {image ? image.name : "Upload Deal Image"}
-            <input type="file" hidden accept="image/*" onChange={(e) => setImage(e.target.files?.[0] ?? null)} />
+            {image ? `${image.name} (${(image.size / (1024 * 1024)).toFixed(1)}MB)` : "Upload Deal Image (max 5MB)"}
+            <input type="file" hidden accept="image/*" onChange={handleImageChange} />
           </Button>
 
           <Button
