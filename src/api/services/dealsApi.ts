@@ -14,6 +14,7 @@ export interface DealResponseDto {
   validTo: string | null;
   submittedByUserId: string;
   submittedByName: string;
+  shopAddress: string | null;
   approvalStatus: string;
   rejectionReason: string | null;
   createdAt: string;

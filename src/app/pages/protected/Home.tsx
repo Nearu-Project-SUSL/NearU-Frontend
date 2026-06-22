@@ -182,6 +182,7 @@ interface HomeDealCardProps {
   description: string;
   badge: string;
   badgeColor: string;
+  shopAddress?: string | null;
 }
 
 
@@ -215,6 +216,7 @@ export default function Home() {
     description: d.description,
     badge: d.badgeText,
     badgeColor: d.badgeColor || '#ef4444',
+    shopAddress: d.shopAddress,
   }));
 
 

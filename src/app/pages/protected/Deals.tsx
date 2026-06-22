@@ -21,6 +21,7 @@ import {
 import AddIcon from "@mui/icons-material/Add";
 import LocalOfferIcon from "@mui/icons-material/LocalOffer";
 import StoreIcon from "@mui/icons-material/Store";
+import PlaceIcon from "@mui/icons-material/Place";
 import CalendarTodayIcon from "@mui/icons-material/CalendarToday";
 import CloseIcon from "@mui/icons-material/Close";
 import InfoIcon from "@mui/icons-material/Info";
@@ -149,6 +150,14 @@ function DealDetailModal({ deal, open, onClose }: DealDetailModalProps) {
                 }}
               />
             </Stack>
+            {deal.shopAddress && (
+              <Stack direction="row" alignItems="center" gap={0.5} mb={1} sx={{ mt: 0.25 }}>
+                <PlaceIcon sx={{ color: "rgba(255,255,255,0.48)", fontSize: 16 }} />
+                <Typography variant="caption" sx={{ color: "rgba(255,255,255,0.48)", fontWeight: 500 }}>
+                  {deal.shopAddress}
+                </Typography>
+              </Stack>
+            )}
             <Typography variant="h5" sx={{ color: "#fff", fontWeight: 800, letterSpacing: "-0.01em" }}>
               {deal.title}
             </Typography>
@@ -310,12 +319,20 @@ function DealCardComponent({ deal, onSelect, showStatus = false }: DealCardCompo
       </Box>
       <CardContent sx={{ p: 2.5, flexGrow: 1, display: "flex", flexDirection: "column", justifyContent: "space-between" }}>
         <Box>
-          <Stack direction="row" alignItems="center" gap={0.5} mb={0.75}>
+          <Stack direction="row" alignItems="center" gap={0.5} mb={deal.shopAddress ? 0.5 : 1.25}>
             <StoreIcon sx={{ color: "#2E9EBF", fontSize: 15 }} />
             <Typography variant="caption" sx={{ color: "rgba(255,255,255,0.48)", fontWeight: 600 }}>
               {deal.shopName} · {deal.shopType}
             </Typography>
           </Stack>
+          {deal.shopAddress && (
+            <Stack direction="row" alignItems="center" gap={0.5} mb={1.25}>
+              <PlaceIcon sx={{ color: "rgba(255,255,255,0.36)", fontSize: 13 }} />
+              <Typography variant="caption" sx={{ color: "rgba(255,255,255,0.36)", fontWeight: 500, display: "-webkit-box", WebkitLineClamp: 1, WebkitBoxOrient: "vertical", overflow: "hidden", textOverflow: "ellipsis" }}>
+                {deal.shopAddress}
+              </Typography>
+            </Stack>
+          )}
           <Typography
             variant="h6"
             sx={{
@@ -361,13 +378,13 @@ export default function Deals() {
   const [activeTab, setActiveTab] = useState("live");
   const [selectedDeal, setSelectedDeal] = useState<DealResponseDto | null>(null);
 
-  const { data: approvedDeals = [], isLoading: loadingApproved } = useApprovedDeals();
-  const { data: myDeals = [], isLoading: loadingMyDeals } = useMyDeals();
-  const createDealMutation = useCreateDeal();
-
   const isBusiness = auth?.user?.roles?.some((role: string) => ["BusinessOwner", "Business"].includes(role));
   const isAdmin = auth?.user?.roles?.some((role: string) => ["Admin", "SuperAdmin"].includes(role));
   const isBusinessOrAdmin = isBusiness || isAdmin;
+
+  const { data: approvedDeals = [], isLoading: loadingApproved } = useApprovedDeals();
+  const { data: myDeals = [], isLoading: loadingMyDeals } = useMyDeals({ enabled: isBusinessOrAdmin });
+  const createDealMutation = useCreateDeal();
 
   const handleSubmit = async (formData: FormData) => {
     try {

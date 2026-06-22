@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { Grow, Card, Box, Typography, Button } from "@mui/material";
 import LazyImage from "../ui/LazyImage";
+import PlaceIcon from "@mui/icons-material/Place";
 
 interface HomeDealCardProps {
   id: string;
@@ -9,6 +10,7 @@ interface HomeDealCardProps {
   description: string;
   badge: string;
   badgeColor: string;
+  shopAddress?: string | null;
 }
 
 export default function DealCard({
@@ -76,6 +78,14 @@ export default function DealCard({
           />
         </Box>
         <Box sx={{ p: 3, pt: 1 }}>
+          {deal.shopAddress && (
+            <Box sx={{ display: "flex", alignItems: "center", gap: 0.5, mb: 0.75 }}>
+              <PlaceIcon sx={{ color: "var(--text-secondary)", fontSize: 13 }} />
+              <Typography variant="caption" sx={{ color: "var(--text-secondary)", fontWeight: 500 }}>
+                {deal.shopAddress}
+              </Typography>
+            </Box>
+          )}
           <Typography
             variant="h6"
             sx={{ color: "var(--nearu-accent)", fontWeight: 700, mb: 1, fontSize: "1.1rem" }}

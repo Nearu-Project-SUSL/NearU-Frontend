@@ -31,10 +31,11 @@ export const useApprovedDeals = () => {
   });
 };
 
-export const useMyDeals = () => {
+export const useMyDeals = (options?: { enabled?: boolean }) => {
   return useQuery({
     queryKey: DEAL_QUERY_KEYS.mine,
     queryFn: getMyDeals,
+    ...options,
   });
 };
 
