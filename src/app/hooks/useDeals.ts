@@ -6,6 +6,7 @@ import {
   getAdminDeals,
   approveDeal,
   rejectDeal,
+  DealResponseDto,
 } from '../../api/services/dealsApi';
 
 export const DEAL_QUERY_KEYS = {
@@ -17,7 +18,15 @@ export const DEAL_QUERY_KEYS = {
 export const useApprovedDeals = () => {
   return useQuery({
     queryKey: DEAL_QUERY_KEYS.approved,
-    queryFn: getApprovedDeals,
+    queryFn: async () => {
+      const data = await getApprovedDeals();
+      localStorage.setItem('nearu_cached_approved_deals', JSON.stringify(data));
+      return data;
+    },
+    initialData: (): DealResponseDto[] | undefined => {
+      const cached = localStorage.getItem('nearu_cached_approved_deals');
+      return cached ? (JSON.parse(cached) as DealResponseDto[]) : undefined;
+    },
     staleTime: 60 * 1000,
   });
 };
