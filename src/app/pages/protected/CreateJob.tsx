@@ -86,6 +86,14 @@ export default function CreateJob() {
   const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files[0]) {
       const file = e.target.files[0];
+
+      // Validate size (5MB)
+      if (file.size > 5 * 1024 * 1024) {
+        toast.error('Logo file size must be less than 5MB');
+        e.target.value = '';
+        return;
+      }
+
       setLogoFile(file);
 
       // Create preview

@@ -62,6 +62,13 @@ export default function UpdateMenuItemDialog({ item, onClose, onSubmit }: Update
     const file = e.target.files?.[0];
     if (!file) return;
 
+    const MAX_SIZE_BYTES = 5 * 1024 * 1024;
+    if (file.size > MAX_SIZE_BYTES) {
+      setError('Image size must be less than 5MB');
+      e.target.value = '';
+      return;
+    }
+    setError('');
     setPhoto(file);
     // create a local URL to preview the selected image
     setPhotoPreview(URL.createObjectURL(file));
@@ -179,7 +186,7 @@ export default function UpdateMenuItemDialog({ item, onClose, onSubmit }: Update
               >
                 <CameraIcon sx={{ color: '#2E9EBF', fontSize: 32, mb: 1 }} />
                 <Typography variant="caption" sx={{ color: 'rgba(255,255,255,0.7)' }}>
-                  {photoPreview ? 'Change photo' : 'Click to change photo'}
+                  {photoPreview ? 'Change photo (max 5MB)' : 'Click to change photo (max 5MB)'}
                 </Typography>
               </Box>
 
