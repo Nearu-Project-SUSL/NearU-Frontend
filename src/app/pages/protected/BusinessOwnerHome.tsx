@@ -45,11 +45,12 @@ export default function BusinessOwnerHome() {
               }}
             >
               <Typography variant="h3" sx={{ color: '#3b82f6', fontWeight: 'bold', mb: 2 }}>
-                Welcome, {auth?.user?.email || 'Owner'}!
+                Welcome, {auth?.user?.username || 'Owner'}!
               </Typography>
               <Typography variant="h6" sx={{ color: '#9ca3af', mb: 4 }}>
                 You are logged in as a Business Owner.
               </Typography>
+            
               
               <Grid container spacing={3}>
                 {[

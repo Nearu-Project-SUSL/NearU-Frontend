@@ -1,5 +1,5 @@
 import { axiosPrivate } from './axios';
-import type { BusRoute, TrainRoute } from '../types/adminTransport';
+import type { BusRoute, TrainRoute } from '../types/transport';
 
 export const transportService = {
   getBusRoutes: async (): Promise<BusRoute[]> => {
