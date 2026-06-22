@@ -168,14 +168,32 @@ export default function Navbar() {
 
             {/* Floating panel — rendered inside the same ref box */}
             {notifOpen && (
-              <Box sx={{
-                position: 'absolute',
-                top: 'calc(100% + 8px)',
-                right: 0,
-                zIndex: 9999,
-              }}>
-                <NotificationPanel onClose={() => setNotifOpen(false)} />
-              </Box>
+              <>
+                {/* Backdrop for mobile */}
+                <Box
+                  onClick={() => setNotifOpen(false)}
+                  sx={{
+                    display: { xs: 'block', sm: 'none' },
+                    position: 'fixed',
+                    inset: 0,
+                    bgcolor: 'rgba(0, 0, 0, 0.6)',
+                    backdropFilter: 'blur(4px)',
+                    zIndex: 9998,
+                  }}
+                />
+                <Box sx={{
+                  position: { xs: 'fixed', sm: 'absolute' },
+                  top: { xs: 'auto', sm: 'calc(100% + 8px)' },
+                  bottom: { xs: 16, sm: 'auto' },
+                  left: { xs: 16, sm: 'auto' },
+                  right: { xs: 16, sm: 0 },
+                  zIndex: 9999,
+                  display: 'flex',
+                  justifyContent: 'center',
+                }}>
+                  <NotificationPanel onClose={() => setNotifOpen(false)} />
+                </Box>
+              </>
             )}
           </Box>
 
