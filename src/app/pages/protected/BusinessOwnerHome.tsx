@@ -249,7 +249,7 @@ export default function BusinessOwnerHome() {
               <Box>
                 {/* 1. Statistics Cards */}
                 <Grid container spacing={3} sx={{ mb: 5 }}>
-                  <Grid item xs={12} sm={4}>
+                  <Grid size={{ xs: 12, sm: 4 }}>
                     <Paper
                       onClick={() => navigate(`/shop/${shop.id}`)}
                       sx={{
@@ -282,7 +282,7 @@ export default function BusinessOwnerHome() {
                     </Paper>
                   </Grid>
 
-                  <Grid item xs={12} sm={4}>
+                  <Grid size={{ xs: 12, sm: 4 }}>
                     <Paper
                       onClick={() => navigate('/deals')}
                       sx={{
@@ -315,7 +315,7 @@ export default function BusinessOwnerHome() {
                     </Paper>
                   </Grid>
 
-                  <Grid item xs={12} sm={4}>
+                  <Grid size={{ xs: 12, sm: 4 }}>
                     <Paper
                       onClick={() => navigate('/deals')}
                       sx={{
@@ -352,7 +352,7 @@ export default function BusinessOwnerHome() {
                 {/* 2. Main Grid Layout */}
                 <Grid container spacing={4}>
                   {/* Left Column: Shop Profile Card */}
-                  <Grid item xs={12} md={5}>
+                  <Grid size={{ xs: 12, md: 5 }}>
                     <Typography variant="h6" sx={{ color: '#fff', fontWeight: 700, mb: 2, display: 'flex', alignItems: 'center', gap: 1 }}>
                       <StoreIcon sx={{ color: '#2E9EBF' }} /> Shop Profile
                     </Typography>
@@ -464,7 +464,7 @@ export default function BusinessOwnerHome() {
                   </Grid>
 
                   {/* Right Column: Deals Overview */}
-                  <Grid item xs={12} md={7}>
+                  <Grid size={{ xs: 12, md: 7 }}>
                     <Stack direction="row" justifyContent="space-between" alignItems="center" mb={2}>
                       <Typography variant="h6" sx={{ color: '#fff', fontWeight: 700, display: 'flex', alignItems: 'center', gap: 1 }}>
                         <OfferIcon sx={{ color: '#2E9EBF' }} /> Recent Deals
