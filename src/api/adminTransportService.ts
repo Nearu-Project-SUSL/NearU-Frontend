@@ -5,7 +5,7 @@ import type {
   TrainRoute,
   TransportBooking,
   TransportAnalyticsSummary
-} from '../types/adminTransport';
+} from '../types/transport';
 
 type ApiResponse<T> = { data?: T } | T;
 
