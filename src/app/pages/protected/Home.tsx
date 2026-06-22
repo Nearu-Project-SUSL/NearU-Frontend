@@ -208,7 +208,7 @@ export default function Home() {
   const [snackbar, setSnackbar] = useState<{ open: boolean; message: string; severity: 'success' | 'error' }>({ open: false, message: '', severity: 'success' });
   const autoRotateRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
-  const homeDeals: HomeDealCardProps[] = approvedDeals.map((d: any) => ({
+  const homeDeals: HomeDealCardProps[] = approvedDeals.slice(0, 10).map((d: any) => ({
     id: d.id,
     image: d.imageUrl || defaultDealImageByType[d.shopType] || '/offer_service.png',
     title: d.title,
