@@ -69,3 +69,7 @@ export const rejectDeal = async (dealId: string, reason?: string): Promise<DealR
   );
   return response.data.data!;
 };
+
+export const deleteDeal = async (dealId: string): Promise<void> => {
+  await axiosPrivate.delete(`/deals/${dealId}`);
+};
