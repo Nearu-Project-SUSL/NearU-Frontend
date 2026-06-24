@@ -6,6 +6,7 @@ import {
   getAdminDeals,
   approveDeal,
   rejectDeal,
+  deleteDeal,
   DealResponseDto,
 } from '../../api/services/dealsApi';
 
@@ -71,6 +72,16 @@ export const useRejectDeal = () => {
   return useMutation({
     mutationFn: ({ dealId, reason }: { dealId: string; reason?: string }) =>
       rejectDeal(dealId, reason),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['deals'] });
+    },
+  });
+};
+
+export const useDeleteDeal = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (dealId: string) => deleteDeal(dealId),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['deals'] });
     },

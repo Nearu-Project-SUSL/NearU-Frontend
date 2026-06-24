@@ -23,7 +23,7 @@ import { toast } from "sonner";
 import { Sidebar } from "../../components/layout/Sidebar";
 import Navbar from "../../components/layout/Navbar";
 import { PageLayout } from "../../components/layout/PageLayout";
-import { useAdminDeals, useApproveDeal, useRejectDeal } from "../../hooks/useDeals";
+import { useAdminDeals, useApproveDeal, useRejectDeal, useDeleteDeal } from "../../hooks/useDeals";
 import type { DealResponseDto } from "../../../api/services/dealsApi";
 
 const STATUSES = ["Pending", "Approved", "Rejected"];
@@ -39,6 +39,7 @@ interface AdminDealCardProps {
   deal: DealResponseDto;
   onApprove: (id: string) => void;
   onRejectClick: (id: string) => void;
+  onDelete: (id: string) => void;
   loading: boolean;
 }
 
@@ -46,6 +47,7 @@ function AdminDealCard({
   deal,
   onApprove,
   onRejectClick,
+  onDelete,
   loading,
 }: AdminDealCardProps) {
   const imageUrl = deal.imageUrl || defaultDealImageByType[deal.shopType] || "/offer_service.png";
@@ -163,51 +165,74 @@ function AdminDealCard({
             </Typography>
           </Stack>
 
-          {deal.approvalStatus === "Pending" && (
-            <Stack direction="row" spacing={1.5}>
-              <Button
-                variant="contained"
-                size="small"
-                startIcon={<CheckCircleIcon />}
-                disabled={loading}
-                onClick={() => onApprove(deal.id)}
-                sx={{
-                  bgcolor: "#10b981",
-                  color: "#000",
-                  fontWeight: 700,
-                  borderRadius: "10px",
-                  textTransform: "none",
-                  px: 2.5,
-                  py: 0.75,
-                  "&:hover": { bgcolor: "#059669" }
-                }}
-              >
-                Approve
-              </Button>
-              <Button
-                variant="outlined"
-                size="small"
-                startIcon={<CancelIcon />}
-                disabled={loading}
-                onClick={() => onRejectClick(deal.id)}
-                sx={{
-                  borderColor: "rgba(239,68,68,0.5)",
-                  color: "#ef4444",
-                  fontWeight: 700,
-                  borderRadius: "10px",
-                  textTransform: "none",
-                  px: 2.5,
-                  py: 0.75,
-                  "&:hover": {
-                    borderColor: "#ef4444",
-                    bgcolor: "rgba(239,68,68,0.05)"
-                  }
-                }}
-              >
-                Reject
-              </Button>
-            </Stack>
-          )}
+          <Stack direction="row" spacing={1.5} alignItems="center">
+            {deal.approvalStatus === "Pending" && (
+              <>
+                <Button
+                  variant="contained"
+                  size="small"
+                  startIcon={<CheckCircleIcon />}
+                  disabled={loading}
+                  onClick={() => onApprove(deal.id)}
+                  sx={{
+                    bgcolor: "#10b981",
+                    color: "#000",
+                    fontWeight: 700,
+                    borderRadius: "10px",
+                    textTransform: "none",
+                    px: 2.5,
+                    py: 0.75,
+                    "&:hover": { bgcolor: "#059669" }
+                  }}
+                >
+                  Approve
+                </Button>
+                <Button
+                  variant="outlined"
+                  size="small"
+                  startIcon={<CancelIcon />}
+                  disabled={loading}
+                  onClick={() => onRejectClick(deal.id)}
+                  sx={{
+                    borderColor: "rgba(239,68,68,0.5)",
+                    color: "#ef4444",
+                    fontWeight: 700,
+                    borderRadius: "10px",
+                    textTransform: "none",
+                    px: 2.5,
+                    py: 0.75,
+                    "&:hover": {
+                      borderColor: "#ef4444",
+                      bgcolor: "rgba(239,68,68,0.05)"
+                    }
+                  }}
+                >
+                  Reject
+                </Button>
+              </>
+            )}
+            <Button
+              variant="outlined"
+              size="small"
+              disabled={loading}
+              onClick={() => onDelete(deal.id)}
+              sx={{
+                borderColor: "rgba(239,68,68,0.3)",
+                color: "#ef4444",
+                fontWeight: 700,
+                borderRadius: "10px",
+                textTransform: "none",
+                px: 2.5,
+                py: 0.75,
+                "&:hover": {
+                  borderColor: "#ef4444",
+                  bgcolor: "rgba(239,68,68,0.08)"
+                }
+              }}
+            >
+              Delete
+            </Button>
+          </Stack>
         </Stack>
 
         {deal.rejectionReason && (
@@ -227,13 +252,14 @@ export default function AdminDeals() {
   const { data, isLoading, refetch } = useAdminDeals(status);
   const approveMutation = useApproveDeal();
   const rejectMutation = useRejectDeal();
+  const deleteMutation = useDeleteDeal();
 
   const [rejectDialogOpen, setRejectDialogOpen] = useState(false);
   const [dealToReject, setDealToReject] = useState<string | null>(null);
   const [rejectionReasonInput, setRejectionReasonInput] = useState("");
 
   const deals = data?.deals ?? [];
-  const busy = approveMutation.isPending || rejectMutation.isPending;
+  const busy = approveMutation.isPending || rejectMutation.isPending || deleteMutation.isPending;
 
   const handleApprove = async (id: string) => {
     try {
@@ -265,6 +291,18 @@ export default function AdminDeals() {
       refetch();
     } catch {
       toast.error("Failed to reject deal");
+    }
+  };
+
+  const handleDelete = async (id: string) => {
+    if (window.confirm("Are you sure you want to delete this deal? This action cannot be undone.")) {
+      try {
+        await deleteMutation.mutateAsync(id);
+        toast.success("Deal deleted successfully.");
+        refetch();
+      } catch {
+        toast.error("Failed to delete deal");
+      }
     }
   };
 
@@ -316,6 +354,7 @@ export default function AdminDeals() {
                   deal={deal}
                   onApprove={handleApprove}
                   onRejectClick={handleRejectClick}
+                  onDelete={handleDelete}
                   loading={busy}
                 />
               ))}

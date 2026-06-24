@@ -29,7 +29,7 @@ import { toast } from "sonner";
 import { Sidebar } from "../../components/layout/Sidebar";
 import Navbar from "../../components/layout/Navbar";
 import DealFormDialog from "../../components/deal/DealFormDialog";
-import { useCreateDeal, useApprovedDeals, useMyDeals } from "../../hooks/useDeals";
+import { useCreateDeal, useApprovedDeals, useMyDeals, useDeleteDeal } from "../../hooks/useDeals";
 import type { DealResponseDto } from "../../../api/services/dealsApi";
 import useAuth from "../../hooks/useAuth";
 
@@ -41,19 +41,36 @@ const defaultDealImageByType: Record<string, string> = {
 };
 
 function statusColor(status: string) {
+  if (status === "Expired") return "#6b7280"; // gray
   if (status === "Approved") return "#10b981"; // green
   if (status === "Rejected") return "#ef4444"; // red
   return "#f59e0b"; // amber/yellow
 }
+
+const isExpired = (deal: DealResponseDto) => {
+  if (!deal.validTo) return false;
+  return new Date(deal.validTo) < new Date();
+};
 
 // ─── Deal Detail Modal ────────────────────────────────────────────────────────
 interface DealDetailModalProps {
   deal: DealResponseDto | null;
   open: boolean;
   onClose: () => void;
+  onDelete?: (dealId: string) => Promise<void>;
+  currentUserId?: string;
+  isAdmin?: boolean;
 }
 
-function DealDetailModal({ deal, open, onClose }: DealDetailModalProps) {
+function DealDetailModal({
+  deal,
+  open,
+  onClose,
+  onDelete,
+  currentUserId,
+  isAdmin,
+}: DealDetailModalProps) {
+  const [isDeleting, setIsDeleting] = useState(false);
   if (!deal) return null;
 
   const formatDate = (dateStr: string | null) => {
@@ -65,7 +82,21 @@ function DealDetailModal({ deal, open, onClose }: DealDetailModalProps) {
     });
   };
 
-  const imageUrl = deal.imageUrl || defaultDealImageByType[deal.shopType] || "/offer_service.png";
+    const imageUrl = deal.imageUrl || defaultDealImageByType[deal.shopType] || "/offer_service.png";
+
+    const showDeleteButton = deal.submittedByUserId === currentUserId || isAdmin;
+
+    const handleDelete = async () => {
+      if (!onDelete || !deal) return;
+      if (window.confirm("Are you sure you want to delete this offer? This action cannot be undone.")) {
+        setIsDeleting(true);
+        try {
+          await onDelete(deal.id);
+        } finally {
+          setIsDeleting(false);
+        }
+      }
+    };
 
   return (
     <Dialog
@@ -208,22 +239,46 @@ function DealDetailModal({ deal, open, onClose }: DealDetailModalProps) {
             </Box>
           )}
 
-          <Button
-            variant="contained"
-            fullWidth
-            onClick={onClose}
-            sx={{
-              bgcolor: "#2E9EBF",
-              color: "#050505",
-              fontWeight: 700,
-              borderRadius: "12px",
-              py: 1.25,
-              textTransform: "none",
-              "&:hover": { bgcolor: "#1e82a0" }
-            }}
-          >
-            Close Window
-          </Button>
+          <Stack direction="row" spacing={2} width="100%">
+            {showDeleteButton && (
+              <Button
+                variant="outlined"
+                fullWidth
+                disabled={isDeleting}
+                onClick={handleDelete}
+                sx={{
+                  borderColor: "#ef4444",
+                  color: "#ef4444",
+                  fontWeight: 700,
+                  borderRadius: "12px",
+                  py: 1.25,
+                  textTransform: "none",
+                  "&:hover": {
+                    bgcolor: "rgba(239, 68, 68, 0.08)",
+                    borderColor: "#ef4444",
+                  }
+                }}
+              >
+                {isDeleting ? "Deleting..." : "Delete Offer"}
+              </Button>
+            )}
+            <Button
+              variant="contained"
+              fullWidth
+              onClick={onClose}
+              sx={{
+                bgcolor: "#2E9EBF",
+                color: "#050505",
+                fontWeight: 700,
+                borderRadius: "12px",
+                py: 1.25,
+                textTransform: "none",
+                "&:hover": { bgcolor: "#1e82a0" }
+              }}
+            >
+              Close Window
+            </Button>
+          </Stack>
         </Stack>
       </DialogContent>
     </Dialog>
@@ -240,6 +295,7 @@ interface DealCardComponentProps {
 function DealCardComponent({ deal, onSelect, showStatus = false }: DealCardComponentProps) {
   const [hovered, setHovered] = useState(false);
   const imageUrl = deal.imageUrl || defaultDealImageByType[deal.shopType] || "/offer_service.png";
+  const displayStatus = (deal.approvalStatus === "Approved" && isExpired(deal)) ? "Expired" : deal.approvalStatus;
 
   return (
     <Card
@@ -294,13 +350,13 @@ function DealCardComponent({ deal, onSelect, showStatus = false }: DealCardCompo
         </Box>
         {showStatus && (
           <Chip
-            label={deal.approvalStatus}
+            label={displayStatus}
             size="small"
             sx={{
               position: "absolute",
               top: 12,
               left: 12,
-              bgcolor: statusColor(deal.approvalStatus),
+              bgcolor: statusColor(displayStatus),
               color: "#111",
               fontWeight: 800,
               fontSize: "0.7rem",
@@ -385,6 +441,7 @@ export default function Deals() {
   const { data: approvedDeals = [], isLoading: loadingApproved } = useApprovedDeals();
   const { data: myDeals = [], isLoading: loadingMyDeals } = useMyDeals({ enabled: isBusinessOrAdmin });
   const createDealMutation = useCreateDeal();
+  const deleteDealMutation = useDeleteDeal();
 
   const handleSubmit = async (formData: FormData) => {
     try {
@@ -516,7 +573,23 @@ export default function Deals() {
       </Box>
 
       <DealFormDialog open={formOpen} onClose={() => setFormOpen(false)} onSubmit={handleSubmit} />
-      <DealDetailModal open={selectedDeal !== null} deal={selectedDeal} onClose={() => setSelectedDeal(null)} />
+      <DealDetailModal
+        open={selectedDeal !== null}
+        deal={selectedDeal}
+        onClose={() => setSelectedDeal(null)}
+        onDelete={async (id) => {
+          try {
+            await deleteDealMutation.mutateAsync(id);
+            toast.success("Deal deleted successfully");
+            setSelectedDeal(null);
+          } catch (err: any) {
+            const message = err.response?.data?.message || "Failed to delete deal";
+            toast.error(message);
+          }
+        }}
+        currentUserId={auth?.user?.id}
+        isAdmin={isAdmin}
+      />
     </Box>
   );
 }
