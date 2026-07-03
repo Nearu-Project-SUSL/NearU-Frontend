@@ -169,28 +169,40 @@ export default function Navbar() {
             {/* Floating panel — rendered inside the same ref box */}
             {notifOpen && (
               <>
-                {/* Backdrop for mobile */}
+                {/* Mobile backdrop — panel itself handles bottom-sheet layout */}
                 <Box
                   onClick={() => setNotifOpen(false)}
                   sx={{
                     display: { xs: 'block', sm: 'none' },
                     position: 'fixed',
                     inset: 0,
-                    bgcolor: 'rgba(0, 0, 0, 0.6)',
-                    backdropFilter: 'blur(4px)',
+                    bgcolor: 'rgba(0, 0, 0, 0.7)',
+                    backdropFilter: 'blur(6px)',
                     zIndex: 9998,
                   }}
                 />
+                {/* Desktop dropdown */}
                 <Box sx={{
-                  position: { xs: 'fixed', sm: 'absolute' },
-                  top: { xs: 'auto', sm: 'calc(100% + 8px)' },
-                  bottom: { xs: 16, sm: 'auto' },
-                  left: { xs: 16, sm: 'auto' },
-                  right: { xs: 16, sm: 0 },
+                  display: { xs: 'none', sm: 'block' },
+                  position: 'absolute',
+                  top: 'calc(100% + 8px)',
+                  right: 0,
                   zIndex: 9999,
-                  display: 'flex',
-                  justifyContent: 'center',
-                }}>
+                  width: 400,
+                }}
+                >
+                  <NotificationPanel onClose={() => setNotifOpen(false)} />
+                </Box>
+                {/* Mobile bottom sheet */}
+                <Box sx={{
+                  display: { xs: 'block', sm: 'none' },
+                  position: 'fixed',
+                  bottom: 0,
+                  left: 0,
+                  right: 0,
+                  zIndex: 9999,
+                }}
+                >
                   <NotificationPanel onClose={() => setNotifOpen(false)} />
                 </Box>
               </>
