@@ -37,26 +37,28 @@ const textFieldStyles = {
   '& .MuiOutlinedInput-root': {
     color: '#fff',
     borderRadius: '12px',
-    bgcolor: 'rgba(255,255,255,0.03)',
+    bgcolor: 'rgba(46, 158, 191, 0.03)',
+    transition: 'all 0.2s ease-in-out',
     '& fieldset': {
-      borderColor: 'rgba(255,255,255,0.1)',
+      borderColor: 'rgba(46, 158, 191, 0.18)',
       borderWidth: '1px',
     },
     '&:hover fieldset': {
-      borderColor: 'rgba(250, 204, 21, 0.4)',
+      borderColor: 'rgba(46, 158, 191, 0.45)',
     },
     '&.Mui-focused fieldset': {
-      borderColor: '#facc15',
-      borderWidth: '2px',
+      borderColor: '#2E9EBF',
+      borderWidth: '1.5px',
+      boxShadow: '0 0 12px rgba(46, 158, 191, 0.15)',
     },
     '& .MuiSelect-icon': {
-      color: 'rgba(255,255,255,0.5)',
+      color: 'rgba(46, 158, 191, 0.7)',
     }
   },
   '& .MuiInputLabel-root': {
-    color: 'rgba(255,255,255,0.4)',
+    color: 'rgba(255, 255, 255, 0.5)',
     '&.Mui-focused': {
-      color: '#facc15',
+      color: '#2E9EBF',
     },
   },
 };
@@ -130,7 +132,7 @@ export default function UpdateJob() {
       const previewUrl = URL.createObjectURL(file);
       setLogoPreview(previewUrl);
       
-      // Upload to ImageKit immediately
+      // Upload to S3 immediately
       try {
         setIsUploadingLogo(true);
         const uploadedUrl = await jobService.uploadLogo(file);
@@ -183,7 +185,7 @@ export default function UpdateJob() {
   };
 
   return (
-    <Box sx={{ display: 'flex', minHeight: '100vh', bgcolor: '#050505', backgroundImage: 'radial-gradient(circle at top left, rgba(250,204,21,0.03) 0%, transparent 50%)' }}>
+    <Box sx={{ display: 'flex', minHeight: '100vh', bgcolor: '#050505', backgroundImage: 'radial-gradient(circle at top left, rgba(46, 158, 191, 0.08) 0%, transparent 60%)' }}>
       <Sidebar activeSection="jobs" />
 
       <Box sx={{ flexGrow: 1, display: 'flex', flexDirection: 'column', minWidth: 0 }}>
@@ -196,7 +198,7 @@ export default function UpdateJob() {
               <Fade in={true} timeout={600}>
                 <Box>
                   <Typography variant="h3" sx={{ fontWeight: 800, color: '#fff', letterSpacing: '-0.02em', mb: 2 }}>
-                    Update <span style={{ color: '#facc15' }}>Job</span>
+                    Update <span style={{ color: '#2E9EBF' }}>Job</span>
                   </Typography>
                   <Typography variant="body1" sx={{ color: 'rgba(255,255,255,0.6)', mb: 6 }}>
                     Edit the details of your job listing below.
@@ -208,8 +210,10 @@ export default function UpdateJob() {
 
                   <Box component="form" onSubmit={handleSubmit} sx={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
 
-                    <Box sx={{ p: 4, bgcolor: 'rgba(255,255,255,0.02)', borderRadius: '24px', border: '1px solid rgba(255,255,255,0.05)' }}>
-                      <Typography variant="h6" sx={{ color: '#fff', mb: 3, fontWeight: 700 }}>Basic Information</Typography>
+                    <Box sx={{ p: 4, bgcolor: 'rgba(255,255,255,0.02)', borderRadius: '24px', border: '1px solid rgba(46, 158, 191, 0.12)' }}>
+                      <Typography variant="h6" sx={{ color: '#fff', mb: 3, fontWeight: 700, borderLeft: '4px solid #2E9EBF', pl: 1.5 }}>
+                        Basic Information
+                      </Typography>
                       <Grid container spacing={3}>
                         <Grid size={{ xs: 12, sm: 6 }}>
                           <TextField
@@ -220,7 +224,7 @@ export default function UpdateJob() {
                             value={formData.title}
                             onChange={handleChange}
                             InputProps={{
-                              startAdornment: <InputAdornment position="start"><WorkIcon sx={{ color: 'rgba(255,255,255,0.5)' }} /></InputAdornment>,
+                              startAdornment: <InputAdornment position="start"><WorkIcon sx={{ color: 'rgba(46, 158, 191, 0.7)' }} /></InputAdornment>,
                             }}
                             sx={textFieldStyles}
                           />
@@ -234,7 +238,7 @@ export default function UpdateJob() {
                             value={formData.company}
                             onChange={handleChange}
                             InputProps={{
-                              startAdornment: <InputAdornment position="start"><CompanyIcon sx={{ color: 'rgba(255,255,255,0.5)' }} /></InputAdornment>,
+                              startAdornment: <InputAdornment position="start"><CompanyIcon sx={{ color: 'rgba(46, 158, 191, 0.7)' }} /></InputAdornment>,
                             }}
                             sx={textFieldStyles}
                           />
@@ -248,7 +252,7 @@ export default function UpdateJob() {
                             value={formData.location}
                             onChange={handleChange}
                             InputProps={{
-                              startAdornment: <InputAdornment position="start"><LocationIcon sx={{ color: 'rgba(255,255,255,0.5)' }} /></InputAdornment>,
+                              startAdornment: <InputAdornment position="start"><LocationIcon sx={{ color: 'rgba(46, 158, 191, 0.7)' }} /></InputAdornment>,
                             }}
                             sx={textFieldStyles}
                           />
@@ -263,48 +267,62 @@ export default function UpdateJob() {
                             value={formData.payRange}
                             onChange={handleChange}
                             InputProps={{
-                              startAdornment: <InputAdornment position="start"><PayIcon sx={{ color: 'rgba(255,255,255,0.5)' }} /></InputAdornment>,
+                              startAdornment: <InputAdornment position="start"><PayIcon sx={{ color: '#22c55e' }} /></InputAdornment>,
                             }}
                             sx={textFieldStyles}
                           />
                         </Grid>
                         <Grid size={{ xs: 12, sm: 12 }}>
                           <Box sx={{ 
-                            border: '1px dashed rgba(255,255,255,0.2)', 
-                            borderRadius: '12px', 
+                            border: '1px dashed rgba(46, 158, 191, 0.25)', 
+                            borderRadius: '16px', 
                             p: 3, 
-                            bgcolor: 'rgba(255,255,255,0.02)',
+                            bgcolor: 'rgba(46, 158, 191, 0.02)',
                           }}>
-                            <Typography variant="body2" sx={{ color: 'rgba(255,255,255,0.6)', mb: 2, textAlign: 'center' }}>
+                            <Typography variant="body2" sx={{ color: 'rgba(255,255,255,0.7)', mb: 2, textAlign: 'center', fontWeight: 600 }}>
                               Company Logo (Optional)
                             </Typography>
                             
                             {/* Toggle between file upload and URL */}
-                            <Stack direction="row" spacing={1} justifyContent="center" sx={{ mb: 2 }}>
+                            <Stack direction="row" spacing={1} justifyContent="center" sx={{ mb: 2.5 }}>
                               <Button 
                                 size="small" 
                                 variant={logoInputMode === 'file' ? 'contained' : 'outlined'}
                                 onClick={() => setLogoInputMode('file')}
                                 sx={{ 
-                                  bgcolor: logoInputMode === 'file' ? 'rgba(250, 204, 21, 0.2)' : 'transparent',
-                                  color: '#fff', 
-                                  borderColor: 'rgba(255,255,255,0.2)',
+                                  bgcolor: logoInputMode === 'file' ? '#2E9EBF' : 'transparent',
+                                  color: logoInputMode === 'file' ? '#000' : '#fff', 
+                                  borderColor: logoInputMode === 'file' ? '#2E9EBF' : 'rgba(255,255,255,0.2)',
+                                  fontWeight: logoInputMode === 'file' ? 700 : 500,
                                   textTransform: 'none',
-                                  fontSize: '0.75rem'
+                                  fontSize: '0.8rem',
+                                  px: 2,
+                                  borderRadius: '8px',
+                                  '&:hover': {
+                                    bgcolor: logoInputMode === 'file' ? '#2585a3' : 'rgba(46, 158, 191, 0.1)',
+                                    borderColor: '#2E9EBF',
+                                  }
                                 }}
                               >
-                                Upload File (ImageKit)
+                                Upload File (S3)
                               </Button>
                               <Button 
                                 size="small" 
                                 variant={logoInputMode === 'url' ? 'contained' : 'outlined'}
                                 onClick={() => setLogoInputMode('url')}
                                 sx={{ 
-                                  bgcolor: logoInputMode === 'url' ? 'rgba(250, 204, 21, 0.2)' : 'transparent',
-                                  color: '#fff', 
-                                  borderColor: 'rgba(255,255,255,0.2)',
+                                  bgcolor: logoInputMode === 'url' ? '#2E9EBF' : 'transparent',
+                                  color: logoInputMode === 'url' ? '#000' : '#fff', 
+                                  borderColor: logoInputMode === 'url' ? '#2E9EBF' : 'rgba(255,255,255,0.2)',
+                                  fontWeight: logoInputMode === 'url' ? 700 : 500,
                                   textTransform: 'none',
-                                  fontSize: '0.75rem'
+                                  fontSize: '0.8rem',
+                                  px: 2,
+                                  borderRadius: '8px',
+                                  '&:hover': {
+                                    bgcolor: logoInputMode === 'url' ? '#2585a3' : 'rgba(46, 158, 191, 0.1)',
+                                    borderColor: '#2E9EBF',
+                                  }
                                 }}
                               >
                                 Image URL
@@ -313,29 +331,29 @@ export default function UpdateJob() {
 
                             {logoInputMode === 'file' ? (
                               <Box sx={{ 
-                                border: '1px dashed rgba(255,255,255,0.2)', 
+                                border: '1px dashed rgba(46, 158, 191, 0.3)', 
                                 borderRadius: '12px', 
-                                p: 2, 
+                                p: 2.5, 
                                 textAlign: 'center',
                                 transition: 'all 0.3s',
-                                '&:hover': { borderColor: '#facc15', bgcolor: 'rgba(250, 204, 21, 0.05)' }
+                                '&:hover': { borderColor: '#2E9EBF', bgcolor: 'rgba(46, 158, 191, 0.06)' }
                               }}>
                                 {logoPreview && logoInputMode === 'file' ? (
                                   <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 2 }}>
-                                    <Box component="img" src={logoPreview} alt="Logo preview" sx={{ height: 64, width: 64, borderRadius: '12px', objectFit: 'cover', border: '1px solid rgba(255,255,255,0.1)' }} />
-                                    {isUploadingLogo && <Typography variant="caption" sx={{ color: '#facc15' }}>Uploading to ImageKit...</Typography>}
-                                    {!isUploadingLogo && logoUrl && <Typography variant="caption" sx={{ color: '#22c55e' }}>✓ Uploaded to ImageKit</Typography>}
-                                    <Button variant="outlined" component="label" htmlFor="update-job-logo-change" size="small" disabled={isUploadingLogo} sx={{ color: '#fff', borderColor: 'rgba(255,255,255,0.3)', textTransform: 'none', fontSize: '0.75rem', '&:hover': { borderColor: '#facc15', color: '#facc15' } }}>
+                                    <Box component="img" src={logoPreview} alt="Logo preview" sx={{ height: 64, width: 64, borderRadius: '12px', objectFit: 'cover', border: '1px solid rgba(46, 158, 191, 0.3)' }} />
+                                    {isUploadingLogo && <Typography variant="caption" sx={{ color: '#2E9EBF' }}>Uploading to AWS S3...</Typography>}
+                                    {!isUploadingLogo && logoUrl && <Typography variant="caption" sx={{ color: '#22c55e', fontWeight: 600 }}>✓ Uploaded to AWS S3</Typography>}
+                                    <Button variant="outlined" component="label" htmlFor="update-job-logo-change" size="small" disabled={isUploadingLogo} sx={{ color: '#fff', borderColor: 'rgba(46, 158, 191, 0.4)', textTransform: 'none', fontSize: '0.75rem', '&:hover': { borderColor: '#2E9EBF', color: '#2E9EBF' } }}>
                                       Change Image
                                       <input id="update-job-logo-change" type="file" hidden accept="image/*" onChange={handleFileChange} />
                                     </Button>
                                   </Box>
                                 ) : (
                                   <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 1 }}>
-                                    <ImageIcon sx={{ color: 'rgba(255,255,255,0.3)', fontSize: 32 }} />
+                                    <ImageIcon sx={{ color: 'rgba(46, 158, 191, 0.6)', fontSize: 32 }} />
                                     <Typography variant="caption" sx={{ color: 'rgba(255,255,255,0.5)' }}>Max 5MB • PNG, JPG, WebP</Typography>
-                                    <Typography variant="caption" sx={{ color: '#facc15' }}>Powered by ImageKit Cloud</Typography>
-                                    <Button variant="contained" component="label" htmlFor="update-job-logo-select" size="small" disabled={isUploadingLogo} sx={{ mt: 1, bgcolor: 'rgba(255,255,255,0.1)', color: '#fff', textTransform: 'none', boxShadow: 'none', fontSize: '0.75rem', '&:hover': { bgcolor: 'rgba(255,255,255,0.2)', boxShadow: 'none' } }}>
+                                    <Typography variant="caption" sx={{ color: '#2E9EBF', fontWeight: 600 }}>Powered by AWS S3</Typography>
+                                    <Button variant="contained" component="label" htmlFor="update-job-logo-select" size="small" disabled={isUploadingLogo} sx={{ mt: 1, bgcolor: 'rgba(46, 158, 191, 0.15)', color: '#fff', textTransform: 'none', boxShadow: 'none', fontSize: '0.8rem', '&:hover': { bgcolor: 'rgba(46, 158, 191, 0.25)', color: '#2E9EBF' } }}>
                                       {isUploadingLogo ? 'Uploading...' : 'Select Image'}
                                       <input id="update-job-logo-select" type="file" hidden accept="image/*" onChange={handleFileChange} />
                                     </Button>
@@ -357,7 +375,7 @@ export default function UpdateJob() {
                             {/* Preview for URL mode */}
                             {logoInputMode === 'url' && logoPreview && (
                               <Box sx={{ mt: 2, display: 'flex', justifyContent: 'center' }}>
-                                <Box component="img" src={logoPreview} alt="Logo preview" sx={{ height: 64, width: 64, borderRadius: '12px', objectFit: 'cover', border: '1px solid rgba(255,255,255,0.1)' }} onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }} />
+                                <Box component="img" src={logoPreview} alt="Logo preview" sx={{ height: 64, width: 64, borderRadius: '12px', objectFit: 'cover', border: '1px solid rgba(46, 158, 191, 0.3)' }} onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }} />
                               </Box>
                             )}
                           </Box>
@@ -372,7 +390,7 @@ export default function UpdateJob() {
                             value={formData.jobType}
                             onChange={handleChange}
                             InputProps={{
-                              startAdornment: <InputAdornment position="start"><LabelIcon sx={{ color: 'rgba(255,255,255,0.5)' }} /></InputAdornment>,
+                              startAdornment: <InputAdornment position="start"><LabelIcon sx={{ color: 'rgba(46, 158, 191, 0.7)' }} /></InputAdornment>,
                             }}
                             sx={textFieldStyles}
                           >
@@ -391,7 +409,7 @@ export default function UpdateJob() {
                             value={formData.category}
                             onChange={handleChange}
                             InputProps={{
-                              startAdornment: <InputAdornment position="start"><CategoryIcon sx={{ color: 'rgba(255,255,255,0.5)' }} /></InputAdornment>,
+                              startAdornment: <InputAdornment position="start"><CategoryIcon sx={{ color: 'rgba(46, 158, 191, 0.7)' }} /></InputAdornment>,
                             }}
                             sx={textFieldStyles}
                           >
@@ -403,8 +421,10 @@ export default function UpdateJob() {
                       </Grid>
                     </Box>
 
-                    <Box sx={{ p: 4, bgcolor: 'rgba(255,255,255,0.02)', borderRadius: '24px', border: '1px solid rgba(255,255,255,0.05)' }}>
-                      <Typography variant="h6" sx={{ color: '#fff', mb: 3, fontWeight: 700 }}>Job Details</Typography>
+                    <Box sx={{ p: 4, bgcolor: 'rgba(255,255,255,0.02)', borderRadius: '24px', border: '1px solid rgba(46, 158, 191, 0.12)' }}>
+                      <Typography variant="h6" sx={{ color: '#fff', mb: 3, fontWeight: 700, borderLeft: '4px solid #2E9EBF', pl: 1.5 }}>
+                        Job Details
+                      </Typography>
                       <Grid container spacing={3}>
                         <Grid size={{ xs: 12 }}>
                           <TextField
@@ -432,7 +452,7 @@ export default function UpdateJob() {
                             value={formData.longDescription}
                             onChange={handleChange}
                             InputProps={{
-                              startAdornment: <InputAdornment position="start" sx={{ alignSelf: 'flex-start', mt: 1.5 }}><DescriptionIcon sx={{ color: 'rgba(255,255,255,0.5)' }} /></InputAdornment>,
+                              startAdornment: <InputAdornment position="start" sx={{ alignSelf: 'flex-start', mt: 1.5 }}><DescriptionIcon sx={{ color: 'rgba(46, 158, 191, 0.7)' }} /></InputAdornment>,
                             }}
                             sx={textFieldStyles}
                           />
@@ -446,7 +466,7 @@ export default function UpdateJob() {
                             value={formData.tags}
                             onChange={handleChange}
                             InputProps={{
-                              startAdornment: <InputAdornment position="start" sx={{ alignSelf: 'flex-start', mt: 1.5 }}><LabelIcon sx={{ color: 'rgba(255,255,255,0.5)' }} /></InputAdornment>,
+                              startAdornment: <InputAdornment position="start" sx={{ alignSelf: 'flex-start', mt: 1.5 }}><LabelIcon sx={{ color: 'rgba(46, 158, 191, 0.7)' }} /></InputAdornment>,
                             }}
                             sx={textFieldStyles}
                           />
@@ -462,7 +482,7 @@ export default function UpdateJob() {
                             value={formData.requirements}
                             onChange={handleChange}
                             InputProps={{
-                              startAdornment: <InputAdornment position="start" sx={{ alignSelf: 'flex-start', mt: 1.5 }}><DescriptionIcon sx={{ color: 'rgba(255,255,255,0.5)' }} /></InputAdornment>,
+                              startAdornment: <InputAdornment position="start" sx={{ alignSelf: 'flex-start', mt: 1.5 }}><DescriptionIcon sx={{ color: 'rgba(46, 158, 191, 0.7)' }} /></InputAdornment>,
                             }}
                             sx={textFieldStyles}
                           />
@@ -476,18 +496,22 @@ export default function UpdateJob() {
                       size="large"
                       disabled={isSubmitting}
                       sx={{
-                        bgcolor: '#facc15',
+                        bgcolor: '#2E9EBF',
                         color: '#000',
                         fontWeight: 800,
                         py: 2,
                         borderRadius: '16px',
                         fontSize: '1.1rem',
                         textTransform: 'none',
+                        boxShadow: '0 8px 20px rgba(46, 158, 191, 0.25)',
+                        transition: 'all 0.3s ease',
                         '&:hover': {
-                          bgcolor: '#eab308',
+                          bgcolor: '#2585a3',
+                          boxShadow: '0 12px 28px rgba(46, 158, 191, 0.4)',
+                          transform: 'translateY(-2px)',
                         },
                         '&:disabled': {
-                          bgcolor: 'rgba(250, 204, 21, 0.3)',
+                          bgcolor: 'rgba(46, 158, 191, 0.3)',
                           color: 'rgba(0,0,0,0.4)'
                         }
                       }}
@@ -497,7 +521,7 @@ export default function UpdateJob() {
                     <Button
                       variant="text"
                       onClick={() => navigate('/my-jobs')}
-                      sx={{ color: 'rgba(255,255,255,0.5)', textTransform: 'none', mt: -2 }}
+                      sx={{ color: 'rgba(255,255,255,0.6)', textTransform: 'none', mt: -2, '&:hover': { color: '#2E9EBF', bgcolor: 'transparent' } }}
                     >
                       Cancel & Return to My Jobs
                     </Button>

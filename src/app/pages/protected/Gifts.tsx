@@ -29,6 +29,7 @@ import {
 } from "../../../api/services/giftShopApi";
 import { useGiftShops } from "../../hooks/useGiftShop";
 import { toast } from "sonner";
+import useAuth from "../../hooks/useAuth";
 
 function useHorizontalScroll() {
   const scrollRef = useRef<HTMLDivElement>(null);
@@ -67,10 +68,14 @@ function GiftCardSkeleton() {
 }
 
 export default function Gifts() {
+  const { auth } = useAuth();
+  const isBusinessOwner = auth?.user?.roles?.some((role: string) =>
+    ["BusinessOwner", "Business", "Admin", "SuperAdmin"].includes(role)
+  );
+
   // Local filter state — only committed to query on Search click
   const [keyword, setKeyword] = useState("");
-  const [location, setLocation] = useState("");
-  const [activeParams, setActiveParams] = useState<{ keyword?: string; location?: string }>({});
+  const [activeParams, setActiveParams] = useState<{ keyword?: string }>({});
   const [createOpen, setCreateOpen] = useState(false);
   const { scrollRef, scroll } = useHorizontalScroll();
   const queryClient = useQueryClient();
@@ -103,7 +108,6 @@ export default function Gifts() {
   const handleSearch = () => {
     setActiveParams({
       keyword: keyword.trim() || undefined,
-      location: location.trim() || undefined,
     });
   };
 
@@ -202,15 +206,6 @@ export default function Gifts() {
                   InputLabelProps={{ style: { color: "rgba(255,255,255,0.55)" } }}
                   sx={darkTextFieldSx}
                 />
-                <TextField
-                  fullWidth
-                  label="Filter by location"
-                  value={location}
-                  onChange={(e) => setLocation(e.target.value)}
-                  onKeyDown={handleKeyDown}
-                  InputLabelProps={{ style: { color: "rgba(255,255,255,0.55)" } }}
-                  sx={darkTextFieldSx}
-                />
                 <Button
                   variant="contained"
                   onClick={handleSearch}
@@ -220,14 +215,16 @@ export default function Gifts() {
                 >
                   Search
                 </Button>
-                <Button
-                  variant="outlined"
-                  onClick={() => setCreateOpen(true)}
-                  sx={secondaryBtnSx}
-                  startIcon={<AddIcon />}
-                >
-                  Add Shop
-                </Button>
+                {isBusinessOwner && (
+                  <Button
+                    variant="outlined"
+                    onClick={() => setCreateOpen(true)}
+                    sx={secondaryBtnSx}
+                    startIcon={<AddIcon />}
+                  >
+                    Add Shop
+                  </Button>
+                )}
               </Stack>
             </Box>
 
@@ -338,8 +335,8 @@ export default function Gifts() {
                     No gift shops found
                   </Typography>
                   <Typography variant="body2" sx={{ color: "rgba(255,255,255,0.25)" }}>
-                    {activeParams.keyword || activeParams.location
-                      ? "Try adjusting your search filters"
+                    {activeParams.keyword
+                      ? "Try adjusting your search filter"
                       : "Be the first to add a gift shop!"}
                   </Typography>
                 </Box>
