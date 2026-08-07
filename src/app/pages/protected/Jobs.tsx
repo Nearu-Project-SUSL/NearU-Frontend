@@ -160,7 +160,7 @@ function JobCard({ job, index, onClick }: { job: JobResponse, index: number, onC
           {/* Top: Logo & Badges */}
           <Box sx={{ display: 'flex', justifyContent: 'space-between', width: '100%', mb: 2.5 }}>
             <Avatar 
-                src={job.logo || `https://ui-avatars.com/api/?name=${job.company}&background=facc15&color=000&bold=true`} 
+                src={job.logo || `https://ui-avatars.com/api/?name=${job.company}&background=2E9EBF&color=000&bold=true`} 
                 variant="rounded"
                 sx={{ 
                     width: 54, 
