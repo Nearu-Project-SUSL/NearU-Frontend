@@ -42,6 +42,7 @@ import {
   Business as AccommodationIcon,
   CardGiftcard as GiftIcon,
   LocalOffer as OffersIcon,
+  CameraAlt as PhotographyIcon,
   AutoAwesome as SparkleIcon,
   ChevronLeft as ChevronLeftIcon,
   ChevronRight as ChevronRightIcon,
@@ -112,6 +113,14 @@ const services = [
     description: 'Send personalised gifts to friends and loved ones.',
     path: '/gifts',
     iconImage: '/gifts_card.png',
+  },
+  {
+    id: 'photography',
+    icon: PhotographyIcon,
+    label: 'Photography',
+    description: 'Book professional student photographers & portrait packages.',
+    path: '/photography',
+    iconImage: 'https://images.unsplash.com/photo-1516035069371-29a1b244cc32?auto=format&fit=crop&w=600&q=80',
   },
   {
     id: 'offers',

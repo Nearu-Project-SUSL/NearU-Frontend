@@ -29,6 +29,7 @@ import {
   Business as AccommodationIcon,
   CardGiftcard as GiftIcon,
   LocalOffer as OffersIcon,
+  CameraAlt as PhotographyIcon,
   Close as CloseIcon,
   Menu as MenuIcon,
   Person as UserIcon,
@@ -77,6 +78,7 @@ export function Sidebar({ activeSection }: SidebarProps) {
     { icon: JobsIcon,          label: 'Jobs',             id: 'jobs',          path: '/jobs' },
     { icon: AccommodationIcon, label: 'Accommodation',    id: 'accommodation', path: '/accommodation' },
     { icon: GiftIcon,          label: 'Gifts',     id: 'gifts',         path: '/gifts' },
+    { icon: PhotographyIcon,   label: 'Photography', id: 'photography', path: '/photography' },
     { icon: OffersIcon,        label: 'Deals and Offers', id: 'offers',        path: '/deals' },
   ];
 
