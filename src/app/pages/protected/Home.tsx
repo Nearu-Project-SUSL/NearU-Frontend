@@ -22,6 +22,7 @@ import {
   Grow,
   IconButton,
   Button,
+  Grid,
   Dialog,
   DialogContent,
   DialogTitle,
@@ -69,7 +70,6 @@ const services = [
     icon: FoodIcon,
     label: 'Food Delivery',
     description: 'Order from nearby restaurants with exclusive student discounts.',
-    badge: '50+',
     path: '/food',
     iconImage: '/food_deal.png',
   },
@@ -78,7 +78,6 @@ const services = [
     icon: TransportIcon,
     label: 'Uni Rides',
     description: 'Quick and affordable transportation around campus and city.',
-    badge: '12',
     path: '/transport',
     iconImage: '/ride_deal.png',
   },
@@ -87,7 +86,6 @@ const services = [
     icon: AccommodationIcon,
     label: 'Accommodation',
     description: 'Browse verified student rooms and boarding houses.',
-    badge: '30+',
     path: '/accommodation',
     iconImage: '/accommodation_deal.png',
   },
@@ -96,7 +94,6 @@ const services = [
     icon: RidesIcon,
     label: 'Bike Rentals',
     description: 'Eco-friendly bike rentals for short campus commutes.',
-    badge: '8',
     path: '/rides',
     iconImage: '/bike_service.png',
   },
@@ -105,7 +102,6 @@ const services = [
     icon: JobsIcon,
     label: 'Part-time Jobs',
     description: 'Find part-time and internship opportunities near you.',
-    badge: '20+',
     path: '/jobs',
     iconImage: '/job_service.png',
   },
@@ -114,7 +110,6 @@ const services = [
     icon: GiftIcon,
     label: 'Gifts',
     description: 'Send personalised gifts to friends and loved ones.',
-    badge: '15+',
     path: '/gifts',
     iconImage: '/gift_service.png',
   },
@@ -123,7 +118,6 @@ const services = [
     icon: OffersIcon,
     label: 'Deals & Offers',
     description: 'Exclusive discounts and promotions for students.',
-    badge: '40+',
     path: '/deals',
     iconImage: '/offer_service.png',
   },
@@ -194,11 +188,9 @@ export default function Home() {
   const theme = useTheme();
   const { isDark } = useNearUTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('md'));
-  const [showAllServices, setShowAllServices] = useState(false);
   const { data: approvedDeals = [], isLoading: dealsLoading } = useApprovedDeals();
   const accent = theme.palette.primary.main;
   const accentAlpha = (a: number) => `rgba(46, 158, 191, ${a})`;
-  const { scrollRef: servicesRef, scroll: scrollServices } = useHorizontalScroll();
   const { scrollRef: dealsRef, scroll: scrollDeals } = useHorizontalScroll();
 
   //testimonial state
@@ -313,69 +305,27 @@ export default function Home() {
                 </Box>
               </Fade>
 
-              {/* ── Explore Services (Carousel) ──────────────────────────── */}
+              {/* ── Explore Services (Grid) ──────────────────────────── */}
               <Box sx={{ mb: 8 }}>
-                <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 3 }}>
-                  <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
-                    <SparkleIcon sx={{ color: 'var(--nearu-accent)', fontSize: 24 }} />
-                    <Typography variant="h5" sx={{ fontWeight: 800, color: 'var(--text-primary)', letterSpacing: '-0.01em' }}>
+                <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5, mb: 3 }}>
+                  <SparkleIcon sx={{ color: 'var(--nearu-accent)', fontSize: 24 }} />
+                  <Box>
+                    <Typography variant="h5" sx={{ fontWeight: 800, color: 'var(--text-primary)', letterSpacing: '-0.01em', lineHeight: 1.2 }}>
                       Explore Services
                     </Typography>
-                  </Box>
-                  <Box sx={{ display: { xs: 'none', md: 'flex' }, gap: 1 }}>
-                    <IconButton onClick={() => scrollServices('left')} sx={{ bgcolor: 'var(--bg-surface)', color: 'var(--text-primary)', border: '1px solid var(--nearu-border)', '&:hover': { bgcolor: 'var(--nearu-accent-subtle)' } }}>
-                      <ChevronLeftIcon />
-                    </IconButton>
-                    <IconButton onClick={() => scrollServices('right')} sx={{ bgcolor: 'var(--bg-surface)', color: 'var(--text-primary)', border: '1px solid var(--nearu-border)', '&:hover': { bgcolor: 'var(--nearu-accent-subtle)' } }}>
-                      <ChevronRightIcon />
-                    </IconButton>
+                    <Typography variant="body2" sx={{ color: 'var(--text-secondary)' }}>
+                      Everything you need for campus life, all in one place
+                    </Typography>
                   </Box>
                 </Box>
 
-                <Box
-                  ref={servicesRef}
-                  sx={{
-                    display: 'flex',
-                    flexDirection: { xs: 'column', md: 'row' },
-                    gap: 3,
-                    overflowX: { xs: 'visible', md: 'auto' },
-                    pb: { xs: 2, md: 4 },
-                    px: 1,
-                    mx: -1,
-                    scrollbarWidth: 'none',
-                    '&::-webkit-scrollbar': { display: 'none' },
-                    scrollBehavior: 'smooth',
-                    scrollSnapType: { xs: 'none', md: 'x mandatory' },
-                    '& > *': { scrollSnapAlign: { xs: 'none', md: 'start' } }
-                  }}
-                >
-                  {(isMobile && !showAllServices ? services.slice(0, 3) : services).map((service, i) => (
-                    <Box key={service.id} sx={{ width: { xs: '100%', md: 'auto' } }}>
+                <Grid container spacing={3}>
+                  {services.map((service, i) => (
+                    <Grid key={service.id} size={{ xs: 12, sm: 6, md: 4 }}>
                       <ServiceCard service={service} index={i} />
-                    </Box>
+                    </Grid>
                   ))}
-                </Box>
-
-                {isMobile && services.length > 3 && (
-                  <Box sx={{ display: 'flex', justifyContent: 'center', mt: 1 }}>
-                    <Button
-                      variant="outlined"
-                      onClick={() => setShowAllServices(!showAllServices)}
-                      sx={{
-                        color: 'var(--nearu-accent)',
-                        borderColor: 'var(--nearu-border)',
-                        borderRadius: '12px',
-                        px: 4,
-                        py: 1.2,
-                        fontWeight: 700,
-                        textTransform: 'none',
-                        '&:hover': { borderColor: 'var(--nearu-accent)', bgcolor: 'var(--nearu-accent-subtle)' }
-                      }}
-                    >
-                      {showAllServices ? 'Show Less' : `View All Services (${services.length})`}
-                    </Button>
-                  </Box>
-                )}
+                </Grid>
               </Box>
 
               {/* ── Hot Deals & Offers (Carousel) ───────────────────────── */}

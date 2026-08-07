@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useNavigate } from "react-router";
 import { Grow, Card, CardActionArea, Box, Typography, useTheme } from "@mui/material";
-
+import ChevronRightIcon from "@mui/icons-material/ChevronRight";
 import LazyImage from "../ui/LazyImage";
 
 interface ServiceProps {
@@ -9,7 +9,6 @@ interface ServiceProps {
   icon: React.ComponentType<any>;
   label: string;
   description: string;
-  badge?: string;
   path: string;
   iconImage?: string;
 }
@@ -28,46 +27,32 @@ export default function ServiceCard({
   const accentAlpha = (a: number) => `rgba(46, 158, 191, ${a})`;
 
   return (
-    <Grow in timeout={400 + index * 100}>
+    <Grow in timeout={300 + index * 60}>
       <Card
         elevation={0}
         sx={{
-          minWidth: { xs: 260, md: 300 },
-          height: 280,
+          height: "100%",
+          minHeight: 250,
           bgcolor: "var(--bg-surface)",
-          borderRadius: "24px",
+          borderRadius: "22px",
           position: "relative",
           overflow: "hidden",
-          transition: "all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275)",
-          transform: hovered ? "translateY(-8px) scale(1.02)" : "translateY(0) scale(1)",
-          boxShadow: hovered ? "0 30px 60px rgba(0,0,0,0.3)" : "none",
+          border: "1px solid var(--nearu-border)",
+          transition: "all 0.35s cubic-bezier(0.16, 1, 0.3, 1)",
+          transform: hovered ? "translateY(-6px)" : "translateY(0)",
+          boxShadow: hovered
+            ? "0 20px 40px rgba(0, 0, 0, 0.45), 0 0 0 1px var(--nearu-accent)"
+            : "none",
           "&::before": {
             content: '""',
             position: "absolute",
-            top: 0,
-            left: 0,
-            right: 0,
-            bottom: 0,
+            inset: 0,
             background: hovered
-              ? `linear-gradient(to bottom, ${accentAlpha(0.08)} 0%, transparent 100%)`
+              ? `radial-gradient(circle at top right, ${accentAlpha(0.15)} 0%, transparent 70%)`
               : "transparent",
             zIndex: 0,
-            transition: "background 0.4s ease",
+            transition: "background 0.3s ease",
           },
-          "&::after": {
-            content: '""',
-            position: "absolute",
-            inset: 0,
-            borderRadius: "24px",
-            padding: "2px",
-            background: hovered
-              ? `linear-gradient(135deg, var(--nearu-accent), var(--nearu-accent-subtle))`
-              : "var(--nearu-border)",
-            WebkitMask: "linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0)",
-            WebkitMaskComposite: "xor",
-            maskComposite: "exclude",
-            transition: "background 0.4s ease",
-          }
         }}
         onMouseEnter={() => setHovered(true)}
         onMouseLeave={() => setHovered(false)}
@@ -76,109 +61,142 @@ export default function ServiceCard({
           onClick={() => navigate(service.path)}
           sx={{
             height: "100%",
-            p: 3,
+            p: 2.5,
             display: "flex",
             flexDirection: "column",
             alignItems: "flex-start",
-            justifyContent: "flex-start",
-            zIndex: 1
+            justifyContent: "space-between",
+            zIndex: 1,
           }}
         >
-          {/* Top section: Placeholder image or Icon block */}
-          <Box sx={{ width: "100%", height: 120, mb: 2, position: "relative", borderRadius: "16px", overflow: "hidden" }}>
+          {/* Top Banner Image / Graphic Container */}
+          <Box
+            sx={{
+              width: "100%",
+              height: 135,
+              borderRadius: "16px",
+              position: "relative",
+              overflow: "hidden",
+              bgcolor: accentAlpha(0.04),
+              mb: 2,
+              border: hovered
+                ? `1px solid ${accentAlpha(0.3)}`
+                : "1px solid rgba(255, 255, 255, 0.06)",
+              transition: "border-color 0.3s ease",
+            }}
+          >
             {service.iconImage ? (
-              <LazyImage
-                src={service.iconImage}
-                alt={service.label}
-                className="w-full h-full"
-                style={{
-                  filter: hovered
-                    ? "brightness(1.1) contrast(1.1)"
-                    : "grayscale(100%) contrast(1.2)",
-                  transition: "all 0.4s ease"
+              <Box
+                sx={{
+                  width: "100%",
+                  height: "100%",
+                  overflow: "hidden",
+                  position: "relative",
                 }}
-              />
+              >
+                <LazyImage
+                  src={service.iconImage}
+                  alt={service.label}
+                  className="w-full h-full"
+                  style={{
+                    objectFit: "cover",
+                    width: "100%",
+                    height: "100%",
+                    transform: hovered ? "scale(1.08)" : "scale(1)",
+                    transition: "transform 0.4s ease",
+                  }}
+                />
+                {/* Gradient vignette overlay */}
+                <Box
+                  sx={{
+                    position: "absolute",
+                    inset: 0,
+                    background:
+                      "linear-gradient(to top, rgba(15,23,42,0.7) 0%, transparent 60%)",
+                  }}
+                />
+              </Box>
             ) : (
               <Box
                 sx={{
                   width: "100%",
                   height: "100%",
-                  bgcolor: accentAlpha(0.04),
+                  bgcolor: accentAlpha(0.08),
                   display: "flex",
                   alignItems: "center",
-                  justifyContent: "center"
+                  justifyContent: "center",
                 }}
               >
                 <service.icon
                   sx={{
-                    fontSize: 48,
-                    color: hovered ? accent : theme.palette.text.disabled,
-                    transition: "color 0.4s ease"
+                    fontSize: 44,
+                    color: hovered ? accent : "var(--text-secondary)",
+                    transition: "all 0.3s ease",
+                    transform: hovered ? "scale(1.1)" : "scale(1)",
                   }}
                 />
               </Box>
             )}
 
-            {/* Gradient Overlay bottom to top */}
+            {/* Hover Action Arrow Badge in Image Banner */}
             <Box
               sx={{
                 position: "absolute",
-                bottom: 0,
-                left: 0,
-                right: 0,
-                height: "60%",
-                background: `linear-gradient(to top, var(--bg-surface), transparent)`
+                top: 10,
+                right: 10,
+                width: 32,
+                height: 32,
+                borderRadius: "50%",
+                bgcolor: hovered ? accent : "rgba(0, 0, 0, 0.5)",
+                backdropFilter: "blur(8px)",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                transition: "all 0.3s ease",
+                boxShadow: hovered ? "0 4px 12px rgba(46, 158, 191, 0.4)" : "none",
               }}
-            />
-
-            {/* Badge */}
-            {service.badge && (
-              <Box
+            >
+              <ChevronRightIcon
                 sx={{
-                  position: "absolute",
-                  top: 12,
-                  right: 12,
-                  bgcolor: accent,
-                  color: "#111",
-                  px: 1.2,
-                  py: 0.3,
-                  borderRadius: "12px",
-                  fontWeight: 800,
-                  fontSize: "0.7rem",
-                  boxShadow: "0 4px 10px rgba(0,0,0,0.3)"
+                  fontSize: 20,
+                  color: hovered ? "#000" : "#fff",
+                  transform: hovered ? "translateX(1px)" : "translateX(0)",
+                  transition: "all 0.3s ease",
                 }}
-              >
-                {service.badge}
-              </Box>
-            )}
+              />
+            </Box>
           </Box>
 
-          <Typography
-            variant="h6"
-            sx={{
-              color: "var(--text-primary)",
-              fontWeight: 700,
-              mb: 1,
-              fontSize: "1.2rem",
-              fontFamily: '"Outfit", "Inter", sans-serif'
-            }}
-          >
-            {service.label}
-          </Typography>
-          <Typography
-            variant="body2"
-            sx={{
-              color: "var(--text-secondary)",
-              fontSize: "0.85rem",
-              lineHeight: 1.5,
-              display: "-webkit-box",
-              WebkitLineClamp: 2,
-              WebkitBoxOrient: "vertical",
-              overflow: "hidden"
-            }}
-          >
-            {service.description}
-          </Typography>
+          {/* Content: Title & Description */}
+          <Box sx={{ width: "100%" }}>
+            <Typography
+              variant="h6"
+              sx={{
+                color: "var(--text-primary)",
+                fontWeight: 700,
+                fontSize: "1.15rem",
+                mb: 0.8,
+                lineHeight: 1.3,
+                fontFamily: '"Outfit", "Inter", sans-serif',
+              }}
+            >
+              {service.label}
+            </Typography>
+            <Typography
+              variant="body2"
+              sx={{
+                color: "var(--text-secondary)",
+                fontSize: "0.85rem",
+                lineHeight: 1.5,
+                display: "-webkit-box",
+                WebkitLineClamp: 2,
+                WebkitBoxOrient: "vertical",
+                overflow: "hidden",
+              }}
+            >
+              {service.description}
+            </Typography>
+          </Box>
         </CardActionArea>
       </Card>
     </Grow>
