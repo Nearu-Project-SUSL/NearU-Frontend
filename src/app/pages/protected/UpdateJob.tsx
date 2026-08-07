@@ -130,7 +130,7 @@ export default function UpdateJob() {
       const previewUrl = URL.createObjectURL(file);
       setLogoPreview(previewUrl);
       
-      // Upload to ImageKit immediately
+      // Upload to S3 immediately
       try {
         setIsUploadingLogo(true);
         const uploadedUrl = await jobService.uploadLogo(file);
@@ -293,7 +293,7 @@ export default function UpdateJob() {
                                   fontSize: '0.75rem'
                                 }}
                               >
-                                Upload File (ImageKit)
+                                Upload File (S3)
                               </Button>
                               <Button 
                                 size="small" 
@@ -323,8 +323,8 @@ export default function UpdateJob() {
                                 {logoPreview && logoInputMode === 'file' ? (
                                   <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 2 }}>
                                     <Box component="img" src={logoPreview} alt="Logo preview" sx={{ height: 64, width: 64, borderRadius: '12px', objectFit: 'cover', border: '1px solid rgba(255,255,255,0.1)' }} />
-                                    {isUploadingLogo && <Typography variant="caption" sx={{ color: '#facc15' }}>Uploading to ImageKit...</Typography>}
-                                    {!isUploadingLogo && logoUrl && <Typography variant="caption" sx={{ color: '#22c55e' }}>✓ Uploaded to ImageKit</Typography>}
+                                    {isUploadingLogo && <Typography variant="caption" sx={{ color: '#facc15' }}>Uploading to AWS S3...</Typography>}
+                                    {!isUploadingLogo && logoUrl && <Typography variant="caption" sx={{ color: '#22c55e' }}>✓ Uploaded to AWS S3</Typography>}
                                     <Button variant="outlined" component="label" htmlFor="update-job-logo-change" size="small" disabled={isUploadingLogo} sx={{ color: '#fff', borderColor: 'rgba(255,255,255,0.3)', textTransform: 'none', fontSize: '0.75rem', '&:hover': { borderColor: '#facc15', color: '#facc15' } }}>
                                       Change Image
                                       <input id="update-job-logo-change" type="file" hidden accept="image/*" onChange={handleFileChange} />
@@ -334,7 +334,7 @@ export default function UpdateJob() {
                                   <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 1 }}>
                                     <ImageIcon sx={{ color: 'rgba(255,255,255,0.3)', fontSize: 32 }} />
                                     <Typography variant="caption" sx={{ color: 'rgba(255,255,255,0.5)' }}>Max 5MB • PNG, JPG, WebP</Typography>
-                                    <Typography variant="caption" sx={{ color: '#facc15' }}>Powered by ImageKit Cloud</Typography>
+                                    <Typography variant="caption" sx={{ color: '#facc15' }}>Powered by AWS S3</Typography>
                                     <Button variant="contained" component="label" htmlFor="update-job-logo-select" size="small" disabled={isUploadingLogo} sx={{ mt: 1, bgcolor: 'rgba(255,255,255,0.1)', color: '#fff', textTransform: 'none', boxShadow: 'none', fontSize: '0.75rem', '&:hover': { bgcolor: 'rgba(255,255,255,0.2)', boxShadow: 'none' } }}>
                                       {isUploadingLogo ? 'Uploading...' : 'Select Image'}
                                       <input id="update-job-logo-select" type="file" hidden accept="image/*" onChange={handleFileChange} />
