@@ -58,6 +58,7 @@ const DealsPage = Loadable(lazyWithRetry(() => import("./pages/protected/Deals")
 const AdminDealsPage = Loadable(lazyWithRetry(() => import("./pages/protected/AdminDeals")));
 const Rides = Loadable(lazyWithRetry(() => import("./pages/protected/Ridespage")));
 const Photography = Loadable(lazyWithRetry(() => import("./pages/protected/Photography")));
+const BikeRentals = Loadable(lazyWithRetry(() => import("./pages/protected/BikeRentals")));
 
 // ── Role-specific Pages (lazy) ────────────────────────────────────────────────
 const AdminHome = Loadable(lazyWithRetry(() => import("./pages/protected/AdminHome")));
@@ -179,6 +180,10 @@ export const router = createBrowserRouter([
       {
         path: "/photography",
         Component: Photography,
+      },
+      {
+        path: "/bike-rentals",
+        Component: BikeRentals,
       },
     ]
   },

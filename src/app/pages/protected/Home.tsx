@@ -95,7 +95,7 @@ const services = [
     icon: RidesIcon,
     label: 'Bike Rentals',
     description: 'Eco-friendly bike rentals for short campus commutes.',
-    path: '/rides',
+    path: '/bike-rentals',
     iconImage: '/bikes_card.png',
   },
   {
