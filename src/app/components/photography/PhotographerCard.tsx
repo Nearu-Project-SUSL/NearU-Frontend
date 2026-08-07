@@ -39,11 +39,15 @@ export default function PhotographerCard({
   const { user } = useAuth();
   const accent = "#2E9EBF";
 
+  const isBusinessOwnerOrAdmin =
+    user?.roles?.some((role: string) =>
+      ["BusinessOwner", "Business", "Admin", "SuperAdmin"].includes(role)
+    ) ?? false;
+
   const isOwnerOrAdmin =
-    user &&
-    (user.roles?.includes("Admin") ||
-      user.roles?.includes("SuperAdmin") ||
-      photographer.ownerId === user.id);
+    isBusinessOwnerOrAdmin &&
+    (user?.roles?.some((role: string) => ["Admin", "SuperAdmin"].includes(role)) ||
+      photographer.ownerId === user?.id);
 
   return (
     <Card

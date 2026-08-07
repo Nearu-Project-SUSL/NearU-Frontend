@@ -75,10 +75,20 @@ export default function Photography() {
       ["BusinessOwner", "Business", "Admin", "SuperAdmin"].includes(role)
     ) ?? false;
 
+  const canManagePhotographer = (photographer?: PhotographerResponseDto | null) => {
+    if (!photographer || !user) return false;
+    const isAdmin = user.roles?.some((role: string) => ["Admin", "SuperAdmin"].includes(role));
+    return isBusinessOwner && (isAdmin || photographer.ownerId === user.id);
+  };
+
   const { data: photographers = [], isLoading, refetch } = usePhotographers({ keyword: searchTerm });
 
   // Photographer CRUD
   const handleSaveProfile = async (formData: FormData) => {
+    if (!isBusinessOwner) {
+      setSnackbar({ open: true, message: "Only Business Owners can post or manage photography profiles.", severity: "error" });
+      return;
+    }
     try {
       setActionLoading(true);
       if (editingPhotographer) {
@@ -103,6 +113,10 @@ export default function Photography() {
   };
 
   const handleDeleteProfile = async (photographer: PhotographerResponseDto) => {
+    if (!canManagePhotographer(photographer)) {
+      setSnackbar({ open: true, message: "You do not have permission to delete this profile.", severity: "error" });
+      return;
+    }
     if (!window.confirm(`Are you sure you want to delete profile "${photographer.name}"?`)) return;
     try {
       setActionLoading(true);
@@ -121,7 +135,10 @@ export default function Photography() {
 
   // Package CRUD
   const handleSavePackage = async (data: { name: string; price: number; description?: string; isActive?: boolean }) => {
-    if (!selectedPhotographer) return;
+    if (!selectedPhotographer || !canManagePhotographer(selectedPhotographer)) {
+      setSnackbar({ open: true, message: "You do not have permission to add or update packages for this profile.", severity: "error" });
+      return;
+    }
     try {
       setActionLoading(true);
       if (editingPackage) {
@@ -450,9 +467,7 @@ export default function Photography() {
                   </Typography>
                 </Box>
 
-                {(user?.roles?.includes("Admin") ||
-                  user?.roles?.includes("SuperAdmin") ||
-                  selectedPhotographer.ownerId === user?.id) && (
+                {canManagePhotographer(selectedPhotographer) && (
                   <Button
                     size="small"
                     startIcon={<AddIcon />}
@@ -520,9 +535,7 @@ export default function Photography() {
                               </Typography>
                             </Stack>
 
-                            {(user?.roles?.includes("Admin") ||
-                              user?.roles?.includes("SuperAdmin") ||
-                              selectedPhotographer.ownerId === user?.id) && (
+                            {canManagePhotographer(selectedPhotographer) && (
                               <Stack direction="row" spacing={0.5}>
                                 <IconButton
                                   size="small"
