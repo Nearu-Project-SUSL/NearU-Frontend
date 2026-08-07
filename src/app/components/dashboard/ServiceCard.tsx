@@ -31,15 +31,15 @@ export default function ServiceCard({
       <Card
         elevation={0}
         sx={{
-          height: "100%",
-          minHeight: 250,
+          width: "100%",
+          aspectRatio: "1 / 1",
           bgcolor: "var(--bg-surface)",
-          borderRadius: "22px",
+          borderRadius: "24px",
           position: "relative",
           overflow: "hidden",
           border: "1px solid var(--nearu-border)",
           transition: "all 0.35s cubic-bezier(0.16, 1, 0.3, 1)",
-          transform: hovered ? "translateY(-6px)" : "translateY(0)",
+          transform: hovered ? "translateY(-6px) scale(1.01)" : "translateY(0) scale(1)",
           boxShadow: hovered
             ? "0 20px 40px rgba(0, 0, 0, 0.45), 0 0 0 1px var(--nearu-accent)"
             : "none",
@@ -61,7 +61,8 @@ export default function ServiceCard({
           onClick={() => navigate(service.path)}
           sx={{
             height: "100%",
-            p: 2.5,
+            width: "100%",
+            p: 2,
             display: "flex",
             flexDirection: "column",
             alignItems: "flex-start",
@@ -69,20 +70,19 @@ export default function ServiceCard({
             zIndex: 1,
           }}
         >
-          {/* Top Banner Image / Graphic Container */}
+          {/* Top Square Banner Image Box (approx 58% height) */}
           <Box
             sx={{
               width: "100%",
-              height: 135,
+              height: "58%",
               borderRadius: "16px",
               position: "relative",
               overflow: "hidden",
-              bgcolor: accentAlpha(0.04),
-              mb: 2,
+              bgcolor: accentAlpha(0.06),
               border: hovered
-                ? `1px solid ${accentAlpha(0.3)}`
-                : "1px solid rgba(255, 255, 255, 0.06)",
-              transition: "border-color 0.3s ease",
+                ? `1px solid ${accentAlpha(0.35)}`
+                : "1px solid rgba(255, 255, 255, 0.08)",
+              transition: "all 0.3s ease",
             }}
           >
             {service.iconImage ? (
@@ -103,16 +103,15 @@ export default function ServiceCard({
                     width: "100%",
                     height: "100%",
                     transform: hovered ? "scale(1.08)" : "scale(1)",
-                    transition: "transform 0.4s ease",
+                    transition: "transform 0.4s cubic-bezier(0.16, 1, 0.3, 1)",
                   }}
                 />
-                {/* Gradient vignette overlay */}
                 <Box
                   sx={{
                     position: "absolute",
                     inset: 0,
                     background:
-                      "linear-gradient(to top, rgba(15,23,42,0.7) 0%, transparent 60%)",
+                      "linear-gradient(to top, rgba(10,15,25,0.65) 0%, transparent 60%)",
                   }}
                 />
               </Box>
@@ -129,7 +128,7 @@ export default function ServiceCard({
               >
                 <service.icon
                   sx={{
-                    fontSize: 44,
+                    fontSize: 40,
                     color: hovered ? accent : "var(--text-secondary)",
                     transition: "all 0.3s ease",
                     transform: hovered ? "scale(1.1)" : "scale(1)",
@@ -138,27 +137,27 @@ export default function ServiceCard({
               </Box>
             )}
 
-            {/* Hover Action Arrow Badge in Image Banner */}
+            {/* Hover Action Badge */}
             <Box
               sx={{
                 position: "absolute",
-                top: 10,
-                right: 10,
-                width: 32,
-                height: 32,
+                top: 8,
+                right: 8,
+                width: 30,
+                height: 30,
                 borderRadius: "50%",
-                bgcolor: hovered ? accent : "rgba(0, 0, 0, 0.5)",
+                bgcolor: hovered ? accent : "rgba(0, 0, 0, 0.55)",
                 backdropFilter: "blur(8px)",
                 display: "flex",
                 alignItems: "center",
                 justifyContent: "center",
                 transition: "all 0.3s ease",
-                boxShadow: hovered ? "0 4px 12px rgba(46, 158, 191, 0.4)" : "none",
+                boxShadow: hovered ? "0 4px 14px rgba(46, 158, 191, 0.45)" : "none",
               }}
             >
               <ChevronRightIcon
                 sx={{
-                  fontSize: 20,
+                  fontSize: 18,
                   color: hovered ? "#000" : "#fff",
                   transform: hovered ? "translateX(1px)" : "translateX(0)",
                   transition: "all 0.3s ease",
@@ -167,17 +166,20 @@ export default function ServiceCard({
             </Box>
           </Box>
 
-          {/* Content: Title & Description */}
-          <Box sx={{ width: "100%" }}>
+          {/* Bottom Info: Title & Description */}
+          <Box sx={{ width: "100%", pt: 0.5 }}>
             <Typography
               variant="h6"
               sx={{
                 color: "var(--text-primary)",
                 fontWeight: 700,
-                fontSize: "1.15rem",
-                mb: 0.8,
-                lineHeight: 1.3,
+                fontSize: "1.05rem",
+                mb: 0.4,
+                lineHeight: 1.25,
                 fontFamily: '"Outfit", "Inter", sans-serif',
+                whiteSpace: "nowrap",
+                overflow: "hidden",
+                textOverflow: "ellipsis",
               }}
             >
               {service.label}
@@ -186,8 +188,8 @@ export default function ServiceCard({
               variant="body2"
               sx={{
                 color: "var(--text-secondary)",
-                fontSize: "0.85rem",
-                lineHeight: 1.5,
+                fontSize: "0.78rem",
+                lineHeight: 1.35,
                 display: "-webkit-box",
                 WebkitLineClamp: 2,
                 WebkitBoxOrient: "vertical",

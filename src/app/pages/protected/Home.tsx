@@ -71,15 +71,15 @@ const services = [
     label: 'Food Delivery',
     description: 'Order from nearby restaurants with exclusive student discounts.',
     path: '/food',
-    iconImage: '/food_deal.png',
+    iconImage: '/food_card.png',
   },
   {
     id: 'transport',
     icon: TransportIcon,
     label: 'Uni Rides',
-    description: 'Quick and affordable transportation around campus and city.',
-    path: '/transport',
-    iconImage: '/ride_deal.png',
+    description: 'Rent motorbikes and ride around campus quickly and affordably.',
+    path: '/rides',
+    iconImage: '/rides_card.png',
   },
   {
     id: 'accommodation',
@@ -87,7 +87,7 @@ const services = [
     label: 'Accommodation',
     description: 'Browse verified student rooms and boarding houses.',
     path: '/accommodation',
-    iconImage: '/accommodation_deal.png',
+    iconImage: '/accommodation_card.png',
   },
   {
     id: 'rides',
@@ -95,7 +95,7 @@ const services = [
     label: 'Bike Rentals',
     description: 'Eco-friendly bike rentals for short campus commutes.',
     path: '/rides',
-    iconImage: '/bike_service.png',
+    iconImage: '/bikes_card.png',
   },
   {
     id: 'jobs',
@@ -103,7 +103,7 @@ const services = [
     label: 'Part-time Jobs',
     description: 'Find part-time and internship opportunities near you.',
     path: '/jobs',
-    iconImage: '/job_service.png',
+    iconImage: '/jobs_card.png',
   },
   {
     id: 'gifts',
@@ -111,7 +111,7 @@ const services = [
     label: 'Gifts',
     description: 'Send personalised gifts to friends and loved ones.',
     path: '/gifts',
-    iconImage: '/gift_service.png',
+    iconImage: '/gifts_card.png',
   },
   {
     id: 'offers',
@@ -119,7 +119,7 @@ const services = [
     label: 'Deals & Offers',
     description: 'Exclusive discounts and promotions for students.',
     path: '/deals',
-    iconImage: '/offer_service.png',
+    iconImage: 'https://images.unsplash.com/photo-1607082348824-0a96f2a4b9da?auto=format&fit=crop&w=600&q=80',
   },
 ];
 
@@ -319,9 +319,9 @@ export default function Home() {
                   </Box>
                 </Box>
 
-                <Grid container spacing={3}>
+                <Grid container spacing={2.5}>
                   {services.map((service, i) => (
-                    <Grid key={service.id} size={{ xs: 12, sm: 6, md: 4 }}>
+                    <Grid key={service.id} size={{ xs: 6, sm: 4, md: 3 }}>
                       <ServiceCard service={service} index={i} />
                     </Grid>
                   ))}
