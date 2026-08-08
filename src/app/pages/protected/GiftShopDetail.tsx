@@ -45,14 +45,14 @@ export default function GiftShopDetailPage() {
   if (isLoading) {
     return (
       <Box sx={{ display: "flex", justifyContent: "center", mt: 10 }}>
-        <Typography sx={{ color: "#fff" }}>Loading...</Typography>
+        <Typography sx={{ color: "var(--text-primary)" }}>Loading...</Typography>
       </Box>
     );
   }
 
   if (error || !shop) {
     return (
-      <Box sx={{ display: "flex", minHeight: "100vh", bgcolor: "#050505" }}>
+      <Box sx={{ display: "flex", minHeight: "100vh", bgcolor: "var(--bg-base)" }}>
         <Sidebar activeSection="gifts" />
         <Box
           sx={{
@@ -63,7 +63,7 @@ export default function GiftShopDetailPage() {
           }}
         >
           <Box sx={{ textAlign: "center" }}>
-            <Typography variant="h5" sx={{ color: "#fff", mb: 2 }}>
+            <Typography variant="h5" sx={{ color: "var(--text-primary)", mb: 2 }}>
               Gift shop not found
             </Typography>
             <IconButton onClick={() => navigate("/gifts")} sx={{ color: "#2E9EBF" }}>
@@ -118,7 +118,7 @@ export default function GiftShopDetailPage() {
       sx={{
         display: "flex",
         minHeight: "100vh",
-        bgcolor: "#050505",
+        bgcolor: "var(--bg-base)",
       }}
     >
       <Sidebar activeSection="gifts" />
@@ -163,7 +163,7 @@ export default function GiftShopDetailPage() {
                   left: 0,
                   right: 0,
                   height: "70%",
-                  background: "linear-gradient(to top, #050505, transparent)",
+                  background: "linear-gradient(to top, var(--bg-base), transparent)",
                 }}
               />
 
@@ -173,10 +173,10 @@ export default function GiftShopDetailPage() {
                   position: "absolute",
                   top: { xs: 70, md: 80 },
                   left: 24,
-                  bgcolor: "rgba(255, 255, 255, 0.5)",
+                  bgcolor: "rgba(0, 0, 0, 0.4)",
                   color: "#fff",
-                  border: "1px solid rgba(255, 255, 255, 0.1)",
-                  "&:hover": { bgcolor: "rgba(0,0,0,0.8)" },
+                  border: "1px solid rgba(255, 255, 255, 0.2)",
+                  "&:hover": { bgcolor: "rgba(0, 0, 0, 0.7)" },
                 }}
               >
                 <BackIcon />
@@ -242,7 +242,7 @@ export default function GiftShopDetailPage() {
                     >
                       <Box sx={{ display: "flex", alignItems: "center", gap: 1.5 }}>
                         <GiftIcon sx={{ color: "#2E9EBF", fontSize: 24 }} />
-                        <Typography variant="h6" sx={{ color: "#fff", fontWeight: 700 }}>
+                        <Typography variant="h6" sx={{ color: "var(--text-primary)", fontWeight: 700 }}>
                           Products
                         </Typography>
                       </Box>
@@ -282,11 +282,11 @@ export default function GiftShopDetailPage() {
                           p: 4,
                           borderRadius: "18px",
                           textAlign: "center",
-                          bgcolor: "rgba(255,255,255,0.02)",
-                          border: "1px dashed rgba(255,255,255,0.08)",
+                          bgcolor: "var(--bg-surface)",
+                          border: "1px dashed var(--nearu-border)",
                         }}
                       >
-                        <Typography sx={{ color: "rgba(255,255,255,0.5)" }}>
+                        <Typography sx={{ color: "var(--text-secondary)" }}>
                           No products yet. Add your first gift item.
                         </Typography>
                       </Box>
@@ -299,15 +299,15 @@ export default function GiftShopDetailPage() {
                     sx={{
                       position: "sticky",
                       top: 80,
-                      bgcolor: "rgba(255,255,255,0.02)",
+                      bgcolor: "var(--bg-surface)",
                       borderRadius: "24px",
                       p: 3.5,
-                      border: "1px solid rgba(255,255,255,0.06)",
+                      border: "1px solid var(--nearu-border)",
                     }}
                   >
                     <Typography
                       variant="subtitle1"
-                      sx={{ color: "#fff", fontWeight: 700, mb: 3 }}
+                      sx={{ color: "var(--text-primary)", fontWeight: 700, mb: 3 }}
                     >
                       Shop Info
                     </Typography>
@@ -319,7 +319,7 @@ export default function GiftShopDetailPage() {
                           <Typography
                             variant="caption"
                             sx={{
-                              color: "rgba(255,255,255,0.4)",
+                              color: "var(--text-secondary)",
                               display: "block",
                               mb: 0.3,
                             }}
@@ -328,14 +328,14 @@ export default function GiftShopDetailPage() {
                           </Typography>
                           <Typography
                             variant="body2"
-                            sx={{ color: "#fff", fontWeight: 600, lineHeight: 1.5 }}
+                            sx={{ color: "var(--text-primary)", fontWeight: 600, lineHeight: 1.5 }}
                           >
                             {shop.locationName}
                           </Typography>
                           <Typography
                             variant="body2"
                             sx={{
-                              color: "rgba(255,255,255,0.55)",
+                              color: "var(--text-secondary)",
                               mt: 0.5,
                               lineHeight: 1.5,
                             }}
@@ -345,7 +345,7 @@ export default function GiftShopDetailPage() {
                         </Box>
                       </Box>
 
-                      <Divider sx={{ borderColor: "rgba(255,255,255,0.05)" }} />
+                      <Divider sx={{ borderColor: "var(--nearu-border)" }} />
 
                       <Box sx={{ display: "flex", gap: 2, alignItems: "flex-start" }}>
                         <PhoneIcon sx={{ color: "#22c55e", mt: 0.3, flexShrink: 0 }} />
@@ -353,7 +353,7 @@ export default function GiftShopDetailPage() {
                           <Typography
                             variant="caption"
                             sx={{
-                              color: "rgba(255,255,255,0.4)",
+                              color: "var(--text-secondary)",
                               display: "block",
                               mb: 0.3,
                             }}
@@ -362,7 +362,7 @@ export default function GiftShopDetailPage() {
                           </Typography>
                           <Typography
                             variant="body2"
-                            sx={{ color: "#fff", fontWeight: 600 }}
+                            sx={{ color: "var(--text-primary)", fontWeight: 600 }}
                           >
                             {shop.phone}
                           </Typography>
@@ -371,14 +371,14 @@ export default function GiftShopDetailPage() {
 
                       {shop.email && (
                         <>
-                          <Divider sx={{ borderColor: "rgba(255,255,255,0.05)" }} />
+                          <Divider sx={{ borderColor: "var(--nearu-border)" }} />
                           <Box sx={{ display: "flex", gap: 2, alignItems: "flex-start" }}>
                             <EmailIcon sx={{ color: "#a78bfa", mt: 0.3, flexShrink: 0 }} />
                             <Box>
                               <Typography
                                 variant="caption"
                                 sx={{
-                                  color: "rgba(255,255,255,0.4)",
+                                  color: "var(--text-secondary)",
                                   display: "block",
                                   mb: 0.3,
                                 }}
@@ -387,7 +387,7 @@ export default function GiftShopDetailPage() {
                               </Typography>
                               <Typography
                                 variant="body2"
-                                sx={{ color: "#fff", fontWeight: 600 }}
+                                sx={{ color: "var(--text-primary)", fontWeight: 600 }}
                               >
                                 {shop.email}
                               </Typography>

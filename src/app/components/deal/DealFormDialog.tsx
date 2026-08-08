@@ -85,15 +85,15 @@ export default function DealFormDialog({ open, onClose, onSubmit }: DealFormDial
 
   const fieldSx = {
     "& .MuiOutlinedInput-root": {
-      color: "#fff",
+      color: "var(--text-primary)",
       borderRadius: "14px",
-      backgroundColor: "rgba(255,255,255,0.02)",
+      backgroundColor: "var(--bg-surface)",
       "& fieldset": { 
-        borderColor: "rgba(255,255,255,0.12)", 
+        borderColor: "var(--nearu-border)", 
         transition: "all 0.23s ease",
       },
       "&:hover fieldset": { 
-        borderColor: "rgba(255,255,255,0.25)", 
+        borderColor: "rgba(46,158,191,0.35)", 
       },
       "&.Mui-focused fieldset": { 
         borderColor: "#2E9EBF", 
@@ -101,7 +101,7 @@ export default function DealFormDialog({ open, onClose, onSubmit }: DealFormDial
       },
     },
     "& .MuiInputLabel-root": { 
-      color: "rgba(255,255,255,0.5)",
+      color: "var(--text-secondary)",
       transition: "all 0.23s ease",
       "&.Mui-focused": { color: "#2E9EBF" }
     },
@@ -115,25 +115,25 @@ export default function DealFormDialog({ open, onClose, onSubmit }: DealFormDial
       maxWidth="sm"
       PaperProps={{
         sx: {
-          bgcolor: "#0b0b0f",
+          bgcolor: "var(--bg-surface)",
           borderRadius: "28px",
-          border: "1px solid rgba(255,255,255,0.08)",
+          border: "1px solid var(--nearu-border)",
           backgroundImage: "radial-gradient(circle at top right, rgba(46,158,191,0.08) 0%, transparent 60%)",
-          boxShadow: "0 24px 64px rgba(0,0,0,0.8)",
+          boxShadow: "0 24px 64px rgba(0,0,0,0.45)",
           p: 1.5,
         },
       }}
     >
       <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center", pr: 2, pt: 1 }}>
-        <DialogTitle sx={{ color: "#fff", fontWeight: 800, fontSize: "1.4rem", pb: 0 }}>
+        <DialogTitle sx={{ color: "var(--text-primary)", fontWeight: 800, fontSize: "1.4rem", pb: 0 }}>
           Submit Deal / Offer
         </DialogTitle>
-        <IconButton onClick={onClose} sx={{ color: "rgba(255,255,255,0.4)", "&:hover": { color: "#fff" }, mt: 1 }}>
+        <IconButton onClick={onClose} sx={{ color: "var(--text-secondary)", "&:hover": { color: "var(--text-primary)" }, mt: 1 }}>
           <CloseIcon />
         </IconButton>
       </Box>
       <DialogContent sx={{ pt: 1.5 }}>
-        <Typography variant="body2" sx={{ color: "rgba(255,255,255,0.48)", mb: 3.5, lineHeight: 1.5 }}>
+        <Typography variant="body2" sx={{ color: "var(--text-secondary)", mb: 3.5, lineHeight: 1.5 }}>
           Fill in the details below to submit a deal or offer. It will be reviewed by our admin team before being displayed publicly.
         </Typography>
         <Stack spacing={2.5}>
@@ -141,7 +141,7 @@ export default function DealFormDialog({ open, onClose, onSubmit }: DealFormDial
           
           <TextField select label="Shop Type" value={shopType} onChange={(e) => setShopType(e.target.value)} fullWidth sx={fieldSx}>
             {SHOP_TYPES.map((t) => (
-              <MenuItem key={t} value={t} sx={{ color: "#fff", bgcolor: "#0b0b0f", "&:hover": { bgcolor: "rgba(255,255,255,0.05)" } }}>
+              <MenuItem key={t} value={t} sx={{ color: "var(--text-primary)", bgcolor: "var(--bg-surface)", "&:hover": { bgcolor: "var(--bg-elevated)" } }}>
                 {t}
               </MenuItem>
             ))}
@@ -197,7 +197,7 @@ export default function DealFormDialog({ open, onClose, onSubmit }: DealFormDial
               py: 1.5,
               mt: 1,
               bgcolor: "#2E9EBF",
-              color: "#050505",
+              color: "#fff",
               textTransform: "none",
               fontSize: "1rem",
               boxShadow: "0 8px 24px rgba(46,158,191,0.2)",

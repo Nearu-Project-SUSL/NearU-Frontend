@@ -35,12 +35,12 @@ const jobCategories = ['Campus', 'Delivery', 'Marketing', 'Tutoring', 'Tech', 'F
 
 const textFieldStyles = {
   '& .MuiOutlinedInput-root': {
-    color: '#fff',
+    color: 'var(--text-primary)',
     borderRadius: '12px',
-    bgcolor: 'rgba(46, 158, 191, 0.03)',
+    bgcolor: 'var(--bg-surface)',
     transition: 'all 0.2s ease-in-out',
     '& fieldset': {
-      borderColor: 'rgba(46, 158, 191, 0.18)',
+      borderColor: 'var(--nearu-border)',
       borderWidth: '1px',
     },
     '&:hover fieldset': {
@@ -56,7 +56,7 @@ const textFieldStyles = {
     }
   },
   '& .MuiInputLabel-root': {
-    color: 'rgba(255, 255, 255, 0.5)',
+    color: 'var(--text-secondary)',
     '&.Mui-focused': {
       color: '#2E9EBF',
     },
