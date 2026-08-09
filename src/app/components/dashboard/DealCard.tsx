@@ -115,7 +115,7 @@ export default function DealCard({
               py: 1.2,
               textTransform: "none",
               fontSize: "0.95rem",
-              color: "#111111",
+              color: "#ffffff",
             }}
           >
             Get Deal

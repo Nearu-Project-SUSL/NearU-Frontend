@@ -89,9 +89,9 @@ function JobSkeleton({ index }: { index: number }) {
         sx={{
           minWidth: { xs: '100%', sm: 340 },
           maxWidth: { sm: 380 },
-          bgcolor: 'rgba(255,255,255,0.02)',
+          bgcolor: 'var(--bg-surface)',
           borderRadius: '24px',
-          border: '1px solid rgba(255, 255, 255, 0.05)',
+          border: '1px solid var(--nearu-border)',
           height: '100%',
           display: 'flex',
           flexDirection: 'column',
@@ -99,28 +99,28 @@ function JobSkeleton({ index }: { index: number }) {
         }}
       >
         <Box sx={{ display: 'flex', justifyContent: 'space-between', width: '100%', mb: 2.5 }}>
-          <Skeleton variant="rounded" width={54} height={54} sx={{ borderRadius: '16px', bgcolor: 'rgba(255,255,255,0.05)' }} />
+          <Skeleton variant="rounded" width={54} height={54} sx={{ borderRadius: '16px', bgcolor: 'var(--nearu-border)' }} />
           <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: 1 }}>
-              <Skeleton variant="text" width={40} height={20} sx={{ bgcolor: 'rgba(255,255,255,0.05)' }} />
-              <Skeleton variant="text" width={60} height={16} sx={{ bgcolor: 'rgba(255,255,255,0.05)' }} />
+              <Skeleton variant="text" width={40} height={20} sx={{ bgcolor: 'var(--nearu-border)' }} />
+              <Skeleton variant="text" width={60} height={16} sx={{ bgcolor: 'var(--nearu-border)' }} />
           </Box>
         </Box>
-        <Skeleton variant="text" width="80%" height={32} sx={{ mb: 0.5, bgcolor: 'rgba(255,255,255,0.05)' }} />
-        <Skeleton variant="text" width="60%" height={24} sx={{ mb: 2, bgcolor: 'rgba(255,255,255,0.05)' }} />
+        <Skeleton variant="text" width="80%" height={32} sx={{ mb: 0.5, bgcolor: 'var(--nearu-border)' }} />
+        <Skeleton variant="text" width="60%" height={24} sx={{ mb: 2, bgcolor: 'var(--nearu-border)' }} />
         
         <Stack direction="row" spacing={2} sx={{ mb: 2.5 }}>
-          <Skeleton variant="text" width={80} height={20} sx={{ bgcolor: 'rgba(255,255,255,0.05)' }} />
-          <Skeleton variant="text" width={80} height={20} sx={{ bgcolor: 'rgba(255,255,255,0.05)' }} />
+          <Skeleton variant="text" width={80} height={20} sx={{ bgcolor: 'var(--nearu-border)' }} />
+          <Skeleton variant="text" width={80} height={20} sx={{ bgcolor: 'var(--nearu-border)' }} />
         </Stack>
 
         <Box sx={{ mb: 3, width: '100%' }}>
-          <Skeleton variant="text" width="100%" height={16} sx={{ bgcolor: 'rgba(255,255,255,0.05)' }} />
-          <Skeleton variant="text" width="90%" height={16} sx={{ bgcolor: 'rgba(255,255,255,0.05)' }} />
+          <Skeleton variant="text" width="100%" height={16} sx={{ bgcolor: 'var(--nearu-border)' }} />
+          <Skeleton variant="text" width="90%" height={16} sx={{ bgcolor: 'var(--nearu-border)' }} />
         </Box>
 
-        <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1, mt: 'auto', width: '100%', pt: 2, borderTop: '1px solid rgba(255,255,255,0.05)' }}>
-          <Skeleton variant="rounded" width={60} height={24} sx={{ borderRadius: '6px', bgcolor: 'rgba(255,255,255,0.05)' }} />
-          <Skeleton variant="rounded" width={80} height={24} sx={{ borderRadius: '6px', bgcolor: 'rgba(255,255,255,0.05)' }} />
+        <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1, mt: 'auto', width: '100%', pt: 2, borderTop: '1px solid var(--nearu-border)' }}>
+          <Skeleton variant="rounded" width={60} height={24} sx={{ borderRadius: '6px', bgcolor: 'var(--nearu-border)' }} />
+          <Skeleton variant="rounded" width={80} height={24} sx={{ borderRadius: '6px', bgcolor: 'var(--nearu-border)' }} />
         </Box>
       </Card>
     </Grow>
@@ -137,17 +137,17 @@ function JobCard({ job, index, onClick }: { job: JobResponse, index: number, onC
         sx={{
           minWidth: { xs: '100%', sm: 340 },
           maxWidth: { sm: 380 },
-          bgcolor: 'rgba(255,255,255,0.02)',
+          bgcolor: 'var(--bg-surface)',
           borderRadius: '24px',
           position: 'relative',
           overflow: 'hidden',
           transition: 'all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275)',
           transform: hovered ? 'translateY(-8px)' : 'translateY(0)',
-          border: '1px solid rgba(255, 255, 255, 0.05)',
+          border: '1px solid var(--nearu-border)',
           '&:hover': {
-             borderColor: 'rgba(46, 158, 191, 0.3)',
-             bgcolor: 'rgba(46, 158, 191, 0.02)',
-             boxShadow: '0 20px 40px rgba(0,0,0,0.3)',
+             borderColor: 'rgba(46, 158, 191, 0.4)',
+             bgcolor: 'var(--bg-elevated)',
+             boxShadow: '0 12px 30px var(--nearu-accent-subtle)',
           }
         }}
         onMouseEnter={() => setHovered(true)}
@@ -160,14 +160,14 @@ function JobCard({ job, index, onClick }: { job: JobResponse, index: number, onC
           {/* Top: Logo & Badges */}
           <Box sx={{ display: 'flex', justifyContent: 'space-between', width: '100%', mb: 2.5 }}>
             <Avatar 
-                src={job.logo || `https://ui-avatars.com/api/?name=${job.company}&background=2E9EBF&color=000&bold=true`} 
+                src={job.logo || `https://ui-avatars.com/api/?name=${job.company}&background=2E9EBF&color=fff&bold=true`} 
                 variant="rounded"
                 sx={{ 
                     width: 54, 
                     height: 54, 
                     borderRadius: '16px', 
-                    border: '1px solid',
-                    boxShadow: hovered ? '0 8px 16px rgba(0,0,0,0.3)' : 'none',
+                    border: '1px solid var(--nearu-border)',
+                    boxShadow: hovered ? '0 8px 16px rgba(0,0,0,0.15)' : 'none',
                     transition: 'all 0.3s ease'
                 }} 
             />
@@ -178,14 +178,14 @@ function JobCard({ job, index, onClick }: { job: JobResponse, index: number, onC
                         size="small" 
                         sx={{ 
                             bgcolor: '#2E9EBF', 
-                            color: '#111111', 
+                            color: '#ffffff', 
                             fontWeight: 800, 
                             fontSize: '0.65rem',
                             height: 20
                         }} 
                     />
                 )}
-                <Typography variant="caption" sx={{ color: 'rgba(255,255,255,0.4)', display: 'flex', alignItems: 'center', gap: 0.5 }}>
+                <Typography variant="caption" sx={{ color: 'text.secondary', display: 'flex', alignItems: 'center', gap: 0.5 }}>
                     <TimeIcon sx={{ fontSize: 12 }} /> {formatDate(job.createdAt)}
                 </Typography>
             </Box>
@@ -201,7 +201,7 @@ function JobCard({ job, index, onClick }: { job: JobResponse, index: number, onC
 
           <Stack direction="row" spacing={2} sx={{ mb: 2.5 }}>
              <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5, color: 'text.secondary' }}>
-                <LocationIcon sx={{ fontSize: 16, color: 'rgba(255,255,255,0.3)' }} />
+                <LocationIcon sx={{ fontSize: 16, color: 'text.secondary' }} />
                 <Typography variant="caption">{job.location}</Typography>
              </Box>
              <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5, color: 'text.secondary' }}>
@@ -214,7 +214,7 @@ function JobCard({ job, index, onClick }: { job: JobResponse, index: number, onC
             {job.description}
           </Typography>
 
-          <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1, mt: 'auto', width: '100%', pt: 2, borderTop: '1px solid rgba(255,255,255,0.05)' }}>
+          <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1, mt: 'auto', width: '100%', pt: 2, borderTop: '1px solid var(--nearu-border)' }}>
             <Box sx={{ px: 1, py: 0.4, borderRadius: '6px', bgcolor: 'rgba(59,130,246,0.1)', color: '#3b82f6', fontSize: '0.7rem', fontWeight: 700, border: '1px solid rgba(59,130,246,0.2)' }}>
               {job.jobType}
             </Box>
@@ -570,35 +570,18 @@ export default function Jobs() {
                     </Grid>
 
                     {/* ── Pagination ─────────────────────────────────────────── */}
+                    {/* Server-Side Pagination Control */}
                     {totalPages > 1 && (
-                      <Box
-                        sx={{
-                          display: 'flex',
-                          justifyContent: 'center',
-                          alignItems: 'center',
-                          mt: 6,
-                          gap: 2,
-                          flexDirection: 'column',
-                        }}
-                      >
-                        <Typography
-                          variant="caption"
-                          sx={{ color: 'rgba(255,255,255,0.35)', letterSpacing: '0.05em' }}
-                        >
-                          Showing {(currentPage - 1) * JOBS_PER_PAGE + 1}–
-                          {Math.min(currentPage * JOBS_PER_PAGE, totalCount)} of{' '}
-                          {totalCount} opportunities
-                        </Typography>
+                      <Box sx={{ display: 'flex', justifyContent: 'center', mt: 6, mb: 2 }}>
                         <Pagination
                           count={totalPages}
                           page={currentPage}
                           onChange={handlePageChange}
-                          siblingCount={1}
-                          boundaryCount={1}
+                          disabled={isFetching}
                           sx={{
                             '& .MuiPaginationItem-root': {
                               color: 'text.secondary',
-                              borderColor: 'divider',
+                              borderColor: 'var(--nearu-border)',
                               borderRadius: '10px',
                               fontWeight: 600,
                               transition: 'all 0.2s ease',
@@ -609,7 +592,7 @@ export default function Jobs() {
                               },
                               '&.Mui-selected': {
                                 bgcolor: '#2E9EBF',
-                                color: '#111111',
+                                color: '#ffffff',
                                 fontWeight: 800,
                                 borderColor: '#2E9EBF',
                                 '&:hover': {
@@ -625,9 +608,9 @@ export default function Jobs() {
                     )}
                   </>
                 ) : (
-                  <Box sx={{ textAlign: 'center', py: 8, bgcolor: 'rgba(255,255,255,0.02)', borderRadius: '24px', border: '1px dashed rgba(255,255,255,0.1)' }}>
+                  <Box sx={{ textAlign: 'center', py: 8, bgcolor: 'var(--bg-surface)', borderRadius: '24px', border: '1px dashed var(--nearu-border)' }}>
                     <Typography variant="h6" sx={{ color: 'text.secondary', mb: 1 }}>No opportunities found</Typography>
-                    <Typography variant="body2" sx={{ color: 'rgba(255,255,255,0.4)' }}>Try adjusting your filters to see more results.</Typography>
+                    <Typography variant="body2" sx={{ color: 'text.secondary' }}>Try adjusting your filters to see more results.</Typography>
                   </Box>
                 )}
               </Box>
@@ -647,9 +630,9 @@ export default function Jobs() {
           sx: {
             bgcolor: 'background.paper',
             borderRadius: { xs: 0, md: '32px' },
-            border: '1px solid rgba(46, 158, 191, 0.12)',
+            border: '1px solid var(--nearu-border)',
             backgroundImage: 'none',
-            boxShadow: '0 25px 50px -12px rgba(0,0,0,0.8)',
+            boxShadow: '0 25px 50px -12px rgba(0,0,0,0.3)',
             m: { xs: 0, md: 2 }
           }
         }}
@@ -666,7 +649,7 @@ export default function Jobs() {
                         top: 20, 
                         right: 20, 
                         bgcolor: 'rgba(0,0,0,0.5)', 
-                        color: 'text.primary', 
+                        color: '#ffffff', 
                         backdropFilter: 'blur(10px)',
                         '&:hover': { bgcolor: 'rgba(0,0,0,0.8)' } 
                     }}
@@ -685,8 +668,8 @@ export default function Jobs() {
                             width: 100, 
                             height: 100, 
                             borderRadius: '24px', 
-                            border: '4px solid #0a0a0a', 
-                            boxShadow: '0 10px 30px rgba(0,0,0,0.5)',
+                            border: '4px solid var(--bg-surface)', 
+                            boxShadow: '0 10px 30px rgba(0,0,0,0.15)',
                             bgcolor: 'background.paper'
                         }} 
                     />
@@ -699,10 +682,10 @@ export default function Jobs() {
                         </Typography>
                     </Box>
                     <Box sx={{ display: 'flex', gap: 1.5 }}>
-                        <IconButton sx={{ border: '1px solid', color: 'text.secondary', borderRadius: '12px' }}>
+                        <IconButton sx={{ border: '1px solid var(--nearu-border)', color: 'text.secondary', borderRadius: '12px' }}>
                             <BookmarkIcon />
                         </IconButton>
-                        <IconButton sx={{ border: '1px solid', color: 'text.secondary', borderRadius: '12px' }}>
+                        <IconButton sx={{ border: '1px solid var(--nearu-border)', color: 'text.secondary', borderRadius: '12px' }}>
                             <ShareIcon />
                         </IconButton>
                     </Box>
@@ -748,14 +731,14 @@ export default function Jobs() {
 
                     <Grid size={{ xs: 12, md: 4 }}>
                         {/* Side Details Card */}
-                        <Box sx={{ bgcolor: 'rgba(255,255,255,0.02)', borderRadius: '24px', p: 3, border: '1px solid rgba(255,255,255,0.05)', position: 'sticky', top: 20 }}>
+                        <Box sx={{ bgcolor: 'var(--bg-surface)', borderRadius: '24px', p: 3, border: '1px solid var(--nearu-border)', position: 'sticky', top: 20 }}>
                             <Typography variant="subtitle1" sx={{ color: 'text.primary', fontWeight: 700, mb: 3 }}>Job Details</Typography>
                             
                             <Stack spacing={3}>
                                 <Box sx={{ display: 'flex', gap: 2 }}>
                                     <PayIcon sx={{ color: '#22c55e' }} />
                                     <Box>
-                                        <Typography variant="caption" sx={{ color: 'rgba(255,255,255,0.4)', display: 'block' }}>Salary / Pay</Typography>
+                                        <Typography variant="caption" sx={{ color: 'text.secondary', display: 'block' }}>Salary / Pay</Typography>
                                         <Typography variant="body2" sx={{ color: 'text.primary', fontWeight: 600 }}>{selectedJob.payRange}</Typography>
                                     </Box>
                                 </Box>
@@ -763,7 +746,7 @@ export default function Jobs() {
                                 <Box sx={{ display: 'flex', gap: 2 }}>
                                     <LocationIcon sx={{ color: '#3b82f6' }} />
                                     <Box>
-                                        <Typography variant="caption" sx={{ color: 'rgba(255,255,255,0.4)', display: 'block' }}>Location</Typography>
+                                        <Typography variant="caption" sx={{ color: 'text.secondary', display: 'block' }}>Location</Typography>
                                         <Typography variant="body2" sx={{ color: 'text.primary', fontWeight: 600 }}>{selectedJob.location}</Typography>
                                     </Box>
                                 </Box>
@@ -771,7 +754,7 @@ export default function Jobs() {
                                 <Box sx={{ display: 'flex', gap: 2 }}>
                                     <LabelIcon sx={{ color: '#2E9EBF' }} />
                                     <Box>
-                                        <Typography variant="caption" sx={{ color: 'rgba(255,255,255,0.4)', display: 'block' }}>Job Type</Typography>
+                                        <Typography variant="caption" sx={{ color: 'text.secondary', display: 'block' }}>Job Type</Typography>
                                         <Typography variant="body2" sx={{ color: 'text.primary', fontWeight: 600 }}>{selectedJob.jobType}</Typography>
                                     </Box>
                                 </Box>
@@ -779,21 +762,21 @@ export default function Jobs() {
                                 <Box sx={{ display: 'flex', gap: 2 }}>
                                     <CategoryIcon sx={{ color: '#ec4899' }} />
                                     <Box>
-                                        <Typography variant="caption" sx={{ color: 'rgba(255,255,255,0.4)', display: 'block' }}>Category</Typography>
+                                        <Typography variant="caption" sx={{ color: 'text.secondary', display: 'block' }}>Category</Typography>
                                         <Typography variant="body2" sx={{ color: 'text.primary', fontWeight: 600 }}>{selectedJob.category}</Typography>
                                     </Box>
                                 </Box>
                             </Stack>
 
-                            <Divider sx={{ my: 3, borderColor: 'rgba(255,255,255,0.05)' }} />
+                            <Divider sx={{ my: 3, borderColor: 'var(--nearu-border)' }} />
 
                             {/* Poster Info */}
-                            <Typography variant="subtitle2" sx={{ color: 'rgba(255,255,255,0.4)', mb: 2, fontSize: '0.75rem', fontWeight: 700, letterSpacing: '0.05em' }}>POSTED BY</Typography>
+                            <Typography variant="subtitle2" sx={{ color: 'text.secondary', mb: 2, fontSize: '0.75rem', fontWeight: 700, letterSpacing: '0.05em' }}>POSTED BY</Typography>
                             <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, mb: 3 }}>
                                 <Avatar src={selectedJob.postedBy.avatar || undefined} sx={{ width: 44, height: 44, border: '1px solid #2E9EBF' }} />
                                 <Box>
                                     <Typography variant="body2" sx={{ color: 'text.primary', fontWeight: 700 }}>{selectedJob.postedBy.name}</Typography>
-                                    <Typography variant="caption" sx={{ color: 'rgba(255,255,255,0.4)' }}>{selectedJob.postedBy.email}</Typography>
+                                    <Typography variant="caption" sx={{ color: 'text.secondary' }}>{selectedJob.postedBy.email}</Typography>
                                 </Box>
                             </Box>
 
@@ -805,7 +788,7 @@ export default function Jobs() {
                                         onClick={() => navigate(`/jobs/update/${selectedJob.id}`)}
                                         sx={{ 
                                             bgcolor: '#3b82f6', 
-                                            color: 'text.primary', 
+                                            color: '#ffffff', 
                                             fontWeight: 700, 
                                             borderRadius: '12px', 
                                             py: 1.2,
@@ -838,7 +821,7 @@ export default function Jobs() {
                                         startIcon={<EmailIcon />}
                                         sx={{ 
                                             bgcolor: '#2E9EBF', 
-                                            color: '#111111', 
+                                            color: '#ffffff', 
                                             fontWeight: 700, 
                                             borderRadius: '12px', 
                                             py: 1.2,

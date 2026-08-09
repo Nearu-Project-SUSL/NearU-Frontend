@@ -106,11 +106,11 @@ function DealDetailModal({
       maxWidth="sm"
       PaperProps={{
         sx: {
-          bgcolor: "#0b0b0f",
+          bgcolor: "var(--bg-surface)",
           borderRadius: "28px",
-          border: "1px solid rgba(255,255,255,0.08)",
+          border: "1px solid var(--nearu-border)",
           backgroundImage: "radial-gradient(circle at top right, rgba(46,158,191,0.06) 0%, transparent 60%)",
-          boxShadow: "0 24px 64px rgba(0,0,0,0.85)",
+          boxShadow: "0 24px 64px rgba(0,0,0,0.45)",
           overflow: "hidden"
         },
       }}
@@ -126,7 +126,7 @@ function DealDetailModal({
           sx={{
             position: "absolute",
             inset: 0,
-            background: "linear-gradient(to bottom, rgba(0,0,0,0.2) 0%, rgba(11,11,15,1) 95%)",
+            background: "linear-gradient(to bottom, rgba(0,0,0,0.2) 0%, var(--bg-surface) 95%)",
           }}
         />
         <IconButton
@@ -165,7 +165,7 @@ function DealDetailModal({
           <Box>
             <Stack direction="row" alignItems="center" gap={1} mb={0.5}>
               <StoreIcon sx={{ color: "#2E9EBF", fontSize: 20 }} />
-              <Typography variant="subtitle1" sx={{ color: "rgba(255,255,255,0.7)", fontWeight: 700 }}>
+              <Typography variant="subtitle1" sx={{ color: "var(--text-secondary)", fontWeight: 700 }}>
                 {deal.shopName}
               </Typography>
               <Chip
@@ -183,46 +183,46 @@ function DealDetailModal({
             </Stack>
             {deal.shopAddress && (
               <Stack direction="row" alignItems="center" gap={0.5} mb={1} sx={{ mt: 0.25 }}>
-                <PlaceIcon sx={{ color: "rgba(255,255,255,0.48)", fontSize: 16 }} />
-                <Typography variant="caption" sx={{ color: "rgba(255,255,255,0.48)", fontWeight: 500 }}>
+                <PlaceIcon sx={{ color: "var(--text-secondary)", fontSize: 16 }} />
+                <Typography variant="caption" sx={{ color: "var(--text-secondary)", fontWeight: 500 }}>
                   {deal.shopAddress}
                 </Typography>
               </Stack>
             )}
-            <Typography variant="h5" sx={{ color: "#fff", fontWeight: 800, letterSpacing: "-0.01em" }}>
+            <Typography variant="h5" sx={{ color: "var(--text-primary)", fontWeight: 800, letterSpacing: "-0.01em" }}>
               {deal.title}
             </Typography>
           </Box>
 
           <Box>
-            <Typography variant="body2" sx={{ color: "rgba(255,255,255,0.4)", mb: 0.75 }}>
+            <Typography variant="body2" sx={{ color: "var(--text-secondary)", mb: 0.75 }}>
               Offer Details
             </Typography>
-            <Typography variant="body1" sx={{ color: "rgba(255,255,255,0.8)", lineHeight: 1.6 }}>
+            <Typography variant="body1" sx={{ color: "var(--text-primary)", lineHeight: 1.6 }}>
               {deal.description}
             </Typography>
           </Box>
 
-          <Stack direction="row" gap={3} sx={{ py: 1.5, borderTop: "1px solid rgba(255,255,255,0.06)", borderBottom: "1px solid rgba(255,255,255,0.06)" }}>
+          <Stack direction="row" gap={3} sx={{ py: 1.5, borderTop: "1px solid var(--nearu-border)", borderBottom: "1px solid var(--nearu-border)" }}>
             <Box>
               <Stack direction="row" alignItems="center" gap={1} mb={0.5}>
-                <CalendarTodayIcon sx={{ color: "rgba(255,255,255,0.4)", fontSize: 16 }} />
-                <Typography variant="caption" sx={{ color: "rgba(255,255,255,0.4)" }}>
+                <CalendarTodayIcon sx={{ color: "var(--text-secondary)", fontSize: 16 }} />
+                <Typography variant="caption" sx={{ color: "var(--text-secondary)" }}>
                   Valid From
                 </Typography>
               </Stack>
-              <Typography variant="body2" sx={{ color: "#fff", fontWeight: 600 }}>
+              <Typography variant="body2" sx={{ color: "var(--text-primary)", fontWeight: 600 }}>
                 {formatDate(deal.validFrom)}
               </Typography>
             </Box>
             <Box>
               <Stack direction="row" alignItems="center" gap={1} mb={0.5}>
-                <CalendarTodayIcon sx={{ color: "rgba(255,255,255,0.4)", fontSize: 16 }} />
-                <Typography variant="caption" sx={{ color: "rgba(255,255,255,0.4)" }}>
+                <CalendarTodayIcon sx={{ color: "var(--text-secondary)", fontSize: 16 }} />
+                <Typography variant="caption" sx={{ color: "var(--text-secondary)" }}>
                   Valid To
                 </Typography>
               </Stack>
-              <Typography variant="body2" sx={{ color: "#fff", fontWeight: 600 }}>
+              <Typography variant="body2" sx={{ color: "var(--text-primary)", fontWeight: 600 }}>
                 {formatDate(deal.validTo)}
               </Typography>
             </Box>
@@ -233,7 +233,7 @@ function DealDetailModal({
               <Typography variant="caption" sx={{ color: "#ef4444", fontWeight: 700, display: "flex", alignItems: "center", gap: 0.5 }}>
                 <InfoIcon sx={{ fontSize: 14 }} /> Rejection Reason
               </Typography>
-              <Typography variant="body2" sx={{ color: "rgba(255,255,255,0.7)", mt: 0.5 }}>
+              <Typography variant="body2" sx={{ color: "var(--text-secondary)", mt: 0.5 }}>
                 {deal.rejectionReason}
               </Typography>
             </Box>
@@ -268,7 +268,7 @@ function DealDetailModal({
               onClick={onClose}
               sx={{
                 bgcolor: "#2E9EBF",
-                color: "#050505",
+                color: "#fff",
                 fontWeight: 700,
                 borderRadius: "12px",
                 py: 1.25,
@@ -307,13 +307,13 @@ function DealCardComponent({ deal, onSelect, showStatus = false }: DealCardCompo
         height: "100%",
         display: "flex",
         flexDirection: "column",
-        bgcolor: "rgba(255,255,255,0.02)",
+        bgcolor: "var(--bg-surface)",
         borderRadius: "20px",
         overflow: "hidden",
-        border: "1px solid rgba(255,255,255,0.06)",
+        border: "1px solid var(--nearu-border)",
         transition: "all 0.3s cubic-bezier(0.4, 0, 0.2, 1)",
         transform: hovered ? "translateY(-6px)" : "none",
-        boxShadow: hovered ? "0 12px 30px rgba(46,158,191,0.12)" : "none",
+        boxShadow: hovered ? "0 12px 30px var(--nearu-accent-subtle)" : "none",
         cursor: "pointer",
       }}
     >
@@ -357,7 +357,7 @@ function DealCardComponent({ deal, onSelect, showStatus = false }: DealCardCompo
               top: 12,
               left: 12,
               bgcolor: statusColor(displayStatus),
-              color: "#111",
+              color: "#fff",
               fontWeight: 800,
               fontSize: "0.7rem",
               zIndex: 2
@@ -368,7 +368,7 @@ function DealCardComponent({ deal, onSelect, showStatus = false }: DealCardCompo
           sx={{
             position: "absolute",
             inset: 0,
-            background: "linear-gradient(to top, rgba(11,11,15,0.95) 0%, transparent 80%)",
+            background: "linear-gradient(to top, var(--bg-surface) 0%, transparent 80%)",
             zIndex: 1
           }}
         />
@@ -377,14 +377,14 @@ function DealCardComponent({ deal, onSelect, showStatus = false }: DealCardCompo
         <Box>
           <Stack direction="row" alignItems="center" gap={0.5} mb={deal.shopAddress ? 0.5 : 1.25}>
             <StoreIcon sx={{ color: "#2E9EBF", fontSize: 15 }} />
-            <Typography variant="caption" sx={{ color: "rgba(255,255,255,0.48)", fontWeight: 600 }}>
+            <Typography variant="caption" sx={{ color: "var(--text-secondary)", fontWeight: 600 }}>
               {deal.shopName} · {deal.shopType}
             </Typography>
           </Stack>
           {deal.shopAddress && (
             <Stack direction="row" alignItems="center" gap={0.5} mb={1.25}>
-              <PlaceIcon sx={{ color: "rgba(255,255,255,0.36)", fontSize: 13 }} />
-              <Typography variant="caption" sx={{ color: "rgba(255,255,255,0.36)", fontWeight: 500, display: "-webkit-box", WebkitLineClamp: 1, WebkitBoxOrient: "vertical", overflow: "hidden", textOverflow: "ellipsis" }}>
+              <PlaceIcon sx={{ color: "var(--text-secondary)", fontSize: 13 }} />
+              <Typography variant="caption" sx={{ color: "var(--text-secondary)", fontWeight: 500, display: "-webkit-box", WebkitLineClamp: 1, WebkitBoxOrient: "vertical", overflow: "hidden", textOverflow: "ellipsis" }}>
                 {deal.shopAddress}
               </Typography>
             </Stack>
@@ -392,7 +392,7 @@ function DealCardComponent({ deal, onSelect, showStatus = false }: DealCardCompo
           <Typography
             variant="h6"
             sx={{
-              color: "#fff",
+              color: "var(--text-primary)",
               fontWeight: 700,
               fontSize: "1.05rem",
               lineHeight: 1.3,
@@ -409,7 +409,7 @@ function DealCardComponent({ deal, onSelect, showStatus = false }: DealCardCompo
           <Typography
             variant="body2"
             sx={{
-              color: "rgba(255,255,255,0.6)",
+              color: "var(--text-secondary)",
               fontSize: "0.85rem",
               lineHeight: 1.5,
               display: "-webkit-box",
@@ -455,7 +455,7 @@ export default function Deals() {
   };
 
   return (
-    <Box sx={{ display: "flex", minHeight: "100vh", bgcolor: "#050505" }}>
+    <Box sx={{ display: "flex", minHeight: "100vh", bgcolor: "var(--bg-base)" }}>
       <Sidebar activeSection="offers" />
       <Box sx={{ flexGrow: 1, display: "flex", flexDirection: "column", minWidth: 0 }}>
         <Navbar />
@@ -465,10 +465,10 @@ export default function Deals() {
             <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
               <LocalOfferIcon sx={{ color: "#2E9EBF", fontSize: 36 }} />
               <Box>
-                <Typography variant="h4" sx={{ color: "#fff", fontWeight: 800, fontSize: { xs: "1.75rem", md: "2.25rem" }, letterSpacing: "-0.02em" }}>
+                <Typography variant="h4" sx={{ color: "var(--text-primary)", fontWeight: 800, fontSize: { xs: "1.75rem", md: "2.25rem" }, letterSpacing: "-0.02em" }}>
                   Deals & Offers
                 </Typography>
-                <Typography variant="body2" sx={{ color: "rgba(255,255,255,0.48)", mt: 0.5 }}>
+                <Typography variant="body2" sx={{ color: "var(--text-secondary)", mt: 0.5 }}>
                   Exclusive savings, student discounts, and limited-time promotions
                 </Typography>
               </Box>
@@ -482,7 +482,7 @@ export default function Deals() {
                   fontWeight: 700,
                   borderRadius: "14px",
                   bgcolor: "#2E9EBF",
-                  color: "#050505",
+                  color: "#fff",
                   textTransform: "none",
                   px: 3,
                   py: 1.25,
@@ -501,10 +501,10 @@ export default function Deals() {
               onChange={(_, v) => setActiveTab(v)}
               sx={{
                 mb: 4,
-                borderBottom: "1px solid rgba(255,255,255,0.08)",
+                borderBottom: "1px solid var(--nearu-border)",
                 "& .MuiTabs-indicator": { bgcolor: "#2E9EBF" },
                 "& .MuiTab-root": {
-                  color: "rgba(255,255,255,0.4)",
+                  color: "var(--text-secondary)",
                   fontWeight: 600,
                   textTransform: "none",
                   fontSize: "0.95rem",
@@ -519,13 +519,13 @@ export default function Deals() {
 
           {activeTab === "live" ? (
             <Box>
-              <Typography variant="h6" sx={{ color: "rgba(255,255,255,0.88)", fontWeight: 800, mb: 3 }}>
+              <Typography variant="h6" sx={{ color: "var(--text-primary)", fontWeight: 800, mb: 3 }}>
                 Live Offers
               </Typography>
               {loadingApproved ? (
                 <CircularProgress size={32} sx={{ color: "#2E9EBF" }} />
               ) : approvedDeals.length === 0 ? (
-                <Typography sx={{ color: "rgba(255,255,255,0.36)" }}>
+                <Typography sx={{ color: "var(--text-secondary)" }}>
                   No approved deals yet. Check back soon!
                 </Typography>
               ) : (
@@ -544,13 +544,13 @@ export default function Deals() {
             </Box>
           ) : (
             <Box>
-              <Typography variant="h6" sx={{ color: "rgba(255,255,255,0.88)", fontWeight: 800, mb: 3 }}>
+              <Typography variant="h6" sx={{ color: "var(--text-primary)", fontWeight: 800, mb: 3 }}>
                 My Submissions
               </Typography>
               {loadingMyDeals ? (
                 <CircularProgress size={32} sx={{ color: "#2E9EBF" }} />
               ) : myDeals.length === 0 ? (
-                <Typography sx={{ color: "rgba(255,255,255,0.36)" }}>
+                <Typography sx={{ color: "var(--text-secondary)" }}>
                   You have not submitted any deals yet. Click "Submit New Deal" to apply.
                 </Typography>
               ) : (

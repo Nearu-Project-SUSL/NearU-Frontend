@@ -98,13 +98,13 @@ export default function GiftShopFormDialog({
       maxWidth="sm"
       PaperProps={{
         sx: {
-          bgcolor: "#0a0a0a",
+          bgcolor: "var(--bg-surface)",
           borderRadius: "24px",
-          border: "1px solid rgba(255,255,255,0.08)",
+          border: "1px solid var(--nearu-border)",
         },
       }}
     >
-      <DialogTitle sx={{ color: "#fff", fontWeight: 800 }}>
+      <DialogTitle sx={{ color: "var(--text-primary)", fontWeight: 800 }}>
         {mode === "create" ? "Create Gift Shop" : "Edit Gift Shop"}
       </DialogTitle>
 
@@ -117,7 +117,7 @@ export default function GiftShopFormDialog({
             fullWidth
             error={!!errors.name}
             helperText={errors.name}
-            InputLabelProps={{ style: { color: "rgba(255,255,255,0.55)" } }}
+            InputLabelProps={{ style: { color: "var(--text-secondary)" } }}
             sx={darkTextFieldSx}
           />
 
@@ -128,7 +128,7 @@ export default function GiftShopFormDialog({
             fullWidth
             error={!!errors.locationName}
             helperText={errors.locationName}
-            InputLabelProps={{ style: { color: "rgba(255,255,255,0.55)" } }}
+            InputLabelProps={{ style: { color: "var(--text-secondary)" } }}
             sx={darkTextFieldSx}
           />
 
@@ -139,7 +139,7 @@ export default function GiftShopFormDialog({
             fullWidth
             error={!!errors.phone}
             helperText={errors.phone}
-            InputLabelProps={{ style: { color: "rgba(255,255,255,0.55)" } }}
+            InputLabelProps={{ style: { color: "var(--text-secondary)" } }}
             sx={darkTextFieldSx}
           />
 
@@ -148,7 +148,7 @@ export default function GiftShopFormDialog({
             value={email}
             onChange={(e) => setEmail(e.target.value)}
             fullWidth
-            InputLabelProps={{ style: { color: "rgba(255,255,255,0.55)" } }}
+            InputLabelProps={{ style: { color: "var(--text-secondary)" } }}
             sx={darkTextFieldSx}
           />
 
@@ -161,17 +161,18 @@ export default function GiftShopFormDialog({
             rows={3}
             error={!!errors.address}
             helperText={errors.address}
-            InputLabelProps={{ style: { color: "rgba(255,255,255,0.55)" } }}
+            InputLabelProps={{ style: { color: "var(--text-secondary)" } }}
             sx={darkTextFieldSx}
           />
 
           <Box>
-            <Typography sx={{ color: "rgba(255,255,255,0.7)", mb: 1 }}>
+            <Typography sx={{ color: "var(--text-secondary)", mb: 1 }}>
               Shop Image
             </Typography>
             <input
               type="file"
               accept="image/*"
+              style={{ color: "var(--text-primary)" }}
               onChange={(e) => setImage(e.target.files?.[0] || null)}
             />
           </Box>
@@ -184,7 +185,7 @@ export default function GiftShopFormDialog({
                   onChange={(e) => setIsActive(e.target.checked)}
                 />
               }
-              label={<Typography sx={{ color: "#fff" }}>Active</Typography>}
+              label={<Typography sx={{ color: "var(--text-primary)" }}>Active</Typography>}
             />
           )}
 
@@ -213,9 +214,9 @@ export default function GiftShopFormDialog({
 
 const darkTextFieldSx = {
   "& .MuiOutlinedInput-root": {
-    color: "#fff",
+    color: "var(--text-primary)",
     borderRadius: "14px",
-    "& fieldset": { borderColor: "rgba(255,255,255,0.12)" },
+    "& fieldset": { borderColor: "var(--nearu-border)" },
     "&:hover fieldset": { borderColor: "rgba(46,158,191,0.35)" },
     "&.Mui-focused fieldset": { borderColor: "#2E9EBF" },
   },
@@ -231,12 +232,12 @@ const primaryBtnSx = {
 };
 
 const secondaryBtnSx = {
-  color: "#fff",
-  borderColor: "rgba(255,255,255,0.15)",
+  color: "var(--text-primary)",
+  borderColor: "var(--nearu-border)",
   textTransform: "none",
   borderRadius: "12px",
   "&:hover": {
     borderColor: "#2E9EBF",
-    bgcolor: "rgba(46,158,191,0.05)",
+    bgcolor: "var(--nearu-accent-subtle)",
   },
 };

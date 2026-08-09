@@ -66,15 +66,15 @@ function AdminDealCard({
       sx={{
         p: { xs: 2, md: 3 },
         borderRadius: "20px",
-        bgcolor: "rgba(255,255,255,0.02)",
-        border: "1px solid rgba(255,255,255,0.06)",
+        bgcolor: "var(--bg-surface)",
+        border: "1px solid var(--nearu-border)",
         display: "flex",
         flexDirection: { xs: "column", md: "row" },
         gap: 3,
         transition: "all 0.2s ease",
         "&:hover": {
-          bgcolor: "rgba(255,255,255,0.04)",
-          borderColor: "rgba(255,255,255,0.12)"
+          bgcolor: "var(--bg-elevated)",
+          borderColor: "rgba(46,158,191,0.35)"
         }
       }}
     >
@@ -117,7 +117,7 @@ function AdminDealCard({
       <Box sx={{ flexGrow: 1, display: "flex", flexDirection: "column", justifyContent: "space-between" }}>
         <Box>
           <Stack direction="row" justifyContent="space-between" alignItems="flex-start" gap={2} mb={0.75}>
-            <Typography variant="h6" sx={{ color: "#fff", fontWeight: 700, fontSize: "1.1rem", lineHeight: 1.3 }}>
+            <Typography variant="h6" sx={{ color: "var(--text-primary)", fontWeight: 700, fontSize: "1.1rem", lineHeight: 1.3 }}>
               {deal.title}
             </Typography>
             <Chip
@@ -137,7 +137,7 @@ function AdminDealCard({
             />
           </Stack>
 
-          <Stack direction="row" flexWrap="wrap" gap={2} mb={1.25} sx={{ color: "rgba(255,255,255,0.48)" }}>
+          <Stack direction="row" flexWrap="wrap" gap={2} mb={1.25} sx={{ color: "var(--text-secondary)" }}>
             <Stack direction="row" alignItems="center" gap={0.5}>
               <StoreIcon sx={{ fontSize: 16, color: "#2E9EBF" }} />
               <Typography variant="caption" sx={{ fontWeight: 600 }}>
@@ -152,13 +152,13 @@ function AdminDealCard({
             </Stack>
           </Stack>
 
-          <Typography variant="body2" sx={{ color: "rgba(255,255,255,0.7)", mb: 2 }}>
+          <Typography variant="body2" sx={{ color: "var(--text-primary)", mb: 2 }}>
             {deal.description}
           </Typography>
         </Box>
 
-        <Stack direction={{ xs: "column", sm: "row" }} justifyContent="space-between" alignItems={{ xs: "stretch", sm: "center" }} gap={2} pt={1.5} sx={{ borderTop: "1px solid rgba(255,255,255,0.05)" }}>
-          <Stack direction="row" alignItems="center" gap={1} sx={{ color: "rgba(255,255,255,0.4)" }}>
+        <Stack direction={{ xs: "column", sm: "row" }} justifyContent="space-between" alignItems={{ xs: "stretch", sm: "center" }} gap={2} pt={1.5} sx={{ borderTop: "1px solid var(--nearu-border)" }}>
+          <Stack direction="row" alignItems="center" gap={1} sx={{ color: "var(--text-secondary)" }}>
             <CalendarTodayIcon sx={{ fontSize: 14 }} />
             <Typography variant="caption" sx={{ fontWeight: 500 }}>
               Validity: {formatDate(deal.validFrom)} – {formatDate(deal.validTo)}
@@ -176,7 +176,7 @@ function AdminDealCard({
                   onClick={() => onApprove(deal.id)}
                   sx={{
                     bgcolor: "#10b981",
-                    color: "#000",
+                    color: "#fff",
                     fontWeight: 700,
                     borderRadius: "10px",
                     textTransform: "none",
@@ -307,7 +307,7 @@ export default function AdminDeals() {
   };
 
   return (
-    <Box sx={{ display: "flex", minHeight: "100vh", bgcolor: "background.default" }}>
+    <Box sx={{ display: "flex", minHeight: "100vh", bgcolor: "var(--bg-base)" }}>
       <Sidebar activeSection="admin" />
       <Box sx={{ flexGrow: 1, display: "flex", flexDirection: "column" }}>
         <Navbar />
@@ -316,7 +316,7 @@ export default function AdminDeals() {
             <Typography variant="h4" sx={{ color: "#ef4444", fontWeight: 800, mb: 1 }}>
               Manage Deals & Offers
             </Typography>
-            <Typography variant="body2" sx={{ color: "rgba(255,255,255,0.48)" }}>
+            <Typography variant="body2" sx={{ color: "var(--text-secondary)" }}>
               Review shop applications, inspect deal details, and approve them for the home page.
             </Typography>
           </Box>
@@ -326,10 +326,10 @@ export default function AdminDeals() {
             onChange={(_, v) => setStatus(v)}
             sx={{
               mb: 4,
-              borderBottom: "1px solid rgba(255,255,255,0.08)",
+              borderBottom: "1px solid var(--nearu-border)",
               "& .MuiTabs-indicator": { bgcolor: "#ef4444" },
               "& .MuiTab-root": {
-                color: "rgba(255,255,255,0.4)",
+                color: "var(--text-secondary)",
                 fontWeight: 600,
                 textTransform: "none",
                 fontSize: "0.95rem",
@@ -345,7 +345,7 @@ export default function AdminDeals() {
           {isLoading ? (
             <CircularProgress sx={{ color: "#ef4444" }} />
           ) : deals.length === 0 ? (
-            <Typography sx={{ color: "rgba(255,255,255,0.36)" }}>No {status.toLowerCase()} deals.</Typography>
+            <Typography sx={{ color: "var(--text-secondary)" }}>No {status.toLowerCase()} deals.</Typography>
           ) : (
             <Stack spacing={3}>
               {deals.map((deal) => (
@@ -369,19 +369,19 @@ export default function AdminDeals() {
         onClose={() => setRejectDialogOpen(false)}
         PaperProps={{
           sx: {
-            bgcolor: "#0b0b0f",
+            bgcolor: "var(--bg-surface)",
             borderRadius: "24px",
-            border: "1px solid rgba(255,255,255,0.08)",
-            boxShadow: "0 24px 64px rgba(0,0,0,0.85)",
+            border: "1px solid var(--nearu-border)",
+            boxShadow: "0 24px 64px rgba(0,0,0,0.45)",
             p: 1.5,
           }
         }}
       >
-        <DialogTitle sx={{ color: "#fff", fontWeight: 800, fontSize: "1.3rem" }}>
+        <DialogTitle sx={{ color: "var(--text-primary)", fontWeight: 800, fontSize: "1.3rem" }}>
           Reject Deal Application
         </DialogTitle>
         <DialogContent>
-          <Typography variant="body2" sx={{ color: "rgba(255,255,255,0.48)", mb: 3 }}>
+          <Typography variant="body2" sx={{ color: "var(--text-secondary)", mb: 3 }}>
             Please state why this application is being rejected. The business owner will see this feedback in their submissions list.
           </Typography>
           <TextField
@@ -394,15 +394,15 @@ export default function AdminDeals() {
             required
             sx={{
               "& .MuiOutlinedInput-root": {
-                color: "#fff",
+                color: "var(--text-primary)",
                 borderRadius: "14px",
-                backgroundColor: "rgba(255,255,255,0.02)",
-                "& fieldset": { borderColor: "rgba(255,255,255,0.12)", transition: "all 0.2s" },
-                "&:hover fieldset": { borderColor: "rgba(255,255,255,0.25)" },
+                backgroundColor: "var(--bg-surface)",
+                "& fieldset": { borderColor: "var(--nearu-border)", transition: "all 0.2s" },
+                "&:hover fieldset": { borderColor: "rgba(239,68,68,0.5)" },
                 "&.Mui-focused fieldset": { borderColor: "#ef4444" }
               },
               "& .MuiInputLabel-root": {
-                color: "rgba(255,255,255,0.5)",
+                color: "var(--text-secondary)",
                 "&.Mui-focused": { color: "#ef4444" }
               }
             }}
@@ -410,7 +410,7 @@ export default function AdminDeals() {
           <Stack direction="row" spacing={2} mt={3} justifyContent="flex-end">
             <Button
               onClick={() => setRejectDialogOpen(false)}
-              sx={{ color: "rgba(255,255,255,0.4)", textTransform: "none", fontWeight: 600 }}
+              sx={{ color: "var(--text-secondary)", textTransform: "none", fontWeight: 600 }}
             >
               Cancel
             </Button>
@@ -427,8 +427,8 @@ export default function AdminDeals() {
                 textTransform: "none",
                 "&:hover": { bgcolor: "#dc2626" },
                 "&.Mui-disabled": {
-                  bgcolor: "rgba(255,255,255,0.05)",
-                  color: "rgba(255,255,255,0.25)",
+                  bgcolor: "rgba(239,68,68,0.3)",
+                  color: "rgba(255,255,255,0.5)",
                 }
               }}
             >
