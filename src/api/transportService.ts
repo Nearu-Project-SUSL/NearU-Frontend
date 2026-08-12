@@ -3,7 +3,7 @@ import type { BusRoute, TrainRoute } from '../types/transport';
 
 export const transportService = {
   getBusRoutes: async (): Promise<BusRoute[]> => {
-    const response = await axiosPrivate.get('/transport/bus-routes');
+    const response = await axiosPrivate.get('/busroutes');
     // Unwrap the response if it's wrapped in a 'data' object
     if (response.data && typeof response.data === 'object' && 'data' in response.data) {
       return response.data.data;
@@ -11,7 +11,7 @@ export const transportService = {
     return response.data;
   },
   getTrainRoutes: async (): Promise<TrainRoute[]> => {
-    const response = await axiosPrivate.get('/transport/train-routes');
+    const response = await axiosPrivate.get('/trainroutes');
     // Unwrap the response if it's wrapped in a 'data' object
     if (response.data && typeof response.data === 'object' && 'data' in response.data) {
       return response.data.data;
