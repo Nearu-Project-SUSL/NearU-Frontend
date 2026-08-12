@@ -1,5 +1,6 @@
-import axiosPrivate  from './axios';
-import { TukTukDriver, BusRoute, TrainRoute } from '../types/transport';
+import { axiosPrivate } from './axios';
+import type { TukTukDriver, BusRoute, TrainRoute } from '../types/transport';
+
 
 export const getTukTukDrivers = async (): Promise<TukTukDriver[]> => {
   const res = await axiosPrivate.get('/tuktukdrivers');

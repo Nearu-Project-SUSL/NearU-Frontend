@@ -156,7 +156,8 @@ const authService = {
         role: 'Business',
         businessName: data.businessName,  
         businessType: data.businessType,   
-        ownerName: data.ownerName          
+        ownerName: data.ownerName,
+        description: data.description,    // ← was silently dropped before
     });
     
     // Extract from ApiResponse wrapper
