@@ -1,5 +1,6 @@
 import ShopCard from "../../components/food/ShopCard";
 import { useFoodShops } from "../../hooks/useFoodShop";
+import { CardSkeleton } from "../../components/ui/Skeleton";
 import Navbar from "../../components/layout/Navbar";
 import { Sidebar } from "../../components/layout/Sidebar";
 import { PageLayout } from "../../components/layout/PageLayout";
@@ -11,6 +12,7 @@ import {
   IconButton,
   TextField,
   InputAdornment,
+  Button
 } from '@mui/material';
 import { useTheme } from '@mui/material';
 import { useState } from "react";
@@ -24,6 +26,10 @@ import DeleteShopDialog from '../../components/food/DeleteShopDialog';
 import { deleteShop, updateShop } from '../../../api/foodapi';
 import { useQueryClient } from '@tanstack/react-query';
 import type { ShopResponse } from '../../../api/foodapi';
+import { Container, Paper, Grid } from '@mui/material';
+import BusinessProfileSetupModal from '../../components/businessapplication/BusinessProfileSet'; 
+
+
 
 const FOOD_CATEGORIES = [
   'All',
@@ -39,10 +45,14 @@ export default function FoodPage(){
   const [activeCategory, setActiveCategory] = useState('All');
   const [searchQuery, setSearchQuery] = useState('');
 
+  const [profileModalOpen, setProfileModalOpen] = useState(false);
+
   const [currentPage, setCurrentPage] = useState(1);
 
   const {auth} = useAuth();
   const currentUserId = auth?.user?.id;
+  console.log('auth user:', auth?.user);
+  console.log('roles:', auth?.user?.roles);
 
   const {data, isLoading, error} = useFoodShops({   //pas params to hook from there to API
     page: currentPage,
@@ -66,13 +76,7 @@ export default function FoodPage(){
     setCurrentPage(1);
   }
 
-  if (isLoading) {
-    return (
-      <Box sx={{ display: 'flex', justifyContent: 'center', mt: 10 }}>
-        <Typography sx={{ color: '#fff' }}>Loading...</Typography>
-      </Box>
-    );
-  }
+
 
   if (error) {
     return (
@@ -149,6 +153,7 @@ export default function FoodPage(){
   const accent = theme.palette.primary.main;
   const accentAlpha = (a: number) => `rgba(46, 158, 191, ${a})`;
 
+
   return (
     <Box
       sx={{
@@ -166,6 +171,58 @@ export default function FoodPage(){
 
         <Box sx={{ flex: 1, overflowY: 'auto', overflowX: 'hidden' }}>
           <Box sx={{px: { xs: 2, md: 4 }, py: { xs: 4, md: 5 }, pb:8, maxWidth:1400, mx:'auto' }}>
+
+              {auth?.user?.roles?.includes('BusinessOwner') && (
+                <Container sx={{ mt: 0, mb: 4 }}>
+                  <Paper 
+                    sx={{ 
+                      p: { xs: 3, md: 5 }, 
+                      display: 'flex',
+                      flexDirection: { xs: 'column', sm: 'row' },
+                      alignItems: { xs: 'flex-start', sm: 'center' },
+                      justifyContent: 'space-between',
+                      gap: 2,
+                      bgcolor: 'rgba(59, 130, 246, 0.05)',
+                      border: '1px solid rgba(59, 130, 246, 0.2)',
+                      borderRadius: '1.5rem',
+                      backdropFilter: 'blur(10px)'
+                    }}
+                  >
+                    <Box>
+                      <Typography variant="h3" sx={{ color: '#3b82f6', fontWeight: 'bold', mb: 2 }}>
+                        Welcome, {auth?.user?.username || 'Owner'}!
+                      </Typography>
+                      <Typography variant="h6" sx={{ color: '#9ca3af' }}>
+                        You are logged in as a Business Owner.
+                      </Typography>
+                    </Box>
+
+                    <Button
+                      variant="contained"
+                      onClick={() => setProfileModalOpen(true)}
+                      sx={{
+                        bgcolor: '#2E9EBF',
+                        color: 'black',
+                        fontWeight: 700,
+                        borderRadius: '0.75rem',
+                        px: 4,
+                        whiteSpace: 'nowrap',
+                        '&:hover': { bgcolor: '#1a7a9a' }
+                      }}
+                    >
+                      Complete Your Profile
+                    </Button>
+                  </Paper>
+                </Container>
+              )}
+
+              <BusinessProfileSetupModal
+                open={profileModalOpen}
+                onClose={() => setProfileModalOpen(false)}
+                onCompleted={() => {
+                  setProfileModalOpen(false);
+                }}
+              />
 
               {/* hero section  */}
               <Box
@@ -211,7 +268,7 @@ export default function FoodPage(){
                     }}
                   >
                     Discover the best food shops near Sabaragamuwa University.
-                    From rice & curry to cafes and bakeries — all in one place.
+                    From rice & curry to cafes and bakeries,  all in one place.
                   </Typography>
                 </Box>
 
@@ -348,7 +405,9 @@ export default function FoodPage(){
               </Box>
 
               {/* shop grid or empty state */}
-              {shops.length > 0 ? (
+              {isLoading ? (
+                <CardSkeleton count={6} />
+              ) : shops.length > 0 ? (
                 <Box
                   sx={{
                     display:'grid',
@@ -360,7 +419,7 @@ export default function FoodPage(){
                     gap:{xs:2, md:2.5},
                     px:{xs:2, md:0} // no side margin
                   }}>
-                  {shops.map((shop) => (
+                  {shops.map((shop: any) => (
                     <ShopCard 
                     key={shop.id} 
                     shop={shop}

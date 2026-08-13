@@ -78,8 +78,8 @@ export default function AdminHome() {
     try {
       const data = await adminService.getStats();
       setStats(data);
-    } catch (error) {
-      console.error('Failed to fetch admin stats:', error);
+    } catch (error: any) {
+      console.error('Error fetching stats:', error);
       toast.error('Failed to update stats panel.');
     } finally {
       setLoadingStats(false);
@@ -94,8 +94,8 @@ export default function AdminHome() {
       const apiFilter = statusFilter === 'All' ? undefined : statusFilter;
       const data = await adminService.getRiders(apiFilter, 1, 50);
       setRiders(data.riders || []);
-    } catch (error) {
-      console.error('Failed to fetch riders list:', error);
+    } catch (error: any) {
+      console.error('Error fetching recent rides:', error);
       toast.error('Failed to load riders list.');
     } finally {
       setLoadingRiders(false);

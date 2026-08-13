@@ -38,8 +38,14 @@ export const RidesApi = {
       .post<ApiResponse<RideSummary>>('/cancel', { rideId })
       .then(r => r.data),
 
+  getActiveRide: () =>
+    axiosPrivate
+      .get<ApiResponse<any>>('/rides/active')
+      .then(r => r.data),
+
   rateRide: (rideId: string, rating: number) =>
     axiosPrivate
       .post<ApiResponse<object>>(`/rides/history/${rideId}/rate`, { rating })
       .then(r => r.data),
+
 };

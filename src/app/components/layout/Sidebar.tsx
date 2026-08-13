@@ -29,6 +29,7 @@ import {
   Business as AccommodationIcon,
   CardGiftcard as GiftIcon,
   LocalOffer as OffersIcon,
+  CameraAlt as PhotographyIcon,
   Close as CloseIcon,
   Menu as MenuIcon,
   Person as UserIcon,
@@ -38,6 +39,7 @@ import {
 
 interface SidebarProps {
   activeSection?: string;
+  activeId?: string;
 }
 
 const DRAWER_WIDTH = 252;
@@ -45,7 +47,8 @@ const COLLAPSED_WIDTH = 68;
 
 export { DRAWER_WIDTH, COLLAPSED_WIDTH };
 
-export function Sidebar({ activeSection }: SidebarProps) {
+export function Sidebar({ activeSection, activeId }: SidebarProps) {
+  const currentActive = activeSection || activeId;
   const { isExpanded, toggleSidebar, isMobileOpen, toggleMobileSidebar } = useSidebar();
   const navigate = useNavigate();
   const { auth } = useAuth();
@@ -77,6 +80,7 @@ export function Sidebar({ activeSection }: SidebarProps) {
     { icon: JobsIcon,          label: 'Jobs',             id: 'jobs',          path: '/jobs' },
     { icon: AccommodationIcon, label: 'Accommodation',    id: 'accommodation', path: '/accommodation' },
     { icon: GiftIcon,          label: 'Gifts',     id: 'gifts',         path: '/gifts' },
+    { icon: PhotographyIcon,   label: 'Photography', id: 'photography', path: '/photography' },
     { icon: OffersIcon,        label: 'Deals and Offers', id: 'offers',        path: '/deals' },
   ];
 
@@ -145,7 +149,7 @@ export function Sidebar({ activeSection }: SidebarProps) {
         {/* Nav Items */}
         <List sx={{ px: 1, pt: 1.5, pb: 1, flex: 1 }}>
           {navItems.map((item) => {
-            const isActive = activeSection === item.id;
+            const isActive = currentActive === item.id;
             return (
               <ListItem key={item.id} disablePadding sx={{ display: 'block', mb: 0.5 }}>
                 <Tooltip title={!expanded ? item.label : ''} placement="right" arrow>

@@ -153,7 +153,7 @@ class RideHubService {
     if (!this.connection) return;
 
     // New ride request broadcast to OnlineRiders group
-    this.connection.on(HUB_EVENTS.RECEIVE_RIDE_REQUEST, (request: RideRequest) => {
+    this.connection.on(HUB_EVENTS.RECEIVE_RIDE_REQUEST, (request: NewRidePayload) => {
       this.callbacks.onRideRequest?.(request);
     });
 

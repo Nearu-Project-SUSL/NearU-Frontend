@@ -1,4 +1,4 @@
-import api from "../axios";
+import api, { axiosPrivate } from "../axios";
 
 export interface GiftProductResponseDto {
   id: string;
@@ -31,6 +31,8 @@ export interface GiftShopQueryParams {
   isActive?: boolean;
 }
 
+// ── Public reads (no auth needed) ────────────────────────────────────────────
+
 export const getGiftShops = async (params?: GiftShopQueryParams) => {
   const response = await api.get<GiftShopResponseDto[]>("/GiftShops", { params });
   return response.data;
@@ -41,27 +43,29 @@ export const getGiftShopById = async (id: string) => {
   return response.data;
 };
 
+// ── Authenticated writes (business owner / admin) ─────────────────────────────
+
 export const createGiftShop = async (formData: FormData) => {
-  const response = await api.post<GiftShopResponseDto>("/GiftShops", formData, {
+  const response = await axiosPrivate.post<GiftShopResponseDto>("/GiftShops", formData, {
     headers: { "Content-Type": "multipart/form-data" },
   });
   return response.data;
 };
 
 export const updateGiftShop = async (id: string, formData: FormData) => {
-  const response = await api.put<GiftShopResponseDto>(`/GiftShops/${id}`, formData, {
+  const response = await axiosPrivate.put<GiftShopResponseDto>(`/GiftShops/${id}`, formData, {
     headers: { "Content-Type": "multipart/form-data" },
   });
   return response.data;
 };
 
 export const deleteGiftShop = async (id: string) => {
-  const response = await api.delete<{ message: string }>(`/GiftShops/${id}`);
+  const response = await axiosPrivate.delete<{ message: string }>(`/GiftShops/${id}`);
   return response.data;
 };
 
 export const addGiftProduct = async (giftShopId: string, formData: FormData) => {
-  const response = await api.post<GiftProductResponseDto>(
+  const response = await axiosPrivate.post<GiftProductResponseDto>(
     `/GiftShops/${giftShopId}/products`,
     formData,
     { headers: { "Content-Type": "multipart/form-data" } }
@@ -70,7 +74,7 @@ export const addGiftProduct = async (giftShopId: string, formData: FormData) => 
 };
 
 export const updateGiftProduct = async (productId: string, formData: FormData) => {
-  const response = await api.put<GiftProductResponseDto>(
+  const response = await axiosPrivate.put<GiftProductResponseDto>(
     `/GiftShops/products/${productId}`,
     formData,
     { headers: { "Content-Type": "multipart/form-data" } }
@@ -79,6 +83,6 @@ export const updateGiftProduct = async (productId: string, formData: FormData) =
 };
 
 export const deleteGiftProduct = async (productId: string) => {
-  const response = await api.delete<{ message: string }>(`/GiftShops/products/${productId}`);
+  const response = await axiosPrivate.delete<{ message: string }>(`/GiftShops/products/${productId}`);
   return response.data;
 };

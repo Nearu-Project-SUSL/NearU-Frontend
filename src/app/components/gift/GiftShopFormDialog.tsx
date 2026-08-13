@@ -36,6 +36,7 @@ export default function GiftShopFormDialog({
   const [isActive, setIsActive] = useState(true);
   const [image, setImage] = useState<File | null>(null);
   const [saving, setSaving] = useState(false);
+  const [errors, setErrors] = useState<Record<string, string>>({});
 
   useEffect(() => {
     if (open) {
@@ -46,16 +47,29 @@ export default function GiftShopFormDialog({
       setAddress(initialData?.address || "");
       setIsActive(initialData?.isActive ?? true);
       setImage(null);
+      setErrors({});
     }
   }, [open, initialData]);
 
   const handleSubmit = async () => {
+    // Validate required fields
+    const newErrors: Record<string, string> = {};
+    if (!name.trim()) newErrors.name = "Shop name is required";
+    if (!locationName.trim()) newErrors.locationName = "Location name is required";
+    if (!phone.trim()) newErrors.phone = "Phone number is required";
+    if (!address.trim()) newErrors.address = "Address is required";
+    if (Object.keys(newErrors).length > 0) {
+      setErrors(newErrors);
+      return;
+    }
+    setErrors({});
+
     const formData = new FormData();
-    formData.append("Name", name);
-    formData.append("LocationName", locationName);
-    formData.append("Phone", phone);
-    formData.append("Email", email);
-    formData.append("Address", address);
+    formData.append("Name", name.trim());
+    formData.append("LocationName", locationName.trim());
+    formData.append("Phone", phone.trim());
+    formData.append("Email", email.trim());
+    formData.append("Address", address.trim());
 
     if (mode === "edit") {
       formData.append("IsActive", String(isActive));
@@ -69,6 +83,8 @@ export default function GiftShopFormDialog({
     try {
       await onSubmit(formData);
       onClose();
+    } catch (err: any) {
+      // Error is already handled by the parent (toast), just stop saving
     } finally {
       setSaving(false);
     }
@@ -82,13 +98,13 @@ export default function GiftShopFormDialog({
       maxWidth="sm"
       PaperProps={{
         sx: {
-          bgcolor: "#0a0a0a",
+          bgcolor: "var(--bg-surface)",
           borderRadius: "24px",
-          border: "1px solid rgba(255,255,255,0.08)",
+          border: "1px solid var(--nearu-border)",
         },
       }}
     >
-      <DialogTitle sx={{ color: "#fff", fontWeight: 800 }}>
+      <DialogTitle sx={{ color: "var(--text-primary)", fontWeight: 800 }}>
         {mode === "create" ? "Create Gift Shop" : "Edit Gift Shop"}
       </DialogTitle>
 
@@ -97,27 +113,33 @@ export default function GiftShopFormDialog({
           <TextField
             label="Shop Name"
             value={name}
-            onChange={(e) => setName(e.target.value)}
+            onChange={(e) => { setName(e.target.value); setErrors((p) => ({ ...p, name: "" })); }}
             fullWidth
-            InputLabelProps={{ style: { color: "rgba(255,255,255,0.55)" } }}
+            error={!!errors.name}
+            helperText={errors.name}
+            InputLabelProps={{ style: { color: "var(--text-secondary)" } }}
             sx={darkTextFieldSx}
           />
 
           <TextField
             label="Location Name"
             value={locationName}
-            onChange={(e) => setLocationName(e.target.value)}
+            onChange={(e) => { setLocationName(e.target.value); setErrors((p) => ({ ...p, locationName: "" })); }}
             fullWidth
-            InputLabelProps={{ style: { color: "rgba(255,255,255,0.55)" } }}
+            error={!!errors.locationName}
+            helperText={errors.locationName}
+            InputLabelProps={{ style: { color: "var(--text-secondary)" } }}
             sx={darkTextFieldSx}
           />
 
           <TextField
             label="Phone"
             value={phone}
-            onChange={(e) => setPhone(e.target.value)}
+            onChange={(e) => { setPhone(e.target.value); setErrors((p) => ({ ...p, phone: "" })); }}
             fullWidth
-            InputLabelProps={{ style: { color: "rgba(255,255,255,0.55)" } }}
+            error={!!errors.phone}
+            helperText={errors.phone}
+            InputLabelProps={{ style: { color: "var(--text-secondary)" } }}
             sx={darkTextFieldSx}
           />
 
@@ -126,28 +148,31 @@ export default function GiftShopFormDialog({
             value={email}
             onChange={(e) => setEmail(e.target.value)}
             fullWidth
-            InputLabelProps={{ style: { color: "rgba(255,255,255,0.55)" } }}
+            InputLabelProps={{ style: { color: "var(--text-secondary)" } }}
             sx={darkTextFieldSx}
           />
 
           <TextField
             label="Address"
             value={address}
-            onChange={(e) => setAddress(e.target.value)}
+            onChange={(e) => { setAddress(e.target.value); setErrors((p) => ({ ...p, address: "" })); }}
             fullWidth
             multiline
             rows={3}
-            InputLabelProps={{ style: { color: "rgba(255,255,255,0.55)" } }}
+            error={!!errors.address}
+            helperText={errors.address}
+            InputLabelProps={{ style: { color: "var(--text-secondary)" } }}
             sx={darkTextFieldSx}
           />
 
           <Box>
-            <Typography sx={{ color: "rgba(255,255,255,0.7)", mb: 1 }}>
+            <Typography sx={{ color: "var(--text-secondary)", mb: 1 }}>
               Shop Image
             </Typography>
             <input
               type="file"
               accept="image/*"
+              style={{ color: "var(--text-primary)" }}
               onChange={(e) => setImage(e.target.files?.[0] || null)}
             />
           </Box>
@@ -160,7 +185,7 @@ export default function GiftShopFormDialog({
                   onChange={(e) => setIsActive(e.target.checked)}
                 />
               }
-              label={<Typography sx={{ color: "#fff" }}>Active</Typography>}
+              label={<Typography sx={{ color: "var(--text-primary)" }}>Active</Typography>}
             />
           )}
 
@@ -189,9 +214,9 @@ export default function GiftShopFormDialog({
 
 const darkTextFieldSx = {
   "& .MuiOutlinedInput-root": {
-    color: "#fff",
+    color: "var(--text-primary)",
     borderRadius: "14px",
-    "& fieldset": { borderColor: "rgba(255,255,255,0.12)" },
+    "& fieldset": { borderColor: "var(--nearu-border)" },
     "&:hover fieldset": { borderColor: "rgba(46,158,191,0.35)" },
     "&.Mui-focused fieldset": { borderColor: "#2E9EBF" },
   },
@@ -207,12 +232,12 @@ const primaryBtnSx = {
 };
 
 const secondaryBtnSx = {
-  color: "#fff",
-  borderColor: "rgba(255,255,255,0.15)",
+  color: "var(--text-primary)",
+  borderColor: "var(--nearu-border)",
   textTransform: "none",
   borderRadius: "12px",
   "&:hover": {
     borderColor: "#2E9EBF",
-    bgcolor: "rgba(46,158,191,0.05)",
+    bgcolor: "var(--nearu-accent-subtle)",
   },
 };

@@ -81,7 +81,9 @@ export default function RiderProfile() {
       
       // Perform clean logout & redirection
       setAuth({ user: null, accessToken: null, refreshToken: null });
-      localStorage.removeItem('accessToken');
+      localStorage.removeItem('auth_user');
+      localStorage.removeItem('auth_accessToken');
+      localStorage.removeItem('auth_refreshToken');
       navigate('/login');
     } catch (error: any) {
       toast.error(error.response?.data?.message || 'Failed to delete account. Please check your password.');
@@ -95,11 +97,13 @@ export default function RiderProfile() {
       if (auth.refreshToken) {
         await authService.logout(auth.refreshToken);
       }
-    } catch (error) {
+    } catch (error: any) {
       console.error('Logout failed on the backend:', error);
     } finally {
       setAuth({ user: null, accessToken: null, refreshToken: null });
-      localStorage.removeItem('accessToken');
+      localStorage.removeItem('auth_user');
+      localStorage.removeItem('auth_accessToken');
+      localStorage.removeItem('auth_refreshToken');
       toast.success('Logged out successfully');
       navigate('/login');
     }

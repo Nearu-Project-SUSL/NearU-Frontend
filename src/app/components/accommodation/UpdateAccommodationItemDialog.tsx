@@ -29,11 +29,11 @@ const inputStyles = {
     borderRadius: '12px',
     bgcolor: 'rgba(255,255,255,0.03)',
     '& fieldset': { borderColor: 'rgba(255,255,255,0.1)' },
-    '&:hover fieldset': { borderColor: 'rgba(250,204,21,0.4)' },
-    '&.Mui-focused fieldset': { borderColor: '#facc15' },
+    '&:hover fieldset': { borderColor: 'rgba(46, 158, 191,0.4)' },
+    '&.Mui-focused fieldset': { borderColor: '#2e9ebf' },
   },
   '& .MuiInputLabel-root': { color: 'rgba(255,255,255,0.4)' },
-  '& .MuiInputLabel-root.Mui-focused': { color: '#facc15' },
+  '& .MuiInputLabel-root.Mui-focused': { color: '#2e9ebf' },
 };
 
 export default function UpdateAccommodationItemDialog({ item, onClose, onSubmit }: UpdateAccommodationItemDialogProps) {
@@ -158,12 +158,12 @@ export default function UpdateAccommodationItemDialog({ item, onClose, onSubmit 
                 onClick={handleSubmit}
                 disabled={loading}
                 sx={{
-                  bgcolor: '#facc15',
+                  bgcolor: '#2e9ebf',
                   color: '#000',
                   fontWeight: 700,
                   borderRadius: '12px',
                   textTransform: 'none',
-                  '&:hover': { bgcolor: '#eab308' },
+                  '&:hover': { bgcolor: '#2e9ebf' },
                 }}
               >
                 {loading ? 'Saving...' : 'Save Changes'}

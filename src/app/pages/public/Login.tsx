@@ -384,7 +384,15 @@ export default function Login() {
 
                 {/* Terms */}
                 <Typography variant="caption" sx={{ display: 'block', textAlign: 'center', color: 'gray', mt: 2 }}>
-                  By Continuing, you agree to NearU's Terms of Service and Privacy Policy.
+                  By continuing, you agree to NearU's{" "}
+                  <Link to="/terms-and-conditions" className="text-[#2E9EBF] hover:underline">
+                    Terms of Service
+                  </Link>{" "}
+                  and{" "}
+                  <Link to="/privacy-policy" className="text-[#2E9EBF] hover:underline">
+                    Privacy Policy
+                  </Link>
+                  .
                 </Typography>
               </form>
             </div>

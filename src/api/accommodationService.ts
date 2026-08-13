@@ -1,4 +1,4 @@
-import axios from "./axios";
+import axios, { axiosPrivate } from "./axios";
 import type { Accommodation } from "../app/pages/data/accommodations";
 
 const ACCOMMODATIONS_ENDPOINT = `/accommodations`;
@@ -103,19 +103,23 @@ export const getAccommodationById = async (id: string): Promise<Accommodation> =
 };
 
 export const createAccommodation = async (data: FormData): Promise<Accommodation> => {
-    const response = await axios.post<unknown>(ACCOMMODATIONS_ENDPOINT, data);
+    const response = await axiosPrivate.post<unknown>(ACCOMMODATIONS_ENDPOINT, data, {
+        headers: { 'Content-Type': 'multipart/form-data' }
+    });
     const payload = unwrapResponse<Record<string, unknown>>(response.data);
     return mapAccommodation(payload, 0);
 };
 
 export const updateAccommodation = async (id: string, data: FormData): Promise<Accommodation> => {
-    const response = await axios.put<unknown>(`${ACCOMMODATIONS_ENDPOINT}/${encodeURIComponent(id)}`, data);
+    const response = await axiosPrivate.put<unknown>(`${ACCOMMODATIONS_ENDPOINT}/${encodeURIComponent(id)}`, data, {
+        headers: { 'Content-Type': 'multipart/form-data' }
+    });
     const payload = unwrapResponse<Record<string, unknown>>(response.data);
     return mapAccommodation(payload, 0);
 };
 
 export const deleteAccommodation = async (id: string): Promise<void> => {
-    await axios.delete(`${ACCOMMODATIONS_ENDPOINT}/${encodeURIComponent(id)}`);
+    await axiosPrivate.delete(`${ACCOMMODATIONS_ENDPOINT}/${encodeURIComponent(id)}`);
 };
 
 export const fetchAccommodationItems = async (accommodationId: string): Promise<AccommodationItem[]> => {
@@ -136,21 +140,25 @@ export const getAccommodationItemById = async (accommodationId: string, itemId: 
 
 export const createAccommodationItem = async (accommodationId: string, data: FormData): Promise<AccommodationItem> => {
     const endpoint = `${ACCOMMODATIONS_ENDPOINT}/${encodeURIComponent(accommodationId)}/items`;
-    const response = await axios.post<unknown>(endpoint, data);
+    const response = await axiosPrivate.post<unknown>(endpoint, data, {
+        headers: { 'Content-Type': 'multipart/form-data' }
+    });
     const payload = unwrapResponse<Record<string, unknown>>(response.data);
     return mapAccommodationItem(payload, 0);
 };
 
 export const updateAccommodationItem = async (accommodationId: string, itemId: string, data: FormData): Promise<AccommodationItem> => {
     const endpoint = `${ACCOMMODATIONS_ENDPOINT}/${encodeURIComponent(accommodationId)}/items/${encodeURIComponent(itemId)}`;
-    const response = await axios.put<unknown>(endpoint, data);
+    const response = await axiosPrivate.put<unknown>(endpoint, data, {
+        headers: { 'Content-Type': 'multipart/form-data' }
+    });
     const payload = unwrapResponse<Record<string, unknown>>(response.data);
     return mapAccommodationItem(payload, 0);
 };
 
 export const deleteAccommodationItem = async (accommodationId: string, itemId: string): Promise<void> => {
     const endpoint = `${ACCOMMODATIONS_ENDPOINT}/${encodeURIComponent(accommodationId)}/items/${encodeURIComponent(itemId)}`;
-    await axios.delete(endpoint);
+    await axiosPrivate.delete(endpoint);
 };
 
 const accommodationService = {

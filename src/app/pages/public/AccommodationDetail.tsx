@@ -36,6 +36,7 @@ import { Sidebar } from "../../components/layout/Sidebar";
 import { PageLayout } from "../../components/layout/PageLayout";
 
 import { useAccommodation, useAccommodationItems } from "../../hooks/useAccommodation";
+import useAuth from "../../hooks/useAuth";
 import {
 	updateAccommodation,
 	deleteAccommodation,
@@ -56,11 +57,14 @@ export default function AccommodationDetail() {
 	const navigate = useNavigate();
 	const queryClient = useQueryClient();
 
-	const accentYellow = "#facc15";
+	const accentBlue = "#2e9ebf";
 	const deepBlack = "#0b0b0b";
 
 	const { data: accommodation, isLoading: loadingAcc, error: errorAcc } = useAccommodation(id || "");
 	const { data: items = [], isLoading: loadingItems } = useAccommodationItems(id || "");
+	const { auth } = useAuth();
+	
+	const canEdit = auth?.user?.roles?.includes('Admin') || auth?.user?.roles?.includes('Business');
 
 	const [openEditAcc, setOpenEditAcc] = useState(false);
 	const [openDeleteAcc, setOpenDeleteAcc] = useState(false);
@@ -134,15 +138,15 @@ export default function AccommodationDetail() {
 			<Box
 				sx={{
 					minHeight: "100vh",
-					background: `radial-gradient(circle at top right, rgba(250, 204, 21, 0.14), transparent 45%), ${deepBlack}`,
+					background: `radial-gradient(circle at top right, rgba(46, 158, 191, 0.14), transparent 45%), ${deepBlack}`,
 				}}
 			>
 				<Sidebar activeSection="accommodation" />
 				<PageLayout>
 					<Container maxWidth="md" sx={{ py: 5 }}>
-						<Card sx={{ borderRadius: 3, p: { xs: 3, md: 4 }, textAlign: "center", backgroundColor: "#121212", border: "1px solid rgba(250, 204, 21, 0.35)" }}>
+						<Card sx={{ borderRadius: 3, p: { xs: 3, md: 4 }, textAlign: "center", backgroundColor: "#121212", border: "1px solid rgba(46, 158, 191, 0.35)" }}>
 							<Stack direction="row" spacing={1.5} alignItems="center" justifyContent="center">
-								<CircularProgress size={22} sx={{ color: accentYellow }} />
+								<CircularProgress size={22} sx={{ color: accentBlue }} />
 								<Typography variant="body1" sx={{ color: "#fff" }}>
 									Loading accommodation details...
 								</Typography>
@@ -161,7 +165,7 @@ export default function AccommodationDetail() {
 					display: "flex",
 					height: "100vh",
 					overflow: "hidden",
-					background: `radial-gradient(circle at top right, rgba(250, 204, 21, 0.14), transparent 45%), ${deepBlack}`,
+					background: `radial-gradient(circle at top right, rgba(46, 158, 191, 0.14), transparent 45%), ${deepBlack}`,
 				}}
 			>
 				<Sidebar activeSection="accommodation" />
@@ -177,7 +181,7 @@ export default function AccommodationDetail() {
 								to="/accommodation"
 								variant="contained"
 								startIcon={<ArrowBackIcon />}
-								sx={{ backgroundColor: accentYellow, color: deepBlack, fontWeight: 800 }}
+								sx={{ backgroundColor: accentBlue, color: deepBlack, fontWeight: 800 }}
 							>
 								Back to Accommodation List
 							</Button>
@@ -194,7 +198,7 @@ export default function AccommodationDetail() {
 				display: "flex",
 				height: "100vh",
 				overflow: "hidden",
-				background: `radial-gradient(circle at top right, rgba(250, 204, 21, 0.16), transparent 45%), ${deepBlack}`,
+				background: `radial-gradient(circle at top right, rgba(46, 158, 191, 0.16), transparent 45%), ${deepBlack}`,
 			}}
 		>
 			<Sidebar activeSection="accommodation" />
@@ -210,10 +214,10 @@ export default function AccommodationDetail() {
 							<Link component={RouterLink} underline="hover" color="inherit" to="/accommodation">
 								Accommodation
 							</Link>
-							<Typography sx={{ color: accentYellow }}>{accommodation.title}</Typography>
+							<Typography sx={{ color: accentBlue }}>{accommodation.title}</Typography>
 						</Breadcrumbs>
 
-						<Card sx={{ borderRadius: 4, overflow: "hidden", border: "1px solid rgba(250, 204, 21, 0.35)", position: "relative" }}>
+						<Card sx={{ borderRadius: 4, overflow: "hidden", border: "1px solid rgba(46, 158, 191, 0.35)", position: "relative" }}>
 							<CardMedia
 								component="img"
 								image={accommodation.image}
@@ -221,44 +225,46 @@ export default function AccommodationDetail() {
 								height="360"
 								sx={{ height: { xs: 220, sm: 280, md: 360 } }}
 							/>
-							<Box sx={{ position: 'absolute', top: 16, right: 16, display: 'flex', gap: 1 }}>
-								<IconButton
-									sx={{ bgcolor: 'rgba(0,0,0,0.5)', color: '#fff', '&:hover': { bgcolor: accentYellow, color: '#000' } }}
-									onClick={() => setOpenEditAcc(true)}
-								>
-									<EditIcon />
-								</IconButton>
-								<IconButton
-									sx={{ bgcolor: 'rgba(0,0,0,0.5)', color: '#fff', '&:hover': { bgcolor: '#ef4444' } }}
-									onClick={() => setOpenDeleteAcc(true)}
-								>
-									<DeleteIcon />
-								</IconButton>
-							</Box>
+							{canEdit && (
+								<Box sx={{ position: 'absolute', top: 16, right: 16, display: 'flex', gap: 1 }}>
+									<IconButton
+										sx={{ bgcolor: 'rgba(0,0,0,0.5)', color: '#fff', '&:hover': { bgcolor: accentBlue, color: '#000' } }}
+										onClick={() => setOpenEditAcc(true)}
+									>
+										<EditIcon />
+									</IconButton>
+									<IconButton
+										sx={{ bgcolor: 'rgba(0,0,0,0.5)', color: '#fff', '&:hover': { bgcolor: '#ef4444' } }}
+										onClick={() => setOpenDeleteAcc(true)}
+									>
+										<DeleteIcon />
+									</IconButton>
+								</Box>
+							)}
 						</Card>
 
 						<Grid container spacing={{ xs: 2, sm: 2.5, md: 3 }}>
 							<Grid size={{ xs: 12, lg: 7 }}>
-								<Card sx={{ borderRadius: 4, backgroundColor: "#121212", border: "1px solid rgba(250, 204, 21, 0.28)" }}>
+								<Card sx={{ borderRadius: 4, backgroundColor: "#121212", border: "1px solid rgba(46, 158, 191, 0.28)" }}>
 									<CardContent>
 										<Stack spacing={2}>
 											<Stack direction="row" justifyContent="space-between" alignItems="center" flexWrap="wrap" useFlexGap>
 												<Typography variant="h4" sx={{ fontWeight: 800, color: "#fff", fontSize: { xs: "1.6rem", sm: "2rem", md: "2.2rem" } }}>
 													{accommodation.title}
 												</Typography>
-												<Chip label={accommodation.type} sx={{ backgroundColor: accentYellow, color: deepBlack, fontWeight: 700 }} />
+												<Chip label={accommodation.type} sx={{ backgroundColor: accentBlue, color: deepBlack, fontWeight: 700 }} />
 											</Stack>
 
 											<Stack direction={{ xs: "column", sm: "row" }} spacing={{ xs: 0.75, sm: 2 }} color="rgba(255,255,255,0.75)" flexWrap="wrap" useFlexGap>
 												<Stack direction="row" spacing={0.5} alignItems="center">
-													<PlaceIcon fontSize="small" sx={{ color: accentYellow }} />
+													<PlaceIcon fontSize="small" sx={{ color: accentBlue }} />
 													<Typography variant="body2">{accommodation.location}</Typography>
 												</Stack>
 												<Typography variant="body2">{accommodation.distanceKm} km to campus</Typography>
 											</Stack>
 
 											<Stack direction="row" spacing={0.5} alignItems="center">
-												<StarIcon sx={{ color: accentYellow, fontSize: 20 }} />
+												<StarIcon sx={{ color: accentBlue, fontSize: 20 }} />
 												<Typography variant="body2" sx={{ color: "#f3f3f3" }}>
 													{accommodation.rating} ({accommodation.reviews} reviews)
 												</Typography>
@@ -270,14 +276,14 @@ export default function AccommodationDetail() {
 
 											<Divider />
 
-											<Typography variant="h6" sx={{ fontWeight: 700, color: accentYellow }}>
+											<Typography variant="h6" sx={{ fontWeight: 700, color: accentBlue }}>
 												Amenities
 											</Typography>
 											<List dense>
 												{accommodation.amenities?.map((amenity) => (
 													<ListItem key={amenity} disableGutters>
 														<ListItemIcon sx={{ minWidth: 32 }}>
-															<CheckCircleIcon sx={{ color: accentYellow }} fontSize="small" />
+															<CheckCircleIcon sx={{ color: accentBlue }} fontSize="small" />
 														</ListItemIcon>
 														<ListItemText primary={amenity} primaryTypographyProps={{ sx: { color: "#f2f2f2" } }} />
 													</ListItem>
@@ -287,32 +293,36 @@ export default function AccommodationDetail() {
 											<Divider />
 
 											<Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-												<Typography variant="h6" sx={{ fontWeight: 700, color: accentYellow }}>
+												<Typography variant="h6" sx={{ fontWeight: 700, color: accentBlue }}>
 													Available Items
 												</Typography>
-												<Button
-													size="small"
-													variant="outlined"
-													startIcon={<AddIcon />}
-													onClick={() => setOpenAddItem(true)}
-													sx={{ borderColor: accentYellow, color: accentYellow, borderRadius: 2 }}
-												>
-													Add Item
-												</Button>
+												{canEdit && (
+													<Button
+														size="small"
+														variant="outlined"
+														startIcon={<AddIcon />}
+														onClick={() => setOpenAddItem(true)}
+														sx={{ borderColor: accentBlue, color: accentBlue, borderRadius: 2 }}
+													>
+														Add Item
+													</Button>
+												)}
 											</Box>
 
 											{items.length > 0 ? (
 												<List dense>
 													{items.map((item) => (
 														<ListItem key={item.id} disableGutters secondaryAction={
-															<Box>
-																<IconButton edge="end" onClick={() => setItemToEdit(item)} sx={{ color: 'rgba(255,255,255,0.6)', '&:hover': { color: accentYellow } }}>
-																	<EditIcon fontSize="small" />
-																</IconButton>
-																<IconButton edge="end" onClick={() => setItemToDelete(item)} sx={{ color: 'rgba(255,255,255,0.6)', '&:hover': { color: '#ef4444' } }}>
-																	<DeleteIcon fontSize="small" />
-																</IconButton>
-															</Box>
+															canEdit ? (
+																<Box>
+																	<IconButton edge="end" onClick={() => setItemToEdit(item)} sx={{ color: 'rgba(255,255,255,0.6)', '&:hover': { color: accentBlue } }}>
+																		<EditIcon fontSize="small" />
+																	</IconButton>
+																	<IconButton edge="end" onClick={() => setItemToDelete(item)} sx={{ color: 'rgba(255,255,255,0.6)', '&:hover': { color: '#ef4444' } }}>
+																		<DeleteIcon fontSize="small" />
+																	</IconButton>
+																</Box>
+															) : null
 														}>
 															<ListItemText
 																primary={`${item.name} - LKR ${item.price.toLocaleString()}`}
@@ -334,10 +344,10 @@ export default function AccommodationDetail() {
 							</Grid>
 
 							<Grid size={{ xs: 12, lg: 5 }}>
-								<Card sx={{ borderRadius: 4, backgroundColor: "#121212", border: "1px solid rgba(250, 204, 21, 0.35)" }}>
+								<Card sx={{ borderRadius: 4, backgroundColor: "#121212", border: "1px solid rgba(46, 158, 191, 0.35)" }}>
 									<CardContent>
 										<Stack spacing={2}>
-											<Typography variant="h5" sx={{ fontWeight: 800, color: accentYellow, fontSize: { xs: "1.3rem", sm: "1.5rem" } }}>
+											<Typography variant="h5" sx={{ fontWeight: 800, color: accentBlue, fontSize: { xs: "1.3rem", sm: "1.5rem" } }}>
 												LKR {accommodation.monthlyRent.toLocaleString()} / month
 											</Typography>
 											<Typography variant="body2" sx={{ color: "rgba(255,255,255,0.74)" }}>
@@ -353,10 +363,10 @@ export default function AccommodationDetail() {
 												component="a"
 												href={`tel:${accommodation.contactPhone}`}
 												sx={{
-													backgroundColor: accentYellow,
+													backgroundColor: accentBlue,
 													color: deepBlack,
 													fontWeight: 800,
-													"&:hover": { backgroundColor: "#facc15" },
+													"&:hover": { backgroundColor: "#2e9ebf" },
 												}}
 											>
 												Call Owner
@@ -366,7 +376,7 @@ export default function AccommodationDetail() {
 												to="/accommodation"
 												variant="outlined"
 												startIcon={<ArrowBackIcon />}
-												sx={{ borderColor: accentYellow, color: accentYellow, fontWeight: 700 }}
+												sx={{ borderColor: accentBlue, color: accentBlue, fontWeight: 700 }}
 											>
 												Back to List
 											</Button>

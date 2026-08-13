@@ -14,6 +14,7 @@ export interface DealResponseDto {
   validTo: string | null;
   submittedByUserId: string;
   submittedByName: string;
+  shopAddress: string | null;
   approvalStatus: string;
   rejectionReason: string | null;
   createdAt: string;
@@ -67,4 +68,8 @@ export const rejectDeal = async (dealId: string, reason?: string): Promise<DealR
     { reason }
   );
   return response.data.data!;
+};
+
+export const deleteDeal = async (dealId: string): Promise<void> => {
+  await axiosPrivate.delete(`/deals/${dealId}`);
 };

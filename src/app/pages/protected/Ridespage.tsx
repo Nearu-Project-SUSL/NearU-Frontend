@@ -338,7 +338,7 @@ export default function RidesPage() {
 
     conn.on(
       'RideStateChanged',
-      (data: { rideId: string; status: string; otp?: string; otpExpiresAt?: string  }) => {
+      (data: { rideId: string; status: string; otp?: string; otpExpiresAt?: string }) => {
         if (data.rideId !== ride.rideId) return;
 
         // Push every status change to the notification bell
@@ -367,12 +367,12 @@ export default function RidesPage() {
         switch (data.status) {
           case 'Accepted':
             setRide(r => r ? {
-            ...r,
-            otp: data.otp,
-            otpExpiresAt: data.otpExpiresAt,
-          } : r);
-          setScreen('accepted');
-          break;
+              ...r,
+              otp: data.otp,
+              otpExpiresAt: data.otpExpiresAt,
+            } : r);
+            setScreen('accepted');
+            break;
 
           case 'Arrived':
             break;
@@ -426,9 +426,9 @@ export default function RidesPage() {
         );
       }
     );
-    
+
     // Live location updates
-    
+
     conn.on(
       'LocationUpdated',
       (data: {
@@ -438,7 +438,7 @@ export default function RidesPage() {
         distanceToPickupKm?: number;
       }) => {
         if (data.rideId !== ride.rideId) return;
-        
+
         setRide(r =>
           r
             ? {
@@ -458,14 +458,34 @@ export default function RidesPage() {
       conn.stop();
       hubRef.current = null;
     };
-
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [ride?.rideId]);
+
+  useEffect(() => {
+    if (screen !== 'accepted' || ride?.otp) return;
+
+    const interval = setInterval(async () => {
+      try {
+        const res = await RidesApi.getActiveRide();
+        if (res.data?.otp) {
+          setRide(r => r ? { 
+            ...r, 
+            otp: res.data.otp, 
+            otpExpiresAt: res.data.otpExpiresAt 
+          } : r);
+          clearInterval(interval);
+        }
+      } catch {
+        // ignore
+      }
+    }, 2000);
+
+    return () => clearInterval(interval);
+  }, [screen, ride?.otp]);
 
   function reset() {
     setRide(null);
     setScreen('request');
-
     hubRef.current?.stop();
   }
 

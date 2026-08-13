@@ -98,9 +98,9 @@ export default function GiftDetailsDialog({
         fullWidth
         PaperProps={{
           sx: {
-            bgcolor: "#0a0a0a",
+            bgcolor: "var(--bg-surface)",
             borderRadius: { xs: 0, md: "28px" },
-            border: "1px solid rgba(255,255,255,0.08)",
+            border: "1px solid var(--nearu-border)",
             m: { xs: 0, md: 2 },
           },
         }}
@@ -120,7 +120,7 @@ export default function GiftDetailsDialog({
                 position: "absolute",
                 inset: 0,
                 background:
-                  "linear-gradient(to top, rgba(10,10,10,1), rgba(10,10,10,0.15))",
+                  "linear-gradient(to top, var(--bg-surface), transparent)",
               }}
             />
             <IconButton
@@ -148,12 +148,12 @@ export default function GiftDetailsDialog({
               }}
             >
               <Box>
-                <Typography variant="h4" sx={{ color: "#fff", fontWeight: 800 }}>
+                <Typography variant="h4" sx={{ color: "var(--text-primary)", fontWeight: 800 }}>
                   {shop.name}
                 </Typography>
                 <Stack direction="row" spacing={1} alignItems="center" sx={{ mt: 1 }}>
                   <LocationOnIcon sx={{ color: "#2E9EBF", fontSize: 18 }} />
-                  <Typography sx={{ color: "rgba(255,255,255,0.75)" }}>
+                  <Typography sx={{ color: "var(--text-secondary)" }}>
                     {shop.locationName}
                   </Typography>
                   <Chip
@@ -195,16 +195,16 @@ export default function GiftDetailsDialog({
                   sx={{
                     p: 3,
                     borderRadius: "20px",
-                    bgcolor: "rgba(255,255,255,0.03)",
-                    border: "1px solid rgba(255,255,255,0.06)",
+                    bgcolor: "var(--bg-elevated)",
+                    border: "1px solid var(--nearu-border)",
                   }}
                 >
-                  <Typography sx={{ color: "#fff", fontWeight: 700, mb: 2 }}>
+                  <Typography sx={{ color: "var(--text-primary)", fontWeight: 700, mb: 2 }}>
                     Shop Details
                   </Typography>
 
                   <Stack spacing={1.8}>
-                    <Typography sx={{ color: "rgba(255,255,255,0.65)" }}>
+                    <Typography sx={{ color: "var(--text-secondary)" }}>
                       {shop.address}
                     </Typography>
 
@@ -240,7 +240,7 @@ export default function GiftDetailsDialog({
                     flexWrap: "wrap",
                   }}
                 >
-                  <Typography sx={{ color: "#fff", fontWeight: 800, fontSize: "1.2rem" }}>
+                  <Typography sx={{ color: "var(--text-primary)", fontWeight: 800, fontSize: "1.2rem" }}>
                     Products
                   </Typography>
                   <Button
@@ -261,8 +261,8 @@ export default function GiftDetailsDialog({
                           sx={{
                             borderRadius: "18px",
                             overflow: "hidden",
-                            border: "1px solid rgba(255,255,255,0.06)",
-                            bgcolor: "rgba(255,255,255,0.03)",
+                            border: "1px solid var(--nearu-border)",
+                            bgcolor: "var(--bg-elevated)",
                           }}
                         >
                           <Box
@@ -274,7 +274,7 @@ export default function GiftDetailsDialog({
                             }}
                           />
                           <Box sx={{ p: 2 }}>
-                            <Typography sx={{ color: "#fff", fontWeight: 700, mb: 0.6 }}>
+                            <Typography sx={{ color: "var(--text-primary)", fontWeight: 700, mb: 0.6 }}>
                               {product.name}
                             </Typography>
                             <Typography sx={{ color: "#2E9EBF", fontWeight: 800, mb: 1.5 }}>
@@ -315,11 +315,11 @@ export default function GiftDetailsDialog({
                           p: 4,
                           borderRadius: "18px",
                           textAlign: "center",
-                          bgcolor: "rgba(255,255,255,0.02)",
-                          border: "1px dashed rgba(255,255,255,0.08)",
+                          bgcolor: "var(--bg-surface)",
+                          border: "1px dashed var(--nearu-border)",
                         }}
                       >
-                        <Typography sx={{ color: "rgba(255,255,255,0.5)" }}>
+                        <Typography sx={{ color: "var(--text-secondary)" }}>
                           No products added yet.
                         </Typography>
                       </Box>
@@ -381,13 +381,13 @@ const primaryBtnSx = {
 };
 
 const secondaryBtnSx = {
-  color: "#fff",
-  borderColor: "rgba(255,255,255,0.15)",
+  color: "var(--text-primary)",
+  borderColor: "var(--nearu-border)",
   textTransform: "none",
   borderRadius: "12px",
   "&:hover": {
     borderColor: "#2E9EBF",
-    bgcolor: "rgba(46,158,191,0.05)",
+    bgcolor: "var(--nearu-accent-subtle)",
   },
 };
 
@@ -404,13 +404,13 @@ const dangerBtnSx = {
 
 const contactBtnSx = {
   justifyContent: "flex-start",
-  color: "#fff",
-  border: "1px solid rgba(255,255,255,0.08)",
-  bgcolor: "rgba(255,255,255,0.03)",
+  color: "var(--text-primary)",
+  border: "1px solid var(--nearu-border)",
+  bgcolor: "var(--bg-surface)",
   textTransform: "none",
   borderRadius: "12px",
   "&:hover": {
-    bgcolor: "rgba(46,158,191,0.06)",
+    bgcolor: "var(--nearu-accent-subtle)",
     borderColor: "rgba(46, 158, 191, 0.35)",
   },
 };

@@ -23,16 +23,16 @@ export default function GiftCard({ shop }: GiftCardProps) {
     <Card
       elevation={0}
       sx={{
-        bgcolor: "rgba(255,255,255,0.02)",
+        bgcolor: "var(--bg-surface)",
         borderRadius: "24px",
         overflow: "hidden",
-        border: "1px solid rgba(255,255,255,0.06)",
+        border: "1px solid var(--nearu-border)",
         transition: "all 0.3s ease",
         "&:hover": {
           transform: "translateY(-6px)",
           borderColor: "rgba(46, 158, 191, 0.35)",
-          boxShadow: "0 20px 40px rgba(0,0,0,0.35)",
-          bgcolor: "rgba(46,158,191,0.03)",
+          boxShadow: "0 12px 30px var(--nearu-accent-subtle)",
+          bgcolor: "var(--bg-elevated)",
         },
       }}
     >
@@ -88,7 +88,7 @@ export default function GiftCard({ shop }: GiftCardProps) {
         <Box sx={{ p: 2.5 }}>
           <Typography
             sx={{
-              color: "rgba(255,255,255,0.55)",
+              color: "var(--text-secondary)",
               fontSize: "0.9rem",
               minHeight: 46,
               mb: 2,
@@ -102,13 +102,14 @@ export default function GiftCard({ shop }: GiftCardProps) {
               firstProducts.map((product) => (
                 <Chip
                   key={product.id}
-                  icon={<LocalOfferIcon />}
+                  icon={<LocalOfferIcon sx={{ fontSize: 14, color: "var(--nearu-accent) !important" }} />}
                   label={`${product.name} - Rs. ${Number(product.price).toLocaleString()}`}
                   size="small"
                   sx={{
-                    bgcolor: "rgba(255,255,255,0.04)",
-                    color: "rgba(255,255,255,0.72)",
-                    border: "1px solid rgba(255,255,255,0.05)",
+                    bgcolor: "var(--nearu-accent-subtle)",
+                    color: "var(--text-primary)",
+                    border: "1px solid var(--nearu-border)",
+                    fontWeight: 600,
                   }}
                 />
               ))
@@ -117,8 +118,8 @@ export default function GiftCard({ shop }: GiftCardProps) {
                 label="No products yet"
                 size="small"
                 sx={{
-                  bgcolor: "rgba(255,255,255,0.04)",
-                  color: "rgba(255,255,255,0.5)",
+                  bgcolor: "var(--bg-elevated)",
+                  color: "var(--text-secondary)",
                 }}
               />
             )}

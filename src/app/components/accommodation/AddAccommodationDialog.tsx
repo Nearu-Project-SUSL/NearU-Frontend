@@ -37,11 +37,11 @@ const inputStyles = {
     borderRadius: '12px',
     bgcolor: 'rgba(255,255,255,0.03)',
     '& fieldset': { borderColor: 'rgba(255,255,255,0.1)' },
-    '&:hover fieldset': { borderColor: 'rgba(250,204,21,0.4)' },
-    '&.Mui-focused fieldset': { borderColor: '#facc15' },
+    '&:hover fieldset': { borderColor: 'rgba(46, 158, 191,0.4)' },
+    '&.Mui-focused fieldset': { borderColor: '#2e9ebf' },
   },
   '& .MuiInputLabel-root': { color: 'rgba(255,255,255,0.4)' },
-  '& .MuiInputLabel-root.Mui-focused': { color: '#facc15' },
+  '& .MuiInputLabel-root.Mui-focused': { color: '#2e9ebf' },
   '& .MuiSelect-icon': { color: 'rgba(255,255,255,0.4)' },
 };
 
@@ -170,7 +170,7 @@ export default function AddAccommodationDialog({ open, onClose, onSubmit }: AddA
                 '&:hover': { bgcolor: 'rgba(0,0,0,0.6)' },
               }}
             >
-              <CameraIcon sx={{ color: '#facc15', fontSize: 28, mb: 0.5 }} />
+              <CameraIcon sx={{ color: '#2e9ebf', fontSize: 28, mb: 0.5 }} />
               <Typography variant="caption" sx={{ color: 'rgba(255,255,255,0.7)' }}>
                 {photoPreview ? 'Change Photo' : 'Upload Photo'}
               </Typography>
@@ -290,12 +290,12 @@ export default function AddAccommodationDialog({ open, onClose, onSubmit }: AddA
               onClick={handleSubmit}
               disabled={loading}
               sx={{
-                bgcolor: '#facc15',
+                bgcolor: '#2e9ebf',
                 color: '#000',
                 fontWeight: 700,
                 borderRadius: '12px',
                 textTransform: 'none',
-                '&:hover': { bgcolor: '#eab308' },
+                '&:hover': { bgcolor: '#2e9ebf' },
               }}
             >
               {loading ? 'Adding...' : 'Add Accommodation'}
