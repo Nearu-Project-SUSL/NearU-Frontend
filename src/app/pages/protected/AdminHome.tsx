@@ -47,6 +47,7 @@ import adminService, { AdminStats, AdminRider, AdminBusiness } from '../../../ap
 import { rideHub } from '../../services/rideHubService';
 import { toast } from 'sonner';
 import { useNearUTheme } from '../../context/ThemeContext';
+import AdminTransportManager from '../../components/transport/AdminTransportManager';
 
 
 export default function AdminHome() {
@@ -811,6 +812,9 @@ export default function AdminHome() {
                 </Table>
               </TableContainer>
             </Paper>
+
+            {/* ── Transport Management (Buses, Trains, Tuk-Tuks) ─────── */}
+            <AdminTransportManager />
 
           </Container>
         </PageLayout>

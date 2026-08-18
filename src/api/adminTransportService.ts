@@ -64,6 +64,16 @@ export const adminTransportService = (client: AxiosInstance) => ({
     console.warn('[adminTransportService] deactivateTrainRoute: endpoint not yet implemented on backend.');
   },
 
+  // ─── TukTuk Drivers ────────────────────────────────────────────────
+  // Backend: [Route("api/[controller]")] → /api/TukTukDrivers
+  getTukTukDrivers: async () => unwrap<any[]>(await client.get('/tuktukdrivers')),
+  getTukTukDriverById: async (id: string | number) => unwrap<any>(await client.get(`/tuktukdrivers/${id}`)),
+  createTukTukDriver: async (payload: any) =>
+    unwrap<any>(await client.post('/tuktukdrivers', payload)),
+  updateTukTukDriver: async (id: string | number, payload: any) =>
+    unwrap<any>(await client.put(`/tuktukdrivers/${id}`, payload)),
+  deleteTukTukDriver: async (id: string | number) => unwrap<void>(await client.delete(`/tuktukdrivers/${id}`)),
+
   // ─── Riders (Admin) ────────────────────────────────────────────────
   // Backend: GET /api/admin/riders, PUT /api/admin/riders/{id}/approve|reject|suspend
   getRiders: async (): Promise<AdminRider[]> => {

@@ -18,6 +18,7 @@
  */
 
 import { useState, useRef, useEffect, useCallback } from 'react';
+import { createPortal } from 'react-dom';
 import { useNavigate } from 'react-router';
 import {
   Bell, X, Check, CheckCheck,
@@ -231,7 +232,13 @@ function FilterPill({
 // ─────────────────────────────────────────────────────────────────────────────
 // NotificationPanel — panel body (bell is external / caller-owned)
 // ─────────────────────────────────────────────────────────────────────────────
-export function NotificationPanel({ onClose }: { onClose?: () => void }) {
+export function NotificationPanel({
+  onClose,
+  isMobileSheet = false,
+}: {
+  onClose?: () => void;
+  isMobileSheet?: boolean;
+}) {
   const [, setTick] = useState(0);
   const [activeFilter, setActiveFilter] = useState<NotificationType | 'all'>('all');
   const navigate = useNavigate();
@@ -270,14 +277,17 @@ export function NotificationPanel({ onClose }: { onClose?: () => void }) {
 
   return (
     <div
-      className="notif-panel w-full flex flex-col"
+      className={`notif-panel w-full flex flex-col ${isMobileSheet ? 'notif-panel-mobile' : ''}`}
       role="dialog"
       aria-label="Notifications"
       aria-modal="true"
     >
       {/* ── Top grab handle (mobile only) ────────── */}
-      <div className="sm:hidden flex justify-center pt-3 pb-1 flex-shrink-0">
-        <div className="w-9 h-1 rounded-full bg-white/20" />
+      <div
+        className="sm:hidden flex justify-center pt-3 pb-1 flex-shrink-0 cursor-pointer"
+        onClick={onClose}
+      >
+        <div className="w-10 h-1 rounded-full bg-white/25 hover:bg-white/40 transition-colors" />
       </div>
 
       {/* ── Header ───────────────────────────────── */}
@@ -414,8 +424,8 @@ export function NotificationPanel({ onClose }: { onClose?: () => void }) {
         /* Panel container */
         .notif-panel {
           background: linear-gradient(160deg,
-            rgba(14,16,28,0.97) 0%,
-            rgba(10,12,22,0.98) 100%
+            rgba(14,16,28,0.98) 0%,
+            rgba(10,12,22,0.99) 100%
           );
           backdrop-filter: blur(32px) saturate(180%);
           -webkit-backdrop-filter: blur(32px) saturate(180%);
@@ -427,6 +437,16 @@ export function NotificationPanel({ onClose }: { onClose?: () => void }) {
             0 8px 32px rgba(0,0,0,0.5),
             0 0 60px rgba(34,211,238,0.04);
           overflow: hidden;
+        }
+
+        .notif-panel-mobile {
+          border-radius: 24px 24px 0 0 !important;
+          border-bottom: none !important;
+          border-left: none !important;
+          border-right: none !important;
+          border-top: 1px solid rgba(255,255,255,0.14) !important;
+          max-height: 85vh;
+          padding-bottom: calc(env(safe-area-inset-bottom, 16px) + 8px);
         }
 
         /* Notification row */
@@ -448,26 +468,38 @@ export function NotificationPanel({ onClose }: { onClose?: () => void }) {
           to   { opacity: 1; transform: translateY(0) scale(1); }
         }
         @keyframes notifSlideUp {
-          from { opacity: 0; transform: translateY(24px) scale(0.97); }
-          to   { opacity: 1; transform: translateY(0) scale(1); }
+          from { opacity: 0; transform: translateY(100%); }
+          to   { opacity: 1; transform: translateY(0); }
+        }
+        @keyframes notifBackdropFadeIn {
+          from { opacity: 0; }
+          to   { opacity: 1; }
         }
 
         /* Scrollbar */
-        .notif-scroll { scrollbar-width: thin; scrollbar-color: rgba(34,211,238,0.15) transparent; }
+        .notif-scroll {
+          scrollbar-width: thin;
+          scrollbar-color: rgba(34,211,238,0.15) transparent;
+          -webkit-overflow-scrolling: touch;
+        }
         .notif-scroll::-webkit-scrollbar { width: 3px; }
         .notif-scroll::-webkit-scrollbar-track { background: transparent; }
         .notif-scroll::-webkit-scrollbar-thumb { background: rgba(34,211,238,0.15); border-radius: 3px; }
         .notif-scroll::-webkit-scrollbar-thumb:hover { background: rgba(34,211,238,0.3); }
 
         /* Filter scroll */
-        .notif-filter-scroll { scrollbar-width: none; }
+        .notif-filter-scroll {
+          scrollbar-width: none;
+          -webkit-overflow-scrolling: touch;
+        }
         .notif-filter-scroll::-webkit-scrollbar { display: none; }
 
         /* Desktop panel entrance */
         .notif-desktop-enter { animation: notifSlideDown 0.2s cubic-bezier(0.16,1,0.3,1) both; }
 
-        /* Mobile sheet entrance */
-        .notif-mobile-enter { animation: notifSlideUp 0.28s cubic-bezier(0.16,1,0.3,1) both; }
+        /* Mobile sheet & backdrop entrance */
+        .notif-sheet-enter { animation: notifSlideUp 0.3s cubic-bezier(0.16,1,0.3,1) both; }
+        .notif-backdrop-enter { animation: notifBackdropFadeIn 0.2s ease-out both; }
       `}</style>
     </div>
   );
@@ -482,11 +514,13 @@ export function NotificationDropdown() {
   const wrapRef = useRef<HTMLDivElement>(null);
   const unreadCount = useNotificationStore((s) => s.unreadCount());
 
-  // Close on outside click
+  // Close on outside click (desktop only — mobile uses full-screen backdrop)
   useEffect(() => {
     if (!isOpen) return;
     const handler = (e: MouseEvent) => {
-      if (wrapRef.current && !wrapRef.current.contains(e.target as Node)) setIsOpen(false);
+      if (window.innerWidth >= 640) {
+        if (wrapRef.current && !wrapRef.current.contains(e.target as Node)) setIsOpen(false);
+      }
     };
     document.addEventListener('mousedown', handler);
     return () => document.removeEventListener('mousedown', handler);
@@ -496,11 +530,12 @@ export function NotificationDropdown() {
   useEffect(() => {
     const isMobile = window.innerWidth < 640;
     if (isOpen && isMobile) {
+      const prevOverflow = document.body.style.overflow;
       document.body.style.overflow = 'hidden';
-    } else {
-      document.body.style.overflow = '';
+      return () => {
+        document.body.style.overflow = prevOverflow;
+      };
     }
-    return () => { document.body.style.overflow = ''; };
   }, [isOpen]);
 
   return (
@@ -553,30 +588,33 @@ export function NotificationDropdown() {
       {/* Panel */}
       {isOpen && (
         <>
-          {/* Mobile backdrop */}
+          {/* Desktop dropdown */}
           <div
-            className="fixed inset-0 bg-black/70 backdrop-blur-sm z-[9998] sm:hidden"
-            onClick={() => setIsOpen(false)}
-            aria-hidden="true"
-          />
-
-          {/* Desktop: dropdown | Mobile: bottom sheet */}
-          <div
-            className={`
-              fixed sm:absolute z-[9999]
-              /* Mobile: anchored to bottom, full width with padding */
-              bottom-0 left-0 right-0 sm:bottom-auto
-              /* Desktop: anchored below bell, right-aligned, max-width */
-              sm:top-full sm:left-auto sm:right-0 sm:mt-2
-              /* Width */
-              sm:w-[400px]
-              /* Mobile sheet rounding */
-              rounded-t-3xl sm:rounded-2xl
-              notif-mobile-enter sm:notif-desktop-enter
-            `}
+            className="hidden sm:block absolute top-full right-0 mt-2 z-[9999] w-[400px] notif-desktop-enter"
           >
             <NotificationPanel onClose={() => setIsOpen(false)} />
           </div>
+
+          {/* Mobile bottom sheet rendered via Portal into document.body */}
+          {typeof document !== 'undefined' && createPortal(
+            <div className="sm:hidden fixed inset-0 z-[99999] pointer-events-auto">
+              {/* Mobile backdrop */}
+              <div
+                className="absolute inset-0 bg-black/70 backdrop-blur-sm notif-backdrop-enter"
+                onClick={() => setIsOpen(false)}
+                aria-hidden="true"
+              />
+
+              {/* Bottom Sheet */}
+              <div
+                className="absolute bottom-0 left-0 right-0 z-10 notif-sheet-enter max-h-[85vh] flex flex-col"
+                onClick={(e) => e.stopPropagation()}
+              >
+                <NotificationPanel onClose={() => setIsOpen(false)} isMobileSheet />
+              </div>
+            </div>,
+            document.body
+          )}
         </>
       )}
     </div>
