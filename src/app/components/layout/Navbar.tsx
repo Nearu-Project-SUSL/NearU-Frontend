@@ -1,4 +1,5 @@
 import { useState, useRef, useEffect } from 'react';
+import { createPortal } from 'react-dom';
 import { Link } from 'react-router';
 import useAuth from '../../hooks/useAuth';
 import { useSidebar } from '../../context/SidebarContext';
@@ -42,16 +43,30 @@ export default function Navbar() {
   const [notifOpen, setNotifOpen] = useState(false);
   const notifRef  = useRef<HTMLDivElement>(null);
 
-  // Close on outside click
+  // Close on outside click (desktop only — mobile uses full-screen backdrop)
   useEffect(() => {
     if (!notifOpen) return;
     const handler = (e: MouseEvent) => {
-      if (notifRef.current && !notifRef.current.contains(e.target as Node)) {
-        setNotifOpen(false);
+      if (window.innerWidth >= 600) {
+        if (notifRef.current && !notifRef.current.contains(e.target as Node)) {
+          setNotifOpen(false);
+        }
       }
     };
     document.addEventListener('mousedown', handler);
     return () => document.removeEventListener('mousedown', handler);
+  }, [notifOpen]);
+
+  // Lock scroll on mobile when notification bottom sheet is open
+  useEffect(() => {
+    const isMobile = window.innerWidth < 600;
+    if (notifOpen && isMobile) {
+      const prevOverflow = document.body.style.overflow;
+      document.body.style.overflow = 'hidden';
+      return () => {
+        document.body.style.overflow = prevOverflow;
+      };
+    }
   }, [notifOpen]);
 
   const getHomePath  = () => getHomePathForRoles(auth?.user?.roles);
@@ -166,45 +181,68 @@ export default function Navbar() {
               </IconButton>
             </Tooltip>
 
-            {/* Floating panel — rendered inside the same ref box */}
+            {/* Floating panel — rendered inside the same ref box for desktop, Portal for mobile */}
             {notifOpen && (
               <>
-                {/* Mobile backdrop — panel itself handles bottom-sheet layout */}
-                <Box
-                  onClick={() => setNotifOpen(false)}
-                  sx={{
-                    display: { xs: 'block', sm: 'none' },
-                    position: 'fixed',
-                    inset: 0,
-                    bgcolor: 'rgba(0, 0, 0, 0.7)',
-                    backdropFilter: 'blur(6px)',
-                    zIndex: 9998,
-                  }}
-                />
                 {/* Desktop dropdown */}
-                <Box sx={{
-                  display: { xs: 'none', sm: 'block' },
-                  position: 'absolute',
-                  top: 'calc(100% + 8px)',
-                  right: 0,
-                  zIndex: 9999,
-                  width: 400,
-                }}
+                <Box
+                  sx={{
+                    display: { xs: 'none', sm: 'block' },
+                    position: 'absolute',
+                    top: 'calc(100% + 8px)',
+                    right: 0,
+                    zIndex: 9999,
+                    width: 400,
+                  }}
+                  className="notif-desktop-enter"
                 >
                   <NotificationPanel onClose={() => setNotifOpen(false)} />
                 </Box>
-                {/* Mobile bottom sheet */}
-                <Box sx={{
-                  display: { xs: 'block', sm: 'none' },
-                  position: 'fixed',
-                  bottom: 0,
-                  left: 0,
-                  right: 0,
-                  zIndex: 9999,
-                }}
-                >
-                  <NotificationPanel onClose={() => setNotifOpen(false)} />
-                </Box>
+
+                {/* Mobile bottom sheet & backdrop (teleported to document.body) */}
+                {typeof document !== 'undefined' && createPortal(
+                  <Box
+                    sx={{
+                      display: { xs: 'block', sm: 'none' },
+                      position: 'fixed',
+                      inset: 0,
+                      zIndex: 99999,
+                      pointerEvents: 'auto',
+                    }}
+                  >
+                    {/* Backdrop */}
+                    <Box
+                      onClick={() => setNotifOpen(false)}
+                      aria-hidden="true"
+                      className="notif-backdrop-enter"
+                      sx={{
+                        position: 'absolute',
+                        inset: 0,
+                        bgcolor: 'rgba(0, 0, 0, 0.7)',
+                        backdropFilter: 'blur(6px)',
+                        WebkitBackdropFilter: 'blur(6px)',
+                      }}
+                    />
+                    {/* Bottom sheet */}
+                    <Box
+                      onClick={(e) => e.stopPropagation()}
+                      className="notif-sheet-enter"
+                      sx={{
+                        position: 'absolute',
+                        bottom: 0,
+                        left: 0,
+                        right: 0,
+                        maxHeight: '85vh',
+                        display: 'flex',
+                        flexDirection: 'column',
+                        zIndex: 1,
+                      }}
+                    >
+                      <NotificationPanel onClose={() => setNotifOpen(false)} isMobileSheet />
+                    </Box>
+                  </Box>,
+                  document.body
+                )}
               </>
             )}
           </Box>
