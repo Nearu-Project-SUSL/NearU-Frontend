@@ -36,7 +36,9 @@ export default function PhotographerCard({
 }: PhotographerCardProps) {
   const [hovered, setHovered] = useState(false);
   const theme = useTheme();
-  const { user } = useAuth();
+  const { auth } = useAuth();
+  const user = auth?.user;
+  const userId = user?.id || (user as any)?.userId;
   const accent = "#2E9EBF";
 
   const isBusinessOwnerOrAdmin =
@@ -47,7 +49,7 @@ export default function PhotographerCard({
   const isOwnerOrAdmin =
     isBusinessOwnerOrAdmin &&
     (user?.roles?.some((role: string) => ["Admin", "SuperAdmin"].includes(role)) ||
-      photographer.ownerId === user?.id);
+      photographer.ownerId === userId);
 
   return (
     <Card
