@@ -52,7 +52,9 @@ import {
 } from "../../../api/services/photographerApi";
 
 export default function Photography() {
-  const { user } = useAuth();
+  const { auth } = useAuth();
+  const user = auth?.user;
+  const userId = user?.id || (user as any)?.userId;
   const [searchTerm, setSearchTerm] = useState("");
 
   // Modals & Active Selections
@@ -78,7 +80,7 @@ export default function Photography() {
   const canManagePhotographer = (photographer?: PhotographerResponseDto | null) => {
     if (!photographer || !user) return false;
     const isAdmin = user.roles?.some((role: string) => ["Admin", "SuperAdmin"].includes(role));
-    return isBusinessOwner && (isAdmin || photographer.ownerId === user.id);
+    return isBusinessOwner && (isAdmin || photographer.ownerId === userId);
   };
 
   const { data: photographers = [], isLoading, refetch } = usePhotographers({ keyword: searchTerm });
