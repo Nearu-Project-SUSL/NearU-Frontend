@@ -31,7 +31,8 @@ import {
   Notifications as BellIcon,
   ChevronRight as ChevronRightIcon,
   DirectionsBike as BikeIcon,
-  History as HistoryIcon
+  History as HistoryIcon,
+  Devices as DevicesIcon,
 } from '@mui/icons-material';
 import useAuth from '../../hooks/useAuth';
 import Navbar from '../../components/layout/Navbar';
@@ -50,6 +51,10 @@ export default function RiderProfile() {
   const [deletePassword, setDeletePassword] = useState('');
   const [deletingAccount, setDeletingAccount] = useState(false);
   const [deleteCountdown, setDeleteCountdown] = useState(3);
+
+  // Logout all devices states
+  const [openLogoutAllModal, setOpenLogoutAllModal] = useState(false);
+  const [loggingOutAll, setLoggingOutAll] = useState(false);
 
   const userId = auth?.user?.id || (auth?.user as any)?.userId;
   const isGuest = userId === 'guest';
@@ -105,6 +110,27 @@ export default function RiderProfile() {
       localStorage.removeItem('auth_accessToken');
       localStorage.removeItem('auth_refreshToken');
       toast.success('Logged out successfully');
+      navigate('/login');
+    }
+  };
+
+  const handleLogoutAll = async () => {
+    setLoggingOutAll(true);
+    try {
+      if (!isGuest) {
+        await authService.logoutAll();
+      }
+    } catch (error: any) {
+      console.error('Logout all devices failed on the backend:', error);
+    } finally {
+      setAuth({ user: null, accessToken: null, refreshToken: null });
+      localStorage.removeItem('auth_user');
+      localStorage.removeItem('auth_accessToken');
+      localStorage.removeItem('auth_refreshToken');
+      window.dispatchEvent(new Event('auth_logout'));
+      setLoggingOutAll(false);
+      setOpenLogoutAllModal(false);
+      toast.success('Logged out from all devices successfully');
       navigate('/login');
     }
   };
@@ -239,6 +265,18 @@ export default function RiderProfile() {
                     <Divider sx={{ borderColor: 'rgba(255, 255, 255, 0.05)' }} />
 
                     <ListItem 
+                      onClick={() => setOpenLogoutAllModal(true)}
+                      sx={{ py: 2, px: 3, cursor: 'pointer', '&:hover': { bgcolor: 'rgba(239, 68, 68, 0.05)' } }}
+                    >
+                      <ListItemIcon><DevicesIcon sx={{ color: '#ef4444' }} /></ListItemIcon>
+                      <ListItemText 
+                        primary={<Typography sx={{ color: '#ef4444', fontWeight: 600 }}>Log Out All Devices</Typography>} 
+                        secondary={<Typography variant="body2" sx={{ color: 'rgba(239, 68, 68, 0.5)' }}>Sign out of all devices and browsers</Typography>} 
+                      />
+                    </ListItem>
+                    <Divider sx={{ borderColor: 'rgba(255, 255, 255, 0.05)' }} />
+
+                    <ListItem 
                       onClick={handleLogout}
                       sx={{ py: 2, px: 3, cursor: 'pointer', '&:hover': { bgcolor: 'rgba(239, 68, 68, 0.05)' } }}
                     >
@@ -351,6 +389,65 @@ export default function RiderProfile() {
                     `Confirm (${deleteCountdown}s)`
                   ) : (
                     'Delete Permanently'
+                  )}
+                </Button>
+              </DialogActions>
+            </Dialog>
+
+            {/* Logout All Devices Confirmation Dialog */}
+            <Dialog
+              open={openLogoutAllModal}
+              onClose={() => {
+                if (!loggingOutAll) setOpenLogoutAllModal(false);
+              }}
+              PaperProps={{
+                sx: {
+                  bgcolor: 'rgba(30, 30, 30, 0.95)',
+                  backdropFilter: 'blur(20px)',
+                  border: '1px solid rgba(239, 68, 68, 0.3)',
+                  borderRadius: '1.5rem',
+                  p: 1,
+                  maxWidth: 460
+                }
+              }}
+            >
+              <DialogTitle sx={{ color: '#ef4444', fontWeight: 'bold', display: 'flex', alignItems: 'center', gap: 1.5 }}>
+                <DevicesIcon color="error" />
+                Log Out All Devices?
+              </DialogTitle>
+              <DialogContent>
+                <DialogContentText sx={{ color: 'rgba(255, 255, 255, 0.7)', mb: 1 }}>
+                  This will revoke all active sessions across all your devices, browsers, and mobile apps. You will be redirected to the login page.
+                </DialogContentText>
+              </DialogContent>
+              <DialogActions sx={{ px: 3, pb: 2, gap: 1.5 }}>
+                <Button 
+                  variant="outlined" 
+                  onClick={() => setOpenLogoutAllModal(false)}
+                  disabled={loggingOutAll}
+                  sx={{ borderRadius: '2rem', textTransform: 'none', px: 3, fontWeight: 'bold', color: 'white', borderColor: 'rgba(255, 255, 255, 0.2)' }}
+                >
+                  Cancel
+                </Button>
+                
+                <Button
+                  variant="contained"
+                  color="error"
+                  onClick={handleLogoutAll}
+                  disabled={loggingOutAll}
+                  sx={{ 
+                    borderRadius: '2rem', 
+                    textTransform: 'none', 
+                    px: 3.5, 
+                    fontWeight: 'bold',
+                    bgcolor: '#ef4444',
+                    '&:hover': { bgcolor: '#dc2626' }
+                  }}
+                >
+                  {loggingOutAll ? (
+                    <CircularProgress size={20} color="inherit" />
+                  ) : (
+                    'Log Out All'
                   )}
                 </Button>
               </DialogActions>

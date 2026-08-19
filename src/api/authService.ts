@@ -209,6 +209,10 @@ const authService = {
   logout: async (refreshToken: string): Promise<void> => {
     await axiosPrivate.post('/auth/logout', { refreshToken });
   },
+
+  logoutAll: async (): Promise<void> => {
+    await axiosPrivate.post('/auth/logout-all');
+  },
 };
 
 export default authService;
