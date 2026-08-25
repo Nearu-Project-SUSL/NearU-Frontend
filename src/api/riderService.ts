@@ -54,28 +54,34 @@ export interface LocationCoords {
 }
 
 export interface FareEstimate {
-  fareAmount: number;
+  estimatedFare: number;
   distanceKm: number;
-  estimatedMinutes: number;
+  baseFare: number;
+  ratePerKm: number;
+  /** Estimated travel duration in seconds (0 if OSRM unavailable). */
+  estimatedDurationSeconds: number;
 }
 
+/**
+ * Flat array item from GET /rides/history (ApiResponse<RideHistoryDto[]>).
+ * Maps to backend RideHistoryDto.
+ */
 export interface RideHistoryItem {
-  id: string;
-  pickupLocation: string;
-  dropoffLocation: string;
-  fareAmount: number;
-  status: string;
-  createdAt: string;
-  completedAt?: string;
-  rating?: number;
+  historyId: string;
+  rideId: string;
+  studentId: string;
+  riderId?: string;
+  /** RideServiceType enum: 0=PersonalRide, 1=FoodDelivery, 2=GroceryPickup */
+  serviceType: number;
+  finalFare: number;
+  distanceKm: number;
+  completedAt: string;
+  riderRating?: number;
+  studentRating?: number;
 }
 
-export interface RideHistoryResponse {
-  items: RideHistoryItem[];
-  totalCount: number;
-  page: number;
-  pageSize: number;
-}
+/** Backend returns ApiResponse<RideHistoryItem[]> — not paginated. */
+export type RideHistoryResponse = RideHistoryItem[];
 
 export interface RiderStatsResponse {
   totalRides: number;
@@ -115,10 +121,11 @@ const getNearbyRequests = async (
   longitude: number,
   radiusMeters?: number
 ): Promise<RideRequest[]> => {
-  const response = await axiosPrivate.get<RideRequest[]>('/requests/nearby', {
+  const response = await axiosPrivate.get<any>('/requests/nearby', {
     params: { latitude, longitude, ...(radiusMeters ? { radiusMeters } : {}) },
   });
-  return response.data;
+  // Backend wraps array in ApiResponse<T>: { success, message, data: [...] }
+  return (response.data?.data ?? response.data) as RideRequest[];
 };
 
 /**
@@ -258,10 +265,11 @@ const getFareEstimate = async (
   dropoffLat: number,
   dropoffLng: number
 ): Promise<FareEstimate> => {
-  const response = await axiosPrivate.get<FareEstimate>('/rides/estimate', {
+  const response = await axiosPrivate.get<any>('/rides/estimate', {
     params: { pickupLat, pickupLng, dropoffLat, dropoffLng },
   });
-  return response.data;
+  // Unwrap ApiResponse<FareEstimateResponseDto>
+  return (response.data?.data ?? response.data) as FareEstimate;
 };
 
 // ─── Ride History ─────────────────────────────────────────────────────────────
@@ -271,10 +279,11 @@ const getFareEstimate = async (
  * GET /rides/history?page=1&pageSize=20  (baseURL already includes /api)
  */
 const getRideHistory = async (page = 1, pageSize = 20): Promise<RideHistoryResponse> => {
-  const response = await axiosPrivate.get<RideHistoryResponse>('/rides/history', {
+  const response = await axiosPrivate.get<any>('/rides/history', {
     params: { page, pageSize },
   });
-  return response.data;
+  // Backend: ApiResponse<IEnumerable<RideHistoryDto>> — flat array, no pagination wrapper
+  return (response.data?.data ?? response.data) as RideHistoryResponse;
 };
 
 /**

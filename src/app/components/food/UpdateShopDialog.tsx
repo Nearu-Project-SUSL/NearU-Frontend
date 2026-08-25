@@ -73,6 +73,14 @@ export default function UpdateShopDialog({ shop, onClose, onSubmit }: UpdateShop
   const handlePhotoChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
+
+    const MAX_SIZE_BYTES = 5 * 1024 * 1024;
+    if (file.size > MAX_SIZE_BYTES) {
+      setError('Image size must be less than 5MB');
+      e.target.value = '';
+      return;
+    }
+    setError('');
     setPhoto(file);
     setPhotoPreview(URL.createObjectURL(file));
   };
@@ -167,7 +175,7 @@ export default function UpdateShopDialog({ shop, onClose, onSubmit }: UpdateShop
               >
                 <CameraIcon sx={{ color: '#facc15', fontSize: 28, mb: 0.5 }} />
                 <Typography variant="caption" sx={{ color: 'rgba(255,255,255,0.7)' }}>
-                  Click to change photo
+                  Click to change photo (max 5MB)
                 </Typography>
               </Box>
               <input

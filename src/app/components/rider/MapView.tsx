@@ -9,6 +9,7 @@ import { MapContainer, TileLayer, Marker, Polyline, useMap } from 'react-leaflet
 import L from 'leaflet';
 import { useLeafletCss } from '../../hooks/useLeafletCss';
 import type { LocationCoords } from '../../../api/riderService';
+import AnimatedMarker from './AnimatedMarker';
 
 // ─── Fix Leaflet default marker icon paths broken by Vite bundling ─────────
 delete (L.Icon.Default.prototype as unknown as Record<string, unknown>)._getIconUrl;
@@ -124,7 +125,7 @@ export default function MapView({
 
         {/* Rider position marker */}
         {riderCoords && (
-          <Marker
+          <AnimatedMarker
             position={[riderCoords.latitude, riderCoords.longitude]}
             icon={riderIcon}
           />

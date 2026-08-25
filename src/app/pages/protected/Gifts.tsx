@@ -29,6 +29,7 @@ import {
 } from "../../../api/services/giftShopApi";
 import { useGiftShops } from "../../hooks/useGiftShop";
 import { toast } from "sonner";
+import useAuth from "../../hooks/useAuth";
 
 function useHorizontalScroll() {
   const scrollRef = useRef<HTMLDivElement>(null);
@@ -53,24 +54,28 @@ function GiftCardSkeleton() {
       sx={{
         borderRadius: "24px",
         overflow: "hidden",
-        border: "1px solid rgba(255,255,255,0.06)",
-        bgcolor: "rgba(255,255,255,0.02)",
+        border: "1px solid var(--nearu-border)",
+        bgcolor: "var(--bg-surface)",
       }}
     >
-      <Skeleton variant="rectangular" height={220} sx={{ bgcolor: "rgba(255,255,255,0.04)" }} />
+      <Skeleton variant="rectangular" height={220} sx={{ bgcolor: "var(--nearu-border)" }} />
       <Box sx={{ p: 2.5 }}>
-        <Skeleton variant="text" height={32} sx={{ bgcolor: "rgba(255,255,255,0.04)", mb: 1 }} />
-        <Skeleton variant="text" height={20} width="60%" sx={{ bgcolor: "rgba(255,255,255,0.04)" }} />
+        <Skeleton variant="text" height={32} sx={{ bgcolor: "var(--nearu-border)", mb: 1 }} />
+        <Skeleton variant="text" height={20} width="60%" sx={{ bgcolor: "var(--nearu-border)" }} />
       </Box>
     </Box>
   );
 }
 
 export default function Gifts() {
+  const { auth } = useAuth();
+  const isBusinessOwner = auth?.user?.roles?.some((role: string) =>
+    ["BusinessOwner", "Business", "Admin", "SuperAdmin"].includes(role)
+  );
+
   // Local filter state — only committed to query on Search click
   const [keyword, setKeyword] = useState("");
-  const [location, setLocation] = useState("");
-  const [activeParams, setActiveParams] = useState<{ keyword?: string; location?: string }>({});
+  const [activeParams, setActiveParams] = useState<{ keyword?: string }>({});
   const [createOpen, setCreateOpen] = useState(false);
   const { scrollRef, scroll } = useHorizontalScroll();
   const queryClient = useQueryClient();
@@ -103,7 +108,6 @@ export default function Gifts() {
   const handleSearch = () => {
     setActiveParams({
       keyword: keyword.trim() || undefined,
-      location: location.trim() || undefined,
     });
   };
 
@@ -116,7 +120,7 @@ export default function Gifts() {
       sx={{
         display: "flex",
         minHeight: "100vh",
-        bgcolor: "#050505",
+        bgcolor: "var(--bg-base)",
         backgroundImage:
           "radial-gradient(circle at top left, rgba(46,158,191,0.03) 0%, transparent 50%)",
       }}
@@ -155,7 +159,7 @@ export default function Gifts() {
                   variant="h2"
                   sx={{
                     fontWeight: 800,
-                    color: "#fff",
+                    color: "var(--text-primary)",
                     fontSize: { xs: "2.4rem", md: "3.8rem" },
                     letterSpacing: "-0.03em",
                     mb: 2,
@@ -169,7 +173,7 @@ export default function Gifts() {
                 <Typography
                   variant="h6"
                   sx={{
-                    color: "rgba(255,255,255,0.5)",
+                    color: "var(--text-secondary)",
                     maxWidth: 700,
                     mx: "auto",
                     fontWeight: 400,
@@ -188,8 +192,8 @@ export default function Gifts() {
                 mb: 4,
                 p: 2,
                 borderRadius: "20px",
-                bgcolor: "rgba(255,255,255,0.02)",
-                border: "1px solid rgba(255,255,255,0.06)",
+                bgcolor: "var(--bg-surface)",
+                border: "1px solid var(--nearu-border)",
               }}
             >
               <Stack direction={{ xs: "column", md: "row" }} spacing={2}>
@@ -199,16 +203,7 @@ export default function Gifts() {
                   value={keyword}
                   onChange={(e) => setKeyword(e.target.value)}
                   onKeyDown={handleKeyDown}
-                  InputLabelProps={{ style: { color: "rgba(255,255,255,0.55)" } }}
-                  sx={darkTextFieldSx}
-                />
-                <TextField
-                  fullWidth
-                  label="Filter by location"
-                  value={location}
-                  onChange={(e) => setLocation(e.target.value)}
-                  onKeyDown={handleKeyDown}
-                  InputLabelProps={{ style: { color: "rgba(255,255,255,0.55)" } }}
+                  InputLabelProps={{ style: { color: "var(--text-secondary)" } }}
                   sx={darkTextFieldSx}
                 />
                 <Button
@@ -220,14 +215,16 @@ export default function Gifts() {
                 >
                   Search
                 </Button>
-                <Button
-                  variant="outlined"
-                  onClick={() => setCreateOpen(true)}
-                  sx={secondaryBtnSx}
-                  startIcon={<AddIcon />}
-                >
-                  Add Shop
-                </Button>
+                {isBusinessOwner && (
+                  <Button
+                    variant="outlined"
+                    onClick={() => setCreateOpen(true)}
+                    sx={secondaryBtnSx}
+                    startIcon={<AddIcon />}
+                  >
+                    Add Shop
+                  </Button>
+                )}
               </Stack>
             </Box>
 
@@ -254,10 +251,10 @@ export default function Gifts() {
                 <Box sx={{ display: "flex", alignItems: "center", gap: 1.5 }}>
                   <CardGiftcardIcon sx={{ color: "#2E9EBF", fontSize: 28 }} />
                   <Box>
-                    <Typography variant="h5" sx={{ fontWeight: 800, color: "#fff" }}>
+                    <Typography variant="h5" sx={{ fontWeight: 800, color: "var(--text-primary)" }}>
                       Featured Gift Shops
                     </Typography>
-                    <Typography variant="caption" sx={{ color: "rgba(255,255,255,0.45)" }}>
+                    <Typography variant="caption" sx={{ color: "var(--text-secondary)" }}>
                       Popular and newly added shops
                     </Typography>
                   </Box>
@@ -305,11 +302,11 @@ export default function Gifts() {
             {/* ── All shops grid ──────────────────────────────────────── */}
             <Box>
               <Box sx={{ display: "flex", alignItems: "center", justifyContent: "space-between", mb: 3 }}>
-                <Typography variant="h5" sx={{ color: "#fff", fontWeight: 800 }}>
+                <Typography variant="h5" sx={{ color: "var(--text-primary)", fontWeight: 800 }}>
                   All Gift Shops
                 </Typography>
                 {!isLoading && (
-                  <Typography variant="caption" sx={{ color: "rgba(255,255,255,0.4)" }}>
+                  <Typography variant="caption" sx={{ color: "var(--text-secondary)" }}>
                     {shops.length} {shops.length === 1 ? "shop" : "shops"} found
                   </Typography>
                 )}
@@ -329,17 +326,17 @@ export default function Gifts() {
                     p: 8,
                     borderRadius: "24px",
                     textAlign: "center",
-                    bgcolor: "rgba(255,255,255,0.02)",
-                    border: "1px dashed rgba(255,255,255,0.08)",
+                    bgcolor: "var(--bg-surface)",
+                    border: "1px dashed var(--nearu-border)",
                   }}
                 >
-                  <CardGiftcardIcon sx={{ fontSize: 56, color: "rgba(255,255,255,0.1)", mb: 2 }} />
-                  <Typography variant="h6" sx={{ color: "rgba(255,255,255,0.4)", mb: 1 }}>
+                  <CardGiftcardIcon sx={{ fontSize: 56, color: "var(--text-secondary)", mb: 2, opacity: 0.5 }} />
+                  <Typography variant="h6" sx={{ color: "var(--text-secondary)", mb: 1 }}>
                     No gift shops found
                   </Typography>
-                  <Typography variant="body2" sx={{ color: "rgba(255,255,255,0.25)" }}>
-                    {activeParams.keyword || activeParams.location
-                      ? "Try adjusting your search filters"
+                  <Typography variant="body2" sx={{ color: "var(--text-secondary)", opacity: 0.7 }}>
+                    {activeParams.keyword
+                      ? "Try adjusting your search filter"
                       : "Be the first to add a gift shop!"}
                   </Typography>
                 </Box>
@@ -374,9 +371,9 @@ export default function Gifts() {
 
 const darkTextFieldSx = {
   "& .MuiOutlinedInput-root": {
-    color: "#fff",
+    color: "var(--text-primary)",
     borderRadius: "14px",
-    "& fieldset": { borderColor: "rgba(255,255,255,0.12)" },
+    "& fieldset": { borderColor: "var(--nearu-border)" },
     "&:hover fieldset": { borderColor: "rgba(46,158,191,0.35)" },
     "&.Mui-focused fieldset": { borderColor: "#2E9EBF" },
   },
@@ -395,24 +392,24 @@ const primaryBtnSx = {
 };
 
 const secondaryBtnSx = {
-  color: "#fff",
-  borderColor: "rgba(255,255,255,0.15)",
+  color: "var(--text-primary)",
+  borderColor: "var(--nearu-border)",
   textTransform: "none",
   borderRadius: "12px",
   px: 3,
   whiteSpace: "nowrap",
   "&:hover": {
     borderColor: "#2E9EBF",
-    bgcolor: "rgba(46,158,191,0.05)",
+    bgcolor: "var(--nearu-accent-subtle)",
   },
 };
 
 const iconBtnSx = {
-  bgcolor: "rgba(255,255,255,0.03)",
-  color: "#fff",
-  border: "1px solid rgba(255,255,255,0.08)",
+  bgcolor: "var(--bg-surface)",
+  color: "var(--text-primary)",
+  border: "1px solid var(--nearu-border)",
   "&:hover": {
-    bgcolor: "rgba(46,158,191,0.15)",
+    bgcolor: "var(--nearu-accent-subtle)",
     borderColor: "#2E9EBF",
   },
 };

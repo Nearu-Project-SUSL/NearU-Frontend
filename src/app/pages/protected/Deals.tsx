@@ -4,93 +4,472 @@ import {
   Button,
   Chip,
   CircularProgress,
+  Dialog,
+  DialogContent,
+  DialogTitle,
+  Grid,
   Grow,
+  IconButton,
   Stack,
+  Tab,
+  Tabs,
   Typography,
+  Card,
+  CardContent,
+  CardMedia,
 } from "@mui/material";
 import AddIcon from "@mui/icons-material/Add";
 import LocalOfferIcon from "@mui/icons-material/LocalOffer";
+import StoreIcon from "@mui/icons-material/Store";
+import PlaceIcon from "@mui/icons-material/Place";
+import CalendarTodayIcon from "@mui/icons-material/CalendarToday";
+import CloseIcon from "@mui/icons-material/Close";
+import InfoIcon from "@mui/icons-material/Info";
 import { toast } from "sonner";
 import { Sidebar } from "../../components/layout/Sidebar";
 import Navbar from "../../components/layout/Navbar";
 import DealFormDialog from "../../components/deal/DealFormDialog";
-import { useCreateDeal, useApprovedDeals } from "../../hooks/useDeals";
+import { useCreateDeal, useApprovedDeals, useMyDeals, useDeleteDeal } from "../../hooks/useDeals";
 import type { DealResponseDto } from "../../../api/services/dealsApi";
 import useAuth from "../../hooks/useAuth";
 
+const defaultDealImageByType: Record<string, string> = {
+  Food: "/food_deal.png",
+  Gift: "/gift_service.png",
+  Accommodation: "/accommodation_deal.png",
+  Other: "/offer_service.png",
+};
+
 function statusColor(status: string) {
-  if (status === "Approved") return "#34d399";
-  if (status === "Rejected") return "#ef4444";
-  return "#facc15";
+  if (status === "Expired") return "#6b7280"; // gray
+  if (status === "Approved") return "#10b981"; // green
+  if (status === "Rejected") return "#ef4444"; // red
+  return "#f59e0b"; // amber/yellow
 }
 
-function DealListCard({ deal }: { deal: DealResponseDto }) {
+const isExpired = (deal: DealResponseDto) => {
+  if (!deal.validTo) return false;
+  return new Date(deal.validTo) < new Date();
+};
+
+// ─── Deal Detail Modal ────────────────────────────────────────────────────────
+interface DealDetailModalProps {
+  deal: DealResponseDto | null;
+  open: boolean;
+  onClose: () => void;
+  onDelete?: (dealId: string) => Promise<void>;
+  currentUserId?: string;
+  isAdmin?: boolean;
+}
+
+function DealDetailModal({
+  deal,
+  open,
+  onClose,
+  onDelete,
+  currentUserId,
+  isAdmin,
+}: DealDetailModalProps) {
+  const [isDeleting, setIsDeleting] = useState(false);
+  if (!deal) return null;
+
+  const formatDate = (dateStr: string | null) => {
+    if (!dateStr) return "Open validation";
+    return new Date(dateStr).toLocaleDateString(undefined, {
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric'
+    });
+  };
+
+    const imageUrl = deal.imageUrl || defaultDealImageByType[deal.shopType] || "/offer_service.png";
+
+    const showDeleteButton = deal.submittedByUserId === currentUserId || isAdmin;
+
+    const handleDelete = async () => {
+      if (!onDelete || !deal) return;
+      if (window.confirm("Are you sure you want to delete this offer? This action cannot be undone.")) {
+        setIsDeleting(true);
+        try {
+          await onDelete(deal.id);
+        } finally {
+          setIsDeleting(false);
+        }
+      }
+    };
+
   return (
-    <Box
-      sx={{
-        p: 2.5,
-        borderRadius: "16px",
-        bgcolor: "rgba(255,255,255,0.03)",
-        border: "1px solid rgba(255,255,255,0.08)",
+    <Dialog
+      open={open}
+      onClose={onClose}
+      fullWidth
+      maxWidth="sm"
+      PaperProps={{
+        sx: {
+          bgcolor: "var(--bg-surface)",
+          borderRadius: "28px",
+          border: "1px solid var(--nearu-border)",
+          backgroundImage: "radial-gradient(circle at top right, rgba(46,158,191,0.06) 0%, transparent 60%)",
+          boxShadow: "0 24px 64px rgba(0,0,0,0.45)",
+          overflow: "hidden"
+        },
       }}
     >
-      <Stack direction="row" justifyContent="space-between" alignItems="flex-start" gap={2}>
-        <Box sx={{ flex: 1 }}>
-          <Typography sx={{ color: "#2E9EBF", fontWeight: 700 }}>{deal.title}</Typography>
-          <Typography variant="body2" sx={{ color: "rgba(255,255,255,0.5)" }}>
-            {deal.shopName} · {deal.shopType}
-          </Typography>
-          <Typography variant="body2" sx={{ color: "rgba(255,255,255,0.7)", mt: 1 }}>
-            {deal.description}
-          </Typography>
-        </Box>
-        <Chip label={deal.approvalStatus} size="small" sx={{ bgcolor: statusColor(deal.approvalStatus), color: "#111", fontWeight: 700 }} />
-      </Stack>
-      {deal.rejectionReason && (
-        <Typography variant="caption" sx={{ color: "#ef4444", mt: 1, display: "block" }}>
-          Reason: {deal.rejectionReason}
-        </Typography>
-      )}
-    </Box>
+      <Box sx={{ position: "relative", height: 260, width: "100%" }}>
+        <CardMedia
+          component="img"
+          image={imageUrl}
+          alt={deal.title}
+          sx={{ height: "100%", width: "100%", objectFit: "cover" }}
+        />
+        <Box
+          sx={{
+            position: "absolute",
+            inset: 0,
+            background: "linear-gradient(to bottom, rgba(0,0,0,0.2) 0%, var(--bg-surface) 95%)",
+          }}
+        />
+        <IconButton
+          onClick={onClose}
+          sx={{
+            position: "absolute",
+            top: 16,
+            right: 16,
+            bgcolor: "rgba(0,0,0,0.5)",
+            backdropFilter: "blur(4px)",
+            color: "#fff",
+            "&:hover": { bgcolor: "rgba(0,0,0,0.8)" }
+          }}
+        >
+          <CloseIcon />
+        </IconButton>
+        <Chip
+          label={deal.badgeText}
+          sx={{
+            position: "absolute",
+            bottom: 20,
+            left: 24,
+            bgcolor: deal.badgeColor || "#ef4444",
+            color: "#fff",
+            fontWeight: 800,
+            fontSize: "1rem",
+            px: 1,
+            py: 0.5,
+            borderRadius: "10px",
+            boxShadow: "0 8px 16px rgba(0,0,0,0.3)"
+          }}
+        />
+      </Box>
+      <DialogContent sx={{ p: 4, pt: 0 }}>
+        <Stack spacing={2.5}>
+          <Box>
+            <Stack direction="row" alignItems="center" gap={1} mb={0.5}>
+              <StoreIcon sx={{ color: "#2E9EBF", fontSize: 20 }} />
+              <Typography variant="subtitle1" sx={{ color: "var(--text-secondary)", fontWeight: 700 }}>
+                {deal.shopName}
+              </Typography>
+              <Chip
+                label={deal.shopType}
+                size="small"
+                variant="outlined"
+                sx={{
+                  color: "#2E9EBF",
+                  borderColor: "rgba(46,158,191,0.3)",
+                  fontSize: "0.75rem",
+                  ml: 1,
+                  height: 20
+                }}
+              />
+            </Stack>
+            {deal.shopAddress && (
+              <Stack direction="row" alignItems="center" gap={0.5} mb={1} sx={{ mt: 0.25 }}>
+                <PlaceIcon sx={{ color: "var(--text-secondary)", fontSize: 16 }} />
+                <Typography variant="caption" sx={{ color: "var(--text-secondary)", fontWeight: 500 }}>
+                  {deal.shopAddress}
+                </Typography>
+              </Stack>
+            )}
+            <Typography variant="h5" sx={{ color: "var(--text-primary)", fontWeight: 800, letterSpacing: "-0.01em" }}>
+              {deal.title}
+            </Typography>
+          </Box>
+
+          <Box>
+            <Typography variant="body2" sx={{ color: "var(--text-secondary)", mb: 0.75 }}>
+              Offer Details
+            </Typography>
+            <Typography variant="body1" sx={{ color: "var(--text-primary)", lineHeight: 1.6 }}>
+              {deal.description}
+            </Typography>
+          </Box>
+
+          <Stack direction="row" gap={3} sx={{ py: 1.5, borderTop: "1px solid var(--nearu-border)", borderBottom: "1px solid var(--nearu-border)" }}>
+            <Box>
+              <Stack direction="row" alignItems="center" gap={1} mb={0.5}>
+                <CalendarTodayIcon sx={{ color: "var(--text-secondary)", fontSize: 16 }} />
+                <Typography variant="caption" sx={{ color: "var(--text-secondary)" }}>
+                  Valid From
+                </Typography>
+              </Stack>
+              <Typography variant="body2" sx={{ color: "var(--text-primary)", fontWeight: 600 }}>
+                {formatDate(deal.validFrom)}
+              </Typography>
+            </Box>
+            <Box>
+              <Stack direction="row" alignItems="center" gap={1} mb={0.5}>
+                <CalendarTodayIcon sx={{ color: "var(--text-secondary)", fontSize: 16 }} />
+                <Typography variant="caption" sx={{ color: "var(--text-secondary)" }}>
+                  Valid To
+                </Typography>
+              </Stack>
+              <Typography variant="body2" sx={{ color: "var(--text-primary)", fontWeight: 600 }}>
+                {formatDate(deal.validTo)}
+              </Typography>
+            </Box>
+          </Stack>
+
+          {deal.rejectionReason && (
+            <Box sx={{ p: 2, bgcolor: "rgba(239,68,68,0.05)", border: "1px solid rgba(239,68,68,0.15)", borderRadius: "12px" }}>
+              <Typography variant="caption" sx={{ color: "#ef4444", fontWeight: 700, display: "flex", alignItems: "center", gap: 0.5 }}>
+                <InfoIcon sx={{ fontSize: 14 }} /> Rejection Reason
+              </Typography>
+              <Typography variant="body2" sx={{ color: "var(--text-secondary)", mt: 0.5 }}>
+                {deal.rejectionReason}
+              </Typography>
+            </Box>
+          )}
+
+          <Stack direction="row" spacing={2} width="100%">
+            {showDeleteButton && (
+              <Button
+                variant="outlined"
+                fullWidth
+                disabled={isDeleting}
+                onClick={handleDelete}
+                sx={{
+                  borderColor: "#ef4444",
+                  color: "#ef4444",
+                  fontWeight: 700,
+                  borderRadius: "12px",
+                  py: 1.25,
+                  textTransform: "none",
+                  "&:hover": {
+                    bgcolor: "rgba(239, 68, 68, 0.08)",
+                    borderColor: "#ef4444",
+                  }
+                }}
+              >
+                {isDeleting ? "Deleting..." : "Delete Offer"}
+              </Button>
+            )}
+            <Button
+              variant="contained"
+              fullWidth
+              onClick={onClose}
+              sx={{
+                bgcolor: "#2E9EBF",
+                color: "#fff",
+                fontWeight: 700,
+                borderRadius: "12px",
+                py: 1.25,
+                textTransform: "none",
+                "&:hover": { bgcolor: "#1e82a0" }
+              }}
+            >
+              Close Window
+            </Button>
+          </Stack>
+        </Stack>
+      </DialogContent>
+    </Dialog>
   );
 }
 
+// ─── Deal Grid Card ───────────────────────────────────────────────────────────
+interface DealCardComponentProps {
+  deal: DealResponseDto;
+  onSelect: (deal: DealResponseDto) => void;
+  showStatus?: boolean;
+}
+
+function DealCardComponent({ deal, onSelect, showStatus = false }: DealCardComponentProps) {
+  const [hovered, setHovered] = useState(false);
+  const imageUrl = deal.imageUrl || defaultDealImageByType[deal.shopType] || "/offer_service.png";
+  const displayStatus = (deal.approvalStatus === "Approved" && isExpired(deal)) ? "Expired" : deal.approvalStatus;
+
+  return (
+    <Card
+      elevation={0}
+      onMouseEnter={() => setHovered(true)}
+      onMouseLeave={() => setHovered(false)}
+      onClick={() => onSelect(deal)}
+      sx={{
+        height: "100%",
+        display: "flex",
+        flexDirection: "column",
+        bgcolor: "var(--bg-surface)",
+        borderRadius: "20px",
+        overflow: "hidden",
+        border: "1px solid var(--nearu-border)",
+        transition: "all 0.3s cubic-bezier(0.4, 0, 0.2, 1)",
+        transform: hovered ? "translateY(-6px)" : "none",
+        boxShadow: hovered ? "0 12px 30px var(--nearu-accent-subtle)" : "none",
+        cursor: "pointer",
+      }}
+    >
+      <Box sx={{ height: 160, position: "relative", overflow: "hidden" }}>
+        <CardMedia
+          component="img"
+          image={imageUrl}
+          alt={deal.title}
+          sx={{
+            height: "100%",
+            width: "100%",
+            objectFit: "cover",
+            transition: "transform 0.5s ease",
+            transform: hovered ? "scale(1.06)" : "scale(1)"
+          }}
+        />
+        <Box
+          sx={{
+            position: "absolute",
+            top: 12,
+            right: 12,
+            bgcolor: deal.badgeColor || "#ef4444",
+            color: "#fff",
+            px: 1.25,
+            py: 0.4,
+            borderRadius: "8px",
+            fontWeight: 800,
+            fontSize: "0.75rem",
+            zIndex: 2,
+            boxShadow: "0 4px 10px rgba(0,0,0,0.35)"
+          }}
+        >
+          {deal.badgeText}
+        </Box>
+        {showStatus && (
+          <Chip
+            label={displayStatus}
+            size="small"
+            sx={{
+              position: "absolute",
+              top: 12,
+              left: 12,
+              bgcolor: statusColor(displayStatus),
+              color: "#fff",
+              fontWeight: 800,
+              fontSize: "0.7rem",
+              zIndex: 2
+            }}
+          />
+        )}
+        <Box
+          sx={{
+            position: "absolute",
+            inset: 0,
+            background: "linear-gradient(to top, var(--bg-surface) 0%, transparent 80%)",
+            zIndex: 1
+          }}
+        />
+      </Box>
+      <CardContent sx={{ p: 2.5, flexGrow: 1, display: "flex", flexDirection: "column", justifyContent: "space-between" }}>
+        <Box>
+          <Stack direction="row" alignItems="center" gap={0.5} mb={deal.shopAddress ? 0.5 : 1.25}>
+            <StoreIcon sx={{ color: "#2E9EBF", fontSize: 15 }} />
+            <Typography variant="caption" sx={{ color: "var(--text-secondary)", fontWeight: 600 }}>
+              {deal.shopName} · {deal.shopType}
+            </Typography>
+          </Stack>
+          {deal.shopAddress && (
+            <Stack direction="row" alignItems="center" gap={0.5} mb={1.25}>
+              <PlaceIcon sx={{ color: "var(--text-secondary)", fontSize: 13 }} />
+              <Typography variant="caption" sx={{ color: "var(--text-secondary)", fontWeight: 500, display: "-webkit-box", WebkitLineClamp: 1, WebkitBoxOrient: "vertical", overflow: "hidden", textOverflow: "ellipsis" }}>
+                {deal.shopAddress}
+              </Typography>
+            </Stack>
+          )}
+          <Typography
+            variant="h6"
+            sx={{
+              color: "var(--text-primary)",
+              fontWeight: 700,
+              fontSize: "1.05rem",
+              lineHeight: 1.3,
+              mb: 1,
+              display: "-webkit-box",
+              WebkitLineClamp: 2,
+              WebkitBoxOrient: "vertical",
+              overflow: "hidden",
+              textOverflow: "ellipsis",
+            }}
+          >
+            {deal.title}
+          </Typography>
+          <Typography
+            variant="body2"
+            sx={{
+              color: "var(--text-secondary)",
+              fontSize: "0.85rem",
+              lineHeight: 1.5,
+              display: "-webkit-box",
+              WebkitLineClamp: 2,
+              WebkitBoxOrient: "vertical",
+              overflow: "hidden",
+              textOverflow: "ellipsis",
+            }}
+          >
+            {deal.description}
+          </Typography>
+        </Box>
+      </CardContent>
+    </Card>
+  );
+}
+
+// ─── Main Deals & Offers Page ────────────────────────────────────────────────
 export default function Deals() {
   const { auth } = useAuth();
   const [formOpen, setFormOpen] = useState(false);
-  
-  const { data: approvedDeals = [], isLoading: loadingApproved } = useApprovedDeals();
-  const createDealMutation = useCreateDeal();
+  const [activeTab, setActiveTab] = useState("live");
+  const [selectedDeal, setSelectedDeal] = useState<DealResponseDto | null>(null);
 
-  const isBusinessOrAdmin = auth?.user?.roles?.includes("BusinessOwner") || auth?.user?.roles?.includes("Admin");
+  const isBusiness = auth?.user?.roles?.some((role: string) => ["BusinessOwner", "Business"].includes(role));
+  const isAdmin = auth?.user?.roles?.some((role: string) => ["Admin", "SuperAdmin"].includes(role));
+  const isBusinessOrAdmin = isBusiness || isAdmin;
+
+  const { data: approvedDeals = [], isLoading: loadingApproved } = useApprovedDeals();
+  const { data: myDeals = [], isLoading: loadingMyDeals } = useMyDeals({ enabled: isBusinessOrAdmin });
+  const createDealMutation = useCreateDeal();
+  const deleteDealMutation = useDeleteDeal();
 
   const handleSubmit = async (formData: FormData) => {
     try {
       await createDealMutation.mutateAsync(formData);
-      toast.success("Deal submitted! Waiting for admin approval.");
-
+      toast.success("Deal application submitted! Awaiting admin review.");
     } catch (err: unknown) {
       const message = (err as { response?: { data?: { message?: string } } })?.response?.data?.message;
-      toast.error(message || "Failed to submit deal");
+      toast.error(message || "Failed to submit deal application");
       throw err;
     }
   };
 
   return (
-    <Box sx={{ display: "flex", minHeight: "100vh", bgcolor: "#050505" }}>
+    <Box sx={{ display: "flex", minHeight: "100vh", bgcolor: "var(--bg-base)" }}>
       <Sidebar activeSection="offers" />
-      <Box sx={{ flexGrow: 1, display: "flex", flexDirection: "column" }}>
+      <Box sx={{ flexGrow: 1, display: "flex", flexDirection: "column", minWidth: 0 }}>
         <Navbar />
-        <Box sx={{ p: { xs: 2, md: 4 }, overflowY: "auto" }}>
-          <Stack direction="row" justifyContent="space-between" alignItems="center" mb={4}>
-            <Box sx={{ display: "flex", alignItems: "center", gap: 1.5 }}>
-              <LocalOfferIcon sx={{ color: "#2E9EBF", fontSize: 32 }} />
+        <Box sx={{ p: { xs: 2.5, md: 5 }, overflowY: "auto", flexGrow: 1 }}>
+          
+          <Stack direction={{ xs: "column", sm: "row" }} justifyContent="space-between" alignItems={{ xs: "flex-start", sm: "center" }} gap={2} mb={4.5}>
+            <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
+              <LocalOfferIcon sx={{ color: "#2E9EBF", fontSize: 36 }} />
               <Box>
-                <Typography variant="h4" sx={{ color: "#fff", fontWeight: 800 }}>
+                <Typography variant="h4" sx={{ color: "var(--text-primary)", fontWeight: 800, fontSize: { xs: "1.75rem", md: "2.25rem" }, letterSpacing: "-0.02em" }}>
                   Deals & Offers
                 </Typography>
-                <Typography variant="body2" sx={{ color: "rgba(255,255,255,0.5)" }}>
-                  Submit shop deals or browse approved offers
+                <Typography variant="body2" sx={{ color: "var(--text-secondary)", mt: 0.5 }}>
+                  Exclusive savings, student discounts, and limited-time promotions
                 </Typography>
               </Box>
             </Box>
@@ -99,35 +478,118 @@ export default function Deals() {
                 variant="contained"
                 startIcon={<AddIcon />}
                 onClick={() => setFormOpen(true)}
-                sx={{ fontWeight: 700, borderRadius: "12px", color: "#111" }}
+                sx={{
+                  fontWeight: 700,
+                  borderRadius: "14px",
+                  bgcolor: "#2E9EBF",
+                  color: "#fff",
+                  textTransform: "none",
+                  px: 3,
+                  py: 1.25,
+                  boxShadow: "0 8px 24px rgba(46,158,191,0.15)",
+                  "&:hover": { bgcolor: "#1e82a0" }
+                }}
               >
-                Submit Deal
+                Submit New Deal
               </Button>
             )}
           </Stack>
 
-          <Typography variant="h6" sx={{ color: "#2E9EBF", fontWeight: 700, mb: 2 }}>
-            Live Offers
-          </Typography>
-          {loadingApproved ? (
-            <CircularProgress size={28} sx={{ color: "#2E9EBF" }} />
-          ) : approvedDeals.length === 0 ? (
-            <Typography sx={{ color: "rgba(255,255,255,0.4)" }}>
-              No approved deals yet. Check back soon!
-            </Typography>
-          ) : (
-            <Stack spacing={2}>
-              {approvedDeals.map((deal, i) => (
-                <Grow in key={deal.id} timeout={300 + i * 80}>
-                  <Box><DealListCard deal={deal} /></Box>
-                </Grow>
-              ))}
-            </Stack>
+          {isBusinessOrAdmin && (
+            <Tabs
+              value={activeTab}
+              onChange={(_, v) => setActiveTab(v)}
+              sx={{
+                mb: 4,
+                borderBottom: "1px solid var(--nearu-border)",
+                "& .MuiTabs-indicator": { bgcolor: "#2E9EBF" },
+                "& .MuiTab-root": {
+                  color: "var(--text-secondary)",
+                  fontWeight: 600,
+                  textTransform: "none",
+                  fontSize: "0.95rem",
+                  "&.Mui-selected": { color: "#2E9EBF" }
+                }
+              }}
+            >
+              <Tab label="Live Offers" value="live" />
+              <Tab label="My Deal Applications" value="my" />
+            </Tabs>
           )}
+
+          {activeTab === "live" ? (
+            <Box>
+              <Typography variant="h6" sx={{ color: "var(--text-primary)", fontWeight: 800, mb: 3 }}>
+                Live Offers
+              </Typography>
+              {loadingApproved ? (
+                <CircularProgress size={32} sx={{ color: "#2E9EBF" }} />
+              ) : approvedDeals.length === 0 ? (
+                <Typography sx={{ color: "var(--text-secondary)" }}>
+                  No approved deals yet. Check back soon!
+                </Typography>
+              ) : (
+                <Grid container spacing={3}>
+                  {approvedDeals.map((deal, i) => (
+                    <Grid size={{ xs: 12, sm: 6, md: 4 }} key={deal.id}>
+                      <Grow in timeout={300 + i * 80}>
+                        <Box sx={{ height: "100%" }}>
+                          <DealCardComponent deal={deal} onSelect={setSelectedDeal} />
+                        </Box>
+                      </Grow>
+                    </Grid>
+                  ))}
+                </Grid>
+              )}
+            </Box>
+          ) : (
+            <Box>
+              <Typography variant="h6" sx={{ color: "var(--text-primary)", fontWeight: 800, mb: 3 }}>
+                My Submissions
+              </Typography>
+              {loadingMyDeals ? (
+                <CircularProgress size={32} sx={{ color: "#2E9EBF" }} />
+              ) : myDeals.length === 0 ? (
+                <Typography sx={{ color: "var(--text-secondary)" }}>
+                  You have not submitted any deals yet. Click "Submit New Deal" to apply.
+                </Typography>
+              ) : (
+                <Grid container spacing={3}>
+                  {myDeals.map((deal, i) => (
+                    <Grid size={{ xs: 12, sm: 6, md: 4 }} key={deal.id}>
+                      <Grow in timeout={300 + i * 80}>
+                        <Box sx={{ height: "100%" }}>
+                          <DealCardComponent deal={deal} onSelect={setSelectedDeal} showStatus />
+                        </Box>
+                      </Grow>
+                    </Grid>
+                  ))}
+                </Grid>
+              )}
+            </Box>
+          )}
+
         </Box>
       </Box>
 
       <DealFormDialog open={formOpen} onClose={() => setFormOpen(false)} onSubmit={handleSubmit} />
+      <DealDetailModal
+        open={selectedDeal !== null}
+        deal={selectedDeal}
+        onClose={() => setSelectedDeal(null)}
+        onDelete={async (id) => {
+          try {
+            await deleteDealMutation.mutateAsync(id);
+            toast.success("Deal deleted successfully");
+            setSelectedDeal(null);
+          } catch (err: any) {
+            const message = err.response?.data?.message || "Failed to delete deal";
+            toast.error(message);
+          }
+        }}
+        currentUserId={auth?.user?.id}
+        isAdmin={isAdmin}
+      />
     </Box>
   );
 }

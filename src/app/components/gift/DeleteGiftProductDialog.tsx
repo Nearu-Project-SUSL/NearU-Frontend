@@ -40,7 +40,7 @@ export default function DeleteGiftProductDialog({
       fullWidth
       PaperProps={{
         sx: {
-          bgcolor: "#0a0a0a",
+          bgcolor: "var(--bg-surface)",
           borderRadius: "24px",
           border: "1px solid rgba(239,68,68,0.2)",
           backgroundImage: "none",
@@ -67,13 +67,13 @@ export default function DeleteGiftProductDialog({
             <DeleteIcon sx={{ color: "#f87171", fontSize: 28 }} />
           </Box>
 
-          <Typography variant="h6" sx={{ color: "#fff", fontWeight: 700, mb: 1 }}>
+          <Typography variant="h6" sx={{ color: "var(--text-primary)", fontWeight: 700, mb: 1 }}>
             Delete Product?
           </Typography>
 
           <Typography
             variant="body2"
-            sx={{ color: "rgba(255,255,255,0.5)", mb: 1, lineHeight: 1.6 }}
+            sx={{ color: "var(--text-secondary)", mb: 1, lineHeight: 1.6 }}
           >
             Are you sure you want to delete
           </Typography>
@@ -87,7 +87,7 @@ export default function DeleteGiftProductDialog({
 
           <Typography
             variant="caption"
-            sx={{ color: "rgba(255,255,255,0.3)", display: "block", mb: 3 }}
+            sx={{ color: "var(--text-secondary)", display: "block", mb: 3 }}
           >
             This action cannot be undone.
           </Typography>
@@ -99,11 +99,11 @@ export default function DeleteGiftProductDialog({
               onClick={onClose}
               disabled={loading}
               sx={{
-                color: "rgba(255,255,255,0.6)",
-                borderColor: "rgba(255,255,255,0.1)",
+                color: "var(--text-primary)",
+                borderColor: "var(--nearu-border)",
                 borderRadius: "12px",
                 textTransform: "none",
-                "&:hover": { borderColor: "rgba(255,255,255,0.3)" },
+                "&:hover": { borderColor: "#2E9EBF", bgcolor: "var(--nearu-accent-subtle)" },
               }}
             >
               Cancel

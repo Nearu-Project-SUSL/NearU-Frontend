@@ -37,6 +37,7 @@ const ForgotPassword = Loadable(lazyWithRetry(() => import("./pages/public/Forgo
 const ResetPassword = Loadable(lazyWithRetry(() => import("./pages/public/ResetPassword")));
 const Unauthorized = Loadable(lazyWithRetry(() => import("./pages/public/Unauthorized")));
 const LandingPage = Loadable(lazyWithRetry(() => import("./pages/public/LandingPage")));
+const LegalHub = Loadable(lazyWithRetry(() => import("./pages/public/LegalHub")));
 
 // ── Protected Pages (lazy) ────────────────────────────────────────────────────
 const Home = Loadable(lazyWithRetry(() => import("./pages/protected/Home")));
@@ -56,6 +57,8 @@ const GiftShopDetailPage = Loadable(lazyWithRetry(() => import("./pages/protecte
 const DealsPage = Loadable(lazyWithRetry(() => import("./pages/protected/Deals")));
 const AdminDealsPage = Loadable(lazyWithRetry(() => import("./pages/protected/AdminDeals")));
 const Rides = Loadable(lazyWithRetry(() => import("./pages/protected/Ridespage")));
+const Photography = Loadable(lazyWithRetry(() => import("./pages/protected/Photography")));
+const BikeRentals = Loadable(lazyWithRetry(() => import("./pages/protected/BikeRentals")));
 
 // ── Role-specific Pages (lazy) ────────────────────────────────────────────────
 const AdminHome = Loadable(lazyWithRetry(() => import("./pages/protected/AdminHome")));
@@ -88,6 +91,14 @@ export const router = createBrowserRouter([
   {
     path: "/unauthorized",
     Component: Unauthorized,
+  },
+  {
+    path: "/privacy-policy",
+    Component: LegalHub,
+  },
+  {
+    path: "/terms-and-conditions",
+    Component: LegalHub,
   },
 
   // Protected Routes - Requires Authentication (Any Role)
@@ -162,6 +173,18 @@ export const router = createBrowserRouter([
         path: "/gifts/:id",
         Component: GiftShopDetailPage,
       },
+      {
+        path: "/deals",
+        Component: DealsPage,
+      },
+      {
+        path: "/photography",
+        Component: Photography,
+      },
+      {
+        path: "/bike-rentals",
+        Component: BikeRentals,
+      },
     ]
   },
 
@@ -169,10 +192,6 @@ export const router = createBrowserRouter([
   {
     element: <ProtectedRoute allowedRoles={["Student"]} />,
     children: [
-      {
-        path: "/deals",
-        Component: DealsPage,
-      },
       {
         path: "/rides",
         Component: Rides,

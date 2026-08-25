@@ -6,6 +6,8 @@ import {
   getAdminDeals,
   approveDeal,
   rejectDeal,
+  deleteDeal,
+  DealResponseDto,
 } from '../../api/services/dealsApi';
 
 export const DEAL_QUERY_KEYS = {
@@ -17,15 +19,24 @@ export const DEAL_QUERY_KEYS = {
 export const useApprovedDeals = () => {
   return useQuery({
     queryKey: DEAL_QUERY_KEYS.approved,
-    queryFn: getApprovedDeals,
+    queryFn: async () => {
+      const data = await getApprovedDeals();
+      localStorage.setItem('nearu_cached_approved_deals', JSON.stringify(data));
+      return data;
+    },
+    initialData: (): DealResponseDto[] | undefined => {
+      const cached = localStorage.getItem('nearu_cached_approved_deals');
+      return cached ? (JSON.parse(cached) as DealResponseDto[]) : undefined;
+    },
     staleTime: 60 * 1000,
   });
 };
 
-export const useMyDeals = () => {
+export const useMyDeals = (options?: { enabled?: boolean }) => {
   return useQuery({
     queryKey: DEAL_QUERY_KEYS.mine,
     queryFn: getMyDeals,
+    ...options,
   });
 };
 
@@ -61,6 +72,16 @@ export const useRejectDeal = () => {
   return useMutation({
     mutationFn: ({ dealId, reason }: { dealId: string; reason?: string }) =>
       rejectDeal(dealId, reason),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['deals'] });
+    },
+  });
+};
+
+export const useDeleteDeal = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (dealId: string) => deleteDeal(dealId),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['deals'] });
     },

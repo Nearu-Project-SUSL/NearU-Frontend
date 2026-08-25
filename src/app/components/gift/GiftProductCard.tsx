@@ -41,13 +41,13 @@ export default function GiftProductCard({
       <Card
         elevation={0}
         sx={{
-          bgcolor: "rgba(255,255,255,0.02)",
+          bgcolor: "var(--bg-surface)",
           borderRadius: "20px",
-          border: "1px solid rgba(255,255,255,0.05)",
+          border: "1px solid var(--nearu-border)",
           overflow: "hidden",
           transition: "all 0.3s ease",
           transform: hovered ? "translateY(-4px)" : "translateY(0)",
-          boxShadow: hovered ? "0 12px 30px rgba(0,0,0,0.3)" : "none",
+          boxShadow: hovered ? "0 12px 30px var(--nearu-accent-subtle)" : "none",
         }}
       >
         <CardActionArea
@@ -95,7 +95,7 @@ export default function GiftProductCard({
             <Box>
               <Typography
                 variant="body1"
-                sx={{ color: "#fff", fontWeight: 700, mb: 0.5, fontSize: "1rem" }}
+                sx={{ color: "var(--text-primary)", fontWeight: 700, mb: 0.5, fontSize: "1rem" }}
               >
                 {item.name}
               </Typography>

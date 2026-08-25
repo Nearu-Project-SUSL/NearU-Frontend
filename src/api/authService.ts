@@ -1,4 +1,4 @@
-import axios from './axios';
+import axios, { axiosPrivate } from './axios';
 
 // Backend ApiResponse wrapper interface
 export interface ApiResponse<T> {
@@ -156,7 +156,8 @@ const authService = {
         role: 'Business',
         businessName: data.businessName,  
         businessType: data.businessType,   
-        ownerName: data.ownerName          
+        ownerName: data.ownerName,
+        description: data.description,    // ← was silently dropped before
     });
     
     // Extract from ApiResponse wrapper
@@ -201,12 +202,16 @@ const authService = {
   },
 
   changePassword: async (data: ChangePasswordData): Promise<{ message: string }> => {
-    const response = await axios.post<ApiResponse<any>>('/auth/change-password', data);
+    const response = await axiosPrivate.post<ApiResponse<any>>('/auth/change-password', data);
     return { message: response.data.message };
   },
 
   logout: async (refreshToken: string): Promise<void> => {
-    await axios.post('/auth/logout', { refreshToken });
+    await axiosPrivate.post('/auth/logout', { refreshToken });
+  },
+
+  logoutAll: async (): Promise<void> => {
+    await axiosPrivate.post('/auth/logout-all');
   },
 };
 

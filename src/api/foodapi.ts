@@ -83,12 +83,12 @@ export async function addMenuItem(
   formData.append("price", String(data.price));
   if (data.photo) formData.append("photo", data.photo);
 
-  const response = await axios.post<MenuItemResponse>(`/foodshops/${shopId}/menuItems`, formData);
+  const response = await axiosPrivate.post<MenuItemResponse>(`/foodshops/${shopId}/menuItems`, formData);
   return response.data;
 }
 
 export async function deleteMenuItem(shopId: string, itemId: string): Promise<void> {
-  await axios.delete(`/foodshops/${shopId}/menuItems/${itemId}`);
+  await axiosPrivate.delete(`/foodshops/${shopId}/menuItems/${itemId}`);
 }
 
 console.log('BASE URL:', axios.defaults.baseURL);
@@ -109,7 +109,7 @@ export async function updateMenuItem(
   if (data.price !== undefined) formData.append('price', String(data.price));
   if (data.photo) formData.append('photo', data.photo);
 
-  const response = await axios.put<MenuItemResponse>(`/foodshops/${shopId}/menuItems/${itemId}`, formData);
+  const response = await axiosPrivate.put<MenuItemResponse>(`/foodshops/${shopId}/menuItems/${itemId}`, formData);
   return response.data;
 }
 

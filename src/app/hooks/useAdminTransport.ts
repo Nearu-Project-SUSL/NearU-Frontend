@@ -7,7 +7,7 @@ import {
   TrainRoute,
   TransportBooking,
   TransportAnalyticsSummary
-} from '../../types/adminTransport';
+} from '../../types/transport';
 
 const useAdminTransport = () => {
   const axiosPrivate = useAxiosPrivate();
